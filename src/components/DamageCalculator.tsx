@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import type { MonsterBase, Element, AttackType } from "../types/game";
+import { usePersistedState } from "../hooks/usePersistedState";
 import { scaleMonster } from "../utils/monsterScaling";
 import {
   calcPhysicalDamage,
@@ -34,19 +35,19 @@ export function DamageCalculator() {
   const [selectedMonster, setSelectedMonster] = useState<MonsterBase | null>(null);
   const [monsterLevel, setMonsterLevel] = useState<number>(1);
 
-  // 自キャラ ステータス
-  const [myAtk, setMyAtk] = useState("");
-  const [myInt, setMyInt] = useState("");
-  const [myDef, setMyDef] = useState("");
-  const [myMdef, setMyMdef] = useState("");
-  const [mySpd, setMySpd] = useState("");
-  const [myElement, setMyElement] = useState<Element>("火");
-  const [myAttackMode, setMyAttackMode] = useState<PlayerAttackMode>("物理");
-  const [analysisBook, setAnalysisBook] = useState("");
-  const [analysisAnalysisBook, setAnalysisAnalysisBook] = useState("");
+  // 自キャラ ステータス（localStorage永続化）
+  const [myAtk, setMyAtk] = usePersistedState("dmg:atk", "");
+  const [myInt, setMyInt] = usePersistedState("dmg:int", "");
+  const [myDef, setMyDef] = usePersistedState("dmg:def", "");
+  const [myMdef, setMyMdef] = usePersistedState("dmg:mdef", "");
+  const [mySpd, setMySpd] = usePersistedState("dmg:spd", "");
+  const [myElement, setMyElement] = usePersistedState<Element>("dmg:element", "火");
+  const [myAttackMode, setMyAttackMode] = usePersistedState<PlayerAttackMode>("dmg:attackMode", "物理");
+  const [analysisBook, setAnalysisBook] = usePersistedState("dmg:analysisBook", "");
+  const [analysisAnalysisBook, setAnalysisAnalysisBook] = usePersistedState("dmg:analysisAnalysisBook", "");
 
   // 目標ターン数
-  const [targetTurns, setTargetTurns] = useState("1");
+  const [targetTurns, setTargetTurns] = usePersistedState("dmg:targetTurns", "1");
 
   const myAtkNum = parseInt(myAtk) || 0;
   const myIntNum = parseInt(myInt) || 0;

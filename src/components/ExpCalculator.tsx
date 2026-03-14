@@ -7,6 +7,7 @@ import {
   calcTimeForExp,
   type MonsterExpEntry,
 } from "../utils/expCalc";
+import { usePersistedState } from "../hooks/usePersistedState";
 import { InputField } from "./ui/InputField";
 import { StatCard } from "./ui/StatCard";
 import { MonsterSelector } from "./ui/MonsterSelector";
@@ -22,9 +23,9 @@ let nextId = 1;
 
 export function ExpCalculator() {
   const [monsterRows, setMonsterRows] = useState<MonsterRow[]>([]);
-  const [secondsPerRun, setSecondsPerRun] = useState("60");
-  const [expBonus, setExpBonus] = useState("0");
-  const [remainingExp, setRemainingExp] = useState("");
+  const [secondsPerRun, setSecondsPerRun] = usePersistedState("exp:seconds", "60");
+  const [expBonus, setExpBonus] = usePersistedState("exp:bonus", "0");
+  const [remainingExp, setRemainingExp] = usePersistedState("exp:remaining", "");
 
   const [pendingMonster, setPendingMonster] = useState<MonsterBase | null>(null);
   const [pendingLevel, setPendingLevel] = useState<number>(1);

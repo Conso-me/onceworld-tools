@@ -30,11 +30,17 @@ function App() {
         </div>
       </header>
 
-      {/* メインコンテンツ */}
+      {/* メインコンテンツ - 全タブを常にマウントし、非アクティブはCSSで隠す */}
       <main className="max-w-3xl mx-auto px-4 py-8">
-        {activeTab === "damage" && <DamageCalculator />}
-        {activeTab === "exp" && <ExpCalculator />}
-        {activeTab === "gold" && <GoldCalculator />}
+        <div className={activeTab === "damage" ? "" : "hidden"}>
+          <DamageCalculator />
+        </div>
+        <div className={activeTab === "exp" ? "" : "hidden"}>
+          <ExpCalculator />
+        </div>
+        <div className={activeTab === "gold" ? "" : "hidden"}>
+          <GoldCalculator />
+        </div>
       </main>
 
       {/* フッター */}

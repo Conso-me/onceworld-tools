@@ -5,6 +5,7 @@ import {
   calcGoldPerHour,
   type MonsterGoldEntry,
 } from "../utils/goldCalc";
+import { usePersistedState } from "../hooks/usePersistedState";
 import { InputField } from "./ui/InputField";
 import { StatCard } from "./ui/StatCard";
 import { MonsterSelector } from "./ui/MonsterSelector";
@@ -19,8 +20,8 @@ let nextId = 1;
 
 export function GoldCalculator() {
   const [monsterRows, setMonsterRows] = useState<MonsterRow[]>([]);
-  const [secondsPerRun, setSecondsPerRun] = useState("60");
-  const [goldBonus, setGoldBonus] = useState("0");
+  const [secondsPerRun, setSecondsPerRun] = usePersistedState("gold:seconds", "60");
+  const [goldBonus, setGoldBonus] = usePersistedState("gold:bonus", "0");
 
   const [pendingMonster, setPendingMonster] = useState<MonsterBase | null>(null);
   const [pendingCount, setPendingCount] = useState("1");
