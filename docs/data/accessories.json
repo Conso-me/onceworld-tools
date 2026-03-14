@@ -1,0 +1,174 @@
+[
+  {
+    "name": "命脈の科学式",
+    "effects": [
+      { "type": "VIT", "value": 155, "scalePercent": 10 }
+    ]
+  },
+  {
+    "name": "鼓動核",
+    "effects": [
+      { "type": "VIT%", "value": 15, "scalePercent": 1 }
+    ]
+  },
+  {
+    "name": "ウィンドクレスト",
+    "effects": [
+      { "type": "SPD", "value": 135, "scalePercent": 10 }
+    ]
+  },
+  {
+    "name": "閃牙星",
+    "effects": [
+      { "type": "SPD%", "value": 15, "scalePercent": 1 }
+    ]
+  },
+  {
+    "name": "ブラッドトニック",
+    "effects": [
+      { "type": "ATK", "value": 90, "scalePercent": 10 },
+      { "type": "ATK%", "value": 5, "scalePercent": 1 }
+    ]
+  },
+  {
+    "name": "力瓶",
+    "effects": [
+      { "type": "ATK%", "value": 20, "scalePercent": 1 }
+    ]
+  },
+  {
+    "name": "アークグリモワール",
+    "effects": [
+      { "type": "INT", "value": 30, "scalePercent": 10 },
+      { "type": "INT%", "value": 25, "scalePercent": 1 }
+    ]
+  },
+  {
+    "name": "創胎珠",
+    "effects": [
+      { "type": "INT%", "value": 20, "scalePercent": 1 }
+    ]
+  },
+  {
+    "name": "フォースモジュール",
+    "effects": [
+      { "type": "DEF", "value": 80, "scalePercent": 10 },
+      { "type": "M-DEF", "value": 90, "scalePercent": 10 }
+    ]
+  },
+  {
+    "name": "騎士の心得",
+    "effects": [
+      { "type": "DEF%", "value": 15, "scalePercent": 1 }
+    ]
+  },
+  {
+    "name": "迷盾陣",
+    "effects": [
+      { "type": "DEF%", "value": 50, "scalePercent": 1 }
+    ]
+  },
+  {
+    "name": "マギバインド",
+    "effects": [
+      { "type": "M-DEF%", "value": 25, "scalePercent": 1 }
+    ]
+  },
+  {
+    "name": "結界嵐",
+    "effects": [
+      { "type": "M-DEF%", "value": 15, "scalePercent": 1 }
+    ]
+  },
+  {
+    "name": "ヘキサスカル",
+    "effects": [
+      { "type": "M-DEF%", "value": 50, "scalePercent": 1 }
+    ]
+  },
+  {
+    "name": "ラッキートランプ",
+    "effects": [
+      { "type": "LUCK", "value": 99, "scalePercent": 10 },
+      { "type": "LUCK%", "value": 15, "scalePercent": 1 }
+    ]
+  },
+  {
+    "name": "運命眼",
+    "effects": [
+      { "type": "LUCK%", "value": 25, "scalePercent": 1 }
+    ]
+  },
+  {
+    "name": "ギャロップタリスマン",
+    "effects": [
+      { "type": "MOV", "value": 2, "scalePercent": 0 }
+    ]
+  },
+  {
+    "name": "慈縛心",
+    "effects": [
+      { "type": "HP回復", "value": 100, "scalePercent": 20 }
+    ]
+  },
+  {
+    "name": "メモリアルページ",
+    "effects": [
+      { "type": "経験値", "value": 30, "scalePercent": 1 }
+    ]
+  },
+  {
+    "name": "賢者の盃",
+    "effects": [
+      { "type": "経験値", "value": 50, "scalePercent": 1 }
+    ]
+  },
+  {
+    "name": "エクスペディアコンパス",
+    "effects": [
+      { "type": "経験値", "value": 100, "scalePercent": 1 }
+    ]
+  },
+  {
+    "name": "知耀杯",
+    "effects": [
+      { "type": "経験値", "value": 180, "scalePercent": 1 }
+    ]
+  },
+  {
+    "name": "テイムマスク",
+    "effects": [
+      { "type": "捕獲率", "value": 30, "scalePercent": 1 }
+    ]
+  },
+  {
+    "name": "魅誘盃",
+    "effects": [
+      { "type": "捕獲率", "value": 50, "scalePercent": 1 }
+    ]
+  },
+  {
+    "name": "コンタクトレター",
+    "effects": [
+      { "type": "捕獲率", "value": 80, "scalePercent": 1 }
+    ]
+  },
+  {
+    "name": "拘魂鎖",
+    "effects": [
+      { "type": "捕獲率", "value": 100, "scalePercent": 1 }
+    ]
+  },
+  {
+    "name": "オービタルリング",
+    "effects": [
+      { "type": "ドロップ率", "value": 30, "scalePercent": 1 }
+    ]
+  },
+  {
+    "name": "収索機",
+    "effects": [
+      { "type": "ドロップ率", "value": 50, "scalePercent": 1 }
+    ]
+  }
+]

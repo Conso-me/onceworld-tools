@@ -1,0 +1,2677 @@
+[
+  {
+    "name": "グリーンスライム",
+    "skills": [
+      {
+        "level": 31,
+        "type": "VIT",
+        "value": 140
+      },
+      {
+        "level": 71,
+        "type": "VIT",
+        "value": 140
+      },
+      {
+        "level": 121,
+        "type": "VIT",
+        "value": 140
+      },
+      {
+        "level": 181,
+        "type": "最終VIT%",
+        "value": 35
+      }
+    ]
+  },
+  {
+    "name": "レッドゴブリン",
+    "skills": [
+      {
+        "level": 31,
+        "type": "ATK",
+        "value": 115
+      },
+      {
+        "level": 71,
+        "type": "ATK",
+        "value": 315
+      },
+      {
+        "level": 121,
+        "type": "ATK%",
+        "value": 5
+      },
+      {
+        "level": 181,
+        "type": "ATK%",
+        "value": 25
+      }
+    ]
+  },
+  {
+    "name": "ゴブリンメイジ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "INT",
+        "value": 95
+      },
+      {
+        "level": 71,
+        "type": "INT%",
+        "value": 5
+      },
+      {
+        "level": 121,
+        "type": "M-DEF",
+        "value": 220
+      },
+      {
+        "level": 181,
+        "type": "M-DEF%",
+        "value": 25
+      }
+    ]
+  },
+  {
+    "name": "クリーチャーローズ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "経験値",
+        "value": 50
+      },
+      {
+        "level": 71,
+        "type": "経験値",
+        "value": 50
+      },
+      {
+        "level": 121,
+        "type": "経験値",
+        "value": 50
+      },
+      {
+        "level": 181,
+        "type": "経験値",
+        "value": 100
+      }
+    ]
+  },
+  {
+    "name": "キメラタートル",
+    "skills": [
+      {
+        "level": 31,
+        "type": "DEF",
+        "value": 25
+      },
+      {
+        "level": 71,
+        "type": "M-DEF",
+        "value": 300
+      },
+      {
+        "level": 121,
+        "type": "VIT",
+        "value": 450
+      },
+      {
+        "level": 181,
+        "type": "VIT",
+        "value": 1250
+      }
+    ]
+  },
+  {
+    "name": "鉄罠花",
+    "skills": [
+      {
+        "level": 31,
+        "type": "M-DEF%",
+        "value": 5
+      },
+      {
+        "level": 71,
+        "type": "M-DEF%",
+        "value": 5
+      },
+      {
+        "level": 121,
+        "type": "M-DEF%",
+        "value": 5
+      },
+      {
+        "level": 181,
+        "type": "M-DEF%",
+        "value": 20
+      }
+    ]
+  },
+  {
+    "name": "ペンギンソルジャー",
+    "skills": [
+      {
+        "level": 31,
+        "type": "SPD",
+        "value": 25
+      },
+      {
+        "level": 71,
+        "type": "SPD",
+        "value": 325
+      },
+      {
+        "level": 121,
+        "type": "SPD%",
+        "value": 5
+      },
+      {
+        "level": 181,
+        "type": "SPD%",
+        "value": 25
+      }
+    ]
+  },
+  {
+    "name": "ハネスライム",
+    "skills": [
+      {
+        "level": 31,
+        "type": "MOV",
+        "value": 3
+      },
+      {
+        "level": 71,
+        "type": "SPD",
+        "value": 220
+      },
+      {
+        "level": 121,
+        "type": "SPD",
+        "value": 320
+      },
+      {
+        "level": 181,
+        "type": "SPD",
+        "value": 1920
+      }
+    ]
+  },
+  {
+    "name": "ボスゴブリン",
+    "skills": [
+      {
+        "level": 31,
+        "type": "ATK",
+        "value": 280
+      },
+      {
+        "level": 71,
+        "type": "VIT",
+        "value": 280
+      },
+      {
+        "level": 121,
+        "type": "DEF",
+        "value": 280
+      },
+      {
+        "level": 181,
+        "type": "LUCK",
+        "value": 980
+      }
+    ]
+  },
+  {
+    "name": "ギガントオーク",
+    "skills": [
+      {
+        "level": 31,
+        "type": "VIT%",
+        "value": 5
+      },
+      {
+        "level": 71,
+        "type": "VIT%",
+        "value": 5
+      },
+      {
+        "level": 121,
+        "type": "防御%",
+        "value": 5
+      },
+      {
+        "level": 181,
+        "type": "防御%",
+        "value": 30
+      }
+    ]
+  },
+  {
+    "name": "古代魚　ザコーン",
+    "skills": [
+      {
+        "level": 31,
+        "type": "最終VIT%",
+        "value": 5
+      },
+      {
+        "level": 71,
+        "type": "最終VIT%",
+        "value": 5
+      },
+      {
+        "level": 121,
+        "type": "最終VIT%",
+        "value": 20
+      },
+      {
+        "level": 181,
+        "type": "最終VIT%",
+        "value": 20
+      }
+    ]
+  },
+  {
+    "name": "禁域のラミア",
+    "skills": [
+      {
+        "level": 31,
+        "type": "経験値",
+        "value": 30
+      },
+      {
+        "level": 71,
+        "type": "経験値",
+        "value": 40
+      },
+      {
+        "level": 121,
+        "type": "経験値",
+        "value": 80
+      },
+      {
+        "level": 181,
+        "type": "経験値",
+        "value": 110
+      }
+    ]
+  },
+  {
+    "name": "マッドガエル",
+    "skills": [
+      {
+        "level": 31,
+        "type": "SPD",
+        "value": 145
+      },
+      {
+        "level": 71,
+        "type": "SPD",
+        "value": 145
+      },
+      {
+        "level": 121,
+        "type": "捕獲率",
+        "value": 35
+      },
+      {
+        "level": 181,
+        "type": "捕獲率",
+        "value": 65
+      }
+    ]
+  },
+  {
+    "name": "ダークメイジ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "INT",
+        "value": 75
+      },
+      {
+        "level": 71,
+        "type": "INT",
+        "value": 275
+      },
+      {
+        "level": 121,
+        "type": "INT%",
+        "value": 5
+      },
+      {
+        "level": 181,
+        "type": "INT%",
+        "value": 30
+      }
+    ]
+  },
+  {
+    "name": "アリクイロード",
+    "skills": [
+      {
+        "level": 31,
+        "type": "ATK",
+        "value": 85
+      },
+      {
+        "level": 71,
+        "type": "LUCK",
+        "value": 250
+      },
+      {
+        "level": 121,
+        "type": "LUCK%",
+        "value": 10
+      },
+      {
+        "level": 181,
+        "type": "M-DEF%",
+        "value": 20
+      }
+    ]
+  },
+  {
+    "name": "原始蝶",
+    "skills": [
+      {
+        "level": 31,
+        "type": "HP回復",
+        "value": 75
+      },
+      {
+        "level": 71,
+        "type": "HP回復",
+        "value": 225
+      },
+      {
+        "level": 121,
+        "type": "HP回復",
+        "value": 700
+      },
+      {
+        "level": 181,
+        "type": "HP回復",
+        "value": 2000
+      }
+    ]
+  },
+  {
+    "name": "動く墓",
+    "skills": [
+      {
+        "level": 31,
+        "type": "VIT%",
+        "value": 10
+      },
+      {
+        "level": 71,
+        "type": "VIT%",
+        "value": 10
+      },
+      {
+        "level": 121,
+        "type": "VIT",
+        "value": 350
+      },
+      {
+        "level": 181,
+        "type": "VIT",
+        "value": 1450
+      }
+    ]
+  },
+  {
+    "name": "オルトロス",
+    "skills": [
+      {
+        "level": 31,
+        "type": "ATK",
+        "value": 345
+      },
+      {
+        "level": 71,
+        "type": "ATK%",
+        "value": 15
+      },
+      {
+        "level": 121,
+        "type": "VIT%",
+        "value": 5
+      },
+      {
+        "level": 181,
+        "type": "VIT%",
+        "value": 25
+      }
+    ]
+  },
+  {
+    "name": "雪だるまん",
+    "skills": [
+      {
+        "level": 31,
+        "type": "経験値",
+        "value": 75
+      },
+      {
+        "level": 71,
+        "type": "SPD",
+        "value": 200
+      },
+      {
+        "level": 121,
+        "type": "経験値",
+        "value": 75
+      },
+      {
+        "level": 181,
+        "type": "SPD",
+        "value": 1500
+      }
+    ]
+  },
+  {
+    "name": "シカファイター",
+    "skills": [
+      {
+        "level": 31,
+        "type": "LUCK",
+        "value": 70
+      },
+      {
+        "level": 71,
+        "type": "LUCK",
+        "value": 370
+      },
+      {
+        "level": 121,
+        "type": "INT",
+        "value": 500
+      },
+      {
+        "level": 181,
+        "type": "INT",
+        "value": 900
+      }
+    ]
+  },
+  {
+    "name": "ペンギンロード",
+    "skills": [
+      {
+        "level": 31,
+        "type": "ATK%",
+        "value": 10
+      },
+      {
+        "level": 71,
+        "type": "ATK%",
+        "value": 10
+      },
+      {
+        "level": 121,
+        "type": "ATK%",
+        "value": 10
+      },
+      {
+        "level": 181,
+        "type": "ATK%",
+        "value": 10
+      }
+    ]
+  },
+  {
+    "name": "パンダ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "ATK%",
+        "value": 10
+      },
+      {
+        "level": 71,
+        "type": "DEF%",
+        "value": 10
+      },
+      {
+        "level": 121,
+        "type": "ATK",
+        "value": 420
+      },
+      {
+        "level": 181,
+        "type": "DEF",
+        "value": 1920
+      }
+    ]
+  },
+  {
+    "name": "ファントムツリー",
+    "skills": [
+      {
+        "level": 31,
+        "type": "DEF",
+        "value": 70
+      },
+      {
+        "level": 71,
+        "type": "M-DEF",
+        "value": 270
+      },
+      {
+        "level": 121,
+        "type": "DEF%",
+        "value": 10
+      },
+      {
+        "level": 181,
+        "type": "M-DEF%",
+        "value": 15
+      }
+    ]
+  },
+  {
+    "name": "スノーモケラ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "VIT",
+        "value": 500
+      },
+      {
+        "level": 71,
+        "type": "VIT",
+        "value": 500
+      },
+      {
+        "level": 121,
+        "type": "INT%",
+        "value": 20
+      },
+      {
+        "level": 181,
+        "type": "M-DEF%",
+        "value": 20
+      }
+    ]
+  },
+  {
+    "name": "零の者",
+    "skills": [
+      {
+        "level": 31,
+        "type": "最終INT%",
+        "value": 5
+      },
+      {
+        "level": 71,
+        "type": "最終INT%",
+        "value": 5
+      },
+      {
+        "level": 121,
+        "type": "最終INT%",
+        "value": 15
+      },
+      {
+        "level": 181,
+        "type": "最終INT%",
+        "value": 25
+      }
+    ]
+  },
+  {
+    "name": "禁域の巨木",
+    "skills": [
+      {
+        "level": 31,
+        "type": "VIT%",
+        "value": 20
+      },
+      {
+        "level": 71,
+        "type": "VIT%",
+        "value": 20
+      },
+      {
+        "level": 121,
+        "type": "VIT%",
+        "value": 20
+      },
+      {
+        "level": 181,
+        "type": "VIT%",
+        "value": 40
+      }
+    ]
+  },
+  {
+    "name": "ゴブリン特攻隊",
+    "skills": [
+      {
+        "level": 31,
+        "type": "ATK%",
+        "value": 10
+      },
+      {
+        "level": 71,
+        "type": "VIT",
+        "value": 360
+      },
+      {
+        "level": 121,
+        "type": "ATK%",
+        "value": 10
+      },
+      {
+        "level": 181,
+        "type": "VIT",
+        "value": 960
+      }
+    ]
+  },
+  {
+    "name": "ゴブリンクルー",
+    "skills": [
+      {
+        "level": 31,
+        "type": "VIT",
+        "value": 30
+      },
+      {
+        "level": 71,
+        "type": "LUCK",
+        "value": 30
+      },
+      {
+        "level": 121,
+        "type": "LUCK%",
+        "value": 15
+      },
+      {
+        "level": 181,
+        "type": "VIT%",
+        "value": 35
+      }
+    ]
+  },
+  {
+    "name": "紅サソリ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "LUCK",
+        "value": 110
+      },
+      {
+        "level": 71,
+        "type": "LUCK%",
+        "value": 25
+      },
+      {
+        "level": 121,
+        "type": "最終LUCK%",
+        "value": 1
+      },
+      {
+        "level": 181,
+        "type": "最終LUCK%",
+        "value": 9
+      }
+    ]
+  },
+  {
+    "name": "死戦士マミー",
+    "skills": [
+      {
+        "level": 31,
+        "type": "M-DEF%",
+        "value": 50
+      },
+      {
+        "level": 71,
+        "type": "M-DEF",
+        "value": 100
+      },
+      {
+        "level": 121,
+        "type": "M-DEF",
+        "value": 100
+      },
+      {
+        "level": 181,
+        "type": "M-DEF",
+        "value": 1000
+      }
+    ]
+  },
+  {
+    "name": "アヌビス",
+    "skills": [
+      {
+        "level": 31,
+        "type": "HP回復",
+        "value": 300
+      },
+      {
+        "level": 71,
+        "type": "HP回復",
+        "value": 300
+      },
+      {
+        "level": 121,
+        "type": "HP回復",
+        "value": 1000
+      },
+      {
+        "level": 181,
+        "type": "HP回復",
+        "value": 1000
+      }
+    ]
+  },
+  {
+    "name": "ファイヤーメイジ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "SPD%",
+        "value": 10
+      },
+      {
+        "level": 71,
+        "type": "SPD",
+        "value": 330
+      },
+      {
+        "level": 121,
+        "type": "SPD%",
+        "value": 15
+      },
+      {
+        "level": 181,
+        "type": "SPD",
+        "value": 550
+      }
+    ]
+  },
+  {
+    "name": "エジプトアシュラ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "DEF",
+        "value": 50
+      },
+      {
+        "level": 71,
+        "type": "DEF%",
+        "value": 9
+      },
+      {
+        "level": 121,
+        "type": "DEF%",
+        "value": 11
+      },
+      {
+        "level": 181,
+        "type": "DEF",
+        "value": 760
+      }
+    ]
+  },
+  {
+    "name": "デザートイッヌ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "ATK%",
+        "value": 25
+      },
+      {
+        "level": 71,
+        "type": "SPD",
+        "value": 200
+      },
+      {
+        "level": 121,
+        "type": "SPD",
+        "value": 200
+      },
+      {
+        "level": 181,
+        "type": "SPD",
+        "value": 2000
+      }
+    ]
+  },
+  {
+    "name": "不思議なツボ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "ドロップ率",
+        "value": 20
+      },
+      {
+        "level": 71,
+        "type": "ドロップ率",
+        "value": 25
+      },
+      {
+        "level": 121,
+        "type": "ドロップ率",
+        "value": 35
+      },
+      {
+        "level": 181,
+        "type": "ドロップ率",
+        "value": 70
+      }
+    ]
+  },
+  {
+    "name": "天狗",
+    "skills": [
+      {
+        "level": 31,
+        "type": "LUCK%",
+        "value": 15
+      },
+      {
+        "level": 71,
+        "type": "LUCK%",
+        "value": 5
+      },
+      {
+        "level": 121,
+        "type": "最終LUCK%",
+        "value": 3
+      },
+      {
+        "level": 181,
+        "type": "最終LUCK%",
+        "value": 17
+      }
+    ]
+  },
+  {
+    "name": "ランプの精霊",
+    "skills": [
+      {
+        "level": 31,
+        "type": "捕獲率",
+        "value": 15
+      },
+      {
+        "level": 71,
+        "type": "捕獲率",
+        "value": 15
+      },
+      {
+        "level": 121,
+        "type": "捕獲率",
+        "value": 30
+      },
+      {
+        "level": 181,
+        "type": "捕獲率",
+        "value": 60
+      }
+    ]
+  },
+  {
+    "name": "邪黒竜",
+    "skills": [
+      {
+        "level": 31,
+        "type": "ATK",
+        "value": 225
+      },
+      {
+        "level": 71,
+        "type": "ATK",
+        "value": 225
+      },
+      {
+        "level": 121,
+        "type": "ATK",
+        "value": 525
+      },
+      {
+        "level": 181,
+        "type": "ATK",
+        "value": 1025
+      }
+    ]
+  },
+  {
+    "name": "捧げし者",
+    "skills": [
+      {
+        "level": 31,
+        "type": "LUCK",
+        "value": 1
+      },
+      {
+        "level": 71,
+        "type": "LUCK",
+        "value": 1
+      },
+      {
+        "level": 121,
+        "type": "LUCK",
+        "value": 1
+      },
+      {
+        "level": 181,
+        "type": "LUCK%",
+        "value": 77
+      }
+    ]
+  },
+  {
+    "name": "黎明神トモダチ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "最終LUCK%",
+        "value": 10
+      },
+      {
+        "level": 71,
+        "type": "最終LUCK%",
+        "value": 10
+      },
+      {
+        "level": 121,
+        "type": "最終LUCK%",
+        "value": 15
+      },
+      {
+        "level": 181,
+        "type": "最終LUCK%",
+        "value": 20
+      }
+    ]
+  },
+  {
+    "name": "禁域のアヌビシュ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "捕獲率",
+        "value": 50
+      },
+      {
+        "level": 71,
+        "type": "捕獲率",
+        "value": 50
+      },
+      {
+        "level": 121,
+        "type": "捕獲率",
+        "value": 50
+      },
+      {
+        "level": 181,
+        "type": "捕獲率",
+        "value": 100
+      }
+    ]
+  },
+  {
+    "name": "居住者A",
+    "skills": [
+      {
+        "level": 31,
+        "type": "ATK",
+        "value": 190
+      },
+      {
+        "level": 71,
+        "type": "ATK",
+        "value": 190
+      },
+      {
+        "level": 121,
+        "type": "SPD",
+        "value": 330
+      },
+      {
+        "level": 181,
+        "type": "SPD%",
+        "value": 35
+      }
+    ]
+  },
+  {
+    "name": "居住者B",
+    "skills": [
+      {
+        "level": 31,
+        "type": "INT",
+        "value": 170
+      },
+      {
+        "level": 71,
+        "type": "INT",
+        "value": 170
+      },
+      {
+        "level": 121,
+        "type": "SPD",
+        "value": 300
+      },
+      {
+        "level": 181,
+        "type": "SPD%",
+        "value": 35
+      }
+    ]
+  },
+  {
+    "name": "ホネ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "DEF",
+        "value": 5
+      },
+      {
+        "level": 71,
+        "type": "DEF",
+        "value": 695
+      },
+      {
+        "level": 121,
+        "type": "ATK",
+        "value": 450
+      },
+      {
+        "level": 181,
+        "type": "ATK",
+        "value": 1500
+      }
+    ]
+  },
+  {
+    "name": "ボーンバトラー",
+    "skills": [
+      {
+        "level": 31,
+        "type": "M-DEF",
+        "value": 100
+      },
+      {
+        "level": 71,
+        "type": "M-DEF%",
+        "value": 15
+      },
+      {
+        "level": 121,
+        "type": "M-DEF%",
+        "value": 15
+      },
+      {
+        "level": 181,
+        "type": "M-DEF",
+        "value": 1880
+      }
+    ]
+  },
+  {
+    "name": "ダイコンに見えるダイコン",
+    "skills": [
+      {
+        "level": 31,
+        "type": "LUCK",
+        "value": 666
+      },
+      {
+        "level": 71,
+        "type": "LUCK",
+        "value": 666
+      },
+      {
+        "level": 121,
+        "type": "最終LUCK%",
+        "value": 5
+      },
+      {
+        "level": 181,
+        "type": "最終LUCK%",
+        "value": 5
+      }
+    ]
+  },
+  {
+    "name": "クリーチャーアイ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "SPD",
+        "value": 70
+      },
+      {
+        "level": 71,
+        "type": "SPD",
+        "value": 300
+      },
+      {
+        "level": 121,
+        "type": "DEF",
+        "value": 450
+      },
+      {
+        "level": 181,
+        "type": "DEF",
+        "value": 1450
+      }
+    ]
+  },
+  {
+    "name": "悪夢の石像",
+    "skills": [
+      {
+        "level": 31,
+        "type": "VIT",
+        "value": 355
+      },
+      {
+        "level": 71,
+        "type": "VIT%",
+        "value": 15
+      },
+      {
+        "level": 121,
+        "type": "VIT%",
+        "value": 15
+      },
+      {
+        "level": 181,
+        "type": "VIT%",
+        "value": 15
+      }
+    ]
+  },
+  {
+    "name": "スカルウィスプ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "ATK",
+        "value": 135
+      },
+      {
+        "level": 71,
+        "type": "SPD",
+        "value": 135
+      },
+      {
+        "level": 121,
+        "type": "ATK%",
+        "value": 20
+      },
+      {
+        "level": 181,
+        "type": "SPD%",
+        "value": 20
+      }
+    ]
+  },
+  {
+    "name": "フレイムフロッグ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "HP回復",
+        "value": 1000
+      },
+      {
+        "level": 71,
+        "type": "HP回復",
+        "value": 1000
+      },
+      {
+        "level": 121,
+        "type": "HP回復",
+        "value": 1000
+      },
+      {
+        "level": 181,
+        "type": "HP回復",
+        "value": 1000
+      }
+    ]
+  },
+  {
+    "name": "キメラキング",
+    "skills": [
+      {
+        "level": 31,
+        "type": "経験値",
+        "value": 98
+      },
+      {
+        "level": 71,
+        "type": "経験値",
+        "value": 1
+      },
+      {
+        "level": 121,
+        "type": "経験値",
+        "value": 1
+      },
+      {
+        "level": 181,
+        "type": "経験値",
+        "value": 150
+      }
+    ]
+  },
+  {
+    "name": "ネクロプリンセス",
+    "skills": [
+      {
+        "level": 31,
+        "type": "M-DEF%",
+        "value": 15
+      },
+      {
+        "level": 71,
+        "type": "M-DEF%",
+        "value": 25
+      },
+      {
+        "level": 121,
+        "type": "捕獲率",
+        "value": 35
+      },
+      {
+        "level": 181,
+        "type": "捕獲率",
+        "value": 35
+      }
+    ]
+  },
+  {
+    "name": "朽ちざる竜骸イゾ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "最終ATK%",
+        "value": 1
+      },
+      {
+        "level": 71,
+        "type": "最終ATK%",
+        "value": 1
+      },
+      {
+        "level": 121,
+        "type": "最終ATK%",
+        "value": 1
+      },
+      {
+        "level": 181,
+        "type": "最終ATK%",
+        "value": 57
+      }
+    ]
+  },
+  {
+    "name": "禁域のクマヌイ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "DEF",
+        "value": 2000
+      },
+      {
+        "level": 71,
+        "type": "M-DEF",
+        "value": 2000
+      },
+      {
+        "level": 121,
+        "type": "DEF",
+        "value": 2000
+      },
+      {
+        "level": 181,
+        "type": "M-DEF",
+        "value": 2000
+      }
+    ]
+  },
+  {
+    "name": "烈火鼠",
+    "skills": [
+      {
+        "level": 31,
+        "type": "SPD",
+        "value": 80
+      },
+      {
+        "level": 71,
+        "type": "SPD",
+        "value": 280
+      },
+      {
+        "level": 121,
+        "type": "SPD%",
+        "value": 15
+      },
+      {
+        "level": 181,
+        "type": "SPD%",
+        "value": 35
+      }
+    ]
+  },
+  {
+    "name": "燃えてる何か",
+    "skills": [
+      {
+        "level": 31,
+        "type": "ATK",
+        "value": 140
+      },
+      {
+        "level": 71,
+        "type": "DEF",
+        "value": 240
+      },
+      {
+        "level": 121,
+        "type": "ATK%",
+        "value": 15
+      },
+      {
+        "level": 181,
+        "type": "DEF%",
+        "value": 30
+      }
+    ]
+  },
+  {
+    "name": "焼トリ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "経験値",
+        "value": 50
+      },
+      {
+        "level": 71,
+        "type": "捕獲率",
+        "value": 50
+      },
+      {
+        "level": 121,
+        "type": "ドロップ率",
+        "value": 50
+      },
+      {
+        "level": 181,
+        "type": "経験値",
+        "value": 150
+      }
+    ]
+  },
+  {
+    "name": "ウォーデン",
+    "skills": [
+      {
+        "level": 31,
+        "type": "ATK",
+        "value": 80
+      },
+      {
+        "level": 71,
+        "type": "ATK%",
+        "value": 25
+      },
+      {
+        "level": 121,
+        "type": "DEF",
+        "value": 600
+      },
+      {
+        "level": 181,
+        "type": "DEF%",
+        "value": 25
+      }
+    ]
+  },
+  {
+    "name": "バーニングロック",
+    "skills": [
+      {
+        "level": 31,
+        "type": "INT",
+        "value": 170
+      },
+      {
+        "level": 71,
+        "type": "INT%",
+        "value": 25
+      },
+      {
+        "level": 121,
+        "type": "M-DEF",
+        "value": 750
+      },
+      {
+        "level": 181,
+        "type": "M-DEF%",
+        "value": 25
+      }
+    ]
+  },
+  {
+    "name": "ケルベロス",
+    "skills": [
+      {
+        "level": 31,
+        "type": "DEF",
+        "value": 5
+      },
+      {
+        "level": 71,
+        "type": "DEF%",
+        "value": 30
+      },
+      {
+        "level": 121,
+        "type": "VIT",
+        "value": 5
+      },
+      {
+        "level": 181,
+        "type": "VIT%",
+        "value": 30
+      }
+    ]
+  },
+  {
+    "name": "ガチキメラ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "M-DEF",
+        "value": 500
+      },
+      {
+        "level": 71,
+        "type": "M-DEF",
+        "value": 700
+      },
+      {
+        "level": 121,
+        "type": "M-DEF",
+        "value": 900
+      },
+      {
+        "level": 181,
+        "type": "M-DEF",
+        "value": 1500
+      }
+    ]
+  },
+  {
+    "name": "フレイムボーン",
+    "skills": [
+      {
+        "level": 31,
+        "type": "LUCK%",
+        "value": 15
+      },
+      {
+        "level": 71,
+        "type": "LUCK%",
+        "value": 15
+      },
+      {
+        "level": 121,
+        "type": "SPD%",
+        "value": 15
+      },
+      {
+        "level": 181,
+        "type": "SPD%",
+        "value": 15
+      }
+    ]
+  },
+  {
+    "name": "炎鬼",
+    "skills": [
+      {
+        "level": 31,
+        "type": "INT",
+        "value": 75
+      },
+      {
+        "level": 71,
+        "type": "INT",
+        "value": 375
+      },
+      {
+        "level": 121,
+        "type": "VIT",
+        "value": 775
+      },
+      {
+        "level": 181,
+        "type": "VIT",
+        "value": 1325
+      }
+    ]
+  },
+  {
+    "name": "ブタ天使",
+    "skills": [
+      {
+        "level": 31,
+        "type": "経験値",
+        "value": 1
+      },
+      {
+        "level": 71,
+        "type": "経験値",
+        "value": 1
+      },
+      {
+        "level": 121,
+        "type": "経験値",
+        "value": 1
+      },
+      {
+        "level": 181,
+        "type": "経験値",
+        "value": 297
+      }
+    ]
+  },
+  {
+    "name": "エレファントパラディン",
+    "skills": [
+      {
+        "level": 31,
+        "type": "VIT",
+        "value": 700
+      },
+      {
+        "level": 71,
+        "type": "VIT%",
+        "value": 15
+      },
+      {
+        "level": 121,
+        "type": "VIT",
+        "value": 900
+      },
+      {
+        "level": 181,
+        "type": "VIT%",
+        "value": 45
+      }
+    ]
+  },
+  {
+    "name": "赫竜王",
+    "skills": [
+      {
+        "level": 31,
+        "type": "DEF%",
+        "value": 15
+      },
+      {
+        "level": 71,
+        "type": "DEF%",
+        "value": 15
+      },
+      {
+        "level": 121,
+        "type": "DEF%",
+        "value": 15
+      },
+      {
+        "level": 181,
+        "type": "DEF%",
+        "value": 45
+      }
+    ]
+  },
+  {
+    "name": "残燃モエコ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "最終SPD%",
+        "value": 10
+      },
+      {
+        "level": 71,
+        "type": "最終SPD%",
+        "value": 10
+      },
+      {
+        "level": 121,
+        "type": "最終SPD%",
+        "value": 15
+      },
+      {
+        "level": 181,
+        "type": "最終SPD%",
+        "value": 15
+      }
+    ]
+  },
+  {
+    "name": "禁域のヴァルネシア",
+    "skills": [
+      {
+        "level": 31,
+        "type": "ATK%",
+        "value": 15
+      },
+      {
+        "level": 71,
+        "type": "ATK%",
+        "value": 15
+      },
+      {
+        "level": 121,
+        "type": "ATK%",
+        "value": 15
+      },
+      {
+        "level": 181,
+        "type": "ATK%",
+        "value": 50
+      }
+    ]
+  },
+  {
+    "name": "カニクラブ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "DEF",
+        "value": 6000
+      },
+      {
+        "level": 71,
+        "type": "DEF",
+        "value": 1
+      },
+      {
+        "level": 121,
+        "type": "DEF",
+        "value": 1
+      },
+      {
+        "level": 181,
+        "type": "DEF",
+        "value": 30000
+      }
+    ]
+  },
+  {
+    "name": "ワニゲーター",
+    "skills": [
+      {
+        "level": 31,
+        "type": "ATK",
+        "value": 100
+      },
+      {
+        "level": 71,
+        "type": "ATK",
+        "value": 1000
+      },
+      {
+        "level": 121,
+        "type": "ATK",
+        "value": 5000
+      },
+      {
+        "level": 181,
+        "type": "ATK",
+        "value": 30000
+      }
+    ]
+  },
+  {
+    "name": "翡翠竜",
+    "skills": [
+      {
+        "level": 31,
+        "type": "INT",
+        "value": 700
+      },
+      {
+        "level": 71,
+        "type": "INT",
+        "value": 1700
+      },
+      {
+        "level": 121,
+        "type": "INT",
+        "value": 10700
+      },
+      {
+        "level": 181,
+        "type": "INT",
+        "value": 100700
+      }
+    ]
+  },
+  {
+    "name": "マッドシャーク",
+    "skills": [
+      {
+        "level": 31,
+        "type": "SPD%",
+        "value": 5
+      },
+      {
+        "level": 71,
+        "type": "SPD%",
+        "value": 35
+      },
+      {
+        "level": 121,
+        "type": "SPD%",
+        "value": 5
+      },
+      {
+        "level": 181,
+        "type": "SPD%",
+        "value": 35
+      }
+    ]
+  },
+  {
+    "name": "浮遊イカ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "LUCK%",
+        "value": 25
+      },
+      {
+        "level": 71,
+        "type": "M-DEF%",
+        "value": 25
+      },
+      {
+        "level": 121,
+        "type": "DEF%",
+        "value": 25
+      },
+      {
+        "level": 181,
+        "type": "VIT%",
+        "value": 25
+      }
+    ]
+  },
+  {
+    "name": "氷結晶",
+    "skills": [
+      {
+        "level": 31,
+        "type": "HP回復",
+        "value": 99
+      },
+      {
+        "level": 71,
+        "type": "HP回復",
+        "value": 999
+      },
+      {
+        "level": 121,
+        "type": "HP回復",
+        "value": 9999
+      },
+      {
+        "level": 181,
+        "type": "HP回復",
+        "value": 99999
+      }
+    ]
+  },
+  {
+    "name": "命を刈り取る者",
+    "skills": [
+      {
+        "level": 31,
+        "type": "捕獲率",
+        "value": 15
+      },
+      {
+        "level": 71,
+        "type": "捕獲率",
+        "value": 35
+      },
+      {
+        "level": 121,
+        "type": "捕獲率",
+        "value": 55
+      },
+      {
+        "level": 181,
+        "type": "捕獲率",
+        "value": 75
+      }
+    ]
+  },
+  {
+    "name": "ヤマタノオロチ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "ATK",
+        "value": 10000
+      },
+      {
+        "level": 71,
+        "type": "ATK",
+        "value": 1
+      },
+      {
+        "level": 121,
+        "type": "ATK",
+        "value": 1
+      },
+      {
+        "level": 181,
+        "type": "ATK",
+        "value": 10000
+      }
+    ]
+  },
+  {
+    "name": "元ギルド長ノック",
+    "skills": [
+      {
+        "level": 31,
+        "type": "VIT%",
+        "value": 30
+      },
+      {
+        "level": 71,
+        "type": "SPD%",
+        "value": 30
+      },
+      {
+        "level": 121,
+        "type": "ATK%",
+        "value": 30
+      },
+      {
+        "level": 181,
+        "type": "INT%",
+        "value": 30
+      }
+    ]
+  },
+  {
+    "name": "ラッキーヒトデ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "LUCK%",
+        "value": 30
+      },
+      {
+        "level": 71,
+        "type": "LUCK%",
+        "value": 30
+      },
+      {
+        "level": 121,
+        "type": "LUCK%",
+        "value": 30
+      },
+      {
+        "level": 181,
+        "type": "LUCK%",
+        "value": 30
+      }
+    ]
+  },
+  {
+    "name": "アビスマーダー",
+    "skills": [
+      {
+        "level": 31,
+        "type": "ドロップ率",
+        "value": 50
+      },
+      {
+        "level": 71,
+        "type": "ドロップ率",
+        "value": 100
+      },
+      {
+        "level": 121,
+        "type": "ドロップ率",
+        "value": 150
+      },
+      {
+        "level": 181,
+        "type": "ドロップ率",
+        "value": 200
+      }
+    ]
+  },
+  {
+    "name": "氷女王アナトユ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "捕獲率",
+        "value": 150
+      },
+      {
+        "level": 71,
+        "type": "M-DEF%",
+        "value": 25
+      },
+      {
+        "level": 121,
+        "type": "M-DEF%",
+        "value": 25
+      },
+      {
+        "level": 181,
+        "type": "M-DEF%",
+        "value": 25
+      }
+    ]
+  },
+  {
+    "name": "封印されし神鯨",
+    "skills": [
+      {
+        "level": 31,
+        "type": "最終VIT%",
+        "value": 25
+      },
+      {
+        "level": 71,
+        "type": "最終VIT%",
+        "value": 25
+      },
+      {
+        "level": 121,
+        "type": "最終VIT%",
+        "value": 25
+      },
+      {
+        "level": 181,
+        "type": "最終VIT%",
+        "value": 25
+      }
+    ]
+  },
+  {
+    "name": "超越者リガミア",
+    "skills": [
+      {
+        "level": 31,
+        "type": "SPD%",
+        "value": 30
+      },
+      {
+        "level": 71,
+        "type": "SPD%",
+        "value": 30
+      },
+      {
+        "level": 121,
+        "type": "SPD%",
+        "value": 30
+      },
+      {
+        "level": 181,
+        "type": "SPD%",
+        "value": 30
+      }
+    ]
+  },
+  {
+    "name": "海賊船",
+    "skills": [
+      {
+        "level": 31,
+        "type": "ドロップ率",
+        "value": 1
+      },
+      {
+        "level": 71,
+        "type": "ドロップ率",
+        "value": 1
+      },
+      {
+        "level": 121,
+        "type": "ドロップ率",
+        "value": 298
+      },
+      {
+        "level": 181,
+        "type": "ドロップ率",
+        "value": 700
+      }
+    ]
+  },
+  {
+    "name": "ホムラウマ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "MOV",
+        "value": 3
+      },
+      {
+        "level": 71,
+        "type": "SPD",
+        "value": 1000
+      },
+      {
+        "level": 121,
+        "type": "SPD",
+        "value": 1000
+      },
+      {
+        "level": 181,
+        "type": "SPD",
+        "value": 1000
+      }
+    ]
+  },
+  {
+    "name": "深淵灯魚",
+    "skills": [
+      {
+        "level": 31,
+        "type": "M-DEF%",
+        "value": 20
+      },
+      {
+        "level": 71,
+        "type": "DEF%",
+        "value": 20
+      },
+      {
+        "level": 121,
+        "type": "VIT%",
+        "value": 20
+      },
+      {
+        "level": 181,
+        "type": "LUCK%",
+        "value": 20
+      }
+    ]
+  },
+  {
+    "name": "うねうね",
+    "skills": [
+      {
+        "level": 31,
+        "type": "VIT%",
+        "value": 15
+      },
+      {
+        "level": 71,
+        "type": "VIT%",
+        "value": 15
+      },
+      {
+        "level": 121,
+        "type": "VIT%",
+        "value": 15
+      },
+      {
+        "level": 181,
+        "type": "VIT%",
+        "value": 15
+      }
+    ]
+  },
+  {
+    "name": "イージスリエル",
+    "skills": [
+      {
+        "level": 31,
+        "type": "INT%",
+        "value": 15
+      },
+      {
+        "level": 71,
+        "type": "INT%",
+        "value": 15
+      },
+      {
+        "level": 121,
+        "type": "INT%",
+        "value": 15
+      },
+      {
+        "level": 181,
+        "type": "INT%",
+        "value": 15
+      }
+    ]
+  },
+  {
+    "name": "デーモンブレイド",
+    "skills": [
+      {
+        "level": 31,
+        "type": "ATK%",
+        "value": 15
+      },
+      {
+        "level": 71,
+        "type": "ATK%",
+        "value": 15
+      },
+      {
+        "level": 121,
+        "type": "ATK%",
+        "value": 15
+      },
+      {
+        "level": 181,
+        "type": "ATK%",
+        "value": 15
+      }
+    ]
+  },
+  {
+    "name": "時空竜クロノゼリウス",
+    "skills": [
+      {
+        "level": 31,
+        "type": "最終SPD%",
+        "value": 25
+      },
+      {
+        "level": 71,
+        "type": "最終ATK%",
+        "value": 25
+      },
+      {
+        "level": 121,
+        "type": "最終DEF%",
+        "value": 25
+      },
+      {
+        "level": 181,
+        "type": "最終M-DEF%",
+        "value": 25
+      }
+    ]
+  },
+  {
+    "name": "マルコゲトカゲ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "捕獲率",
+        "value": 20
+      },
+      {
+        "level": 71,
+        "type": "捕獲率",
+        "value": 30
+      },
+      {
+        "level": 121,
+        "type": "捕獲率",
+        "value": 200
+      },
+      {
+        "level": 181,
+        "type": "捕獲率",
+        "value": 300
+      }
+    ]
+  },
+  {
+    "name": "白竜",
+    "skills": [
+      {
+        "level": 31,
+        "type": "ATK%",
+        "value": 1
+      },
+      {
+        "level": 71,
+        "type": "LUCK%",
+        "value": 1
+      },
+      {
+        "level": 121,
+        "type": "ATK%",
+        "value": 80
+      },
+      {
+        "level": 181,
+        "type": "LUCK%",
+        "value": 80
+      }
+    ]
+  },
+  {
+    "name": "イグニス・シスター",
+    "skills": [
+      {
+        "level": 31,
+        "type": "DEF%",
+        "value": 30
+      },
+      {
+        "level": 71,
+        "type": "M-DEF%",
+        "value": 30
+      },
+      {
+        "level": 121,
+        "type": "DEF",
+        "value": 1200
+      },
+      {
+        "level": 181,
+        "type": "M-DEF",
+        "value": 2800
+      }
+    ]
+  },
+  {
+    "name": "オルド・クラウセス",
+    "skills": [
+      {
+        "level": 31,
+        "type": "ATK%",
+        "value": 30
+      },
+      {
+        "level": 71,
+        "type": "SPD%",
+        "value": 30
+      },
+      {
+        "level": 121,
+        "type": "ATK",
+        "value": 1200
+      },
+      {
+        "level": 181,
+        "type": "SPD",
+        "value": 2800
+      }
+    ]
+  },
+  {
+    "name": "BOX",
+    "skills": [
+      {
+        "level": 31,
+        "type": "DEF",
+        "value": 10
+      },
+      {
+        "level": 71,
+        "type": "DEF",
+        "value": 100
+      },
+      {
+        "level": 121,
+        "type": "DEF",
+        "value": 1000
+      },
+      {
+        "level": 181,
+        "type": "DEF",
+        "value": 10000
+      }
+    ]
+  },
+  {
+    "name": "冥王ノクタール",
+    "skills": [
+      {
+        "level": 31,
+        "type": "INT%",
+        "value": 1
+      },
+      {
+        "level": 71,
+        "type": "INT%",
+        "value": 1
+      },
+      {
+        "level": 121,
+        "type": "INT%",
+        "value": 1
+      },
+      {
+        "level": 181,
+        "type": "INT%",
+        "value": 97
+      }
+    ]
+  },
+  {
+    "name": "罪環の監視者モルモ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "捕獲率",
+        "value": 100
+      },
+      {
+        "level": 71,
+        "type": "捕獲率",
+        "value": 200
+      },
+      {
+        "level": 121,
+        "type": "捕獲率",
+        "value": 300
+      },
+      {
+        "level": 181,
+        "type": "捕獲率",
+        "value": 400
+      }
+    ]
+  },
+  {
+    "name": "イグニシア",
+    "skills": [
+      {
+        "level": 31,
+        "type": "SPD%",
+        "value": 40
+      },
+      {
+        "level": 71,
+        "type": "経験値",
+        "value": 100
+      },
+      {
+        "level": 121,
+        "type": "SPD%",
+        "value": 20
+      },
+      {
+        "level": 181,
+        "type": "経験値",
+        "value": 100
+      }
+    ]
+  },
+  {
+    "name": "ヌー",
+    "skills": [
+      {
+        "level": 31,
+        "type": "ATK%",
+        "value": 40
+      },
+      {
+        "level": 71,
+        "type": "経験値",
+        "value": 100
+      },
+      {
+        "level": 121,
+        "type": "ATK%",
+        "value": 20
+      },
+      {
+        "level": 181,
+        "type": "経験値",
+        "value": 100
+      }
+    ]
+  },
+  {
+    "name": "ミニハム",
+    "skills": [
+      {
+        "level": 31,
+        "type": "LUCK%",
+        "value": 40
+      },
+      {
+        "level": 71,
+        "type": "経験値",
+        "value": 100
+      },
+      {
+        "level": 121,
+        "type": "LUCK%",
+        "value": 20
+      },
+      {
+        "level": 181,
+        "type": "経験値",
+        "value": 100
+      }
+    ]
+  },
+  {
+    "name": "シーサー",
+    "skills": [
+      {
+        "level": 31,
+        "type": "DEF%",
+        "value": 40
+      },
+      {
+        "level": 71,
+        "type": "経験値",
+        "value": 100
+      },
+      {
+        "level": 121,
+        "type": "DEF%",
+        "value": 20
+      },
+      {
+        "level": 181,
+        "type": "経験値",
+        "value": 100
+      }
+    ]
+  },
+  {
+    "name": "グルームエッグ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "INT%",
+        "value": 40
+      },
+      {
+        "level": 71,
+        "type": "経験値",
+        "value": 100
+      },
+      {
+        "level": 121,
+        "type": "INT%",
+        "value": 20
+      },
+      {
+        "level": 181,
+        "type": "経験値",
+        "value": 100
+      }
+    ]
+  },
+  {
+    "name": "スライムガール(物理)",
+    "skills": [
+      {
+        "level": 31,
+        "type": "ATK%",
+        "value": 60
+      },
+      {
+        "level": 71,
+        "type": "経験値",
+        "value": 100
+      },
+      {
+        "level": 121,
+        "type": "ATK%",
+        "value": 60
+      },
+      {
+        "level": 181,
+        "type": "経験値",
+        "value": 100
+      }
+    ]
+  },
+  {
+    "name": "スライムガール(魔法)",
+    "skills": [
+      {
+        "level": 31,
+        "type": "INT%",
+        "value": 60
+      },
+      {
+        "level": 71,
+        "type": "経験値",
+        "value": 100
+      },
+      {
+        "level": 121,
+        "type": "INT%",
+        "value": 60
+      },
+      {
+        "level": 181,
+        "type": "経験値",
+        "value": 100
+      }
+    ]
+  },
+  {
+    "name": "ペリカンEXP",
+    "skills": [
+      {
+        "level": 31,
+        "type": "経験値",
+        "value": 50
+      },
+      {
+        "level": 71,
+        "type": "経験値",
+        "value": 50
+      },
+      {
+        "level": 121,
+        "type": "経験値",
+        "value": 50
+      },
+      {
+        "level": 181,
+        "type": "経験値",
+        "value": 50
+      }
+    ]
+  },
+  {
+    "name": "支配のトリ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "捕獲率",
+        "value": 30
+      },
+      {
+        "level": 71,
+        "type": "捕獲率",
+        "value": 30
+      },
+      {
+        "level": 121,
+        "type": "捕獲率",
+        "value": 30
+      },
+      {
+        "level": 181,
+        "type": "捕獲率",
+        "value": 80
+      }
+    ]
+  },
+  {
+    "name": "キングニワトリ",
+    "skills": [
+      {
+        "level": 31,
+        "type": "経験値",
+        "value": 100
+      },
+      {
+        "level": 71,
+        "type": "経験値",
+        "value": 100
+      },
+      {
+        "level": 121,
+        "type": "経験値",
+        "value": 100
+      },
+      {
+        "level": 181,
+        "type": "経験値",
+        "value": 200
+      }
+    ]
+  },
+  {
+    "name": "虹ペリカンEXP",
+    "skills": [
+      {
+        "level": 31,
+        "type": "経験値",
+        "value": 250
+      },
+      {
+        "level": 71,
+        "type": "経験値",
+        "value": 250
+      },
+      {
+        "level": 121,
+        "type": "経験値",
+        "value": 250
+      },
+      {
+        "level": 181,
+        "type": "経験値",
+        "value": 250
+      }
+    ]
+  }
+]
