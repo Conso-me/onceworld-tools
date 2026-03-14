@@ -127,7 +127,7 @@ export function calcMultiHitCount(
 }
 
 /**
- * 確殺ターン数を計算 (最小ダメージベース)
+ * 確殺攻撃回数を計算 (最小ダメージベース)
  */
 export function calcHitsToKill(
   enemyHP: number,

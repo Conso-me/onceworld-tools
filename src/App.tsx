@@ -24,14 +24,14 @@ function App() {
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       {/* ヘッダー */}
       <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-3xl mx-auto px-4 py-4 space-y-3">
+        <div className="max-w-3xl lg:max-w-[1400px] mx-auto px-4 py-4 space-y-3">
           <h1 className="text-xl font-bold text-gray-800">OnceWorld Tools</h1>
           <TabNav tabs={tabs} onTabChange={handleTabChange} />
         </div>
       </header>
 
       {/* メインコンテンツ - 全タブを常にマウントし、非アクティブはCSSで隠す */}
-      <main className="max-w-3xl mx-auto px-4 py-8">
+      <main className="max-w-3xl lg:max-w-[1400px] mx-auto px-4 py-8 lg:py-4">
         <div className={activeTab === "damage" ? "" : "hidden"}>
           <DamageCalculator />
         </div>

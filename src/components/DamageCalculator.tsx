@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
-import type { MonsterBase, Element, AttackType } from "../types/game";
+import type { MonsterBase, Element } from "../types/game";
 import { usePersistedState } from "../hooks/usePersistedState";
+import { useStatPresets } from "../hooks/useStatPresets";
 import { scaleMonster } from "../utils/monsterScaling";
 import {
   calcPhysicalDamage,
@@ -46,7 +47,7 @@ export function DamageCalculator() {
   const [analysisBook, setAnalysisBook] = usePersistedState("dmg:analysisBook", "");
   const [analysisAnalysisBook, setAnalysisAnalysisBook] = usePersistedState("dmg:analysisAnalysisBook", "");
 
-  // 目標ターン数
+  // 目標攻撃回数
   const [targetTurns, setTargetTurns] = usePersistedState("dmg:targetTurns", "1");
 
   const myAtkNum = parseInt(myAtk) || 0;
@@ -59,6 +60,50 @@ export function DamageCalculator() {
   const analysisAnalysisBookNum = parseInt(analysisAnalysisBook) || 0;
 
   const magicBaseInt = analysisBookNum * (1 + analysisAnalysisBookNum * 0.1);
+
+  // プリセット
+  const [presetName, setPresetName] = useState("");
+  const [selectedPresetId, setSelectedPresetId] = useState("");
+  const { presets, savePreset, loadPreset, deletePreset } = useStatPresets();
+
+  const handleSavePreset = useCallback(() => {
+    if (!presetName.trim()) return;
+    const name = presetName.trim();
+    const existing = presets.find((p) => p.name === name);
+    if (existing && !window.confirm(`"${name}" を上書きしますか？`)) return;
+    savePreset(name, {
+      atk: myAtk,
+      int: myInt,
+      def: myDef,
+      mdef: myMdef,
+      spd: mySpd,
+      element: myElement,
+      attackMode: myAttackMode,
+      targetTurns,
+      analysisBook,
+      analysisAnalysisBook,
+    });
+  }, [presetName, presets, savePreset, myAtk, myInt, myDef, myMdef, mySpd, myElement, myAttackMode, targetTurns, analysisBook, analysisAnalysisBook]);
+
+  const handleLoadPreset = useCallback(() => {
+    const preset = loadPreset(selectedPresetId);
+    if (!preset) return;
+    setMyAtk(preset.atk);
+    setMyInt(preset.int);
+    setMyDef(preset.def);
+    setMyMdef(preset.mdef);
+    setMySpd(preset.spd);
+    setMyElement(preset.element);
+    setMyAttackMode(preset.attackMode);
+    setTargetTurns(preset.targetTurns);
+    setAnalysisBook(preset.analysisBook);
+    setAnalysisAnalysisBook(preset.analysisAnalysisBook);
+  }, [selectedPresetId, loadPreset, setMyAtk, setMyInt, setMyDef, setMyMdef, setMySpd, setMyElement, setMyAttackMode, setTargetTurns, setAnalysisBook, setAnalysisAnalysisBook]);
+
+  const handleDeletePreset = useCallback(() => {
+    deletePreset(selectedPresetId);
+    setSelectedPresetId("");
+  }, [selectedPresetId, deletePreset]);
 
   const handleMonsterSelect = useCallback(
     (monster: MonsterBase, level: number) => {
@@ -256,24 +301,25 @@ export function DamageCalculator() {
   };
 
   return (
-    <div className="max-w-lg mx-auto space-y-6">
+    <div className="max-w-lg mx-auto space-y-6 lg:max-w-none lg:space-y-0 lg:grid lg:grid-cols-[minmax(340px,400px)_1fr_1fr] lg:gap-4 lg:items-start">
       {/* ヘッダー */}
-      <div className="text-center space-y-1">
+      <div className="text-center space-y-1 lg:col-span-3 lg:flex lg:items-baseline lg:gap-3 lg:justify-center lg:space-y-0">
         <h2 className="text-2xl font-bold text-gray-800">ダメージ計算機</h2>
         <p className="text-sm text-gray-500">
           与ダメ・被ダメ・必要ステータスを一括計算
         </p>
       </div>
 
-      {/* モンスター選択 */}
-      <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 space-y-6">
+      {/* Column 1: 入力パネル */}
+      <div className="space-y-6 lg:space-y-4">
+      <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-6 lg:space-y-3">
         <MonsterSelector
           onSelect={handleMonsterSelect}
           selectedMonster={selectedMonster}
         />
 
         {scaled && (
-          <div className="grid grid-cols-2 gap-2 text-xs text-gray-500 bg-gray-50 rounded-xl p-3">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 text-xs text-gray-500 bg-gray-50 rounded-xl p-3">
             <div>HP: {scaled.hp.toLocaleString()}</div>
             <div>ATK: {scaled.scaledAtk.toLocaleString()}</div>
             <div>INT: {scaled.scaledInt.toLocaleString()}</div>
@@ -296,12 +342,59 @@ export function DamageCalculator() {
         <div className="border-t border-gray-100" />
 
         {/* 自分のステータス */}
-        <div className="space-y-4">
+        <div className="space-y-4 lg:space-y-2">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
               <span className="text-blue-500 text-sm">自</span>
             </div>
             <h3 className="font-semibold text-gray-800">自分のステータス</h3>
+          </div>
+
+          {/* プリセット */}
+          <div className="bg-gray-50 rounded-2xl p-3 space-y-2">
+            <p className="text-xs font-medium text-gray-500">プリセット</p>
+            <div className="flex gap-1.5">
+              <select
+                value={selectedPresetId}
+                onChange={(e) => setSelectedPresetId(e.target.value)}
+                className="flex-1 min-w-0 text-sm rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-gray-700"
+              >
+                <option value="">選択...</option>
+                {presets.map((p) => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
+                ))}
+              </select>
+              <button
+                onClick={handleLoadPreset}
+                disabled={!selectedPresetId}
+                className="px-3 py-1.5 text-xs rounded-lg bg-indigo-100 text-indigo-600 font-medium disabled:opacity-40 hover:bg-indigo-200 transition-colors"
+              >
+                読込
+              </button>
+              <button
+                onClick={handleDeletePreset}
+                disabled={!selectedPresetId}
+                className="px-3 py-1.5 text-xs rounded-lg bg-red-100 text-red-600 font-medium disabled:opacity-40 hover:bg-red-200 transition-colors"
+              >
+                削除
+              </button>
+            </div>
+            <div className="flex gap-1.5">
+              <input
+                type="text"
+                value={presetName}
+                onChange={(e) => setPresetName(e.target.value)}
+                placeholder="プリセット名..."
+                className="flex-1 min-w-0 text-sm rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-gray-700 placeholder-gray-300"
+              />
+              <button
+                onClick={handleSavePreset}
+                disabled={!presetName.trim()}
+                className="px-3 py-1.5 text-xs rounded-lg bg-green-100 text-green-600 font-medium disabled:opacity-40 hover:bg-green-200 transition-colors"
+              >
+                保存
+              </button>
+            </div>
           </div>
 
           {/* 属性・攻撃方法 */}
@@ -349,14 +442,14 @@ export function DamageCalculator() {
           </div>
 
           {/* ステータス入力 */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-2">
             <InputField label="ATK" value={myAtk} onChange={setMyAtk} />
             <InputField label="INT" value={myInt} onChange={setMyInt} />
             <InputField label="DEF" value={myDef} onChange={setMyDef} />
             <InputField label="M-DEF" value={myMdef} onChange={setMyMdef} />
             <InputField label="SPD" value={mySpd} onChange={setMySpd} />
             <InputField
-              label="目標ターン数"
+              label="目標回数"
               value={targetTurns}
               onChange={setTargetTurns}
               placeholder="1"
@@ -381,10 +474,39 @@ export function DamageCalculator() {
         </div>
       </div>
 
-      {/* ===== 結果: 与ダメージ ===== */}
-      {hasMonster && offensiveResult && (
-        <div className="space-y-4">
-          <h3 className="font-semibold text-gray-700 px-1">与ダメージ</h3>
+      {/* 計算式 */}
+      <details className="group">
+        <summary className="cursor-pointer text-sm text-gray-400 hover:text-gray-600 transition-colors list-none flex items-center gap-1">
+          <svg
+            className="w-4 h-4 transition-transform group-open:rotate-90"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+          計算式を表示
+        </summary>
+        <div className="mt-3 p-4 bg-gray-50 rounded-2xl text-xs text-gray-500 space-y-1 font-mono">
+          <p>物理/魔弾: (ATK or INT)×1.75 - (DEF+M-DEF/10 or M-DEF+DEF/10)) × 4 × 属性</p>
+          <p>主人公魔法: (INT+解析書)×1.25×魔法倍率 - (M-DEF+DEF/10)) × 4 × 属性</p>
+          <p className="pt-2 text-gray-400">※ 乱数: ×0.9〜1.1 / クリティカル: ×2.5</p>
+          <p className="text-gray-400">※ 多段: SPD 3k→2, 10k→3, 30k→4, 100k→5</p>
+          <p className="text-gray-400">※ 計算結果≤0 → 被ダメ1〜9</p>
+        </div>
+      </details>
+      </div>{/* /Column 1 */}
+
+      {/* ===== Column 2: 与ダメージ ===== */}
+      <div className="space-y-4">
+        <h3 className="font-semibold text-gray-700 px-1">与ダメージ</h3>
+        {hasMonster && offensiveResult ? (<>
+
           <StatCard
             title={`${myAttackMode === "物理" ? "物理" : "魔法"}攻撃 → ${scaled!.name} Lv${monsterLevel}`}
             accent="green"
@@ -425,12 +547,12 @@ export function DamageCalculator() {
                   {!offensiveResult.dmg.isNullified && (
                     <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
                       <span className="text-sm text-gray-500">
-                        確殺ターン数
+                        確殺回数
                       </span>
                       <span className="font-bold text-gray-700">
                         {offensiveResult.hitsToKill === Infinity
                           ? "∞"
-                          : `${offensiveResult.hitsToKill}ターン`}
+                          : `${offensiveResult.hitsToKill}回`}
                       </span>
                     </div>
                   )}
@@ -451,7 +573,7 @@ export function DamageCalculator() {
                 color="purple"
               />
               <ResultRow
-                label={`${targetTurnsNum}ターン撃破${myAttackMode === "物理" ? "ATK" : "INT"}`}
+                label={`${targetTurnsNum}回で撃破${myAttackMode === "物理" ? "ATK" : "INT"}`}
                 value={offensiveResult.targetStat}
                 current={
                   myAttackMode === "物理" ? myAtkNum : myIntNum
@@ -460,13 +582,17 @@ export function DamageCalculator() {
               />
             </div>
           </StatCard>
-        </div>
-      )}
+        </>) : (
+          <div className="bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 p-8 text-center">
+            <p className="text-sm text-gray-400">モンスターを選択すると与ダメージが表示されます</p>
+          </div>
+        )}
+      </div>{/* /Column 2 */}
 
-      {/* ===== 結果: 被ダメージ ===== */}
-      {hasMonster && defensiveResult && (
-        <div className="space-y-4">
-          <h3 className="font-semibold text-gray-700 px-1">被ダメージ</h3>
+      {/* ===== Column 3: 被ダメージ ===== */}
+      <div className="space-y-4">
+        <h3 className="font-semibold text-gray-700 px-1">被ダメージ</h3>
+        {hasMonster && defensiveResult ? (<>
           <StatCard
             title={`${defensiveResult.enemyIsPhysical ? "物理" : "魔法"}攻撃（${scaled!.attackType} / ${defensiveResult.enemyIsPhysical ? "ATK" : "INT"}: ${defensiveResult.enemyStat.toLocaleString()}）`}
             accent="orange"
@@ -567,35 +693,12 @@ export function DamageCalculator() {
               </div>
             </div>
           )}
-        </div>
-      )}
-
-      {/* 計算式 */}
-      <details className="group">
-        <summary className="cursor-pointer text-sm text-gray-400 hover:text-gray-600 transition-colors list-none flex items-center gap-1">
-          <svg
-            className="w-4 h-4 transition-transform group-open:rotate-90"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-          計算式を表示
-        </summary>
-        <div className="mt-3 p-4 bg-gray-50 rounded-2xl text-xs text-gray-500 space-y-1 font-mono">
-          <p>物理/魔弾: (ATK or INT)×1.75 - (DEF+M-DEF/10 or M-DEF+DEF/10)) × 4 × 属性</p>
-          <p>主人公魔法: (INT+解析書)×1.25×魔法倍率 - (M-DEF+DEF/10)) × 4 × 属性</p>
-          <p className="pt-2 text-gray-400">※ 乱数: ×0.9〜1.1 / クリティカル: ×2.5</p>
-          <p className="text-gray-400">※ 多段: SPD 3k→2, 10k→3, 30k→4, 100k→5</p>
-          <p className="text-gray-400">※ 計算結果≤0 → 被ダメ1〜9</p>
-        </div>
-      </details>
+        </>) : (
+          <div className="bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 p-8 text-center">
+            <p className="text-sm text-gray-400">モンスターを選択すると被ダメージが表示されます</p>
+          </div>
+        )}
+      </div>{/* /Column 3 */}
     </div>
   );
 }
