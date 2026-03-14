@@ -1,5 +1,6 @@
 import rawData from "../../docs/data/pet-skills.json";
-import type { PetEntry, PetSkill } from "../types/game";
+import monstersJson from "../../docs/data/monsters.json";
+import type { PetEntry, PetSkill, Element } from "../types/game";
 
 // Normalize 防御% → DEF% for consistency
 function normalizeSkillType(type: string): string {
@@ -17,6 +18,28 @@ export const pets: PetEntry[] = (rawData as Array<{ name: string; skills: Array<
     })),
   })
 );
+
+// Build element lookup from monsters data
+const monsterElements = new Map<string, Element>(
+  (monstersJson as Array<{ name: string; element: string }>).map(
+    (m) => [m.name, m.element as Element]
+  )
+);
+
+export function getPetElement(petName: string): Element | null {
+  return monsterElements.get(petName) ?? null;
+}
+
+/** ペットを属性別にグループ化して返す */
+export function getPetsByElement(): Map<Element | "不明", PetEntry[]> {
+  const map = new Map<Element | "不明", PetEntry[]>();
+  for (const pet of pets) {
+    const el: Element | "不明" = monsterElements.get(pet.name) ?? "不明";
+    if (!map.has(el)) map.set(el, []);
+    map.get(el)!.push(pet);
+  }
+  return map;
+}
 
 export function getPetByName(name: string): PetEntry | undefined {
   return pets.find((p) => p.name === name);

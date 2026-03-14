@@ -39,6 +39,8 @@ export type EquipmentSlot = "武器" | "頭" | "服" | "手" | "盾" | "脚";
 export interface EquipmentItem {
   name: string;
   slot: EquipmentSlot;
+  series?: string | null;
+  material?: string;
   vit: number;
   spd: number;
   atk: number;
@@ -61,6 +63,7 @@ export interface AccessoryEffect {
 
 export interface AccessoryItem {
   name: string;
+  maxLevel: number;
   effects: AccessoryEffect[];
 }
 
@@ -107,18 +110,20 @@ export interface StatBreakdown {
   finalPctBonus: CoreStats;
   final: CoreStats;
   hp: number;
+  setBonus: boolean;
+  setBonusSeries: string | null;
 }
 
 export interface SimConfig extends Record<string, unknown> {
   charLevel: number;
   reinCount: 0 | 10 | 11 | 12;   // 天命輪廻回数
   // 振り分けポイント（使える総量）
-  hasCosmoCube: boolean;      // コスモキューブ所持 (天命輪廻回数×10,000ポイント)
-  johaneCount: number;        // ヨハネの羽ペン (利用可能ポイント×1%/個)
+  hasCosmoCube: boolean;
+  johaneCount: number;
   // 振り分け上限（各ステータスへの上限、基底10,000）
-  kinikiBookCount: number;    // 禁域の書物 (上限+80/個)
-  sageItemCount: number;      // 賢者の落とし物 (上限+10/個)
-  hasChoyoContract: boolean;  // 超越の契約書 (上限+900,000)
+  kinikiBookCount: number;
+  sageItemCount: number;
+  hasChoyoContract: boolean;
   // ステータス割り振り
   allocVit: number;
   allocSpd: number;
@@ -127,19 +132,22 @@ export interface SimConfig extends Record<string, unknown> {
   allocDef: number;
   allocMdef: number;
   allocLuck: number;
-  // 装備
-  equipWeapon: string;
-  equipHead: string;
-  equipBody: string;
-  equipHand: string;
-  equipShield: string;
-  equipFoot: string;
-  // アクセサリー
-  acc1: string;
-  acc2: string;
-  // ペット
-  petName: string;
-  petLevel: 0 | 31 | 71 | 121 | 181;
+  // 装備 + 強化値（0=未強化, 1100=最大。強化不可アイテムは計算時に無視）
+  equipWeapon: string;  enhWeapon: number;
+  equipHead: string;    enhHead: number;
+  equipBody: string;    enhBody: number;
+  equipHand: string;    enhHand: number;
+  equipShield: string;  enhShield: number;
+  equipFoot: string;    enhFoot: number;
+  // アクセサリー（4枠 + 各レベル）
+  acc1: string; acc1Level: number;
+  acc2: string; acc2Level: number;
+  acc3: string; acc3Level: number;
+  acc4: string; acc4Level: number;
+  // ペット（3枠）
+  petName: string;  petLevel: 0 | 31 | 71 | 121 | 181;
+  pet2Name: string; pet2Level: 0 | 31 | 71 | 121 | 181;
+  pet3Name: string; pet3Level: 0 | 31 | 71 | 121 | 181;
   // プロテイン
   proteinVit: number;
   proteinSpd: number;
@@ -148,7 +156,7 @@ export interface SimConfig extends Record<string, unknown> {
   proteinDef: number;
   proteinMdef: number;
   proteinLuck: number;
-  pShakerCount: number;       // Pシェーカー (プロテイン効果+1%/個)
+  pShakerCount: number;
   // HP補正
-  kinikiLiquidCount: number;  // 禁域の液体 (HP+1%/個)
+  kinikiLiquidCount: number;
 }

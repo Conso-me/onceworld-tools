@@ -1,3 +1,3 @@
 export { getEquipmentBySlot, getEquipmentByName, equipment } from "./equipment";
-export { getAccessoryByName, getAllAccessoryNames, accessories } from "./accessories";
-export { getPetByName, getActiveSkills, getAllPetNames, pets } from "./petSkills";
+export { getAccessoryByName, getAllAccessoryNames, calcAccEffectAtLevel, accessories } from "./accessories";
+export { getPetByName, getActiveSkills, getAllPetNames, getPetsByElement, pets } from "./petSkills";

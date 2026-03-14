@@ -1,36 +1,24 @@
 import type { SimConfig, CoreStats, StatBreakdown } from "../types/game";
 import { getEquipmentByName } from "../data/equipment";
-import { getAccessoryByName } from "../data/accessories";
+import { getAccessoryByName, calcAccEffectAtLevel } from "../data/accessories";
 import { getPetByName, getActiveSkills } from "../data/petSkills";
 import statPointsData from "../../docs/data/stat-points.json";
 
 const STAT_KEYS = ["vit", "spd", "atk", "int", "def", "mdef", "luck"] as const;
+const ARMOR_SLOTS = ["equipHead", "equipBody", "equipHand", "equipShield", "equipFoot"] as const;
 
 function zeroStats(): CoreStats {
   return { vit: 0, spd: 0, atk: 0, int: 0, def: 0, mdef: 0, luck: 0 };
 }
 
-/** 利用可能な振り分けポイント総量
- *
- * 式: (basePoints × (1 + reinCount)) + cosmoCubeBonus + pinnacleBonus
- * 参照: formulas.md D10
- *   basePoints × (1 + reinCount) … 天命輪廻で基礎ポイントが乗算される
- *   pinnacleBonus … 天命輪廻10/11/12回時の追加ボーナス（乗算外・加算）
- */
+/** 利用可能な振り分けポイント総量 */
 export function getAvailablePoints(cfg: SimConfig): number {
   const entry = statPointsData.levelPoints.find((e) => e.level === cfg.charLevel);
   const base = entry?.points ?? 0;
-
-  // 基礎ポイントに (1 + 天命輪廻回数) を乗算
   const multiplied = base * (1 + cfg.reinCount);
-
-  // 天命輪廻10/11/12 時の頂点ボーナス（乗算後に加算）
   const pinnacleBonus =
     statPointsData.extremeReincarnation.find((e) => e.count === cfg.reinCount)?.bonus ?? 0;
-
-  // コスモキューブ（天命輪廻回数 × 10,000）
   const cosmoCubeBonus = cfg.hasCosmoCube ? cfg.reinCount * 10000 : 0;
-
   const subtotal = multiplied + pinnacleBonus + cosmoCubeBonus;
   return Math.floor(subtotal * (1 + cfg.johaneCount / 100));
 }
@@ -44,10 +32,8 @@ export function getPerStatLimit(cfg: SimConfig): number {
 }
 
 export function calcAllocatedPoints(cfg: SimConfig): number {
-  return (
-    cfg.allocVit + cfg.allocSpd + cfg.allocAtk + cfg.allocInt +
-    cfg.allocDef + cfg.allocMdef + cfg.allocLuck
-  );
+  return cfg.allocVit + cfg.allocSpd + cfg.allocAtk + cfg.allocInt
+    + cfg.allocDef + cfg.allocMdef + cfg.allocLuck;
 }
 
 function allocStats(cfg: SimConfig): CoreStats {
@@ -57,14 +43,41 @@ function allocStats(cfg: SimConfig): CoreStats {
   };
 }
 
+/** セット効果検出：頭/服/手/盾/脚 が同一非nullシリーズで揃っているか */
+function detectSetBonus(cfg: SimConfig): { active: boolean; series: string | null } {
+  const names = ARMOR_SLOTS.map((k) => cfg[k] as string);
+  if (names.some((n) => !n)) return { active: false, series: null };
+  const seriesList = names.map((n) => getEquipmentByName(n)?.series ?? null);
+  if (seriesList.some((s) => !s)) return { active: false, series: null };
+  const first = seriesList[0]!;
+  return seriesList.every((s) => s === first)
+    ? { active: true, series: first }
+    : { active: false, series: null };
+}
+
+/** 装備スタット（強化値を乗算済み）
+ *  強化式: floor(base * (1 + enhance * 0.1))
+ *  "強化できない" アイテムは enhance を無視
+ */
 function equipmentStats(cfg: SimConfig): CoreStats {
-  const slots = [cfg.equipWeapon, cfg.equipHead, cfg.equipBody, cfg.equipHand, cfg.equipShield, cfg.equipFoot];
+  const slots: [string, number][] = [
+    [cfg.equipWeapon, cfg.enhWeapon],
+    [cfg.equipHead,   cfg.enhHead],
+    [cfg.equipBody,   cfg.enhBody],
+    [cfg.equipHand,   cfg.enhHand],
+    [cfg.equipShield, cfg.enhShield],
+    [cfg.equipFoot,   cfg.enhFoot],
+  ];
   const result = zeroStats();
-  for (const name of slots) {
+  for (const [name, enh] of slots) {
     if (!name) continue;
     const item = getEquipmentByName(name);
     if (!item) continue;
-    for (const k of STAT_KEYS) result[k] += item[k] ?? 0;
+    const canEnhance = item.material !== "強化できない";
+    const factor = canEnhance ? 1 + enh * 0.1 : 1;
+    for (const k of STAT_KEYS) {
+      result[k] += Math.floor((item[k] ?? 0) * factor);
+    }
   }
   return result;
 }
@@ -82,80 +95,99 @@ function proteinStats(cfg: SimConfig): CoreStats {
   };
 }
 
-// Stat key lookup maps
-const FLAT_MAP: Record<string, keyof CoreStats | null> = {
-  VIT: "vit", SPD: "spd", ATK: "atk", INT: "int",
-  DEF: "def", "M-DEF": "mdef", LUCK: "luck",
+// Effect type classification
+const FLAT_TYPES = new Set(["VIT","SPD","ATK","INT","DEF","M-DEF","MDEF","LUCK"]);
+const FLAT_MAP: Record<string, keyof CoreStats> = {
+  VIT:"vit", SPD:"spd", ATK:"atk", INT:"int", DEF:"def", "M-DEF":"mdef", LUCK:"luck",
 };
-const PCT_MAP: Record<string, keyof CoreStats | null> = {
-  "VIT%": "vit", "SPD%": "spd", "ATK%": "atk", "INT%": "int",
-  "DEF%": "def", "M-DEF%": "mdef", "LUCK%": "luck",
+const PCT_MAP: Record<string, keyof CoreStats> = {
+  "VIT%":"vit","SPD%":"spd","ATK%":"atk","INT%":"int","DEF%":"def","M-DEF%":"mdef","LUCK%":"luck",
 };
-const FINAL_PCT_MAP: Record<string, keyof CoreStats | null> = {
-  "最終VIT%": "vit", "最終SPD%": "spd", "最終ATK%": "atk", "最終INT%": "int",
-  "最終DEF%": "def", "最終M-DEF%": "mdef", "最終LUCK%": "luck",
+const FINAL_PCT_MAP: Record<string, keyof CoreStats> = {
+  "最終VIT%":"vit","最終SPD%":"spd","最終ATK%":"atk","最終INT%":"int",
+  "最終DEF%":"def","最終M-DEF%":"mdef","最終LUCK%":"luck",
 };
 
+/** アクセサリーフラット補正（4枠・レベルスケール済み） */
 function accFlatStats(cfg: SimConfig): CoreStats {
   const result = zeroStats();
-  for (const accName of [cfg.acc1, cfg.acc2]) {
-    if (!accName) continue;
-    const acc = getAccessoryByName(accName);
+  const slots: [string, number][] = [
+    [cfg.acc1, cfg.acc1Level], [cfg.acc2, cfg.acc2Level],
+    [cfg.acc3, cfg.acc3Level], [cfg.acc4, cfg.acc4Level],
+  ];
+  for (const [name, level] of slots) {
+    if (!name) continue;
+    const acc = getAccessoryByName(name);
     if (!acc) continue;
     for (const eff of acc.effects) {
       const key = FLAT_MAP[eff.type];
-      if (key) result[key] += eff.value;
+      if (!key) continue;
+      result[key] += calcAccEffectAtLevel(eff.value, eff.scalePercent, true, level);
     }
   }
   return result;
 }
 
+/** アクセサリー%補正（4枠・レベルスケール済み） */
 function accPctBonus(cfg: SimConfig): CoreStats {
   const result = zeroStats();
-  for (const accName of [cfg.acc1, cfg.acc2]) {
-    if (!accName) continue;
-    const acc = getAccessoryByName(accName);
+  const slots: [string, number][] = [
+    [cfg.acc1, cfg.acc1Level], [cfg.acc2, cfg.acc2Level],
+    [cfg.acc3, cfg.acc3Level], [cfg.acc4, cfg.acc4Level],
+  ];
+  for (const [name, level] of slots) {
+    if (!name) continue;
+    const acc = getAccessoryByName(name);
     if (!acc) continue;
     for (const eff of acc.effects) {
       const key = PCT_MAP[eff.type];
-      if (key) result[key] += eff.value;
+      if (!key) continue;
+      result[key] += calcAccEffectAtLevel(eff.value, eff.scalePercent, false, level);
     }
   }
   return result;
 }
 
-function petFlatStats(cfg: SimConfig): CoreStats {
+function petFlatFor(petName: string, petLevel: number): CoreStats {
   const result = zeroStats();
-  if (!cfg.petName || cfg.petLevel === 0) return result;
-  const pet = getPetByName(cfg.petName);
+  if (!petName || petLevel === 0) return result;
+  const pet = getPetByName(petName);
   if (!pet) return result;
-  for (const skill of getActiveSkills(pet, cfg.petLevel)) {
+  for (const skill of getActiveSkills(pet, petLevel)) {
     const key = FLAT_MAP[skill.type];
     if (key) result[key] += skill.value;
   }
   return result;
 }
 
-function petPctBonus(cfg: SimConfig): CoreStats {
+function petPctFor(petName: string, petLevel: number): CoreStats {
   const result = zeroStats();
-  if (!cfg.petName || cfg.petLevel === 0) return result;
-  const pet = getPetByName(cfg.petName);
+  if (!petName || petLevel === 0) return result;
+  const pet = getPetByName(petName);
   if (!pet) return result;
-  for (const skill of getActiveSkills(pet, cfg.petLevel)) {
+  for (const skill of getActiveSkills(pet, petLevel)) {
     const key = PCT_MAP[skill.type];
     if (key) result[key] += skill.value;
   }
   return result;
 }
 
-function petFinalPctBonus(cfg: SimConfig): CoreStats {
+function petFinalPctFor(petName: string, petLevel: number): CoreStats {
   const result = zeroStats();
-  if (!cfg.petName || cfg.petLevel === 0) return result;
-  const pet = getPetByName(cfg.petName);
+  if (!petName || petLevel === 0) return result;
+  const pet = getPetByName(petName);
   if (!pet) return result;
-  for (const skill of getActiveSkills(pet, cfg.petLevel)) {
+  for (const skill of getActiveSkills(pet, petLevel)) {
     const key = FINAL_PCT_MAP[skill.type];
     if (key) result[key] += skill.value;
+  }
+  return result;
+}
+
+function sumStats(...statsList: CoreStats[]): CoreStats {
+  const result = zeroStats();
+  for (const s of statsList) {
+    for (const k of STAT_KEYS) result[k] += s[k];
   }
   return result;
 }
@@ -165,24 +197,41 @@ export function calcStatus(cfg: SimConfig): StatBreakdown {
   const equip = equipmentStats(cfg);
   const protein = proteinStats(cfg);
   const accFlat = accFlatStats(cfg);
-  const petFlat = petFlatStats(cfg);
+
+  const petFlat = sumStats(
+    petFlatFor(cfg.petName, cfg.petLevel),
+    petFlatFor(cfg.pet2Name, cfg.pet2Level),
+    petFlatFor(cfg.pet3Name, cfg.pet3Level),
+  );
+  const petPct = sumStats(
+    petPctFor(cfg.petName, cfg.petLevel),
+    petPctFor(cfg.pet2Name, cfg.pet2Level),
+    petPctFor(cfg.pet3Name, cfg.pet3Level),
+  );
+  const finalPctBonus = sumStats(
+    petFinalPctFor(cfg.petName, cfg.petLevel),
+    petFinalPctFor(cfg.pet2Name, cfg.pet2Level),
+    petFinalPctFor(cfg.pet3Name, cfg.pet3Level),
+  );
+
+  // セット効果：alloc + equip + protein に ×1.10
+  const { active: setBonus, series: setBonusSeries } = detectSetBonus(cfg);
+  const setMult = setBonus ? 1.1 : 1.0;
+
+  const accPct = accPctBonus(cfg);
+  const pctBonus = zeroStats();
+  for (const k of STAT_KEYS) pctBonus[k] = accPct[k] + petPct[k];
 
   const prePct = zeroStats();
   for (const k of STAT_KEYS) {
-    prePct[k] = alloc[k] + equip[k] + protein[k] + accFlat[k] + petFlat[k];
+    prePct[k] = Math.floor((alloc[k] + equip[k] + protein[k]) * setMult) + accFlat[k] + petFlat[k];
   }
-
-  const accPct = accPctBonus(cfg);
-  const petPct = petPctBonus(cfg);
-  const pctBonus = zeroStats();
-  for (const k of STAT_KEYS) pctBonus[k] = accPct[k] + petPct[k];
 
   const afterPct = zeroStats();
   for (const k of STAT_KEYS) {
     afterPct[k] = Math.floor(prePct[k] * (1 + pctBonus[k] / 100));
   }
 
-  const finalPctBonus = petFinalPctBonus(cfg);
   const final = zeroStats();
   for (const k of STAT_KEYS) {
     final[k] = Math.floor(afterPct[k] * (1 + finalPctBonus[k] / 100));
@@ -190,5 +239,11 @@ export function calcStatus(cfg: SimConfig): StatBreakdown {
 
   const hp = Math.floor((final.vit * 18 + 100) * (1 + cfg.kinikiLiquidCount / 100));
 
-  return { alloc, equipment: equip, protein, accFlat, petFlat, prePct, pctBonus, afterPct, finalPctBonus, final, hp };
+  return {
+    alloc, equipment: equip, protein, accFlat, petFlat,
+    prePct, pctBonus, afterPct, finalPctBonus, final, hp,
+    setBonus, setBonusSeries,
+  };
 }
+
+export { FLAT_TYPES };
