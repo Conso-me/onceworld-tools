@@ -1,6 +1,15 @@
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import type { MonsterBase } from "../../types/game";
 import { getAllMonsters } from "../../data/monsters";
+import { MonsterSelectorModal } from "./MonsterSelectorModal";
+
+const elementColors: Record<string, string> = {
+  火: "bg-red-100 text-red-600",
+  水: "bg-blue-100 text-blue-600",
+  木: "bg-green-100 text-green-600",
+  光: "bg-yellow-100 text-yellow-700",
+  闇: "bg-purple-100 text-purple-600",
+};
 
 export function MonsterSelector({
   onSelect,
@@ -8,58 +17,37 @@ export function MonsterSelector({
   selectedMonster: _selectedMonster,
   externalLevel,
   externalMonsterName,
+  presetVersion,
 }: {
   onSelect: (monster: MonsterBase, level: number) => void;
   onMonsterPick?: (monster: MonsterBase, level: number) => void;
   selectedMonster?: MonsterBase | null;
   externalLevel?: number;
   externalMonsterName?: string;
+  presetVersion?: number;
 }) {
-  const [query, setQuery] = useState("");
   const [level, setLevel] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedName, setSelectedName] = useState("");
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [selectedMonster, setSelectedMonster] = useState<MonsterBase | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const allMonsters = useMemo(() => getAllMonsters(), []);
 
-  const filtered = useMemo(() => {
-    if (!query || query === selectedName) return allMonsters;
-    const lower = query.toLowerCase();
-    return allMonsters.filter((m) => m.name.toLowerCase().includes(lower));
-  }, [query, allMonsters, selectedName]);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  // 外部からの値注入（プリセット選択時）
+  // 外部からの値注入（プリセット選択時）- presetVersion を依存に含めることで同値でも再発火する
   useEffect(() => {
     if (externalLevel !== undefined) {
       setLevel(String(externalLevel));
     }
-  }, [externalLevel]);
+  }, [externalLevel, presetVersion]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (externalMonsterName !== undefined) {
-      setQuery(externalMonsterName);
-      setSelectedName(externalMonsterName);
+      const monster = allMonsters.find((m) => m.name === externalMonsterName);
+      if (monster) setSelectedMonster(monster);
     }
-  }, [externalMonsterName]);
+  }, [externalMonsterName, allMonsters, presetVersion]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSelectMonster = (monster: MonsterBase) => {
-    setSelectedName(monster.name);
-    setQuery(monster.name);
-    setIsOpen(false);
+    setSelectedMonster(monster);
     const lvl = parseInt(level) || 1;
     onSelect(monster, lvl);
     onMonsterPick?.(monster, lvl);
@@ -67,20 +55,9 @@ export function MonsterSelector({
 
   const handleLevelChange = (newLevel: string) => {
     setLevel(newLevel);
-    if (selectedName) {
-      const monster = allMonsters.find((m) => m.name === selectedName);
-      if (monster) {
-        onSelect(monster, parseInt(newLevel) || 1);
-      }
+    if (selectedMonster) {
+      onSelect(selectedMonster, parseInt(newLevel) || 1);
     }
-  };
-
-  const elementColors: Record<string, string> = {
-    火: "bg-red-100 text-red-600",
-    水: "bg-blue-100 text-blue-600",
-    木: "bg-green-100 text-green-600",
-    光: "bg-yellow-100 text-yellow-700",
-    闇: "bg-purple-100 text-purple-600",
   };
 
   return (
@@ -93,46 +70,28 @@ export function MonsterSelector({
           敵を選択してレベルを指定
         </span>
       </div>
-      <div className="grid grid-cols-[1fr_auto] gap-3" ref={containerRef}>
-        <div className="relative">
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setIsOpen(true);
-              if (e.target.value !== selectedName) {
-                setSelectedName("");
-              }
-            }}
-            onFocus={() => setIsOpen(true)}
-            placeholder="モンスター名を検索..."
-            className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-          {isOpen && filtered.length > 0 && (
-            <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
-              {filtered.map((monster, i) => (
-                <button
-                  key={`${monster.name}-${i}`}
-                  onClick={() => handleSelectMonster(monster)}
-                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center justify-between"
-                >
-                  <span className="text-gray-800">{monster.name}</span>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`text-xs px-1.5 py-0.5 rounded ${elementColors[monster.element] ?? "bg-gray-100 text-gray-500"}`}
-                    >
-                      {monster.element}
-                    </span>
-                    <span className="text-xs text-gray-400">
-                      {monster.attackType}
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
+      <div className="grid grid-cols-[1fr_auto] gap-3">
+        {/* Monster picker button */}
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center justify-between px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-left hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+        >
+          {selectedMonster ? (
+            <span className="flex items-center gap-2 min-w-0">
+              <span className="font-medium text-gray-800 truncate">{selectedMonster.name}</span>
+              <span className={`text-xs px-1.5 py-0.5 rounded-full flex-shrink-0 ${elementColors[selectedMonster.element] ?? "bg-gray-100 text-gray-500"}`}>
+                {selectedMonster.element}
+              </span>
+            </span>
+          ) : (
+            <span className="text-gray-400">モンスターを選択...</span>
           )}
-        </div>
+          <svg className="w-4 h-4 text-gray-400 flex-shrink-0 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        {/* Level input */}
         <div className="flex items-center gap-2">
           <label className="text-sm font-medium text-gray-600 whitespace-nowrap">
             Lv
@@ -147,6 +106,12 @@ export function MonsterSelector({
           />
         </div>
       </div>
+
+      <MonsterSelectorModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSelect={handleSelectMonster}
+      />
     </div>
   );
 }

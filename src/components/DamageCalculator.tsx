@@ -32,6 +32,7 @@ import { StatCard } from "./ui/StatCard";
 import { ResultRow } from "./ui/ResultRow";
 import { ProgressBar } from "./ui/ProgressBar";
 import { MonsterSelector } from "./ui/MonsterSelector";
+import { EnemyPresetModal } from "./ui/EnemyPresetModal";
 
 type PlayerAttackMode = "物理" | "魔弾" | "魔攻";
 
@@ -126,13 +127,16 @@ export function DamageCalculator() {
   // 敵プリセット
   const [injectedLevel, setInjectedLevel] = useState<number | undefined>(undefined);
   const [injectedMonsterName, setInjectedMonsterName] = useState<string | undefined>(undefined);
+  const [enemyModalOpen, setEnemyModalOpen] = useState(false);
+  const [selectedPresetLabel, setSelectedPresetLabel] = useState<string | null>(null);
+  const [presetVersion, setPresetVersion] = useState(0);
 
-  const handleEnemyPresetChange = useCallback((value: string) => {
-    if (!value) return;
-    const [groupIdx, presetIdx] = value.split("-").map(Number);
+  const handleEnemyPresetSelect = useCallback((groupIdx: number, presetIdx: number) => {
     const preset = enemyPresetGroups[groupIdx]?.presets[presetIdx];
     if (!preset) return;
 
+    setSelectedPresetLabel(formatPresetLabel(preset));
+    setPresetVersion((v) => v + 1);
     setInjectedLevel(preset.level);
 
     if (preset.monsterName) {
@@ -368,29 +372,31 @@ export function DamageCalculator() {
         {/* 敵プリセット */}
         <div className="space-y-1.5">
           <label className="block text-xs font-medium text-gray-500">敵プリセット</label>
-          <select
-            defaultValue=""
-            onChange={(e) => handleEnemyPresetChange(e.target.value)}
-            className="w-full text-sm rounded-xl border border-gray-200 bg-white px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          <button
+            onClick={() => setEnemyModalOpen(true)}
+            className="w-full flex items-center justify-between px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm text-left hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
           >
-            <option value="">プリセットから選択...</option>
-            {enemyPresetGroups.map((group, gi) => (
-              <optgroup key={gi} label={group.label}>
-                {group.presets.map((preset, pi) => (
-                  <option key={`${gi}-${pi}`} value={`${gi}-${pi}`}>
-                    {formatPresetLabel(preset)}
-                  </option>
-                ))}
-              </optgroup>
-            ))}
-          </select>
+            <span className={selectedPresetLabel ? "text-gray-800 truncate" : "text-gray-400"}>
+              {selectedPresetLabel ?? "プリセットから選択..."}
+            </span>
+            <svg className="w-4 h-4 text-gray-400 flex-shrink-0 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          <EnemyPresetModal
+            isOpen={enemyModalOpen}
+            onClose={() => setEnemyModalOpen(false)}
+            onSelect={handleEnemyPresetSelect}
+          />
         </div>
 
         <MonsterSelector
           onSelect={handleMonsterSelect}
+          onMonsterPick={() => setSelectedPresetLabel(null)}
           selectedMonster={selectedMonster}
           externalLevel={injectedLevel}
           externalMonsterName={injectedMonsterName}
+          presetVersion={presetVersion}
         />
 
         <div className="border-t border-gray-100" />
