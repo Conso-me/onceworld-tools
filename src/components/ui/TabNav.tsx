@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 export interface Tab {
   id: string;
   label: string;
+  icon?: string;
   disabled?: boolean;
 }
 
@@ -54,6 +55,7 @@ export function TabNav({
                 : "text-gray-500 hover:text-gray-700"
           }`}
         >
+          {tab.icon && <span className="mr-1">{tab.icon}</span>}
           {tab.label}
           {tab.disabled && (
             <span className="ml-1 text-xs text-gray-300">準備中</span>
