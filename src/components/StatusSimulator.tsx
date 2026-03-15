@@ -1,14 +1,14 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePersistedState, usePersistedGroup } from "../hooks/usePersistedState";
 import { useStatPresets } from "../hooks/useStatPresets";
 import { calcStatus, calcAllocatedPoints, getAvailablePoints, getPerStatLimit } from "../utils/statusCalc";
 import {
-  getEquipmentBySlot, getEquipmentByName,
-  getAllAccessoryNames, getAccessoryByName,
-  getPetsByPrimaryStat, getPetMaxSkillSummary,
+  getEquipmentByName, equipment,
+  getAccessoryByName, accessories,
+  getPetsByPrimaryStat, getPetSkillSummaryForCategory,
 } from "../data";
-import type { PetStatCategory } from "../data";
-import type { SimConfig, CoreStats, EquipmentSlot, Element } from "../types/game";
+import type { PetStatCategory, PetCategoryGroup } from "../data";
+import type { SimConfig, CoreStats, EquipmentSlot, Element, AccessoryItem, EquipmentItem } from "../types/game";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -62,6 +62,70 @@ const PET_STAT_CATEGORY_ORDER: PetStatCategory[] = [
 
 // Computed once — pet data is static
 const petStatGroups = getPetsByPrimaryStat();
+
+// ── Equipment grouping ────────────────────────────────────────────────────────
+
+const EQUIP_SERIES_ORDER = ["皮", "鉄", "プラチナ", "魔導士", "獄炎", "ドラゴン", "その他"] as const;
+type EquipSeries = typeof EQUIP_SERIES_ORDER[number];
+
+// Computed once — slot → series → items (items named "なし" are excluded)
+const equipGroups = (() => {
+  const slotMap = new Map<EquipmentSlot, Map<EquipSeries, EquipmentItem[]>>();
+  for (const item of equipment) {
+    if (item.name === "なし") continue;
+    if (!slotMap.has(item.slot)) slotMap.set(item.slot, new Map());
+    const seriesMap = slotMap.get(item.slot)!;
+    const series: EquipSeries = (item.series as EquipSeries) ?? "その他";
+    if (!seriesMap.has(series)) seriesMap.set(series, []);
+    seriesMap.get(series)!.push(item);
+  }
+  return slotMap;
+})();
+
+function getEquipStatSummary(item: EquipmentItem): string {
+  const stats = [
+    { key: "ATK", val: item.atk }, { key: "INT", val: item.int },
+    { key: "DEF", val: item.def }, { key: "M-DEF", val: item.mdef },
+    { key: "VIT", val: item.vit }, { key: "SPD", val: item.spd },
+    { key: "LUCK", val: item.luck },
+  ].filter((s) => s.val > 0).sort((a, b) => b.val - a.val);
+  return stats.slice(0, 2).map((s) => `${s.key} +${s.val}`).join("・");
+}
+
+// ── Accessory grouping ────────────────────────────────────────────────────────
+
+const ACC_CATEGORY_ORDER = ["体力", "攻撃力", "魔力", "防御力", "魔法防御力", "幸運", "攻撃速度", "その他"] as const;
+type AccCategory = typeof ACC_CATEGORY_ORDER[number];
+
+function accEffectCat(type: string): AccCategory {
+  if (type.startsWith("VIT"))   return "体力";
+  if (type.startsWith("ATK"))   return "攻撃力";
+  if (type.startsWith("INT"))   return "魔力";
+  if (type.startsWith("M-DEF")) return "魔法防御力";
+  if (type.startsWith("DEF"))   return "防御力";
+  if (type.startsWith("LUCK"))  return "幸運";
+  if (type.startsWith("SPD"))   return "攻撃速度";
+  return "その他";
+}
+
+// Computed once — accessory data is static
+const accGroups = (() => {
+  const map = new Map<AccCategory, AccessoryItem[]>();
+  for (const acc of accessories) {
+    const cat = acc.effects.length > 0 ? accEffectCat(acc.effects[0].type) : "その他";
+    if (!map.has(cat)) map.set(cat, []);
+    map.get(cat)!.push(acc);
+  }
+  return map;
+})();
+
+function getAccSummary(acc: AccessoryItem): string {
+  return acc.effects.map((e) => `${e.type} +${e.value}`).join("・");
+}
+
+function getAccMaxLvLabel(maxLevel: number): string {
+  return maxLevel >= 9999 ? "上限なし" : `Lv~${maxLevel}`;
+}
 
 const PROTEIN_KEYS: { cfg: keyof SimConfig; label: string }[] = [
   { cfg: "proteinVit",  label: "VIT"   },
@@ -168,6 +232,525 @@ function NumInput({
   );
 }
 
+// ── Pet Sub Group (実数 / 加算% / 乗算) ──────────────────────────────────────
+
+// ── Equip Selector Modal ──────────────────────────────────────────────────────
+
+function EquipSelectorModal({
+  slotLabel, slot, selectedName, onEquipChange, onClose,
+}: {
+  slotLabel: string;
+  slot: EquipmentSlot;
+  selectedName: string;
+  onEquipChange: (name: string) => void;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  const slotGroups = equipGroups.get(slot);
+  const isNoneSelected = !selectedName || selectedName === "なし";
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-12 bg-black/40"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[75vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* ヘッダー */}
+        <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-200 shrink-0">
+          <h3 className="text-sm font-semibold text-gray-700">{slotLabel} を選択</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl leading-none px-1">×</button>
+        </div>
+
+        {/* リスト（常に展開） */}
+        <div className="overflow-y-auto flex-1">
+          {/* なし */}
+          <button
+            type="button"
+            onClick={() => { onEquipChange(""); onClose(); }}
+            className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm transition-colors border-l-2 ${
+              isNoneSelected
+                ? "bg-blue-50 text-blue-700 font-medium border-blue-400"
+                : "text-gray-500 hover:bg-gray-50 border-transparent"
+            }`}
+          >
+            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isNoneSelected ? "bg-blue-400" : "bg-gray-300"}`} />
+            <span className="text-xs">なし</span>
+          </button>
+
+          {/* シリーズ見出し + アイテム（常に展開） */}
+          {EQUIP_SERIES_ORDER.map((series) => {
+            const items = slotGroups?.get(series);
+            if (!items?.length) return null;
+            return (
+              <div key={series} className="border-t border-gray-200">
+                <div className="px-4 py-1.5 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  {series}
+                </div>
+                <div className="bg-white">
+                  {items.map((item) => {
+                    const selected = selectedName === item.name;
+                    const summary = getEquipStatSummary(item);
+                    return (
+                      <button
+                        key={item.name}
+                        type="button"
+                        onClick={() => { onEquipChange(item.name); onClose(); }}
+                        className={`w-full flex items-center gap-2 px-4 py-2 text-sm transition-colors border-l-2 border-b border-b-gray-100 last:border-b-0 ${
+                          selected
+                            ? "bg-blue-50 text-blue-700 font-medium border-l-blue-400"
+                            : "text-gray-700 hover:bg-gray-50 border-l-transparent"
+                        }`}
+                      >
+                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${selected ? "bg-blue-400" : "bg-gray-300"}`} />
+                        <span className="flex-1 text-left text-xs truncate">{item.name}</span>
+                        {summary && <span className="text-xs text-gray-400 shrink-0">{summary}</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* フッター */}
+        <div className="px-4 py-2.5 border-t border-gray-100 shrink-0">
+          <button
+            onClick={onClose}
+            className="w-full text-xs py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors font-medium"
+          >
+            閉じる
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EquipSelector({
+  slot, slotLabel, selectedName, enhVal, onEquipChange, onEnhChange,
+}: {
+  slot: EquipmentSlot;
+  slotLabel: string;
+  selectedName: string;
+  enhVal: number;
+  onEquipChange: (name: string) => void;
+  onEnhChange: (v: number) => void;
+}) {
+  const [modalOpen, setModalOpen] = useState(false);
+  const item = selectedName ? getEquipmentByName(selectedName) : undefined;
+  const canEnhance = item ? item.material !== "強化できない" : false;
+  const isNone = !selectedName || selectedName === "なし";
+
+  return (
+    <div className="space-y-1.5">
+      <span className="text-xs text-gray-500 font-medium">{slotLabel}</span>
+      <div className="flex gap-2 items-center">
+        <button
+          type="button"
+          onClick={() => setModalOpen(true)}
+          className="flex-1 text-left border border-gray-200 rounded-lg px-3 py-1.5 text-xs bg-white hover:bg-gray-50 transition-colors min-w-0"
+        >
+          {!isNone
+            ? <span className="text-gray-700 truncate block">{selectedName}</span>
+            : <span className="text-gray-400">なし（タップして選択）</span>
+          }
+        </button>
+        <div className="flex items-center gap-1 shrink-0">
+          <span className="text-xs text-gray-400">+</span>
+          <input
+            type="number" min={0} max={1100} value={enhVal}
+            disabled={!canEnhance}
+            onChange={(e) => onEnhChange(Math.max(0, Math.min(1100, Number(e.target.value))))}
+            className="w-16 border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:bg-gray-50 disabled:text-gray-300"
+          />
+          <button onClick={() => onEnhChange(1100)} disabled={!canEnhance} className={maxBtnCls}>MAX</button>
+        </div>
+      </div>
+      {modalOpen && (
+        <EquipSelectorModal
+          slotLabel={slotLabel}
+          slot={slot}
+          selectedName={selectedName}
+          onEquipChange={onEquipChange}
+          onClose={() => setModalOpen(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+// ── Acc Selector Modal ────────────────────────────────────────────────────────
+
+function AccSelectorModal({
+  slotLabel, accName, onAccChange, onClose,
+}: {
+  slotLabel: string;
+  accName: string;
+  onAccChange: (name: string) => void;
+  onClose: () => void;
+}) {
+  const [openCategory, setOpenCategory] = useState<AccCategory | null>(null);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-12 bg-black/40"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[75vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* ヘッダー */}
+        <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-200 shrink-0">
+          <h3 className="text-sm font-semibold text-gray-700">{slotLabel} を選択</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl leading-none px-1">×</button>
+        </div>
+
+        {/* リスト */}
+        <div className="overflow-y-auto flex-1">
+          {/* なし */}
+          <button
+            type="button"
+            onClick={() => { onAccChange(""); onClose(); }}
+            className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm transition-colors border-l-2 ${
+              !accName
+                ? "bg-blue-50 text-blue-700 font-medium border-blue-400"
+                : "text-gray-500 hover:bg-gray-50 border-transparent"
+            }`}
+          >
+            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${!accName ? "bg-blue-400" : "bg-gray-300"}`} />
+            <span className="text-xs">なし</span>
+          </button>
+
+          {/* カテゴリアコーディオン */}
+          {ACC_CATEGORY_ORDER.map((cat) => {
+            const items = accGroups.get(cat);
+            if (!items?.length) return null;
+            const isOpen = openCategory === cat;
+            return (
+              <div key={cat} className="border-t border-gray-200">
+                <button
+                  type="button"
+                  onClick={() => setOpenCategory(isOpen ? null : cat)}
+                  className={`w-full flex items-center justify-between px-4 py-2.5 text-sm font-semibold transition-colors ${
+                    isOpen ? "bg-indigo-50 text-indigo-700" : "bg-gray-50 text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  <span>{cat}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-normal bg-white/80 rounded-full px-2 py-0.5 text-gray-500 border border-gray-200">
+                      {items.length}個
+                    </span>
+                    <span className="text-xs text-gray-400">{isOpen ? "▲" : "▼"}</span>
+                  </div>
+                </button>
+                {isOpen && (
+                  <div className="bg-white">
+                    {items.map((acc) => {
+                      const selected = accName === acc.name;
+                      return (
+                        <button
+                          key={acc.name}
+                          type="button"
+                          onClick={() => { onAccChange(acc.name); onClose(); }}
+                          className={`w-full flex items-center gap-2 px-4 py-2 text-sm transition-colors border-l-2 border-b border-b-gray-100 last:border-b-0 ${
+                            selected
+                              ? "bg-blue-50 text-blue-700 font-medium border-l-blue-400"
+                              : "text-gray-700 hover:bg-gray-50 border-l-transparent"
+                          }`}
+                        >
+                          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${selected ? "bg-blue-400" : "bg-gray-300"}`} />
+                          <span className="flex-1 text-left text-xs truncate">{acc.name}</span>
+                          <span className="text-xs text-gray-400 shrink-0">{getAccSummary(acc)}</span>
+                          <span className="text-xs text-gray-300 shrink-0">{getAccMaxLvLabel(acc.maxLevel)}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* フッター */}
+        <div className="px-4 py-2.5 border-t border-gray-100 shrink-0">
+          <button
+            onClick={onClose}
+            className="w-full text-xs py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors font-medium"
+          >
+            閉じる
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AccSelector({
+  slotLabel, accName, accLevel, effMax,
+  onAccChange, onLevelChange,
+}: {
+  slotLabel: string;
+  accName: string;
+  accLevel: number;
+  effMax: number;
+  onAccChange: (name: string) => void;
+  onLevelChange: (lv: number) => void;
+}) {
+  const [modalOpen, setModalOpen] = useState(false);
+  return (
+    <div className="space-y-1.5">
+      <span className="text-xs text-gray-500 font-medium">{slotLabel}</span>
+      <div className="flex gap-2 items-center">
+        <button
+          type="button"
+          onClick={() => setModalOpen(true)}
+          className="flex-1 text-left border border-gray-200 rounded-lg px-3 py-1.5 text-xs bg-white hover:bg-gray-50 transition-colors min-w-0"
+        >
+          {accName
+            ? <span className="text-gray-700 truncate block">{accName}</span>
+            : <span className="text-gray-400">なし（タップして選択）</span>
+          }
+        </button>
+        <div className="flex items-center gap-1 shrink-0">
+          <span className="text-xs text-gray-400">Lv</span>
+          <input
+            type="number" min={1} max={effMax} value={accLevel}
+            disabled={!accName}
+            onChange={(e) => onLevelChange(Math.max(1, Math.min(effMax, Number(e.target.value))))}
+            className="w-16 border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:bg-gray-50 disabled:text-gray-300"
+          />
+          <button
+            onClick={() => onLevelChange(effMax)}
+            disabled={!accName}
+            className={maxBtnCls}
+          >MAX</button>
+        </div>
+      </div>
+      {modalOpen && (
+        <AccSelectorModal
+          slotLabel={slotLabel}
+          accName={accName}
+          onAccChange={(name) => {
+            onAccChange(name);
+          }}
+          onClose={() => setModalOpen(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+const SUBGROUP_STYLE: Record<string, string> = {
+  "実数":       "bg-sky-50 text-sky-700 border-sky-200",
+  "加算%":      "bg-emerald-50 text-emerald-700 border-emerald-200",
+  "乗算（最終%）": "bg-violet-50 text-violet-700 border-violet-200",
+};
+
+function PetSubGroup({
+  label, pets, showLabel, cat, subgroupKey, petName, petLevel, onPetChange, onLevelChange,
+}: {
+  label: string;
+  pets: PetCategoryGroup["flat"];
+  showLabel: boolean;
+  cat: PetStatCategory;
+  subgroupKey: keyof PetCategoryGroup;
+  petName: string;
+  petLevel: number;
+  onPetChange: (name: string) => void;
+  onLevelChange: (level: number) => void;
+}) {
+  if (pets.length === 0) return null;
+  const labelCls = SUBGROUP_STYLE[label] ?? "bg-gray-50 text-gray-500 border-gray-200";
+  return (
+    <>
+      {showLabel && (
+        <div className={`flex items-center gap-2 px-4 py-1 border-y text-xs font-semibold ${labelCls}`}>
+          <span>{label}</span>
+          <span className="font-normal opacity-60">{pets.length}体</span>
+        </div>
+      )}
+      {pets.map((pet) => {
+        const selected = petName === pet.name;
+        return (
+          <div key={pet.name}>
+            <button
+              type="button"
+              onClick={() => {
+                onPetChange(pet.name);
+                if (!selected) onLevelChange(181);
+              }}
+              className={`w-full flex items-center gap-2 px-4 py-2 text-sm transition-colors border-l-2 ${
+                selected
+                  ? "bg-blue-50 text-blue-700 font-medium border-blue-400"
+                  : "text-gray-700 hover:bg-gray-50 border-transparent"
+              }`}
+            >
+              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${selected ? "bg-blue-400" : "bg-gray-300"}`} />
+              <span className="flex-1 text-left text-xs truncate">{pet.name}</span>
+              <span className="text-xs text-gray-400 shrink-0">{getPetSkillSummaryForCategory(pet, cat, subgroupKey)}</span>
+            </button>
+            {selected && (
+              <div className="flex flex-wrap gap-x-4 gap-y-1 px-6 py-2 bg-blue-50 border-t border-blue-100 border-l-2 border-l-blue-400">
+                {PET_LEVELS.map((lv) => (
+                  <label key={lv} className="flex items-center gap-1 text-xs cursor-pointer">
+                    <input
+                      type="radio"
+                      checked={petLevel === lv}
+                      onChange={() => onLevelChange(lv)}
+                      className="accent-blue-500"
+                    />
+                    <span className={petLevel === lv ? "text-blue-700 font-semibold" : "text-gray-600"}>
+                      {lv === 0 ? "なし" : `Lv${lv}`}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+// ── Pet Selector Modal ────────────────────────────────────────────────────────
+
+function PetSelectorModal({
+  slotLabel, petName, petLevel, onPetChange, onLevelChange, onClose,
+}: {
+  slotLabel: string;
+  petName: string;
+  petLevel: number;
+  onPetChange: (name: string) => void;
+  onLevelChange: (level: number) => void;
+  onClose: () => void;
+}) {
+  const [openCategory, setOpenCategory] = useState<PetStatCategory | null>(null);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-12 bg-black/40"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[75vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* ヘッダー */}
+        <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-200 shrink-0">
+          <h3 className="text-sm font-semibold text-gray-700">{slotLabel} を選択</h3>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 text-xl leading-none px-1"
+          >×</button>
+        </div>
+
+        {/* リスト */}
+        <div className="overflow-y-auto flex-1">
+          {/* なし */}
+          <button
+            type="button"
+            onClick={() => { onPetChange(""); onLevelChange(0); onClose(); }}
+            className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm transition-colors border-l-2 ${
+              !petName
+                ? "bg-blue-50 text-blue-700 font-medium border-blue-400"
+                : "text-gray-500 hover:bg-gray-50 border-transparent"
+            }`}
+          >
+            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${!petName ? "bg-blue-400" : "bg-gray-300"}`} />
+            <span className="text-xs">なし</span>
+          </button>
+
+          {/* カテゴリアコーディオン */}
+          {PET_STAT_CATEGORY_ORDER.map((cat) => {
+            const group = petStatGroups.get(cat);
+            const totalCount = (group?.flat.length ?? 0) + (group?.pct.length ?? 0) + (group?.finalPct.length ?? 0);
+            if (!totalCount) return null;
+            const isOpen = openCategory === cat;
+            const hasMultipleGroups = group
+              ? [group.flat, group.pct, group.finalPct].filter((g) => g.length > 0).length > 1
+              : false;
+            return (
+              <div key={cat} className="border-t border-gray-200">
+                <button
+                  type="button"
+                  onClick={() => setOpenCategory(isOpen ? null : cat)}
+                  className={`w-full flex items-center justify-between px-4 py-2.5 text-sm font-semibold transition-colors ${
+                    isOpen ? "bg-indigo-50 text-indigo-700" : "bg-gray-50 text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  <span>{cat}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-normal bg-white/80 rounded-full px-2 py-0.5 text-gray-500 border border-gray-200">
+                      {totalCount}体
+                    </span>
+                    <span className="text-xs text-gray-400">{isOpen ? "▲" : "▼"}</span>
+                  </div>
+                </button>
+                {isOpen && group && (
+                  <div className="bg-white">
+                    <PetSubGroup
+                      label="実数" pets={group.flat} showLabel={hasMultipleGroups}
+                      cat={cat} subgroupKey="flat"
+                      petName={petName} petLevel={petLevel}
+                      onPetChange={onPetChange} onLevelChange={onLevelChange}
+                    />
+                    <PetSubGroup
+                      label="加算%" pets={group.pct} showLabel={hasMultipleGroups}
+                      cat={cat} subgroupKey="pct"
+                      petName={petName} petLevel={petLevel}
+                      onPetChange={onPetChange} onLevelChange={onLevelChange}
+                    />
+                    <PetSubGroup
+                      label="乗算（最終%）" pets={group.finalPct} showLabel={hasMultipleGroups}
+                      cat={cat} subgroupKey="finalPct"
+                      petName={petName} petLevel={petLevel}
+                      onPetChange={onPetChange} onLevelChange={onLevelChange}
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* フッター */}
+        <div className="px-4 py-2.5 border-t border-gray-100 shrink-0">
+          <button
+            onClick={onClose}
+            className="w-full text-xs py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors font-medium"
+          >
+            閉じる
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Pet Selector ──────────────────────────────────────────────────────────────
 
 function PetSelector({
@@ -179,87 +762,31 @@ function PetSelector({
   onPetChange: (name: string) => void;
   onLevelChange: (level: number) => void;
 }) {
-  const [openCategory, setOpenCategory] = useState<PetStatCategory | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-1">
       <span className="text-xs text-gray-500 font-medium">{slotLabel}</span>
-      <div className="text-xs bg-gray-50 rounded-lg px-3 py-1.5 text-gray-600 min-h-[28px]">
+      <button
+        type="button"
+        onClick={() => setModalOpen(true)}
+        className="w-full text-left border border-gray-200 rounded-lg px-3 py-1.5 text-xs bg-white hover:bg-gray-50 transition-colors"
+      >
         {petName
-          ? `選択中: ${petName} (${petLevel === 0 ? "Lv—" : `Lv${petLevel}`})`
-          : "なし"}
-      </div>
-      <div className="border border-gray-200 rounded-lg overflow-hidden text-sm max-h-64 overflow-y-auto">
-        {/* なし */}
-        <button
-          type="button"
-          onClick={() => { onPetChange(""); onLevelChange(0); }}
-          className={`w-full text-left px-3 py-1.5 hover:bg-gray-50 transition-colors text-xs ${
-            !petName ? "bg-blue-50 text-blue-700 font-medium" : "text-gray-600"
-          }`}
-        >
-          なし
-        </button>
-
-        {/* カテゴリアコーディオン */}
-        {PET_STAT_CATEGORY_ORDER.map((cat) => {
-          const petsInCat = petStatGroups.get(cat);
-          if (!petsInCat?.length) return null;
-          const isOpen = openCategory === cat;
-          return (
-            <div key={cat} className="border-t border-gray-100">
-              <button
-                type="button"
-                onClick={() => setOpenCategory(isOpen ? null : cat)}
-                className="w-full flex items-center justify-between px-3 py-1.5 text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                <span className="font-medium text-xs">[{cat}]</span>
-                <span className="text-xs text-gray-400">
-                  {isOpen ? "▲" : "▼"} {petsInCat.length}体
-                </span>
-              </button>
-              {isOpen && (
-                <div className="border-t border-gray-100">
-                  {petsInCat.map((pet) => (
-                    <div key={pet.name} className="border-b border-gray-100 last:border-0">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          onPetChange(pet.name);
-                          if (petName !== pet.name) onLevelChange(181);
-                        }}
-                        className={`w-full flex items-center justify-between px-4 py-1.5 text-xs hover:bg-blue-50/50 transition-colors ${
-                          petName === pet.name
-                            ? "bg-blue-50 text-blue-700 font-medium"
-                            : "text-gray-600"
-                        }`}
-                      >
-                        <span>{pet.name}</span>
-                        <span className="text-gray-400 ml-2 shrink-0">{getPetMaxSkillSummary(pet)}</span>
-                      </button>
-                      {petName === pet.name && (
-                        <div className="flex flex-wrap gap-x-3 gap-y-1 px-4 py-1.5 bg-blue-50/30">
-                          {PET_LEVELS.map((lv) => (
-                            <label key={lv} className="flex items-center gap-1 text-xs cursor-pointer">
-                              <input
-                                type="radio"
-                                checked={petLevel === lv}
-                                onChange={() => onLevelChange(lv)}
-                                className="accent-blue-500"
-                              />
-                              {lv === 0 ? "なし" : `Lv${lv}`}
-                            </label>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+          ? <span className="text-gray-700">{petName}（{petLevel === 0 ? "Lv—" : `Lv${petLevel}`}）</span>
+          : <span className="text-gray-400">なし（タップして選択）</span>
+        }
+      </button>
+      {modalOpen && (
+        <PetSelectorModal
+          slotLabel={slotLabel}
+          petName={petName}
+          petLevel={petLevel}
+          onPetChange={onPetChange}
+          onLevelChange={onLevelChange}
+          onClose={() => setModalOpen(false)}
+        />
+      )}
     </div>
   );
 }
@@ -286,7 +813,6 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SetFie
   const remaining = available - used;
   const overflowed = remaining < 0;
 
-  const accNames = getAllAccessoryNames();
 
   const cappedStats = ALLOC_KEYS
     .map(({ cfg: k, label }) => ({ label, value: cfg[k] as number }))
@@ -353,17 +879,17 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SetFie
 
       {/* ── 基本タブ ── */}
       {activeTab === "basic" && (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {/* キャラクター設定 */}
-          <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+          <section className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
             <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">キャラクター設定</h3>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2">
               <NumInput label="レベル" value={cfg.charLevel} min={1} max={200}
                 onChange={(v) => setField("charLevel", v)} />
               <NumInput label="天命輪廻 (回数)" value={cfg.reinCount} min={0}
                 onChange={(v) => setField("reinCount", v)} />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2">
               <label className="space-y-1">
                 <span className="text-xs text-gray-500">属性</span>
                 <select
@@ -394,57 +920,60 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SetFie
           </section>
 
           {/* 振り分けポイント・上限 */}
-          <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+          <section className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
             <SectionHeader title="振り分けポイント・上限" onAllMax={maxAllPoints} />
-            <div className="space-y-1">
-              <p className="text-xs font-medium text-gray-500">ポイント補正</p>
-              <NumInput label="ヨハネの羽ペン (利用可能ポイント×1%/個)" value={cfg.johaneCount} max={1000}
-                onChange={(v) => setField("johaneCount", v)} />
+            <NumInput label="ヨハネの羽ペン (利用可能ポイント×1%/個)" value={cfg.johaneCount} max={1000}
+              onChange={(v) => setField("johaneCount", v)} />
+            <div className="grid grid-cols-2 gap-2">
+              <NumInput label="禁域の書物 (+80/個)" value={cfg.kinikiBookCount} max={1000}
+                onChange={(v) => setField("kinikiBookCount", v)} />
+              <NumInput label="賢者の落とし物 (+10/個)" value={cfg.sageItemCount} max={1000}
+                onChange={(v) => setField("sageItemCount", v)} />
             </div>
-            <div className="space-y-2">
-              <p className="text-xs font-medium text-gray-500">上限補正</p>
-              <div className="grid grid-cols-2 gap-3">
-                <NumInput label="禁域の書物 (+80/個)" value={cfg.kinikiBookCount} max={1000}
-                  onChange={(v) => setField("kinikiBookCount", v)} />
-                <NumInput label="賢者の落とし物 (+10/個)" value={cfg.sageItemCount} max={1000}
-                  onChange={(v) => setField("sageItemCount", v)} />
-              </div>
-              <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <input
-                  type="checkbox" checked={cfg.hasChoyoContract}
-                  onChange={(e) => setField("hasChoyoContract", e.target.checked)}
-                  className="accent-blue-500 w-4 h-4"
-                />
-                <span>超越の契約書所持 (+900,000)</span>
-              </label>
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-xs bg-gray-50 rounded-lg px-3 py-2">
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
+              <input
+                type="checkbox" checked={cfg.hasChoyoContract}
+                onChange={(e) => setField("hasChoyoContract", e.target.checked)}
+                className="accent-blue-500 w-4 h-4"
+              />
+              <span className="text-xs">超越の契約書所持 (+900,000)</span>
+            </label>
+            <div className="grid grid-cols-2 gap-2 text-xs bg-gray-50 rounded-lg px-3 py-1.5">
               <div>利用可能ポイント<br /><span className="font-mono font-semibold text-gray-700">{available.toLocaleString()}</span></div>
               <div>1ステータス上限<br /><span className="font-mono font-semibold text-gray-700">{perStatLimit.toLocaleString()}</span></div>
             </div>
           </section>
 
           {/* ステータス割り振り */}
-          <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+          <section className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">割り振りポイント</h3>
               <span className={`text-xs font-mono px-2 py-0.5 rounded-full ${overflowed ? "bg-red-100 text-red-600" : "bg-green-100 text-green-700"}`}>
                 残り {remaining.toLocaleString()}
               </span>
             </div>
-            <div className="grid grid-cols-2 gap-x-3 gap-y-2">
+            <div className="grid grid-cols-3 gap-x-2 gap-y-1.5">
               {ALLOC_KEYS.map(({ cfg: cfgKey, label }) => {
                 const val = cfg[cfgKey] as number;
                 const over = val > perStatLimit;
+                const canAdd = remaining > 0 && val < perStatLimit;
                 return (
-                  <label key={cfgKey} className="space-y-1">
+                  <div key={cfgKey} className="space-y-0.5">
                     <span className={`text-xs ${over ? "text-red-500 font-semibold" : "text-gray-500"}`}>{label}</span>
-                    <input
-                      type="number" min={0} value={val}
-                      onChange={(e) => setField(cfgKey, Math.max(0, Number(e.target.value)))}
-                      className={`w-full border rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 ${over ? "border-red-300 focus:ring-red-300" : "border-gray-200 focus:ring-blue-300"}`}
-                    />
-                  </label>
+                    <div className="flex gap-1 items-center">
+                      <input
+                        type="number" min={0} value={val}
+                        onChange={(e) => setField(cfgKey, Math.max(0, Number(e.target.value)))}
+                        className={`flex-1 min-w-0 border rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 ${over ? "border-red-300 focus:ring-red-300" : "border-gray-200 focus:ring-blue-300"}`}
+                      />
+                      <button
+                        disabled={!canAdd}
+                        onClick={() => setField(cfgKey, Math.min(val + remaining, perStatLimit))}
+                        title={`残り${remaining.toLocaleString()}pt全振り`}
+                        className="shrink-0 text-xs px-1 py-1 rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 font-medium transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+                      >残</button>
+                    </div>
+                  </div>
                 );
               })}
             </div>
@@ -463,46 +992,17 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SetFie
           <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
             <SectionHeader title="装備" onAllMax={maxAllEquip} />
             <div className="space-y-3">
-              {EQUIPMENT_SLOTS.map(({ slot, label, cfgKey, enhKey }) => {
-                const items = getEquipmentBySlot(slot);
-                const selectedName = cfg[cfgKey] as string;
-                const item = selectedName ? getEquipmentByName(selectedName) : undefined;
-                const canEnhance = item ? item.material !== "強化できない" : false;
-                const enhVal = cfg[enhKey] as number;
-                return (
-                  <div key={slot} className="space-y-1.5">
-                    <span className="text-xs text-gray-500 font-medium">{label}</span>
-                    <div className="flex gap-2 items-center">
-                      <select
-                        value={selectedName}
-                        onChange={(e) => setField(cfgKey, e.target.value)}
-                        className={`${inputCls} flex-1`}
-                      >
-                        <option value="">なし</option>
-                        {items.map((it) => (
-                          <option key={it.name} value={it.name}>{it.name}</option>
-                        ))}
-                      </select>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <span className="text-xs text-gray-400">+</span>
-                        <input
-                          type="number" min={0} max={1100} value={enhVal}
-                          disabled={!canEnhance}
-                          onChange={(e) => setField(enhKey, Math.max(0, Math.min(1100, Number(e.target.value))))}
-                          className="w-16 border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:bg-gray-50 disabled:text-gray-300"
-                        />
-                        <button
-                          onClick={() => setField(enhKey, 1100)}
-                          disabled={!canEnhance}
-                          className={maxBtnCls}
-                        >
-                          MAX
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+              {EQUIPMENT_SLOTS.map(({ slot, label, cfgKey, enhKey }) => (
+                <EquipSelector
+                  key={slot}
+                  slot={slot}
+                  slotLabel={label}
+                  selectedName={cfg[cfgKey] as string}
+                  enhVal={cfg[enhKey] as number}
+                  onEquipChange={(name) => setField(cfgKey, name)}
+                  onEnhChange={(v) => setField(enhKey, v)}
+                />
+              ))}
             </div>
           </section>
         </div>
@@ -520,44 +1020,21 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SetFie
                 const effMax = acc ? effectiveAccMax(acc.maxLevel) : 1;
                 const lv = Math.min(cfg[levelKey] as number, effMax);
                 return (
-                  <div key={String(nameKey)} className="space-y-1.5">
-                    <span className="text-xs text-gray-500 font-medium">{label}</span>
-                    <div className="flex gap-2 items-center">
-                      <select
-                        value={accName}
-                        onChange={(e) => {
-                          const name = e.target.value;
-                          setField(nameKey, name);
-                          if (name) {
-                            const a = getAccessoryByName(name);
-                            if (a) setField(levelKey, defaultAccLevel(a.maxLevel));
-                          }
-                        }}
-                        className={`${inputCls} flex-1`}
-                      >
-                        <option value="">なし</option>
-                        {accNames.map((name) => (
-                          <option key={name} value={name}>{name}</option>
-                        ))}
-                      </select>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <span className="text-xs text-gray-400">Lv</span>
-                        <input
-                          type="number" min={1} max={effMax} value={lv}
-                          disabled={!accName}
-                          onChange={(e) => setField(levelKey, Math.max(1, Math.min(effMax, Number(e.target.value))))}
-                          className="w-16 border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:bg-gray-50 disabled:text-gray-300"
-                        />
-                        <button
-                          onClick={() => setField(levelKey, effMax)}
-                          disabled={!accName}
-                          className={maxBtnCls}
-                        >
-                          MAX
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  <AccSelector
+                    key={String(nameKey)}
+                    slotLabel={label}
+                    accName={accName}
+                    accLevel={lv}
+                    effMax={effMax}
+                    onAccChange={(name) => {
+                      setField(nameKey, name);
+                      if (name) {
+                        const a = getAccessoryByName(name);
+                        if (a) setField(levelKey, defaultAccLevel(a.maxLevel));
+                      }
+                    }}
+                    onLevelChange={(lv) => setField(levelKey, lv)}
+                  />
                 );
               })}
             </div>

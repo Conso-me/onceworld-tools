@@ -4,7 +4,7 @@ import { getAllMonsters } from "../../data/monsters";
 
 export function MonsterSelector({
   onSelect,
-  selectedMonster,
+  selectedMonster: _selectedMonster,
   externalLevel,
   externalMonsterName,
 }: {
