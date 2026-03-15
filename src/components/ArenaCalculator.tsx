@@ -38,6 +38,19 @@ const ARENA_MONSTERS: ArenaMonsterDef[] = ARENA_MONSTER_DEFS.flatMap((d) => {
 });
 
 // ────────────────────────────────────────────
+// LUK回避レベル
+// ────────────────────────────────────────────
+type LukEvasionLevel = "ほぼほぼ" | "大体" | "たぶん" | null;
+
+function calcLukEvasion(playerLuk: number, enemyLuk: number): LukEvasionLevel {
+  if (enemyLuk <= 0) return null;
+  if (playerLuk >= enemyLuk * 5) return "ほぼほぼ";
+  if (playerLuk >= enemyLuk * 4) return "大体";
+  if (playerLuk >= enemyLuk * 3) return "たぶん";
+  return null;
+}
+
+// ────────────────────────────────────────────
 // 無効化限界レベル逆算
 // scaleStat(base, lv) = floor(base * ((lv-1)*0.1 + 1)) <= effective/1.75
 // => lv <= (effective/(base*1.75) - 1) / 0.1 + 1
@@ -73,7 +86,38 @@ type ArenaResult = {
   nullifiedNow: boolean;
   maxNullifyLv: number | null;
   defReq: DefenseRequirement;
+  lukEvasionLevel: LukEvasionLevel;
+  scaledLuck: number;
 };
+
+function LukEvasionBadge({ level, enemyLuk }: { level: LukEvasionLevel; enemyLuk: number }) {
+  if (level === "ほぼほぼ") {
+    return (
+      <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
+        ほぼほぼ
+      </span>
+    );
+  }
+  if (level === "大体") {
+    return (
+      <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700 border border-yellow-200">
+        大体
+      </span>
+    );
+  }
+  if (level === "たぶん") {
+    return (
+      <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-bold bg-orange-100 text-orange-600 border border-orange-200">
+        たぶん
+      </span>
+    );
+  }
+  return (
+    <span className="text-xs text-gray-400">
+      {enemyLuk > 0 ? `×3: ${(enemyLuk * 3).toLocaleString("ja-JP")}` : "—"}
+    </span>
+  );
+}
 
 function NullifyLvBadge({ lv }: { lv: number | null }) {
   if (lv === null) {
@@ -135,6 +179,9 @@ function ArenaMonsterRow({ result }: { result: ArenaResult }) {
           ? result.defReq.defOnly.toLocaleString("ja-JP")
           : result.defReq.mdefOnly.toLocaleString("ja-JP")}
       </td>
+      <td className="px-2 py-1.5 text-center whitespace-nowrap">
+        <LukEvasionBadge level={result.lukEvasionLevel} enemyLuk={result.scaledLuck} />
+      </td>
     </tr>
   );
 }
@@ -145,6 +192,7 @@ function ArenaMonsterRow({ result }: { result: ArenaResult }) {
 export function ArenaCalculator() {
   const [myDef, setMyDef] = usePersistedState("arena:def", "");
   const [myMdef, setMyMdef] = usePersistedState("arena:mdef", "");
+  const [myLuk, setMyLuk] = usePersistedState("arena:luk", "");
   const [syncWithDmg, setSyncWithDmg] = usePersistedState("arena:sync", false);
   const [arenaLevel, setArenaLevel] = usePersistedState(
     "arena:level",
@@ -164,12 +212,18 @@ export function ArenaCalculator() {
         JSON.parse(localStorage.getItem("owt:dmg:mdef") ?? '""') || "0"
       ) || 0
     : parseInt(myMdef) || 0;
+  const effectiveLuk = syncWithDmg
+    ? parseInt(
+        JSON.parse(localStorage.getItem("owt:dmg:luck") ?? '""') || "0"
+      ) || 0
+    : parseInt(myLuk) || 0;
 
   const handleLoadPreset = (id: string) => {
     const preset = loadPreset(id);
     if (!preset) return;
     setMyDef(preset.def);
     setMyMdef(preset.mdef);
+    setMyLuk(preset.luck);
     setSyncWithDmg(false);
     setSelectedPresetId(id);
   };
@@ -195,6 +249,8 @@ export function ArenaCalculator() {
       const defReq = isPhysical
         ? calcPhysicalDefenseRequirement(enemyStat)
         : calcMagicalDefenseRequirement(enemyStat);
+      const scaledLuck = scaled.scaledLuck;
+      const lukEvasionLevel = calcLukEvasion(effectiveLuk, scaledLuck);
       return {
         base,
         area,
@@ -204,9 +260,11 @@ export function ArenaCalculator() {
         nullifiedNow,
         maxNullifyLv,
         defReq,
+        lukEvasionLevel,
+        scaledLuck,
       } satisfies ArenaResult;
     });
-  }, [effectiveDef, effectiveMdef, arenaLevel]);
+  }, [effectiveDef, effectiveMdef, effectiveLuk, arenaLevel]);
 
   const arenaLevelNum = useMemo(
     () =>
@@ -302,6 +360,20 @@ export function ArenaCalculator() {
             )}
           </div>
 
+          {/* LUK 入力 */}
+          {syncWithDmg ? (
+            <div className="space-y-1.5 lg:space-y-1">
+              <label className="block text-sm lg:text-xs font-medium text-gray-400">
+                LUK（回避判定用）
+              </label>
+              <div className="w-full px-4 py-3 lg:py-2 bg-gray-50 border border-gray-200 rounded-xl text-lg lg:text-base font-medium text-gray-400">
+                {effectiveLuk > 0 ? effectiveLuk.toLocaleString("ja-JP") : "—"}
+              </div>
+            </div>
+          ) : (
+            <InputField label="LUK（回避判定用）" value={myLuk} onChange={setMyLuk} />
+          )}
+
           {/* ダメ計と同期トグル */}
           <div className="flex items-center gap-3">
             <span className="text-sm text-gray-600">ダメ計と同期</span>
@@ -337,10 +409,12 @@ export function ArenaCalculator() {
               </span>
             </label>
             <input
-              type="number"
-              min={1000}
-              step={1000}
-              value={arenaLevel}
+              type="text"
+              inputMode="numeric"
+              value={(() => {
+                const n = parseInt(arenaLevel, 10);
+                return isNaN(n) ? "" : n.toLocaleString("ja-JP");
+              })()}
               onChange={(e) => {
                 const raw = e.target.value.replace(/[^0-9]/g, "");
                 setArenaLevel(raw);
@@ -353,7 +427,7 @@ export function ArenaCalculator() {
                 );
                 setArenaLevel(String(snapped));
               }}
-              placeholder="10000"
+              placeholder="10,000"
               className="w-full px-4 py-3 lg:py-2 bg-white border border-gray-200 rounded-xl text-lg lg:text-base font-medium text-gray-800 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
             />
           </div>
@@ -397,6 +471,9 @@ export function ArenaCalculator() {
                 <th className="px-2 py-2 text-right font-medium whitespace-nowrap">
                   無効化必要DEF
                 </th>
+                <th className="px-2 py-2 text-center font-medium whitespace-nowrap">
+                  LUK回避
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -411,16 +488,36 @@ export function ArenaCalculator() {
         </div>
 
         {/* 凡例 */}
-        <div className="px-3 py-2 border-t border-gray-100 flex gap-4 text-xs text-gray-400">
-          <span className="flex items-center gap-1">
-            <span className="w-3 h-3 rounded-sm bg-green-100 border border-green-200 inline-block" />
-            無効化達成
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-3 h-3 rounded-sm bg-orange-100 border border-orange-200 inline-block" />
-            未達成
-          </span>
-          <span className="ml-auto">無効化必要DEF = 物理はDEF、魔法はM-DEFのみで換算</span>
+        <div className="px-3 py-2 border-t border-gray-100 space-y-1.5">
+          <div className="flex gap-4 text-xs text-gray-400">
+            <span className="flex items-center gap-1">
+              <span className="w-3 h-3 rounded-sm bg-green-100 border border-green-200 inline-block" />
+              無効化達成
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-3 h-3 rounded-sm bg-orange-100 border border-orange-200 inline-block" />
+              未達成
+            </span>
+            <span className="ml-auto">無効化必要DEF = 物理はDEF、魔法はM-DEFのみで換算</span>
+          </div>
+          <div className="text-xs text-gray-400 space-y-0.5">
+            <div className="flex flex-wrap gap-x-3 gap-y-0.5 items-center">
+              <span className="font-medium text-gray-500">LUK回避目安：</span>
+              <span className="flex items-center gap-1">
+                <span className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-bold bg-orange-100 text-orange-600 border border-orange-200">たぶん</span>
+                敵LUK×3
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700 border border-yellow-200">大体</span>
+                敵LUK×4
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">ほぼほぼ</span>
+                敵LUK×5
+              </span>
+            </div>
+            <p className="text-gray-400">※ LUK回避の計算式は非公式です。当たっても知らないよ！確定回避にはなりません。</p>
+          </div>
         </div>
       </div>
     </div>

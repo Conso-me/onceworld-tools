@@ -13,14 +13,16 @@ export function InputField({
   className?: string;
   max?: number;
 }) {
+  const num = parseInt(value || "", 10);
+  const display = isNaN(num) ? "" : num.toLocaleString("ja-JP");
+
   return (
     <div className={`space-y-1.5 lg:space-y-1 ${className}`}>
       <label className="block text-sm lg:text-xs font-medium text-gray-600">{label}</label>
       <input
-        type="number"
-        min={0}
-        max={max}
-        value={value}
+        type="text"
+        inputMode="numeric"
+        value={display}
         onChange={(e) => {
           const raw = e.target.value.replace(/[^0-9]/g, "");
           if (max !== undefined && raw !== "" && parseInt(raw, 10) > max) return;

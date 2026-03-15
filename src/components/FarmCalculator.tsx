@@ -249,15 +249,15 @@ export function FarmCalculator() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <label className="flex items-center gap-1 text-xs text-gray-500">
                       Lv
-                      <input type="number" min="1" value={row.level}
-                        onChange={(e) => updateRow(row.id, "level", e.target.value)}
+                      <input type="text" inputMode="numeric" min="1" value={row.level.toLocaleString("ja-JP")}
+                        onChange={(e) => updateRow(row.id, "level", e.target.value.replace(/[^0-9]/g, ""))}
                         className="w-14 px-1.5 py-0.5 bg-white border border-gray-200 rounded-lg text-center text-xs font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-400"
                       />
                     </label>
                     <label className="flex items-center gap-1 text-xs text-gray-500">
                       ×
-                      <input type="number" min="1" value={row.count}
-                        onChange={(e) => updateRow(row.id, "count", e.target.value)}
+                      <input type="text" inputMode="numeric" min="1" value={row.count.toLocaleString("ja-JP")}
+                        onChange={(e) => updateRow(row.id, "count", e.target.value.replace(/[^0-9]/g, ""))}
                         className="w-14 px-1.5 py-0.5 bg-white border border-gray-200 rounded-lg text-center text-xs font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-400"
                       />
                     </label>
