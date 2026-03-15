@@ -36,7 +36,7 @@ export function usePersistedState<T>(
 export function usePersistedGroup<T extends Record<string, unknown>>(
   key: string,
   defaults: T
-): [T, <K extends keyof T>(field: K, value: T[K]) => void, () => void] {
+): [T, <K extends keyof T>(field: K, value: T[K]) => void, () => void, (newState: T) => void] {
   const storageKey = STORAGE_PREFIX + key;
 
   const [state, setState] = useState<T>(() => {
@@ -69,5 +69,9 @@ export function usePersistedGroup<T extends Record<string, unknown>>(
     localStorage.removeItem(storageKey);
   }, [storageKey, defaults]);
 
-  return [state, setField, reset];
+  const replaceAll = useCallback((newState: T) => {
+    setState(newState);
+  }, []);
+
+  return [state, setField, reset, replaceAll];
 }

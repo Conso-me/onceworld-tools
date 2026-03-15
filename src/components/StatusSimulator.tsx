@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { usePersistedState, usePersistedGroup } from "../hooks/usePersistedState";
 import { useStatPresets } from "../hooks/useStatPresets";
+import { useSimPresets } from "../hooks/useSimPresets";
 import { calcStatus, calcAllocatedPoints, getAvailablePoints, getPerStatLimit } from "../utils/statusCalc";
 import {
   getEquipmentByName, equipment,
@@ -1227,13 +1228,19 @@ function CompareTable({ resultA, resultB }: { resultA: ReturnType<typeof calcSta
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function StatusSimulator() {
-  const [cfgA, setFieldA, resetA] = usePersistedGroup<SimConfig>("sim-a", DEFAULT_CONFIG);
-  const [cfgB, setFieldB, resetB] = usePersistedGroup<SimConfig>("sim-b", DEFAULT_CONFIG);
+  const [cfgA, setFieldA, resetA, replaceAllA] = usePersistedGroup<SimConfig>("sim-a", DEFAULT_CONFIG);
+  const [cfgB, setFieldB, resetB, replaceAllB] = usePersistedGroup<SimConfig>("sim-b", DEFAULT_CONFIG);
   const [activeConfig, setActiveConfig] = usePersistedState<"A" | "B">("sim-active", "A");
   const [compareMode, setCompareMode] = usePersistedState<boolean>("sim-compare", false);
 
   const { presets, savePreset } = useStatPresets();
   const [presetName, setPresetName] = useState("");
+
+  const { presets: simPresets, savePreset: saveSimPreset,
+          loadPreset: loadSimPreset, deletePreset: deleteSimPreset } = useSimPresets();
+  const [simPresetName, setSimPresetName] = useState("");
+  const [selectedSimPresetId, setSelectedSimPresetId] = useState("");
+  const [attackModeForExport, setAttackModeForExport] = useState<"物理" | "魔攻">("物理");
 
   const resultA = useMemo(() => calcStatus(cfgA), [cfgA]);
   const resultB = useMemo(() => calcStatus(cfgB), [cfgB]);
@@ -1241,6 +1248,7 @@ export function StatusSimulator() {
   const activeCfg = activeConfig === "A" ? cfgA : cfgB;
   const activeSetField = activeConfig === "A" ? setFieldA : setFieldB;
   const activeReset = activeConfig === "A" ? resetA : resetB;
+  const activeReplaceAll = activeConfig === "A" ? replaceAllA : replaceAllB;
 
   function handleSavePreset() {
     const trimmed = presetName.trim();
@@ -1249,19 +1257,39 @@ export function StatusSimulator() {
     const existing = presets.find((p) => p.name === trimmed);
     if (existing && !window.confirm(`プリセット「${trimmed}」を上書きしますか？`)) return;
     savePreset(trimmed, {
-      atk: String(activeResult.final.atk),
-      int: String(activeResult.final.int),
-      def: String(activeResult.final.def),
+      atk:  String(activeResult.final.atk),
+      int:  String(activeResult.final.int),
+      def:  String(activeResult.final.def),
       mdef: String(activeResult.final.mdef),
-      spd: String(activeResult.final.spd),
-      vit: "",
-      luck: "",
-      element: activeCfg.charElement,
-      attackMode: "物理",
+      spd:  String(activeResult.final.spd),
+      vit:  String(activeResult.final.vit),
+      luck: String(activeResult.final.luck),
+      element:    activeCfg.charElement,
+      attackMode: attackModeForExport,
       analysisBook: "0",
       analysisAnalysisBook: "0",
     });
     setPresetName("");
+  }
+
+  function handleSaveSimPreset() {
+    const trimmed = simPresetName.trim();
+    if (!trimmed) return;
+    const existing = simPresets.find((p) => p.name === trimmed);
+    if (existing && !window.confirm(`ビルドプリセット「${trimmed}」を上書きしますか？`)) return;
+    saveSimPreset(trimmed, activeCfg);
+    setSimPresetName("");
+  }
+
+  function handleLoadSimPreset() {
+    const preset = loadSimPreset(selectedSimPresetId);
+    if (!preset) return;
+    activeReplaceAll(preset.config);
+  }
+
+  function handleDeleteSimPreset() {
+    deleteSimPreset(selectedSimPresetId);
+    setSelectedSimPresetId("");
   }
 
   return (
@@ -1285,6 +1313,47 @@ export function StatusSimulator() {
             ))}
           </div>
         )}
+        {/* ── ビルドプリセット ── */}
+        <div className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
+          <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">ビルドプリセット</h3>
+          <div className="flex gap-1.5 items-center">
+            <select
+              value={selectedSimPresetId}
+              onChange={(e) => setSelectedSimPresetId(e.target.value)}
+              className={`${inputCls} flex-1 min-w-0`}
+            >
+              <option value="">-- プリセットを選択 --</option>
+              {simPresets.map((p) => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
+            <button
+              onClick={handleLoadSimPreset}
+              disabled={!selectedSimPresetId}
+              className="shrink-0 text-xs px-2.5 py-1.5 rounded-lg bg-indigo-100 text-indigo-600 font-medium disabled:opacity-30 disabled:cursor-not-allowed hover:bg-indigo-200 transition-colors"
+            >読込</button>
+            <button
+              onClick={handleDeleteSimPreset}
+              disabled={!selectedSimPresetId}
+              className="shrink-0 text-xs px-2.5 py-1.5 rounded-lg bg-red-100 text-red-600 font-medium disabled:opacity-30 disabled:cursor-not-allowed hover:bg-red-200 transition-colors"
+            >削除</button>
+          </div>
+          <div className="flex gap-1.5 items-center">
+            <input
+              type="text"
+              placeholder="プリセット名"
+              value={simPresetName}
+              onChange={(e) => setSimPresetName(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSaveSimPreset()}
+              className={`${inputCls} flex-1`}
+            />
+            <button
+              onClick={handleSaveSimPreset}
+              disabled={!simPresetName.trim()}
+              className="shrink-0 text-xs px-2.5 py-1.5 rounded-lg bg-green-500 text-white font-medium disabled:opacity-30 disabled:cursor-not-allowed hover:bg-green-600 transition-colors"
+            >保存</button>
+          </div>
+        </div>
         <InputPanel cfg={activeCfg} setField={activeSetField} reset={activeReset} />
       </div>
 
@@ -1328,6 +1397,22 @@ export function StatusSimulator() {
         {/* ── ダメ計プリセット保存 ── */}
         <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
           <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">ダメ計プリセット保存</h3>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500 shrink-0">攻撃モード</span>
+            <div className="flex gap-1">
+              {(["物理", "魔攻"] as const).map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => setAttackModeForExport(mode)}
+                  className={`text-xs px-2.5 py-1 rounded-lg font-medium transition-colors ${
+                    attackModeForExport === mode
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+                >{mode}</button>
+              ))}
+            </div>
+          </div>
           <div className="flex gap-2">
             <input
               type="text"

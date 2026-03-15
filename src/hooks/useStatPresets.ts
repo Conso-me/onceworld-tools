@@ -1,5 +1,7 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import type { Element } from "../types/game";
+
+const SYNC_EVENT = "owt:stat-presets-updated";
 
 const STORAGE_KEY = "owt:stat-presets";
 
@@ -34,6 +36,7 @@ function loadFromStorage(): StatPreset[] {
 function persist(presets: StatPreset[]) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(presets));
+    window.dispatchEvent(new CustomEvent(SYNC_EVENT));
   } catch {
     // ignore quota errors
   }
@@ -41,6 +44,12 @@ function persist(presets: StatPreset[]) {
 
 export function useStatPresets() {
   const [presets, setPresets] = useState<StatPreset[]>(loadFromStorage);
+
+  useEffect(() => {
+    const handler = () => setPresets(loadFromStorage());
+    window.addEventListener(SYNC_EVENT, handler);
+    return () => window.removeEventListener(SYNC_EVENT, handler);
+  }, []);
 
   const savePreset = useCallback(
     (name: string, stats: Omit<StatPreset, "id" | "name">) => {
