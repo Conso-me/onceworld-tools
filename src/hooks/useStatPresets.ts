@@ -15,7 +15,6 @@ export type StatPreset = {
   spd: string;
   element: Element;
   attackMode: PlayerAttackMode;
-  targetTurns: string;
   analysisBook: string;
   analysisAnalysisBook: string;
 };

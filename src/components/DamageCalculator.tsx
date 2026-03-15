@@ -22,7 +22,8 @@ import {
   calcDamage as calcDefDamage,
   canNullifyDamage,
 } from "../utils/defenseCalc";
-import { getElementAffinity, getMagicMultiplier } from "../data/elements";
+import { getElementAffinity } from "../data/elements";
+import { MAGIC_SPELLS } from "../data/magicSpells";
 import { enemyPresetGroups, formatPresetLabel } from "../data/enemyPresets";
 import { getMonsterByName } from "../data/monsters";
 import { InputField } from "./ui/InputField";
@@ -37,6 +38,8 @@ export function DamageCalculator() {
   // モンスター選択
   const [selectedMonster, setSelectedMonster] = useState<MonsterBase | null>(null);
   const [monsterLevel, setMonsterLevel] = useState<number>(1);
+  // 魔攻モード時の右パネル切り替え
+  const [defPanelTab, setDefPanelTab] = useState<"被ダメ" | "最低INT">("被ダメ");
 
   // 自キャラ ステータス（localStorage永続化）
   const [myAtk, setMyAtk] = usePersistedState("dmg:atk", "");
@@ -49,15 +52,11 @@ export function DamageCalculator() {
   const [analysisBook, setAnalysisBook] = usePersistedState("dmg:analysisBook", "");
   const [analysisAnalysisBook, setAnalysisAnalysisBook] = usePersistedState("dmg:analysisAnalysisBook", "");
 
-  // 目標攻撃回数
-  const [targetTurns, setTargetTurns] = usePersistedState("dmg:targetTurns", "1");
-
   const myAtkNum = parseInt(myAtk) || 0;
   const myIntNum = parseInt(myInt) || 0;
   const myDefNum = parseInt(myDef) || 0;
   const myMdefNum = parseInt(myMdef) || 0;
   const mySpdNum = parseInt(mySpd) || 0;
-  const targetTurnsNum = parseInt(targetTurns) || 1;
   const analysisBookNum = parseInt(analysisBook) || 0;
   const analysisAnalysisBookNum = parseInt(analysisAnalysisBook) || 0;
 
@@ -81,11 +80,10 @@ export function DamageCalculator() {
       spd: mySpd,
       element: myElement,
       attackMode: myAttackMode,
-      targetTurns,
       analysisBook,
       analysisAnalysisBook,
     });
-  }, [presetName, presets, savePreset, myAtk, myInt, myDef, myMdef, mySpd, myElement, myAttackMode, targetTurns, analysisBook, analysisAnalysisBook]);
+  }, [presetName, presets, savePreset, myAtk, myInt, myDef, myMdef, mySpd, myElement, myAttackMode, analysisBook, analysisAnalysisBook]);
 
   const handleLoadPreset = useCallback(() => {
     const preset = loadPreset(selectedPresetId);
@@ -97,10 +95,9 @@ export function DamageCalculator() {
     setMySpd(preset.spd);
     setMyElement(preset.element);
     setMyAttackMode(preset.attackMode);
-    setTargetTurns(preset.targetTurns);
     setAnalysisBook(preset.analysisBook);
     setAnalysisAnalysisBook(preset.analysisAnalysisBook);
-  }, [selectedPresetId, loadPreset, setMyAtk, setMyInt, setMyDef, setMyMdef, setMySpd, setMyElement, setMyAttackMode, setTargetTurns, setAnalysisBook, setAnalysisAnalysisBook]);
+  }, [selectedPresetId, loadPreset, setMyAtk, setMyInt, setMyDef, setMyMdef, setMySpd, setMyElement, setMyAttackMode, setAnalysisBook, setAnalysisAnalysisBook]);
 
   const handleDeletePreset = useCallback(() => {
     deletePreset(selectedPresetId);
@@ -159,31 +156,55 @@ export function DamageCalculator() {
     return getElementAffinity(selectedMonster.element, myElement);
   }, [myElement, selectedMonster]);
 
-  // 魔法倍率
-  const magicMult = useMemo(
-    () => getMagicMultiplier(myElement),
-    [myElement]
-  );
-
   // ===== 与ダメージ計算 =====
   const offensiveResult = useMemo(() => {
     if (!scaled) return null;
 
     const multiHit = calcMultiHitCount(mySpdNum, myAttackMode === "魔攻");
 
+    if (myAttackMode === "魔攻") {
+      // 全魔法の結果を計算
+      const spellResults = MAGIC_SPELLS.map((spell) => {
+        const dmg = calcPlayerMagicDamage(
+          myIntNum,
+          magicBaseInt,
+          spell.multiplier,
+          scaled.scaledDef,
+          scaled.scaledMdef,
+          selfToEnemyAffinity
+        );
+        const hitsToKill = calcHitsToKill(scaled.hp, dmg.isNullified ? 1 : dmg.min, spell.hits);
+        const totalMin = dmg.isNullified ? spell.hits : dmg.min * spell.hits;
+        const totalMax = dmg.isNullified ? 9 * spell.hits : dmg.max * spell.hits;
+        const totalCritMin = dmg.isNullified ? spell.hits : dmg.critMin * spell.hits;
+        const totalCritMax = dmg.isNullified ? 9 * spell.hits : dmg.critMax * spell.hits;
+        const minStat = calcMinIntToHit(
+          scaled.scaledDef,
+          scaled.scaledMdef,
+          spell.multiplier,
+          magicBaseInt
+        );
+        // N回確殺: hits>1の魔法はN回の使用でN*hits回ヒット
+        const targetStats = [1, 2, 3].map((n) =>
+          calcIntForKill(
+            scaled.hp,
+            scaled.scaledDef,
+            scaled.scaledMdef,
+            selfToEnemyAffinity,
+            spell.multiplier,
+            magicBaseInt,
+            n * spell.hits
+          )
+        );
+        return { spell, dmg, totalMin, totalMax, totalCritMin, totalCritMax, hitsToKill, minStat, targetStats };
+      });
+      return { mode: "魔攻" as const, spellResults };
+    }
+
     let dmg;
     if (myAttackMode === "物理") {
       dmg = calcPhysicalDamage(
         myAtkNum,
-        scaled.scaledDef,
-        scaled.scaledMdef,
-        selfToEnemyAffinity
-      );
-    } else if (myAttackMode === "魔攻") {
-      dmg = calcPlayerMagicDamage(
-        myIntNum,
-        magicBaseInt,
-        magicMult,
         scaled.scaledDef,
         scaled.scaledMdef,
         selfToEnemyAffinity
@@ -204,55 +225,36 @@ export function DamageCalculator() {
     let minStat: number;
     if (myAttackMode === "物理") {
       minStat = calcMinAtkToHit(scaled.scaledDef, scaled.scaledMdef);
-    } else if (myAttackMode === "魔攻") {
-      minStat = calcMinIntToHit(
-        scaled.scaledDef,
-        scaled.scaledMdef,
-        magicMult,
-        magicBaseInt
-      );
     } else {
       minStat = calcMinIntToHitMadan(scaled.scaledDef, scaled.scaledMdef);
     }
 
-    // N回撃破用ステータス
-    let targetStat: number;
-    if (myAttackMode === "物理") {
-      targetStat = calcAtkForKill(
-        scaled.hp,
-        scaled.scaledDef,
-        scaled.scaledMdef,
-        selfToEnemyAffinity,
-        multiHit,
-        targetTurnsNum
-      );
-    } else if (myAttackMode === "魔攻") {
-      targetStat = calcIntForKill(
-        scaled.hp,
-        scaled.scaledDef,
-        scaled.scaledMdef,
-        selfToEnemyAffinity,
-        magicMult,
-        magicBaseInt,
-        targetTurnsNum
-      );
-    } else {
-      // 魔弾のN回撃破（物理式と同じ構造だがDEF/MDEFが逆）
-      const effectiveDef = calcEffectiveDef(
-        scaled.scaledDef,
-        scaled.scaledMdef,
-        false
-      );
-      const requiredDmgPerTurn = Math.ceil(scaled.hp / targetTurnsNum);
-      const requiredBase =
-        requiredDmgPerTurn / 4 / selfToEnemyAffinity / 0.9 / multiHit;
-      targetStat = Math.max(
-        Math.ceil((requiredBase + effectiveDef) / 1.75),
-        0
-      );
-    }
+    // N回確殺用ステータス（1〜3回分）
+    const targetStats = [1, 2, 3].map((n) => {
+      if (myAttackMode === "物理") {
+        return calcAtkForKill(
+          scaled.hp,
+          scaled.scaledDef,
+          scaled.scaledMdef,
+          selfToEnemyAffinity,
+          multiHit,
+          n
+        );
+      } else {
+        // 魔弾
+        const effectiveDef = calcEffectiveDef(
+          scaled.scaledDef,
+          scaled.scaledMdef,
+          false
+        );
+        const requiredDmgPerTurn = Math.ceil(scaled.hp / n);
+        const requiredBase =
+          requiredDmgPerTurn / 4 / selfToEnemyAffinity / 0.9 / multiHit;
+        return Math.max(Math.ceil((requiredBase + effectiveDef) / 1.75), 0);
+      }
+    });
 
-    return { dmg, multiHit, hitsToKill, minStat, targetStat };
+    return { mode: myAttackMode as "物理" | "魔弾", dmg, multiHit, hitsToKill, minStat, targetStats };
   }, [
     scaled,
     myAtkNum,
@@ -260,9 +262,7 @@ export function DamageCalculator() {
     mySpdNum,
     myAttackMode,
     selfToEnemyAffinity,
-    magicMult,
     magicBaseInt,
-    targetTurnsNum,
   ]);
 
   // ===== 被ダメージ計算 =====
@@ -317,7 +317,6 @@ export function DamageCalculator() {
   const elements: Element[] = ["火", "水", "木", "光", "闇"];
   const attackModes: { value: PlayerAttackMode; label: string }[] = [
     { value: "物理", label: "物理" },
-    { value: "魔弾", label: "魔弾" },
     { value: "魔攻", label: "魔法" },
   ];
 
@@ -432,7 +431,7 @@ export function DamageCalculator() {
           <div className="space-y-3">
             <div className="space-y-1.5">
               <label className="block text-sm font-medium text-gray-600">
-                攻撃属性
+                主人公の属性
               </label>
               <div className="flex gap-1.5">
                 {elements.map((el) => (
@@ -479,26 +478,22 @@ export function DamageCalculator() {
             <InputField label="DEF" value={myDef} onChange={setMyDef} />
             <InputField label="M-DEF" value={myMdef} onChange={setMyMdef} />
             <InputField label="SPD" value={mySpd} onChange={setMySpd} />
-            <InputField
-              label="目標回数"
-              value={targetTurns}
-              onChange={setTargetTurns}
-              placeholder="1"
-            />
           </div>
 
           {/* 魔法設定（魔攻モード時のみ） */}
           {myAttackMode === "魔攻" && (
             <div className="grid grid-cols-2 gap-4 pt-2 border-t border-gray-100">
               <InputField
-                label="解析書INT"
+                label="魔法解析書"
                 value={analysisBook}
                 onChange={setAnalysisBook}
+                max={1000}
               />
               <InputField
-                label="解析解析書数"
+                label="解析書の解析書"
                 value={analysisAnalysisBook}
                 onChange={setAnalysisAnalysisBook}
+                max={1000}
               />
             </div>
           )}
@@ -577,81 +572,141 @@ export function DamageCalculator() {
 
         {hasMonster && offensiveResult ? (<>
 
-          <StatCard
-            title={`${myAttackMode === "物理" ? "物理" : "魔法"}攻撃 → ${scaled!.name} Lv${monsterLevel}`}
-            accent="green"
-          >
-            <div className="space-y-2">
-              {hasMyOffenseStats && (
-                <>
-                  <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
-                    <span className="text-sm text-gray-500">ダメージ</span>
-                    {offensiveResult.dmg.isNullified ? (
-                      <span className="text-sm text-gray-400">
-                        1〜9（防御貫通不可）
-                      </span>
-                    ) : (
-                      <span className="text-lg font-bold text-green-600">
-                        {offensiveResult.dmg.min.toLocaleString()} 〜{" "}
-                        {offensiveResult.dmg.max.toLocaleString()}
-                      </span>
-                    )}
+          {offensiveResult.mode === "魔攻" ? (
+            /* ===== 魔攻モード: 全魔法テーブル ===== */
+            <>
+              <StatCard
+                title={`魔法攻撃 → ${scaled!.name} Lv${monsterLevel}`}
+                accent="green"
+              >
+                {/* 属性アフィニティ表示 */}
+                <div className="flex items-center gap-1.5 text-xs mb-2 pb-2 border-b border-gray-100">
+                  <span className={`px-1.5 py-0.5 rounded border font-medium ${elementColors[myElement]}`}>{myElement}</span>
+                  <span className="text-gray-400">→</span>
+                  <span className={`px-1.5 py-0.5 rounded border font-medium ${elementColors[scaled!.element]}`}>{scaled!.element}</span>
+                  <span className={`font-semibold ${selfToEnemyAffinity > 1 ? "text-green-600" : selfToEnemyAffinity < 1 ? "text-red-500" : "text-gray-500"}`}>
+                    {selfToEnemyAffinity > 1 ? "弱点 ×1.2" : selfToEnemyAffinity < 1 ? "耐性 ×0.8" : "通常 ×1.0"}
+                  </span>
+                </div>
+                {hasMyOffenseStats ? (
+                  <div className="space-y-1.5">
+                    {offensiveResult.spellResults.map(({ spell, dmg, totalMin, totalMax, totalCritMin, totalCritMax, hitsToKill }) => (
+                      <div key={spell.name} className="py-1.5 px-2 bg-white/60 rounded-lg">
+                        <div className="flex items-center gap-1 mb-1">
+                          <span className={`text-xs px-1 py-0.5 rounded border font-medium ${elementColors[spell.element]}`}>{spell.element}</span>
+                          <span className="text-sm font-medium text-gray-700">{spell.name}</span>
+                          <span className="text-xs text-gray-400">
+                            ×{spell.multiplier}{spell.hits > 1 ? ` / ${spell.hits}連` : ""}
+                          </span>
+                          {!dmg.isNullified && (
+                            <span className={`ml-auto text-sm font-bold px-2 py-0.5 rounded-full ${
+                              hitsToKill === 1 ? "bg-green-100 text-green-700" :
+                              hitsToKill <= 3 ? "bg-yellow-100 text-yellow-700" :
+                              "bg-gray-100 text-gray-600"
+                            }`}>
+                              {hitsToKill === Infinity ? "∞" : hitsToKill}回
+                            </span>
+                          )}
+                        </div>
+                        {dmg.isNullified ? (
+                          <span className="text-xs text-gray-400">防御貫通不可</span>
+                        ) : (
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-sm">
+                            <span className="font-bold text-green-600">
+                              {totalMin.toLocaleString()}〜{totalMax.toLocaleString()}
+                            </span>
+                            <span className="text-yellow-600 text-xs">
+                              クリ {totalCritMin.toLocaleString()}〜{totalCritMax.toLocaleString()}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                  {!offensiveResult.dmg.isNullified && (
-                    <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
-                      <span className="text-sm text-gray-500">
-                        クリティカル
-                      </span>
-                      <span className="text-lg font-bold text-yellow-600">
-                        {offensiveResult.dmg.critMin.toLocaleString()} 〜{" "}
-                        {offensiveResult.dmg.critMax.toLocaleString()}
-                      </span>
-                    </div>
+                ) : (
+                  <p className="text-xs text-gray-400">INTを入力するとダメージが表示されます</p>
+                )}
+              </StatCard>
+            </>
+          ) : (
+            /* ===== 物理 / 魔弾モード ===== */
+            <>
+              <StatCard
+                title={`${offensiveResult.mode === "物理" ? "物理" : "魔弾"}攻撃 → ${scaled!.name} Lv${monsterLevel}`}
+                accent="green"
+              >
+                <div className="space-y-2">
+                  {hasMyOffenseStats && (
+                    <>
+                      <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
+                        <span className="text-sm text-gray-500">ダメージ</span>
+                        {offensiveResult.dmg.isNullified ? (
+                          <span className="text-sm text-gray-400">
+                            1〜9（防御貫通不可）
+                          </span>
+                        ) : (
+                          <span className="text-lg font-bold text-green-600">
+                            {offensiveResult.dmg.min.toLocaleString()} 〜{" "}
+                            {offensiveResult.dmg.max.toLocaleString()}
+                          </span>
+                        )}
+                      </div>
+                      {!offensiveResult.dmg.isNullified && (
+                        <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
+                          <span className="text-sm text-gray-500">
+                            クリティカル
+                          </span>
+                          <span className="text-lg font-bold text-yellow-600">
+                            {offensiveResult.dmg.critMin.toLocaleString()} 〜{" "}
+                            {offensiveResult.dmg.critMax.toLocaleString()}
+                          </span>
+                        </div>
+                      )}
+                      <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
+                        <span className="text-sm text-gray-500">多段回数</span>
+                        <span className="font-bold text-gray-700">
+                          {offensiveResult.multiHit}回
+                        </span>
+                      </div>
+                      {!offensiveResult.dmg.isNullified && (
+                        <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
+                          <span className="text-sm text-gray-500">
+                            確殺回数
+                          </span>
+                          <span className="font-bold text-gray-700">
+                            {offensiveResult.hitsToKill === Infinity
+                              ? "∞"
+                              : `${offensiveResult.hitsToKill}回`}
+                          </span>
+                        </div>
+                      )}
+                    </>
                   )}
-                  <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
-                    <span className="text-sm text-gray-500">多段回数</span>
-                    <span className="font-bold text-gray-700">
-                      {offensiveResult.multiHit}回
-                    </span>
-                  </div>
-                  {!offensiveResult.dmg.isNullified && (
-                    <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
-                      <span className="text-sm text-gray-500">
-                        確殺回数
-                      </span>
-                      <span className="font-bold text-gray-700">
-                        {offensiveResult.hitsToKill === Infinity
-                          ? "∞"
-                          : `${offensiveResult.hitsToKill}回`}
-                      </span>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          </StatCard>
+                </div>
+              </StatCard>
 
-          {/* 最低必要ステータス */}
-          <StatCard title="最低必要ステータス" accent="purple">
-            <div className="space-y-2">
-              <ResultRow
-                label={`最低${myAttackMode === "物理" ? "ATK" : "INT"}`}
-                value={offensiveResult.minStat}
-                current={
-                  myAttackMode === "物理" ? myAtkNum : myIntNum
-                }
-                color="purple"
-              />
-              <ResultRow
-                label={`${targetTurnsNum}回で撃破${myAttackMode === "物理" ? "ATK" : "INT"}`}
-                value={offensiveResult.targetStat}
-                current={
-                  myAttackMode === "物理" ? myAtkNum : myIntNum
-                }
-                color="purple"
-              />
-            </div>
-          </StatCard>
+              {/* 最低必要ステータス */}
+              <StatCard title="最低必要ステータス" accent="purple">
+                <div className="space-y-2">
+                  <ResultRow
+                    label={`最低${offensiveResult.mode === "物理" ? "ATK" : "INT"}`}
+                    value={offensiveResult.minStat}
+                    current={offensiveResult.mode === "物理" ? myAtkNum : myIntNum}
+                    color="purple"
+                  />
+                  {offensiveResult.targetStats.map((stat, i) => (
+                    <ResultRow
+                      key={i}
+                      label={`${i + 1}回確殺${offensiveResult.mode === "物理" ? "ATK" : "INT"}`}
+                      value={stat}
+                      current={offensiveResult.mode === "物理" ? myAtkNum : myIntNum}
+                      color="purple"
+                    />
+                  ))}
+                </div>
+              </StatCard>
+            </>
+          )}
         </>) : (
           <div className="bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 p-8 text-center">
             <p className="text-sm text-gray-400">モンスターを選択すると与ダメージが表示されます</p>
@@ -659,10 +714,58 @@ export function DamageCalculator() {
         )}
       </div>{/* /与ダメージ */}
 
-      {/* 被ダメージ */}
+      {/* 被ダメージ / 最低必要INT（魔攻時切り替え） */}
       <div className="space-y-2">
-        <h3 className="font-semibold text-gray-700 px-1">被ダメージ</h3>
-        {hasMonster && defensiveResult ? (<>
+        <div className="flex items-center gap-2 px-1">
+          {myAttackMode === "魔攻" ? (
+            <div className="flex bg-gray-100 rounded-lg p-0.5 gap-0.5">
+              {(["被ダメ", "最低INT"] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setDefPanelTab(tab)}
+                  className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
+                    defPanelTab === tab
+                      ? "bg-white text-gray-700 shadow-sm"
+                      : "text-gray-400 hover:text-gray-600"
+                  }`}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <h3 className="font-semibold text-gray-700">被ダメージ</h3>
+          )}
+        </div>
+
+        {/* 最低必要INT パネル（魔攻 + 最低INTタブ時） */}
+        {myAttackMode === "魔攻" && defPanelTab === "最低INT" && hasMonster && offensiveResult && offensiveResult.mode === "魔攻" && (
+          <StatCard title="最低必要INT（魔法別）" accent="purple">
+            <div className="space-y-1.5">
+              {offensiveResult.spellResults.map(({ spell, minStat, targetStats }) => (
+                <div key={spell.name} className="py-1.5 px-2 bg-white/60 rounded-lg">
+                  <div className="flex items-center gap-1 mb-0.5">
+                    <span className={`text-xs px-1 py-0.5 rounded border font-medium ${elementColors[spell.element]}`}>{spell.element}</span>
+                    <span className="text-xs font-medium text-gray-700">{spell.name}</span>
+                  </div>
+                  <div className="grid grid-cols-4 gap-1 text-xs">
+                    {[{ label: "最低", val: minStat }, { label: "1確殺", val: targetStats[0] }, { label: "2確殺", val: targetStats[1] }, { label: "3確殺", val: targetStats[2] }].map(({ label, val }) => (
+                      <div key={label} className="text-center">
+                        <div className="text-gray-400">{label}</div>
+                        <div className={`font-bold ${val <= myIntNum ? "text-green-600" : "text-purple-600"}`}>
+                          {val.toLocaleString()}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </StatCard>
+        )}
+
+        {/* 被ダメパネル（非魔攻 or 被ダメタブ時） */}
+        {(myAttackMode !== "魔攻" || defPanelTab === "被ダメ") && hasMonster && defensiveResult ? (<>
           <StatCard
             title={`${defensiveResult.enemyIsPhysical ? "物理" : "魔法"}攻撃（${scaled!.attackType} / ${defensiveResult.enemyIsPhysical ? "ATK" : "INT"}: ${defensiveResult.enemyStat.toLocaleString()}）`}
             accent="orange"
@@ -764,11 +867,13 @@ export function DamageCalculator() {
             </div>
           )}
         </>) : (
-          <div className="bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 p-8 text-center">
-            <p className="text-sm text-gray-400">モンスターを選択すると被ダメージが表示されます</p>
-          </div>
+          (myAttackMode !== "魔攻" || defPanelTab === "被ダメ") && (
+            <div className="bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 p-8 text-center">
+              <p className="text-sm text-gray-400">モンスターを選択すると被ダメージが表示されます</p>
+            </div>
+          )
         )}
-      </div>{/* /被ダメージ */}
+      </div>{/* /被ダメージ・最低INT */}
 
       </div>{/* /与ダメ・被ダメ 2カラム */}
       </div>{/* /右エリア */}
