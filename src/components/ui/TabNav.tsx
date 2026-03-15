@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 export interface Tab {
   id: string;
   label: string;
+  shortLabel?: string;
   icon?: string;
   disabled?: boolean;
 }
@@ -47,7 +48,7 @@ export function TabNav({
           key={tab.id}
           onClick={() => handleClick(tab)}
           disabled={tab.disabled}
-          className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+          className={`flex-1 px-1 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
             activeTab === tab.id
               ? "bg-white text-gray-800 shadow-sm"
               : tab.disabled
@@ -56,7 +57,8 @@ export function TabNav({
           }`}
         >
           {tab.icon && <span className="mr-1">{tab.icon}</span>}
-          {tab.label}
+          <span className="sm:hidden">{tab.shortLabel ?? tab.label}</span>
+          <span className="hidden sm:inline">{tab.label}</span>
           {tab.disabled && (
             <span className="ml-1 text-xs text-gray-300">準備中</span>
           )}

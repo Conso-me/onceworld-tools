@@ -6,10 +6,10 @@ import { ArenaCalculator } from "./components/ArenaCalculator";
 import { TabNav, type Tab } from "./components/ui/TabNav";
 
 const tabs: Tab[] = [
-  { id: "damage", label: "ダメージ計算", icon: "⚔" },
+  { id: "damage", label: "ダメージ計算", shortLabel: "ダメ計", icon: "⚔" },
   { id: "arena", label: "裏路地", icon: "🏟" },
   { id: "status", label: "ステータス", icon: "✦" },
-  { id: "farm", label: "周回計算", icon: "♻" },
+  { id: "farm", label: "周回計算", shortLabel: "周回計", icon: "♻" },
 ];
 
 function App() {
@@ -28,7 +28,7 @@ function App() {
       <header className="bg-gradient-to-b from-white to-gray-100 border-b border-gray-200 shadow-sm sticky top-0 z-10">
         <div className="max-w-3xl lg:max-w-[1400px] mx-auto px-4 py-3 space-y-2">
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-bold text-indigo-900 tracking-wide">⚔ OnceWorld Tools</h1>
+            <h1 className="text-xl font-bold text-indigo-900 tracking-wide whitespace-nowrap">⚔ OnceWorld Tools</h1>
             <div className="flex items-center gap-3">
               <a
                 href="https://docs.google.com/forms/d/e/1FAIpQLSf6NFySGmPNkQdFJEIwk11gtyvfiFVoJdwUVlwQ3MkN-vNHcg/viewform?usp=dialog"
@@ -44,7 +44,7 @@ function App() {
                 rel="noopener noreferrer"
                 className="text-sm text-amber-600 hover:text-amber-700 font-medium"
               >
-                ☕ Buy me a coffee
+                ☕<span className="hidden sm:inline"> Buy me a coffee</span>
               </a>
             </div>
           </div>

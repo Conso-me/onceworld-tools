@@ -49,9 +49,9 @@ export function MonsterSelectorModal({ isOpen, onClose, onSelect }: Props) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col" style={{ height: "min(600px, 80vh)" }}>
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col" style={{ height: "min(600px, 85vh)" }}>
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
@@ -65,10 +65,29 @@ export function MonsterSelectorModal({ isOpen, onClose, onSelect }: Props) {
         </div>
 
         {/* Body */}
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-col sm:flex-row flex-1 overflow-hidden">
 
-          {/* Left: Element filter */}
-          <div className="w-28 flex-shrink-0 bg-gray-50 border-r border-gray-200 overflow-y-auto py-2">
+          {/* Mobile: 横スクロール属性フィルタ */}
+          <div className="sm:hidden flex overflow-x-auto gap-2 px-4 py-2 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+            {ELEMENTS.map((el) => (
+              <button
+                key={el}
+                onClick={() => setElementFilter(el)}
+                className={`flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
+                  elementFilter === el
+                    ? el === "すべて"
+                      ? "bg-indigo-600 text-white"
+                      : `${elementColors[el]} ring-1 ring-current`
+                    : "bg-white text-gray-700 border border-gray-200"
+                }`}
+              >
+                {el}
+              </button>
+            ))}
+          </div>
+
+          {/* PC: 左サイドバー属性フィルタ */}
+          <div className="hidden sm:flex sm:flex-col w-28 flex-shrink-0 bg-gray-50 border-r border-gray-200 overflow-y-auto py-2">
             {ELEMENTS.map((el) => (
               <button
                 key={el}
@@ -84,9 +103,9 @@ export function MonsterSelectorModal({ isOpen, onClose, onSelect }: Props) {
             ))}
           </div>
 
-          {/* Right: Monster list */}
+          {/* モンスター一覧 */}
           <div className="flex-1 overflow-y-auto flex flex-col">
-            {/* Search bar (sticky) */}
+            {/* 検索バー */}
             <div className="px-4 py-3 border-b border-gray-200 bg-white sticky top-0">
               <input
                 type="text"
@@ -98,14 +117,14 @@ export function MonsterSelectorModal({ isOpen, onClose, onSelect }: Props) {
               />
             </div>
 
-            {/* Column header */}
-            <div className="flex items-center gap-3 px-5 py-2.5 border-b border-gray-200 bg-gray-50 sticky top-[57px]">
+            {/* PC: カラムヘッダー */}
+            <div className="hidden sm:flex items-center gap-3 px-5 py-2.5 border-b border-gray-200 bg-gray-50 sticky top-[57px]">
               <span className="flex-1 text-xs font-bold text-gray-600 uppercase tracking-wide">名前</span>
               <span className="w-14 text-center text-xs font-bold text-gray-600 uppercase tracking-wide">属性</span>
               <span className="w-16 text-right text-xs font-bold text-gray-600 uppercase tracking-wide">攻撃タイプ</span>
             </div>
 
-            {/* Monster rows */}
+            {/* モンスター行 */}
             <div className="flex-1">
               {filtered.length === 0 ? (
                 <div className="px-5 py-8 text-center text-sm text-gray-400">
@@ -119,17 +138,32 @@ export function MonsterSelectorModal({ isOpen, onClose, onSelect }: Props) {
                       onSelect(monster);
                       onClose();
                     }}
-                    className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-indigo-50 border-b border-gray-100 text-left transition-colors group"
+                    className="w-full px-5 py-3 hover:bg-indigo-50 border-b border-gray-100 text-left transition-colors group"
                   >
-                    <span className="flex-1 font-semibold text-gray-900 text-sm group-hover:text-indigo-700 transition-colors">
-                      {monster.name}
-                    </span>
-                    <span className={`w-14 text-center text-xs px-2 py-0.5 rounded-full font-medium ${elementColors[monster.element] ?? "bg-gray-100 text-gray-500"}`}>
-                      {monster.element}
-                    </span>
-                    <span className="w-16 text-right text-sm text-gray-700">
-                      {monster.attackType}
-                    </span>
+                    {/* PC: 横並び */}
+                    <div className="hidden sm:flex items-center gap-3">
+                      <span className="flex-1 font-semibold text-gray-900 text-sm group-hover:text-indigo-700 transition-colors">
+                        {monster.name}
+                      </span>
+                      <span className={`w-14 text-center text-xs px-2 py-0.5 rounded-full font-medium ${elementColors[monster.element] ?? "bg-gray-100 text-gray-500"}`}>
+                        {monster.element}
+                      </span>
+                      <span className="w-16 text-right text-sm text-gray-700">
+                        {monster.attackType}
+                      </span>
+                    </div>
+                    {/* Mobile: 名前＋属性バッジ＋攻撃タイプを1行に */}
+                    <div className="sm:hidden flex items-center gap-2">
+                      <span className="flex-1 font-semibold text-gray-900 text-sm group-hover:text-indigo-700 transition-colors">
+                        {monster.name}
+                      </span>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${elementColors[monster.element] ?? "bg-gray-100 text-gray-500"}`}>
+                        {monster.element}
+                      </span>
+                      <span className="text-xs text-gray-500 flex-shrink-0">
+                        {monster.attackType}
+                      </span>
+                    </div>
                   </button>
                 ))
               )}
