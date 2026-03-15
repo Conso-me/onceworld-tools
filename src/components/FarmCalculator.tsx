@@ -40,12 +40,6 @@ let nextId = 1;
 
 type Rarity = "normal" | "rare" | "superRare";
 
-const RARITY_LABEL: Record<Rarity, string> = { normal: "ノ", rare: "レア", superRare: "激レア" };
-const RARITY_STYLE: Record<Rarity, string> = {
-  normal: "bg-gray-100 text-gray-500",
-  rare: "bg-purple-100 text-purple-600",
-  superRare: "bg-orange-100 text-orange-600",
-};
 const RARITY_VALUE_STYLE: Record<Rarity, string> = {
   normal: "text-indigo-600",
   rare: "text-purple-600",
