@@ -1,11 +1,3 @@
-import { useState } from "react";
-
-function formatWithCommas(val: string): string {
-  const num = parseInt(val.replace(/,/g, ""), 10);
-  if (isNaN(num)) return val;
-  return num.toLocaleString("ja-JP");
-}
-
 export function InputField({
   label,
   value,
@@ -21,18 +13,14 @@ export function InputField({
   className?: string;
   max?: number;
 }) {
-  const [focused, setFocused] = useState(false);
-  const displayValue = focused ? value : formatWithCommas(value);
-
   return (
     <div className={`space-y-1.5 lg:space-y-1 ${className}`}>
       <label className="block text-sm lg:text-xs font-medium text-gray-600">{label}</label>
       <input
-        type="text"
-        inputMode="numeric"
-        value={displayValue}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
+        type="number"
+        min={0}
+        max={max}
+        value={value}
         onChange={(e) => {
           const raw = e.target.value.replace(/[^0-9]/g, "");
           if (max !== undefined && raw !== "" && parseInt(raw, 10) > max) return;

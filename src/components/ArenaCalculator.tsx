@@ -337,17 +337,10 @@ export function ArenaCalculator() {
               </span>
             </label>
             <input
-              type="text"
-              inputMode="numeric"
-              value={(() => {
-                const n = parseInt(
-                  arenaLevel.replace(/[^0-9]/g, "")
-                );
-                return isNaN(n) ? arenaLevel : n.toLocaleString("ja-JP");
-              })()}
-              onFocus={(e) => {
-                e.target.value = arenaLevel.replace(/,/g, "");
-              }}
+              type="number"
+              min={1000}
+              step={1000}
+              value={arenaLevel}
               onChange={(e) => {
                 const raw = e.target.value.replace(/[^0-9]/g, "");
                 setArenaLevel(raw);
@@ -360,7 +353,7 @@ export function ArenaCalculator() {
                 );
                 setArenaLevel(String(snapped));
               }}
-              placeholder="10,000"
+              placeholder="10000"
               className="w-full px-4 py-3 lg:py-2 bg-white border border-gray-200 rounded-xl text-lg lg:text-base font-medium text-gray-800 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
             />
           </div>
