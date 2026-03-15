@@ -18,7 +18,7 @@ export function StatCard({
 }) {
   return (
     <div
-      className={`rounded-2xl border-2 ${accentClasses[accent]} p-4 space-y-3`}
+      className={`rounded-2xl border-2 ${accentClasses[accent]} p-4 lg:p-3 space-y-3 lg:space-y-2`}
     >
       <h4 className="font-semibold text-gray-700">{title}</h4>
       {children}

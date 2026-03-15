@@ -23,6 +23,8 @@ import {
   canNullifyDamage,
 } from "../utils/defenseCalc";
 import { getElementAffinity, getMagicMultiplier } from "../data/elements";
+import { enemyPresetGroups, formatPresetLabel } from "../data/enemyPresets";
+import { getMonsterByName } from "../data/monsters";
 import { InputField } from "./ui/InputField";
 import { StatCard } from "./ui/StatCard";
 import { ResultRow } from "./ui/ResultRow";
@@ -112,6 +114,33 @@ export function DamageCalculator() {
     },
     []
   );
+
+  // 敵プリセット
+  const [injectedLevel, setInjectedLevel] = useState<number | undefined>(undefined);
+  const [injectedMonsterName, setInjectedMonsterName] = useState<string | undefined>(undefined);
+
+  const handleEnemyPresetChange = useCallback((value: string) => {
+    if (!value) return;
+    const [groupIdx, presetIdx] = value.split("-").map(Number);
+    const preset = enemyPresetGroups[groupIdx]?.presets[presetIdx];
+    if (!preset) return;
+
+    setInjectedLevel(preset.level);
+
+    if (preset.monsterName) {
+      const monster = getMonsterByName(preset.monsterName);
+      if (monster) {
+        setInjectedMonsterName(preset.monsterName);
+        handleMonsterSelect(monster, preset.level);
+      } else {
+        // モンスターDBにない場合はレベルのみ注入
+        setInjectedMonsterName(preset.monsterName);
+      }
+    } else {
+      // 名称不明: レベルのみ設定、モンスター種別は手動選択
+      setInjectedMonsterName(undefined);
+    }
+  }, [handleMonsterSelect]);
 
   // レベルスケーリングされた敵ステータス
   const scaled = useMemo(() => {
@@ -301,9 +330,9 @@ export function DamageCalculator() {
   };
 
   return (
-    <div className="max-w-lg mx-auto space-y-6 lg:max-w-none lg:space-y-0 lg:grid lg:grid-cols-[minmax(340px,400px)_1fr_1fr] lg:gap-4 lg:items-start">
+    <div className="max-w-lg mx-auto space-y-6 lg:max-w-none lg:space-y-0 lg:grid lg:grid-cols-[minmax(340px,400px)_1fr] lg:gap-2 lg:items-start">
       {/* ヘッダー */}
-      <div className="text-center space-y-1 lg:col-span-3 lg:flex lg:items-baseline lg:gap-3 lg:justify-center lg:space-y-0">
+      <div className="text-center space-y-1 lg:col-span-2 lg:flex lg:items-baseline lg:gap-3 lg:justify-center lg:space-y-0">
         <h2 className="text-2xl font-bold text-gray-800">ダメージ計算機</h2>
         <p className="text-sm text-gray-500">
           与ダメ・被ダメ・必要ステータスを一括計算
@@ -311,33 +340,35 @@ export function DamageCalculator() {
       </div>
 
       {/* Column 1: 入力パネル */}
-      <div className="space-y-6 lg:space-y-4">
+      <div className="space-y-6 lg:space-y-2">
       <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-6 lg:space-y-3">
+        {/* 敵プリセット */}
+        <div className="space-y-1.5">
+          <label className="block text-xs font-medium text-gray-500">敵プリセット</label>
+          <select
+            defaultValue=""
+            onChange={(e) => handleEnemyPresetChange(e.target.value)}
+            className="w-full text-sm rounded-xl border border-gray-200 bg-white px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            <option value="">プリセットから選択...</option>
+            {enemyPresetGroups.map((group, gi) => (
+              <optgroup key={gi} label={group.label}>
+                {group.presets.map((preset, pi) => (
+                  <option key={`${gi}-${pi}`} value={`${gi}-${pi}`}>
+                    {formatPresetLabel(preset)}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+        </div>
+
         <MonsterSelector
           onSelect={handleMonsterSelect}
           selectedMonster={selectedMonster}
+          externalLevel={injectedLevel}
+          externalMonsterName={injectedMonsterName}
         />
-
-        {scaled && (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 text-xs text-gray-500 bg-gray-50 rounded-xl p-3">
-            <div>HP: {scaled.hp.toLocaleString()}</div>
-            <div>ATK: {scaled.scaledAtk.toLocaleString()}</div>
-            <div>INT: {scaled.scaledInt.toLocaleString()}</div>
-            <div>DEF: {scaled.scaledDef.toLocaleString()}</div>
-            <div>M-DEF: {scaled.scaledMdef.toLocaleString()}</div>
-            <div>SPD: {scaled.scaledSpd.toLocaleString()}</div>
-            <div>LUCK: {scaled.scaledLuck.toLocaleString()}</div>
-            <div>
-              EXP:{" "}
-              {(
-                Math.max(
-                  Math.floor(Math.pow(monsterLevel, 1.1) * 0.2),
-                  1
-                ) * scaled.exp
-              ).toLocaleString()}
-            </div>
-          </div>
-        )}
 
         <div className="border-t border-gray-100" />
 
@@ -502,9 +533,48 @@ export function DamageCalculator() {
       </details>
       </div>{/* /Column 1 */}
 
-      {/* ===== Column 2: 与ダメージ ===== */}
-      <div className="space-y-4">
+      {/* ===== 右エリア: 敵ステータス + 与ダメ/被ダメ ===== */}
+      <div className="space-y-4 lg:space-y-2">
+
+      {/* 敵ステータス */}
+      {scaled && (
+        <div className="bg-white rounded-2xl shadow shadow-gray-200/50 p-4">
+          <div className="flex items-center gap-2 flex-wrap mb-3">
+            <span className="font-bold text-base text-gray-800">{scaled.name}</span>
+            <span className="text-sm bg-gray-100 text-gray-600 px-2 py-0.5 rounded-lg font-medium">Lv{monsterLevel.toLocaleString()}</span>
+            <span className={`text-sm px-2 py-0.5 rounded-lg border font-medium ${elementColors[scaled.element]}`}>{scaled.element}</span>
+            <span className="text-sm bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-lg font-medium">{scaled.attackType}</span>
+          </div>
+          <div className="grid grid-cols-4 gap-x-4 gap-y-1 text-sm">
+            <div><span className="text-gray-400">HP</span> <span className="font-semibold text-gray-700">{scaled.hp.toLocaleString()}</span></div>
+            <div><span className="text-gray-400">ATK</span> <span className="font-semibold text-gray-700">{scaled.scaledAtk.toLocaleString()}</span> <span className="text-xs text-gray-400">({scaled.atk})</span></div>
+            <div><span className="text-gray-400">INT</span> <span className="font-semibold text-gray-700">{scaled.scaledInt.toLocaleString()}</span> <span className="text-xs text-gray-400">({scaled.int})</span></div>
+            <div><span className="text-gray-400">DEF</span> <span className="font-semibold text-gray-700">{scaled.scaledDef.toLocaleString()}</span> <span className="text-xs text-gray-400">({scaled.def})</span></div>
+            <div><span className="text-gray-400">M-DEF</span> <span className="font-semibold text-gray-700">{scaled.scaledMdef.toLocaleString()}</span> <span className="text-xs text-gray-400">({scaled.mdef})</span></div>
+            <div><span className="text-gray-400">SPD</span> <span className="font-semibold text-gray-700">{scaled.scaledSpd.toLocaleString()}</span> <span className="text-xs text-gray-400">({scaled.spd})</span></div>
+            <div><span className="text-gray-400">LUCK</span> <span className="font-semibold text-gray-700">{scaled.scaledLuck.toLocaleString()}</span> <span className="text-xs text-gray-400">({scaled.luck})</span></div>
+            <div>
+              <span className="text-gray-400">EXP</span>{" "}
+              <span className="font-semibold text-gray-700">
+              {(
+                Math.max(
+                  Math.floor(Math.pow(monsterLevel, 1.1) * 0.2),
+                  1
+                ) * scaled.exp
+              ).toLocaleString()}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 与ダメ・被ダメ 2カラム */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-2 gap-4">
+
+      {/* 与ダメージ */}
+      <div className="space-y-2">
         <h3 className="font-semibold text-gray-700 px-1">与ダメージ</h3>
+
         {hasMonster && offensiveResult ? (<>
 
           <StatCard
@@ -587,10 +657,10 @@ export function DamageCalculator() {
             <p className="text-sm text-gray-400">モンスターを選択すると与ダメージが表示されます</p>
           </div>
         )}
-      </div>{/* /Column 2 */}
+      </div>{/* /与ダメージ */}
 
-      {/* ===== Column 3: 被ダメージ ===== */}
-      <div className="space-y-4">
+      {/* 被ダメージ */}
+      <div className="space-y-2">
         <h3 className="font-semibold text-gray-700 px-1">被ダメージ</h3>
         {hasMonster && defensiveResult ? (<>
           <StatCard
@@ -667,7 +737,7 @@ export function DamageCalculator() {
 
           {/* 現在の被ダメージ */}
           {hasMyDefenseStats && (
-            <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-5">
+            <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 p-3">
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">現在の被ダメージ</span>
                 {defensiveResult.nullified ? (
@@ -698,7 +768,10 @@ export function DamageCalculator() {
             <p className="text-sm text-gray-400">モンスターを選択すると被ダメージが表示されます</p>
           </div>
         )}
-      </div>{/* /Column 3 */}
+      </div>{/* /被ダメージ */}
+
+      </div>{/* /与ダメ・被ダメ 2カラム */}
+      </div>{/* /右エリア */}
     </div>
   );
 }

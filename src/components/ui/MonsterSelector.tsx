@@ -5,9 +5,13 @@ import { getAllMonsters } from "../../data/monsters";
 export function MonsterSelector({
   onSelect,
   selectedMonster,
+  externalLevel,
+  externalMonsterName,
 }: {
   onSelect: (monster: MonsterBase, level: number) => void;
   selectedMonster?: MonsterBase | null;
+  externalLevel?: number;
+  externalMonsterName?: string;
 }) {
   const [query, setQuery] = useState("");
   const [level, setLevel] = useState("");
@@ -35,6 +39,20 @@ export function MonsterSelector({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // 外部からの値注入（プリセット選択時）
+  useEffect(() => {
+    if (externalLevel !== undefined) {
+      setLevel(String(externalLevel));
+    }
+  }, [externalLevel]);
+
+  useEffect(() => {
+    if (externalMonsterName !== undefined) {
+      setQuery(externalMonsterName);
+      setSelectedName(externalMonsterName);
+    }
+  }, [externalMonsterName]);
 
   const handleSelectMonster = (monster: MonsterBase) => {
     setSelectedName(monster.name);
@@ -126,20 +144,6 @@ export function MonsterSelector({
           />
         </div>
       </div>
-      {selectedMonster && selectedName && (
-        <div className="flex items-center gap-2 text-xs text-gray-500">
-          <span
-            className={`px-1.5 py-0.5 rounded ${elementColors[selectedMonster.element] ?? ""}`}
-          >
-            {selectedMonster.element}
-          </span>
-          <span>{selectedMonster.attackType}</span>
-          <span>ATK:{selectedMonster.atk}</span>
-          <span>INT:{selectedMonster.int}</span>
-          <span>DEF:{selectedMonster.def}</span>
-          <span>M-DEF:{selectedMonster.mdef}</span>
-        </div>
-      )}
     </div>
   );
 }
