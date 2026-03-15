@@ -4,11 +4,13 @@ import { getAllMonsters } from "../../data/monsters";
 
 export function MonsterSelector({
   onSelect,
+  onMonsterPick,
   selectedMonster: _selectedMonster,
   externalLevel,
   externalMonsterName,
 }: {
   onSelect: (monster: MonsterBase, level: number) => void;
+  onMonsterPick?: (monster: MonsterBase, level: number) => void;
   selectedMonster?: MonsterBase | null;
   externalLevel?: number;
   externalMonsterName?: string;
@@ -22,10 +24,10 @@ export function MonsterSelector({
   const allMonsters = useMemo(() => getAllMonsters(), []);
 
   const filtered = useMemo(() => {
-    if (!query) return allMonsters;
+    if (!query || query === selectedName) return allMonsters;
     const lower = query.toLowerCase();
     return allMonsters.filter((m) => m.name.toLowerCase().includes(lower));
-  }, [query, allMonsters]);
+  }, [query, allMonsters, selectedName]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -60,6 +62,7 @@ export function MonsterSelector({
     setIsOpen(false);
     const lvl = parseInt(level) || 1;
     onSelect(monster, lvl);
+    onMonsterPick?.(monster, lvl);
   };
 
   const handleLevelChange = (newLevel: string) => {

@@ -1,14 +1,12 @@
 import { useState, useCallback } from "react";
 import { DamageCalculator } from "./components/DamageCalculator";
-import { ExpCalculator } from "./components/ExpCalculator";
-import { GoldCalculator } from "./components/GoldCalculator";
+import { FarmCalculator } from "./components/FarmCalculator";
 import { StatusSimulator } from "./components/StatusSimulator";
 import { TabNav, type Tab } from "./components/ui/TabNav";
 
 const tabs: Tab[] = [
   { id: "damage", label: "ダメージ計算" },
-  { id: "exp", label: "経験値計算" },
-  { id: "gold", label: "金策計算" },
+  { id: "farm", label: "周回計算" },
   { id: "status", label: "ステータス" },
 ];
 
@@ -37,11 +35,8 @@ function App() {
         <div className={activeTab === "damage" ? "" : "hidden"}>
           <DamageCalculator />
         </div>
-        <div className={activeTab === "exp" ? "" : "hidden"}>
-          <ExpCalculator />
-        </div>
-        <div className={activeTab === "gold" ? "" : "hidden"}>
-          <GoldCalculator />
+        <div className={activeTab === "farm" ? "" : "hidden"}>
+          <FarmCalculator />
         </div>
         <div className={activeTab === "status" ? "" : "hidden"}>
           <StatusSimulator />
