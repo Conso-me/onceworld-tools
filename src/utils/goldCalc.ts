@@ -1,6 +1,10 @@
 /**
  * OnceWorld 金策計算ユーティリティ
+ *
+ * ゴールドのドロップ率は固定30%（固有ドロップ率とは別枠）
  */
+
+import { GOLD_DROP_RATE } from "./dropCalc";
 
 export interface MonsterGoldEntry {
   name: string;
@@ -9,10 +13,13 @@ export interface MonsterGoldEntry {
 }
 
 /**
- * 1周あたりのゴールド合計
+ * 1周あたりの期待ゴールド（30%ドロップ率を考慮）
  */
 export function calcGoldPerRun(monsters: MonsterGoldEntry[]): number {
-  return monsters.reduce((total, m) => total + m.gold * m.count, 0);
+  return monsters.reduce(
+    (total, m) => total + m.gold * m.count * GOLD_DROP_RATE,
+    0
+  );
 }
 
 /**
