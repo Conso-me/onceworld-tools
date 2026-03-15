@@ -870,14 +870,20 @@ export function DamageCalculator() {
                   </div>
                 )}
               </div>
-              {defensiveResult.hitsToTake && (
-                <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg border border-gray-100">
-                  <span className="text-gray-600 text-sm">受けられる回数</span>
-                  <span className="font-bold text-blue-600">
-                    {defensiveResult.hitsToTake.worst}〜{defensiveResult.hitsToTake.best}回
-                  </span>
-                </div>
-              )}
+              {defensiveResult.hitsToTake && (() => {
+                const { worst, best } = defensiveResult.hitsToTake!;
+                const isDanger = worst <= 1;
+                return (
+                  <div className={`flex items-center justify-between py-2 px-3 rounded-lg border ${isDanger ? "bg-red-100 border-red-400 animate-pulse" : "bg-white/60 border-gray-100"}`}>
+                    <span className={`text-sm font-medium ${isDanger ? "text-red-700" : "text-gray-600"}`}>
+                      {isDanger && "💀 "}受けられる回数
+                    </span>
+                    <span className={`font-bold ${isDanger ? "text-red-600 text-base" : "text-blue-600"}`}>
+                      {worst}〜{best}回{isDanger && " ⚠️"}
+                    </span>
+                  </div>
+                );
+              })()}
             </div>
           )}
         </>) : (
