@@ -116,7 +116,8 @@ export interface StatBreakdown {
 
 export interface SimConfig extends Record<string, unknown> {
   charLevel: number;
-  reinCount: 0 | 10 | 11 | 12;   // 天命輪廻回数
+  reinCount: number;              // 天命輪廻回数（上限なし）
+  charElement: Element;           // 属性（ダメ計プリセット用）
   // 振り分けポイント（使える総量）
   hasCosmoCube: boolean;
   johaneCount: number;

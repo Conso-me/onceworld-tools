@@ -52,3 +52,52 @@ export function getActiveSkills(pet: PetEntry, petLevel: number): PetSkill[] {
 export function getAllPetNames(): string[] {
   return pets.map((p) => p.name);
 }
+
+// ── ステータスカテゴリグルーピング ──────────────────────────────────────────
+
+export type PetStatCategory =
+  | "体力" | "攻撃力" | "魔力" | "防御力" | "魔法防御力"
+  | "幸運" | "攻撃速度" | "経験値" | "捕獲率" | "ドロップ率" | "その他";
+
+function skillTypeToCategory(type: string): PetStatCategory {
+  if (type.includes("VIT")) return "体力";
+  if (type.includes("ATK")) return "攻撃力";
+  if (type.includes("INT")) return "魔力";
+  if (type.includes("M-DEF")) return "魔法防御力";
+  if (type.includes("DEF")) return "防御力";
+  if (type.includes("LUCK")) return "幸運";
+  if (type.includes("SPD")) return "攻撃速度";
+  if (type === "経験値") return "経験値";
+  if (type === "捕獲率") return "捕獲率";
+  if (type === "ドロップ率") return "ドロップ率";
+  return "その他";
+}
+
+/** ペットをLv181スキルの主要ステータスでグループ化 */
+export function getPetsByPrimaryStat(): Map<PetStatCategory, PetEntry[]> {
+  const map = new Map<PetStatCategory, PetEntry[]>();
+  for (const pet of pets) {
+    const primarySkill =
+      pet.skills.find((s) => s.level === 181) ??
+      pet.skills.reduce<PetSkill | undefined>(
+        (best, s) => (!best || s.level > best.level ? s : best),
+        undefined
+      );
+    const category = primarySkill ? skillTypeToCategory(primarySkill.type) : "その他";
+    if (!map.has(category)) map.set(category, []);
+    map.get(category)!.push(pet);
+  }
+  return map;
+}
+
+/** 全レベルスキルの累積合計を返す（例: "VIT +420・最終VIT% +35"） */
+export function getPetMaxSkillSummary(pet: PetEntry): string {
+  if (!pet.skills.length) return "";
+  const totals = new Map<string, number>();
+  for (const s of pet.skills) {
+    totals.set(s.type, (totals.get(s.type) ?? 0) + s.value);
+  }
+  return [...totals.entries()]
+    .map(([type, total]) => `${type} +${total}`)
+    .join("・");
+}
