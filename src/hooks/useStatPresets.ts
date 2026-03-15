@@ -13,6 +13,8 @@ export type StatPreset = {
   def: string;
   mdef: string;
   spd: string;
+  vit: string;
+  luck: string;
   element: Element;
   attackMode: PlayerAttackMode;
   analysisBook: string;

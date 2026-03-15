@@ -15,6 +15,7 @@ import {
   calcAtkForKill,
   calcIntForKill,
   calcEffectiveDef,
+  calcHitRate,
 } from "../utils/damageCalc";
 import {
   calcPhysicalDefenseRequirement,
@@ -47,6 +48,8 @@ export function DamageCalculator() {
   const [myDef, setMyDef] = usePersistedState("dmg:def", "");
   const [myMdef, setMyMdef] = usePersistedState("dmg:mdef", "");
   const [mySpd, setMySpd] = usePersistedState("dmg:spd", "");
+  const [myVit, setMyVit] = usePersistedState("dmg:vit", "");
+  const [myLuck, setMyLuck] = usePersistedState("dmg:luck", "");
   const [myElement, setMyElement] = usePersistedState<Element>("dmg:element", "火");
   const [myAttackMode, setMyAttackMode] = usePersistedState<PlayerAttackMode>("dmg:attackMode", "物理");
   const [analysisBook, setAnalysisBook] = usePersistedState("dmg:analysisBook", "");
@@ -57,6 +60,9 @@ export function DamageCalculator() {
   const myDefNum = parseInt(myDef) || 0;
   const myMdefNum = parseInt(myMdef) || 0;
   const mySpdNum = parseInt(mySpd) || 0;
+  const myVitNum = parseInt(myVit) || 0;
+  const myLuckNum = parseInt(myLuck) || 0;
+  const playerHp = myVitNum > 0 ? myVitNum * 18 + 100 : 0;
   const analysisBookNum = parseInt(analysisBook) || 0;
   const analysisAnalysisBookNum = parseInt(analysisAnalysisBook) || 0;
 
@@ -65,6 +71,7 @@ export function DamageCalculator() {
   // プリセット
   const [presetName, setPresetName] = useState("");
   const [selectedPresetId, setSelectedPresetId] = useState("");
+  const [presetModalOpen, setPresetModalOpen] = useState(false);
   const { presets, savePreset, loadPreset, deletePreset } = useStatPresets();
 
   const handleSavePreset = useCallback(() => {
@@ -78,12 +85,14 @@ export function DamageCalculator() {
       def: myDef,
       mdef: myMdef,
       spd: mySpd,
+      vit: myVit,
+      luck: myLuck,
       element: myElement,
       attackMode: myAttackMode,
       analysisBook,
       analysisAnalysisBook,
     });
-  }, [presetName, presets, savePreset, myAtk, myInt, myDef, myMdef, mySpd, myElement, myAttackMode, analysisBook, analysisAnalysisBook]);
+  }, [presetName, presets, savePreset, myAtk, myInt, myDef, myMdef, mySpd, myVit, myLuck, myElement, myAttackMode, analysisBook, analysisAnalysisBook]);
 
   const handleLoadPreset = useCallback(() => {
     const preset = loadPreset(selectedPresetId);
@@ -93,11 +102,13 @@ export function DamageCalculator() {
     setMyDef(preset.def);
     setMyMdef(preset.mdef);
     setMySpd(preset.spd);
+    setMyVit(preset.vit || "");
+    setMyLuck(preset.luck || "");
     setMyElement(preset.element);
     setMyAttackMode(preset.attackMode);
     setAnalysisBook(preset.analysisBook);
     setAnalysisAnalysisBook(preset.analysisAnalysisBook);
-  }, [selectedPresetId, loadPreset, setMyAtk, setMyInt, setMyDef, setMyMdef, setMySpd, setMyElement, setMyAttackMode, setAnalysisBook, setAnalysisAnalysisBook]);
+  }, [selectedPresetId, loadPreset, setMyAtk, setMyInt, setMyDef, setMyMdef, setMySpd, setMyVit, setMyLuck, setMyElement, setMyAttackMode, setAnalysisBook, setAnalysisAnalysisBook]);
 
   const handleDeletePreset = useCallback(() => {
     deletePreset(selectedPresetId);
@@ -254,12 +265,17 @@ export function DamageCalculator() {
       }
     });
 
-    return { mode: myAttackMode as "物理" | "魔弾", dmg, multiHit, hitsToKill, minStat, targetStats };
+    const hitRate = myAttackMode === "物理"
+      ? calcHitRate(myLuckNum, scaled.scaledLuck)
+      : null;
+
+    return { mode: myAttackMode as "物理" | "魔弾", dmg, multiHit, hitsToKill, minStat, targetStats, hitRate };
   }, [
     scaled,
     myAtkNum,
     myIntNum,
     mySpdNum,
+    myLuckNum,
     myAttackMode,
     selfToEnemyAffinity,
     magicBaseInt,
@@ -299,6 +315,13 @@ export function DamageCalculator() {
       scaled.attackType === "魔攻"
     );
 
+    const hitsToTake = playerHp > 0
+      ? {
+          worst: Math.ceil(playerHp / Math.max(currentDmg.max * enemyMultiHit, 1)),
+          best: Math.floor(playerHp / Math.max(currentDmg.min * enemyMultiHit, 1)),
+        }
+      : null;
+
     return {
       defReq,
       currentDmg,
@@ -306,8 +329,9 @@ export function DamageCalculator() {
       enemyIsPhysical,
       enemyStat,
       enemyMultiHit,
+      hitsToTake,
     };
-  }, [scaled, myDefNum, myMdefNum, enemyToSelfAffinity]);
+  }, [scaled, myDefNum, myMdefNum, enemyToSelfAffinity, playerHp]);
 
   const hasMonster = !!scaled;
   const hasMyOffenseStats =
@@ -378,53 +402,19 @@ export function DamageCalculator() {
               <span className="text-blue-500 text-sm">自</span>
             </div>
             <h3 className="font-semibold text-gray-800">自分のステータス</h3>
-          </div>
-
-          {/* プリセット */}
-          <div className="bg-gray-50 rounded-2xl p-3 space-y-2">
-            <p className="text-xs font-medium text-gray-500">プリセット</p>
-            <div className="flex gap-1.5">
-              <select
-                value={selectedPresetId}
-                onChange={(e) => setSelectedPresetId(e.target.value)}
-                className="flex-1 min-w-0 text-sm rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-gray-700"
-              >
-                <option value="">選択...</option>
-                {presets.map((p) => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
-                ))}
-              </select>
-              <button
-                onClick={handleLoadPreset}
-                disabled={!selectedPresetId}
-                className="px-3 py-1.5 text-xs rounded-lg bg-indigo-100 text-indigo-600 font-medium disabled:opacity-40 hover:bg-indigo-200 transition-colors"
-              >
-                読込
-              </button>
-              <button
-                onClick={handleDeletePreset}
-                disabled={!selectedPresetId}
-                className="px-3 py-1.5 text-xs rounded-lg bg-red-100 text-red-600 font-medium disabled:opacity-40 hover:bg-red-200 transition-colors"
-              >
-                削除
-              </button>
-            </div>
-            <div className="flex gap-1.5">
-              <input
-                type="text"
-                value={presetName}
-                onChange={(e) => setPresetName(e.target.value)}
-                placeholder="プリセット名..."
-                className="flex-1 min-w-0 text-sm rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-gray-700 placeholder-gray-300"
-              />
-              <button
-                onClick={handleSavePreset}
-                disabled={!presetName.trim()}
-                className="px-3 py-1.5 text-xs rounded-lg bg-green-100 text-green-600 font-medium disabled:opacity-40 hover:bg-green-200 transition-colors"
-              >
-                保存
-              </button>
-            </div>
+            <button
+              onClick={() => setPresetModalOpen(true)}
+              className="ml-auto flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-100 border border-gray-200 text-xs text-gray-600 hover:bg-gray-200 transition-colors"
+            >
+              <span>
+                {selectedPresetId
+                  ? presets.find((p) => p.id === selectedPresetId)?.name ?? "プリセット"
+                  : "プリセット"}
+              </span>
+              <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
           </div>
 
           {/* 属性・攻撃方法 */}
@@ -475,8 +465,10 @@ export function DamageCalculator() {
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-2">
             <InputField label="ATK" value={myAtk} onChange={setMyAtk} />
             <InputField label="INT" value={myInt} onChange={setMyInt} />
+            <InputField label="LUK" value={myLuck} onChange={setMyLuck} />
             <InputField label="DEF" value={myDef} onChange={setMyDef} />
             <InputField label="M-DEF" value={myMdef} onChange={setMyMdef} />
+            <InputField label="VIT" value={myVit} onChange={setMyVit} />
             <InputField label="SPD" value={mySpd} onChange={setMySpd} />
           </div>
 
@@ -680,6 +672,14 @@ export function DamageCalculator() {
                           </span>
                         </div>
                       )}
+                      {offensiveResult.hitRate !== null && myLuckNum > 0 && (
+                        <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
+                          <span className="text-sm text-gray-500">命中率</span>
+                          <span className={`font-bold ${offensiveResult.hitRate >= 80 ? "text-green-600" : offensiveResult.hitRate < 20 ? "text-red-500" : "text-yellow-600"}`}>
+                            {offensiveResult.hitRate}%
+                          </span>
+                        </div>
+                      )}
                     </>
                   )}
                 </div>
@@ -840,7 +840,7 @@ export function DamageCalculator() {
 
           {/* 現在の被ダメージ */}
           {hasMyDefenseStats && (
-            <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 p-3">
+            <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 p-3 space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">現在の被ダメージ</span>
                 {defensiveResult.nullified ? (
@@ -864,6 +864,14 @@ export function DamageCalculator() {
                   </div>
                 )}
               </div>
+              {defensiveResult.hitsToTake && (
+                <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg border border-gray-100">
+                  <span className="text-gray-600 text-sm">受けられる回数</span>
+                  <span className="font-bold text-blue-600">
+                    {defensiveResult.hitsToTake.worst}〜{defensiveResult.hitsToTake.best}回
+                  </span>
+                </div>
+              )}
             </div>
           )}
         </>) : (
@@ -877,6 +885,83 @@ export function DamageCalculator() {
 
       </div>{/* /与ダメ・被ダメ 2カラム */}
       </div>{/* /右エリア */}
+
+      {/* プリセットモーダル */}
+      {presetModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+          onClick={() => setPresetModalOpen(false)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-xl p-5 w-80 space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-gray-800">プリセット</h3>
+              <button
+                onClick={() => setPresetModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* 読込・削除 */}
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium text-gray-500">読込 / 削除</p>
+              <div className="flex gap-1.5">
+                <select
+                  value={selectedPresetId}
+                  onChange={(e) => setSelectedPresetId(e.target.value)}
+                  className="flex-1 min-w-0 text-sm rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-gray-700"
+                >
+                  <option value="">選択...</option>
+                  {presets.map((p) => (
+                    <option key={p.id} value={p.id}>{p.name}</option>
+                  ))}
+                </select>
+                <button
+                  onClick={() => { handleLoadPreset(); setPresetModalOpen(false); }}
+                  disabled={!selectedPresetId}
+                  className="px-3 py-1.5 text-xs rounded-lg bg-indigo-100 text-indigo-600 font-medium disabled:opacity-40 hover:bg-indigo-200 transition-colors"
+                >
+                  読込
+                </button>
+                <button
+                  onClick={handleDeletePreset}
+                  disabled={!selectedPresetId}
+                  className="px-3 py-1.5 text-xs rounded-lg bg-red-100 text-red-600 font-medium disabled:opacity-40 hover:bg-red-200 transition-colors"
+                >
+                  削除
+                </button>
+              </div>
+            </div>
+
+            {/* 保存 */}
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium text-gray-500">保存</p>
+              <div className="flex gap-1.5">
+                <input
+                  type="text"
+                  value={presetName}
+                  onChange={(e) => setPresetName(e.target.value)}
+                  placeholder="プリセット名..."
+                  className="flex-1 min-w-0 text-sm rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-gray-700 placeholder-gray-300"
+                />
+                <button
+                  onClick={handleSavePreset}
+                  disabled={!presetName.trim()}
+                  className="px-3 py-1.5 text-xs rounded-lg bg-green-100 text-green-600 font-medium disabled:opacity-40 hover:bg-green-200 transition-colors"
+                >
+                  保存
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

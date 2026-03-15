@@ -194,6 +194,20 @@ export function calcAtkForKill(
 }
 
 /**
+ * 命中率を計算（物理攻撃のみ）
+ * playerLuck < enemyLuck × 0.5 → 1%
+ * playerLuck ≥ enemyLuck → 100%
+ * その間: 線形補間
+ */
+export function calcHitRate(playerLuck: number, enemyLuck: number): number {
+  if (enemyLuck <= 0) return 100;
+  const ratio = playerLuck / enemyLuck;
+  if (ratio < 0.5) return 1;
+  if (ratio >= 1.0) return 100;
+  return Math.round(1 + ((ratio - 0.5) / 0.5) * 99);
+}
+
+/**
  * N回で倒すために必要なINT（プレイヤー魔法）
  */
 export function calcIntForKill(

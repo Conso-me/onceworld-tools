@@ -1254,9 +1254,10 @@ export function StatusSimulator() {
       def: String(activeResult.final.def),
       mdef: String(activeResult.final.mdef),
       spd: String(activeResult.final.spd),
+      vit: "",
+      luck: "",
       element: activeCfg.charElement,
       attackMode: "物理",
-      targetTurns: "1",
       analysisBook: "0",
       analysisAnalysisBook: "0",
     });
