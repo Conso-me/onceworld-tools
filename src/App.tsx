@@ -25,7 +25,27 @@ function App() {
       {/* ヘッダー */}
       <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-3xl lg:max-w-[1400px] mx-auto px-4 py-3 space-y-2">
-          <h1 className="text-xl font-bold text-gray-800">OnceWorld Tools</h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-bold text-gray-800">OnceWorld Tools</h1>
+            <div className="flex items-center gap-3">
+              <a
+                href="https://docs.google.com/forms/d/e/1FAIpQLSf6NFySGmPNkQdFJEIwk11gtyvfiFVoJdwUVlwQ3MkN-vNHcg/viewform?usp=dialog"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-gray-500 hover:text-gray-700 underline"
+              >
+                フィードバック
+              </a>
+              <a
+                href="https://buymeacoffee.com/consommex"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-yellow-500 hover:text-yellow-600 font-medium"
+              >
+                ☕ Buy me a coffee
+              </a>
+            </div>
+          </div>
           <TabNav tabs={tabs} onTabChange={handleTabChange} />
         </div>
       </header>
