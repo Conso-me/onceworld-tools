@@ -2,12 +2,14 @@ import { useState, useCallback } from "react";
 import { DamageCalculator } from "./components/DamageCalculator";
 import { FarmCalculator } from "./components/FarmCalculator";
 import { StatusSimulator } from "./components/StatusSimulator";
+import { ArenaCalculator } from "./components/ArenaCalculator";
 import { TabNav, type Tab } from "./components/ui/TabNav";
 
 const tabs: Tab[] = [
   { id: "damage", label: "ダメージ計算", icon: "⚔" },
-  { id: "farm", label: "周回計算", icon: "♻" },
+  { id: "arena", label: "裏路地", icon: "🏟" },
   { id: "status", label: "ステータス", icon: "✦" },
+  { id: "farm", label: "周回計算", icon: "♻" },
 ];
 
 function App() {
@@ -60,6 +62,9 @@ function App() {
         </div>
         <div className={activeTab === "status" ? "" : "hidden"}>
           <StatusSimulator />
+        </div>
+        <div className={activeTab === "arena" ? "" : "hidden"}>
+          <ArenaCalculator />
         </div>
       </main>
 
