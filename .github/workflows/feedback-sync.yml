@@ -1,0 +1,33 @@
+name: Feedback Sync
+
+on:
+  schedule:
+    - cron: '0 1 * * *'   # 10:00 JST
+    - cron: '0 10 * * *'  # 19:00 JST
+  workflow_dispatch:       # 手動実行
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run fetch-feedback
+        run: npx tsx scripts/fetch-feedback.ts
+        env:
+          GOOGLE_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
+          SHEETS_FEEDBACK_ID: ${{ secrets.SHEETS_FEEDBACK_ID }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_REPO_OWNER: ${{ github.repository_owner }}
+          GH_REPO_NAME: ${{ github.event.repository.name }}
