@@ -268,6 +268,49 @@ function NumInput({
 
 // ── Pet Sub Group (実数 / 加算% / 乗算) ──────────────────────────────────────
 
+// ── SmallNumInput（インライン数値入力・空文字許容） ────────────────────────────
+
+function SmallNumInput({
+  value, onChange, min = 0, max, disabled, className,
+}: {
+  value: number; onChange: (v: number) => void;
+  min?: number; max?: number; disabled?: boolean; className: string;
+}) {
+  const [localValue, setLocalValue] = useState(value.toLocaleString("ja-JP"));
+  const focused = useRef(false);
+
+  useEffect(() => {
+    if (!focused.current) setLocalValue(value.toLocaleString("ja-JP"));
+  }, [value]);
+
+  return (
+    <input
+      type="text"
+      inputMode="numeric"
+      value={localValue}
+      disabled={disabled}
+      onFocus={() => { focused.current = true; setLocalValue(String(value)); }}
+      onChange={(e) => {
+        const raw = e.target.value.replace(/[^0-9]/g, "");
+        setLocalValue(raw);
+        if (raw !== "") {
+          const v = Number(raw);
+          onChange(max !== undefined ? Math.max(min, Math.min(max, v)) : Math.max(min, v));
+        }
+      }}
+      onBlur={() => {
+        focused.current = false;
+        const raw = localValue.replace(/[^0-9]/g, "");
+        const v = raw === "" ? min : Number(raw);
+        const clamped = max !== undefined ? Math.max(min, Math.min(max, v)) : Math.max(min, v);
+        onChange(clamped);
+        setLocalValue(clamped.toLocaleString("ja-JP"));
+      }}
+      className={className}
+    />
+  );
+}
+
 // ── Equip Selector Modal ──────────────────────────────────────────────────────
 
 function EquipSelectorModal({
@@ -400,15 +443,9 @@ function EquipSelector({
         </button>
         <div className="flex items-center gap-1 shrink-0">
           <span className="text-xs text-gray-400">+</span>
-          <input
-            type="text"
-            inputMode="numeric"
-            value={enhVal.toLocaleString("ja-JP")}
+          <SmallNumInput
+            value={enhVal} onChange={onEnhChange} min={0} max={1100}
             disabled={!canEnhance}
-            onChange={(e) => {
-              const raw = e.target.value.replace(/[^0-9]/g, "");
-              onEnhChange(Math.max(0, Math.min(1100, raw === "" ? 0 : Number(raw))));
-            }}
             className="w-16 border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:bg-gray-50 disabled:text-gray-300"
           />
           <button onClick={() => onEnhChange(1100)} disabled={!canEnhance} className={maxBtnCls}>MAX</button>
@@ -569,15 +606,9 @@ function AccSelector({
         </button>
         <div className="flex items-center gap-1 shrink-0">
           <span className="text-xs text-gray-400">Lv</span>
-          <input
-            type="text"
-            inputMode="numeric"
-            value={accLevel.toLocaleString("ja-JP")}
+          <SmallNumInput
+            value={accLevel} onChange={onLevelChange} min={1} max={effMax}
             disabled={!accName}
-            onChange={(e) => {
-              const raw = e.target.value.replace(/[^0-9]/g, "");
-              onLevelChange(Math.max(1, Math.min(effMax, raw === "" ? 1 : Number(raw))));
-            }}
             className="w-16 border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:bg-gray-50 disabled:text-gray-300"
           />
           <button
@@ -1005,14 +1036,8 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SetFie
                   <div key={cfgKey} className="space-y-0.5">
                     <span className={`text-xs ${over ? "text-red-500 font-semibold" : "text-gray-500"}`}>{label}</span>
                     <div className="flex gap-1 items-center">
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        value={val.toLocaleString("ja-JP")}
-                        onChange={(e) => {
-                          const raw = e.target.value.replace(/[^0-9]/g, "");
-                          setField(cfgKey, Math.max(0, raw === "" ? 0 : Number(raw)));
-                        }}
+                      <SmallNumInput
+                        value={val} onChange={(v) => setField(cfgKey, v)} min={0}
                         className={`flex-1 min-w-0 border rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 ${over ? "border-red-300 focus:ring-red-300" : "border-gray-200 focus:ring-blue-300"}`}
                       />
                       <button
