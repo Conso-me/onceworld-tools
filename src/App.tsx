@@ -5,6 +5,7 @@ import { StatusSimulator } from "./components/StatusSimulator";
 import { ArenaCalculator } from "./components/ArenaCalculator";
 import { MonsterEditor } from "./components/MonsterEditor";
 import { TabNav, type Tab } from "./components/ui/TabNav";
+import { PatchNotesModal } from "./components/PatchNotesModal";
 
 const tabs: Tab[] = [
   { id: "damage", label: "ダメージ計算", shortLabel: "ダメ計", icon: "⚔" },
@@ -19,6 +20,7 @@ function App() {
     const hash = window.location.hash.slice(1);
     return tabs.find((t) => t.id === hash && !t.disabled)?.id ?? "damage";
   });
+  const [showPatchNotes, setShowPatchNotes] = useState(false);
 
   const handleTabChange = useCallback((tabId: string) => {
     setActiveTab(tabId);
@@ -31,15 +33,22 @@ function App() {
         <div className="max-w-3xl lg:max-w-[1400px] mx-auto px-4 py-3 space-y-2">
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-bold text-indigo-900 tracking-wide whitespace-nowrap">⚔ OnceWorld Tools</h1>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5">
               <a
                 href="https://docs.google.com/forms/d/e/1FAIpQLSf6NFySGmPNkQdFJEIwk11gtyvfiFVoJdwUVlwQ3MkN-vNHcg/viewform?usp=dialog"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-gray-500 hover:text-gray-700 underline"
+                className="text-xs px-2.5 py-1 rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors font-medium"
               >
                 フィードバック
               </a>
+              <button
+                onClick={() => setShowPatchNotes(true)}
+                className="text-xs px-2.5 py-1 rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors font-medium"
+              >
+                更新履歴
+              </button>
+              <div className="w-px h-4 bg-gray-300 mx-1.5" />
               <a
                 href="https://buymeacoffee.com/consommex"
                 target="_blank"
@@ -77,6 +86,8 @@ function App() {
       <footer className="mt-auto py-3 text-center text-xs text-gray-400">
         <p>OnceWorld 計算ツール</p>
       </footer>
+
+      {showPatchNotes && <PatchNotesModal onClose={() => setShowPatchNotes(false)} />}
     </div>
   );
 }

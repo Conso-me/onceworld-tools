@@ -1,0 +1,101 @@
+export type ChangeType = "fix" | "feature" | "improve";
+
+export interface PatchChange {
+  type: ChangeType;
+  text: string;
+}
+
+export interface PatchEntry {
+  date: string; // "YYYY-MM-DD"
+  title?: string; // 任意（手動追加用）
+  changes: PatchChange[];
+}
+
+export const patchNotes: PatchEntry[] = [
+  {
+    date: "2026-03-16",
+    changes: [
+      { type: "feature", text: "カスタムモンスター登録機能を追加" },
+      {
+        type: "fix",
+        text: "数値入力のカーソルズレを修正し、被ダメ防御値表示を右揃えに改善",
+      },
+      {
+        type: "improve",
+        text: "被ダメ計算UIに補助防御情報と魔法ダメージ表示を改善",
+      },
+      {
+        type: "fix",
+        text: "ビルドプリセット保存・連携機能を追加し、ダメ計プリセットのバグを修正",
+      },
+      { type: "feature", text: "裏路地シミュレーターを追加（Issue #4）" },
+      { type: "feature", text: "裏路地にLUK回避表示を追加" },
+      { type: "fix", text: "モバイル表示の崩れを修正（入力欄・周回計算）" },
+      { type: "improve", text: "スマホ向けレスポンシブ対応を改善" },
+      { type: "improve", text: "数値入力欄の空文字許容・3桁カンマ表示を統一" },
+      {
+        type: "improve",
+        text: "ステータスの入力欄を数値キーボード化・3桁カンマ表示に統一",
+      },
+      {
+        type: "improve",
+        text: "敵ステータス表示をラベル上・値下の縦積みレイアウトに統一",
+      },
+      { type: "improve", text: "タブにアイコン追加・ヘッダーデザインを変更" },
+    ],
+  },
+  {
+    date: "2026-03-15",
+    changes: [
+      {
+        type: "feature",
+        text: "フィードバックループの仕組みを実装（Issue #9）",
+      },
+      {
+        type: "feature",
+        text: "受けられる回数が0〜1回の時に即死警告UIを表示",
+      },
+      {
+        type: "feature",
+        text: "ダメージ計算機にVIT・LUK追加、プリセットUIをモーダル化（Issue #10）",
+      },
+      {
+        type: "feature",
+        text: "モンスタードロップデータ最新化・周回計算機を実装（Issue #7）",
+      },
+      { type: "fix", text: "未使用定数を削除してVercelビルドエラーを修正" },
+      { type: "improve", text: "ダメージ計算機の魔法攻撃機能を大幅強化" },
+      { type: "improve", text: "敵プリセット・モンスター選択をモーダルUIに変更" },
+      { type: "improve", text: "周回設定UIの入力欄を整理・改善" },
+      { type: "improve", text: "経験値・金策タブを周回計算機に統合" },
+      {
+        type: "improve",
+        text: "ステータスシミュのUI改善（装備・アクセ・ペット選択モーダル化など）",
+      },
+      {
+        type: "improve",
+        text: "ステータスシミュレーターを拡張（装備強化・4枠アクセ・3枠ペット・全MAX）",
+      },
+      {
+        type: "improve",
+        text: "ダメージ計算機のレイアウト改修・敵プリセット追加（Issue #3）",
+      },
+    ],
+  },
+  {
+    date: "2026-03-14",
+    changes: [
+      { type: "feature", text: "タブ切り替え・リロード時の状態保持を実装" },
+      { type: "feature", text: "ダメージ計算機・経験値計算機・金策計算機のUIを実装" },
+      { type: "feature", text: "型定義・データモジュール・計算ユーティリティを実装" },
+      { type: "feature", text: "ゲームデータとWiki計算式リファレンスを追加" },
+      { type: "improve", text: "プロジェクト基盤をセットアップ" },
+    ],
+  },
+  {
+    date: "2026-01-17",
+    changes: [
+    { type: "improve", text: "Initial commit" },
+    ],
+  },
+];
