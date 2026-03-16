@@ -961,7 +961,12 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SetFie
             <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">キャラクター設定</h3>
             <div className="grid grid-cols-3 gap-2">
               <NumInput label="レベル" value={cfg.charLevel} min={1} max={200}
-                onChange={(v) => setField("charLevel", v)} />
+                onChange={(v) => {
+                  setField("charLevel", v);
+                  if (cfg.reinCount < 10) {
+                    setField("tenseisCount", Math.min(10, Math.max(0, Math.ceil((v - 100) / 10))));
+                  }
+                }} />
               {cfg.reinCount >= 10 ? (
                 <label className="space-y-1">
                   <span className="text-xs text-gray-500">転生</span>
