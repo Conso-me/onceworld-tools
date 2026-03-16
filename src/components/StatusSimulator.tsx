@@ -218,9 +218,13 @@ function NumInput({
           <span className={`text-xs ${error ? "text-red-500 font-semibold" : "text-gray-500"}`}>{label}</span>
         )}
         <input
-          type="number" min={min} max={max} value={value} disabled={disabled}
+          type="text"
+          inputMode="numeric"
+          value={value.toLocaleString("ja-JP")}
+          disabled={disabled}
           onChange={(e) => {
-            const v = Number(e.target.value);
+            const raw = e.target.value.replace(/[^0-9]/g, "");
+            const v = raw === "" ? min : Number(raw);
             onChange(max !== undefined ? Math.max(min, Math.min(max, v)) : Math.max(min, v));
           }}
           className={`w-full border rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 disabled:bg-gray-50 disabled:text-gray-300 ${error ? "border-red-300 focus:ring-red-300" : "border-gray-200 focus:ring-blue-300"}`}
@@ -368,9 +372,14 @@ function EquipSelector({
         <div className="flex items-center gap-1 shrink-0">
           <span className="text-xs text-gray-400">+</span>
           <input
-            type="number" min={0} max={1100} value={enhVal}
+            type="text"
+            inputMode="numeric"
+            value={enhVal.toLocaleString("ja-JP")}
             disabled={!canEnhance}
-            onChange={(e) => onEnhChange(Math.max(0, Math.min(1100, Number(e.target.value))))}
+            onChange={(e) => {
+              const raw = e.target.value.replace(/[^0-9]/g, "");
+              onEnhChange(Math.max(0, Math.min(1100, raw === "" ? 0 : Number(raw))));
+            }}
             className="w-16 border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:bg-gray-50 disabled:text-gray-300"
           />
           <button onClick={() => onEnhChange(1100)} disabled={!canEnhance} className={maxBtnCls}>MAX</button>
@@ -532,9 +541,14 @@ function AccSelector({
         <div className="flex items-center gap-1 shrink-0">
           <span className="text-xs text-gray-400">Lv</span>
           <input
-            type="number" min={1} max={effMax} value={accLevel}
+            type="text"
+            inputMode="numeric"
+            value={accLevel.toLocaleString("ja-JP")}
             disabled={!accName}
-            onChange={(e) => onLevelChange(Math.max(1, Math.min(effMax, Number(e.target.value))))}
+            onChange={(e) => {
+              const raw = e.target.value.replace(/[^0-9]/g, "");
+              onLevelChange(Math.max(1, Math.min(effMax, raw === "" ? 1 : Number(raw))));
+            }}
             className="w-16 border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:bg-gray-50 disabled:text-gray-300"
           />
           <button
@@ -963,8 +977,13 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SetFie
                     <span className={`text-xs ${over ? "text-red-500 font-semibold" : "text-gray-500"}`}>{label}</span>
                     <div className="flex gap-1 items-center">
                       <input
-                        type="number" min={0} value={val}
-                        onChange={(e) => setField(cfgKey, Math.max(0, Number(e.target.value)))}
+                        type="text"
+                        inputMode="numeric"
+                        value={val.toLocaleString("ja-JP")}
+                        onChange={(e) => {
+                          const raw = e.target.value.replace(/[^0-9]/g, "");
+                          setField(cfgKey, Math.max(0, raw === "" ? 0 : Number(raw)));
+                        }}
                         className={`flex-1 min-w-0 border rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 ${over ? "border-red-300 focus:ring-red-300" : "border-gray-200 focus:ring-blue-300"}`}
                       />
                       <button
