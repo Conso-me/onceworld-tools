@@ -134,8 +134,17 @@ export function MonsterEditor() {
     setForm(f => ({ ...f, [field]: digits === "" ? 0 : parseInt(digits, 10) }));
   }
 
+  function setDecimal(field: keyof MonsterBase, value: string) {
+    const cleaned = value.replace(/[^0-9.]/g, "").replace(/^(\d*\.?\d*).*$/, "$1");
+    setForm(f => ({ ...f, [field]: cleaned === "" ? 0 : parseFloat(cleaned) }));
+  }
+
   function blockNonDigit(e: React.KeyboardEvent<HTMLInputElement>) {
     if (["e", "E", "+", "-", "."].includes(e.key)) e.preventDefault();
+  }
+
+  function blockNonDecimal(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault();
   }
 
   const numHandlers = (field: keyof MonsterBase) => ({
@@ -147,6 +156,18 @@ export function MonsterEditor() {
     },
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
       if (!(e.nativeEvent as InputEvent).isComposing) setNum(field, e.target.value);
+    },
+  });
+
+  const decimalHandlers = (field: keyof MonsterBase) => ({
+    type: "text" as const,
+    inputMode: "decimal" as const,
+    onKeyDown: blockNonDecimal,
+    onCompositionEnd: (e: React.CompositionEvent<HTMLInputElement>) => {
+      setDecimal(field, e.currentTarget.value);
+    },
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (!(e.nativeEvent as InputEvent).isComposing) setDecimal(field, e.target.value);
     },
   });
 
@@ -243,7 +264,7 @@ export function MonsterEditor() {
           <div>
             <label className="text-xs text-gray-500 block mb-1">捕獲率(%)</label>
             <input
-              {...numHandlers("captureRate")}
+              {...decimalHandlers("captureRate")}
               value={form.captureRate || ""}
               className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-300 text-right"
             />
