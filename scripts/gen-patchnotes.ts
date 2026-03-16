@@ -34,6 +34,7 @@ function getGitLog(): PatchEntry[] {
     const subject = rest.join("|");
     if (!date || !subject) continue;
     if (subject.includes("[skip]")) continue;
+    if (subject.startsWith("Merge pull request")) continue;
 
     const change: PatchChange = { type: classifyChange(subject), text: subject };
     if (!grouped.has(date)) grouped.set(date, []);
