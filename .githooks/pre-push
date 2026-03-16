@@ -1,0 +1,10 @@
+#!/bin/sh
+# パッチノートを自動更新してからプッシュ
+
+npm run gen:patchnotes
+
+# 差分があればコミット
+if ! git diff --quiet src/data/patchNotes.ts; then
+  git add src/data/patchNotes.ts
+  git commit -m "chore: パッチノート自動更新"
+fi
