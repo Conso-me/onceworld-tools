@@ -14,6 +14,18 @@ const badgeLabel: Record<ChangeType, string> = {
   improve: "改善",
 };
 
+function groupByYearMonth(entries: PatchEntry[]): Map<string, Map<string, PatchEntry[]>> {
+  const grouped = new Map<string, Map<string, PatchEntry[]>>();
+  for (const entry of entries) {
+    const [year, month] = entry.date.split("-");
+    if (!grouped.has(year)) grouped.set(year, new Map());
+    const yearGroup = grouped.get(year)!;
+    if (!yearGroup.has(month)) yearGroup.set(month, []);
+    yearGroup.get(month)!.push(entry);
+  }
+  return grouped;
+}
+
 function PatchEntryBlock({
   entry,
   defaultOpen,
@@ -23,14 +35,14 @@ function PatchEntryBlock({
 }) {
   return (
     <details open={defaultOpen} className="border-b border-gray-100 last:border-b-0">
-      <summary className="flex items-center gap-2 px-4 py-2.5 cursor-pointer hover:bg-gray-50 select-none list-none">
+      <summary className="flex items-center gap-2 pl-8 pr-4 py-2 cursor-pointer hover:bg-gray-50 select-none list-none">
         <span className="text-xs font-medium text-gray-400">{entry.date}</span>
         {entry.title && (
           <span className="text-sm font-semibold text-gray-700">{entry.title}</span>
         )}
         <span className="ml-auto text-xs text-gray-400">{entry.changes.length}件</span>
       </summary>
-      <ul className="px-4 pb-3 space-y-1.5">
+      <ul className="pl-8 pr-4 pb-3 space-y-1.5">
         {entry.changes.map((change, i) => (
           <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
             <span
@@ -46,6 +58,59 @@ function PatchEntryBlock({
   );
 }
 
+function MonthBlock({
+  month,
+  entries,
+  defaultOpen,
+}: {
+  month: string;
+  entries: PatchEntry[];
+  defaultOpen: boolean;
+}) {
+  const totalChanges = entries.reduce((sum, e) => sum + e.changes.length, 0);
+  return (
+    <details open={defaultOpen} className="border-b border-gray-100 last:border-b-0">
+      <summary className="flex items-center gap-2 pl-5 pr-4 py-2 cursor-pointer hover:bg-gray-50 select-none list-none">
+        <span className="text-xs font-semibold text-gray-500">{parseInt(month)}月</span>
+        <span className="ml-auto text-xs text-gray-400">{totalChanges}件</span>
+      </summary>
+      <div>
+        {entries.map((entry, i) => (
+          <PatchEntryBlock key={entry.date} entry={entry} defaultOpen={defaultOpen && i === 0} />
+        ))}
+      </div>
+    </details>
+  );
+}
+
+function YearBlock({
+  year,
+  monthMap,
+  defaultOpen,
+}: {
+  year: string;
+  monthMap: Map<string, PatchEntry[]>;
+  defaultOpen: boolean;
+}) {
+  return (
+    <details open={defaultOpen} className="border-b border-gray-200 last:border-b-0">
+      <summary className="flex items-center gap-2 px-4 py-2.5 cursor-pointer hover:bg-gray-50 select-none list-none">
+        <span className="text-sm font-semibold text-gray-700">{year}年</span>
+      </summary>
+      <div>
+        {[...monthMap.entries()].map(([month, entries], i) => (
+          <MonthBlock
+            key={month}
+            month={month}
+            entries={entries}
+            defaultOpen={defaultOpen && i === 0}
+          />
+        ))}
+      </div>
+    </details>
+  );
+}
+
 export function PatchNotesModal({ onClose }: { onClose: () => void }) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -54,6 +119,8 @@ export function PatchNotesModal({ onClose }: { onClose: () => void }) {
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
   }, [onClose]);
+
+  const grouped = groupByYearMonth(patchNotes);
 
   return (
     <div
@@ -77,8 +144,13 @@ export function PatchNotesModal({ onClose }: { onClose: () => void }) {
 
         {/* エントリリスト */}
         <div className="overflow-y-auto flex-1">
-          {patchNotes.map((entry, i) => (
-            <PatchEntryBlock key={entry.date} entry={entry} defaultOpen={i === 0} />
+          {[...grouped.entries()].map(([year, monthMap], i) => (
+            <YearBlock
+              key={year}
+              year={year}
+              monthMap={monthMap}
+              defaultOpen={i === 0}
+            />
           ))}
         </div>
 
