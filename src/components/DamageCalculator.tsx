@@ -22,6 +22,7 @@ import {
   calcMagicalDefenseRequirement,
   calcDamage as calcDefDamage,
   canNullifyDamage,
+  calcAdditionalDefNeeded,
 } from "../utils/defenseCalc";
 import { getElementAffinity } from "../data/elements";
 import { MAGIC_SPELLS } from "../data/magicSpells";
@@ -326,6 +327,8 @@ export function DamageCalculator() {
         }
       : null;
 
+    const additionalNeeded = calcAdditionalDefNeeded(enemyStat, myDefNum, myMdefNum, enemyIsPhysical);
+
     return {
       defReq,
       currentDmg,
@@ -334,6 +337,7 @@ export function DamageCalculator() {
       enemyStat,
       enemyMultiHit,
       hitsToTake,
+      additionalNeeded,
     };
   }, [scaled, myDefNum, myMdefNum, enemyToSelfAffinity, playerHp]);
 
@@ -609,10 +613,10 @@ export function DamageCalculator() {
                   </span>
                 </div>
                 {hasMyOffenseStats ? (
-                  <div className="space-y-1.5">
+                  <div className="grid grid-cols-[1fr_auto_auto_auto_auto_auto_auto] gap-y-1.5 gap-x-1">
                     {offensiveResult.spellResults.map(({ spell, dmg, totalMin, totalMax, totalCritMin, totalCritMax, hitsToKill }) => (
-                      <div key={spell.name} className="py-1.5 px-2 bg-white/60 rounded-lg">
-                        <div className="flex items-center gap-1 mb-1">
+                      <div key={spell.name} className="col-span-7 grid grid-cols-subgrid bg-white/60 rounded-lg py-1.5">
+                        <div className="col-span-7 flex items-center gap-1 mb-1 px-2">
                           <span className={`text-xs px-1 py-0.5 rounded border font-medium ${elementColors[spell.element]}`}>{spell.element}</span>
                           <span className="text-sm font-medium text-gray-700">{spell.name}</span>
                           <span className="text-xs text-gray-400">
@@ -629,16 +633,17 @@ export function DamageCalculator() {
                           )}
                         </div>
                         {dmg.isNullified ? (
-                          <span className="text-xs text-gray-400">防御貫通不可</span>
+                          <span className="col-span-7 text-xs text-gray-400 px-2">防御貫通不可</span>
                         ) : (
-                          <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-sm">
-                            <span className="font-bold text-green-600">
-                              {totalMin.toLocaleString()}〜{totalMax.toLocaleString()}
-                            </span>
-                            <span className="text-yellow-600 text-xs">
-                              クリ {totalCritMin.toLocaleString()}〜{totalCritMax.toLocaleString()}
-                            </span>
-                          </div>
+                          <>
+                            <span className="pl-2 text-sm font-bold text-green-600 tabular-nums text-right self-center">{totalMin.toLocaleString()}</span>
+                            <span className="text-sm text-green-600 text-center self-center">〜</span>
+                            <span className="text-sm font-bold text-green-600 tabular-nums text-right self-center">{totalMax.toLocaleString()}</span>
+                            <span className="px-1 text-xs text-yellow-600 text-center self-center">クリ</span>
+                            <span className="text-xs text-yellow-600 tabular-nums text-right self-center">{totalCritMin.toLocaleString()}</span>
+                            <span className="text-xs text-yellow-600 text-center self-center">〜</span>
+                            <span className="pr-2 text-xs text-yellow-600 tabular-nums text-right self-center">{totalCritMax.toLocaleString()}</span>
+                          </>
                         )}
                       </div>
                     ))}
@@ -831,38 +836,61 @@ export function DamageCalculator() {
                   />
                 </div>
               )}
-              <ResultRow
-                label={`${defensiveResult.enemyIsPhysical ? "DEF" : "M-DEF"}のみで無効化`}
-                value={
-                  defensiveResult.enemyIsPhysical
-                    ? defensiveResult.defReq.defOnly
-                    : defensiveResult.defReq.mdefOnly
-                }
-                current={
-                  hasMyDefenseStats
-                    ? defensiveResult.enemyIsPhysical
-                      ? myDefNum
-                      : myMdefNum
-                    : undefined
-                }
-                color="orange"
-              />
-              <ResultRow
-                label={`${defensiveResult.enemyIsPhysical ? "M-DEF" : "DEF"}のみで無効化`}
-                value={
-                  defensiveResult.enemyIsPhysical
-                    ? defensiveResult.defReq.mdefOnly
-                    : defensiveResult.defReq.defOnly
-                }
-                current={
-                  hasMyDefenseStats
-                    ? defensiveResult.enemyIsPhysical
-                      ? myMdefNum
-                      : myDefNum
-                    : undefined
-                }
-                color="orange"
-              />
+              {(() => {
+                const isPhys = defensiveResult.enemyIsPhysical;
+                const rows = [
+                  {
+                    label: `${isPhys ? "DEF" : "M-DEF"}のみで無効化できる値`,
+                    value: isPhys ? defensiveResult.defReq.defOnly : defensiveResult.defReq.mdefOnly,
+                    current: hasMyDefenseStats ? (isPhys ? myDefNum : myMdefNum) : undefined,
+                    hintStat: isPhys ? "M-DEF" : "DEF",
+                    hintAmount: isPhys
+                      ? `+${defensiveResult.additionalNeeded.additionalMdef.toLocaleString()}`
+                      : `+${defensiveResult.additionalNeeded.additionalDef.toLocaleString()}`,
+                  },
+                  {
+                    label: `${isPhys ? "M-DEF" : "DEF"}のみで無効化できる値`,
+                    value: isPhys ? defensiveResult.defReq.mdefOnly : defensiveResult.defReq.defOnly,
+                    current: hasMyDefenseStats ? (isPhys ? myMdefNum : myDefNum) : undefined,
+                    hintStat: isPhys ? "DEF" : "M-DEF",
+                    hintAmount: isPhys
+                      ? `+${defensiveResult.additionalNeeded.additionalDef.toLocaleString()}`
+                      : `+${defensiveResult.additionalNeeded.additionalMdef.toLocaleString()}`,
+                  },
+                ];
+                const showHints = hasMyDefenseStats && !defensiveResult.nullified;
+                return (
+                  <div className="grid grid-cols-[1fr_auto_auto] gap-x-2 gap-y-0.5">
+                    {rows.map(({ label, value, current }) => {
+                      const remaining = current !== undefined ? value - current : undefined;
+                      const achieved = remaining !== undefined && remaining <= 0;
+                      return (
+                        <div key={label} className="col-span-3 grid grid-cols-subgrid items-center bg-white/60 rounded-lg py-2 px-3">
+                          <span className="text-sm text-gray-500">{label}</span>
+                          <span className="text-lg font-bold text-orange-600 text-right tabular-nums">
+                            {value.toLocaleString()}
+                          </span>
+                          {remaining !== undefined ? (
+                            <span className={`text-xs px-2 py-0.5 rounded-full text-right ${achieved ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-500"}`}>
+                              {achieved ? "達成" : `あと${remaining.toLocaleString()}`}
+                            </span>
+                          ) : <span />}
+                        </div>
+                      );
+                    })}
+                    {showHints && (
+                      <div className="col-span-3 grid grid-cols-[auto_auto_auto_auto] gap-x-1 gap-y-0 text-xs text-blue-400 pl-3 justify-start">
+                        {rows.map(({ hintStat, hintAmount }) => [
+                          <span key={`${hintStat}-s`} className="text-right">{hintStat}</span>,
+                          <span key={`${hintStat}-m`} className="text-right">で補うなら あと</span>,
+                          <span key={`${hintStat}-n`} className="text-right">{hintStat}</span>,
+                          <span key={`${hintStat}-v`} className="text-right tabular-nums">{hintAmount}</span>,
+                        ])}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           </StatCard>
 
@@ -892,14 +920,22 @@ export function DamageCalculator() {
                   </div>
                 )}
               </div>
+              {playerHp > 0 && (
+                <div className="flex items-center justify-between py-1 px-3">
+                  <span className="text-xs text-gray-400">自HP</span>
+                  <span className="text-xs text-gray-500 tabular-nums">{playerHp.toLocaleString()}</span>
+                </div>
+              )}
               {defensiveResult.hitsToTake && (() => {
                 const { worst, best } = defensiveResult.hitsToTake!;
                 const isDanger = worst <= 1;
+                const isInstantDeath = best === 0;
                 return (
                   <div className={`flex items-center justify-between py-2 px-3 rounded-lg border ${isDanger ? "bg-red-100 border-red-400 animate-pulse" : "bg-white/60 border-gray-100"}`}>
-                    <span className={`text-sm font-medium ${isDanger ? "text-red-700" : "text-gray-600"}`}>
-                      {isDanger && "💀 "}受けられる回数
-                    </span>
+                    <div className={`flex items-center gap-2 ${isDanger ? "text-red-700" : "text-gray-600"}`}>
+                      <span className="text-sm font-medium">{isDanger && "💀 "}受けられる回数</span>
+                      {isInstantDeath && <span className="text-xs font-bold text-red-600">ワンパン即死</span>}
+                    </div>
                     <span className={`font-bold ${isDanger ? "text-red-600 text-base" : "text-blue-600"}`}>
                       {worst}〜{best}回{isDanger && " ⚠️"}
                     </span>

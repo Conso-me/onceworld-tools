@@ -113,6 +113,33 @@ export function canNullifyDamage(
 }
 
 /**
+ * 現在のDEF/M-DEFを考慮して、あとどれだけ追加すれば無効化できるかを計算
+ *
+ * 物理: DEF + M-DEF/10 >= threshold → additionalDef: ceil(threshold - DEF - MDEF/10), additionalMdef: ceil((threshold - DEF)*10 - MDEF)
+ * 魔法: M-DEF + DEF/10 >= threshold → additionalMdef: ceil(threshold - MDEF - DEF/10), additionalDef: ceil((threshold - MDEF)*10 - DEF)
+ */
+export function calcAdditionalDefNeeded(
+  attackerStat: number,
+  currentDef: number,
+  currentMdef: number,
+  isPhysical: boolean
+): { additionalDef: number; additionalMdef: number } {
+  const threshold = attackerStat * 1.75;
+
+  if (isPhysical) {
+    return {
+      additionalDef: Math.max(0, Math.ceil(threshold - currentDef - currentMdef / 10)),
+      additionalMdef: Math.max(0, Math.ceil((threshold - currentDef) * 10 - currentMdef)),
+    };
+  } else {
+    return {
+      additionalMdef: Math.max(0, Math.ceil(threshold - currentMdef - currentDef / 10)),
+      additionalDef: Math.max(0, Math.ceil((threshold - currentMdef) * 10 - currentDef)),
+    };
+  }
+}
+
+/**
  * 敵のATK/INTから必要な防御力をまとめて計算
  */
 export function calcDefenseRequirements(
