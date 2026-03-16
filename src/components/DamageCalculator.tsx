@@ -860,26 +860,31 @@ export function DamageCalculator() {
                 ];
                 const showHints = hasMyDefenseStats && !defensiveResult.nullified;
                 return (
-                  <div className="grid grid-cols-[1fr_auto_auto] gap-x-2 gap-y-0.5">
+                  <div className="grid grid-cols-[1fr_auto_auto_auto] gap-x-2 gap-y-0.5">
                     {rows.map(({ label, value, current }) => {
                       const remaining = current !== undefined ? value - current : undefined;
                       const achieved = remaining !== undefined && remaining <= 0;
                       return (
-                        <div key={label} className="col-span-3 grid grid-cols-subgrid items-center bg-white/60 rounded-lg py-2 px-3">
+                        <div key={label} className="col-span-4 grid grid-cols-subgrid items-center bg-white/60 rounded-lg py-2 px-3">
                           <span className="text-sm text-gray-500">{label}</span>
                           <span className="text-lg font-bold text-orange-600 text-right tabular-nums">
                             {value.toLocaleString()}
                           </span>
                           {remaining !== undefined ? (
-                            <span className={`text-xs px-2 py-0.5 rounded-full text-right ${achieved ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-500"}`}>
-                              {achieved ? "達成" : `あと${remaining.toLocaleString()}`}
-                            </span>
-                          ) : <span />}
+                            <>
+                              <span className={`text-xs text-right ${achieved ? "text-green-600" : "text-gray-400"}`}>
+                                {achieved ? "" : "あと"}
+                              </span>
+                              <span className={`text-xs px-2 py-0.5 rounded-full text-right tabular-nums ${achieved ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-500"}`}>
+                                {achieved ? "達成" : remaining.toLocaleString()}
+                              </span>
+                            </>
+                          ) : <><span /><span /></>}
                         </div>
                       );
                     })}
                     {showHints && (
-                      <div className="col-span-3 grid grid-cols-[auto_auto_auto_auto] gap-x-1 gap-y-0 text-xs text-blue-400 pl-3 justify-start">
+                      <div className="col-span-4 grid grid-cols-[auto_auto_auto_auto] gap-x-1 gap-y-0 text-xs text-blue-400 pl-3 justify-start">
                         {rows.map(({ hintStat, hintAmount }) => [
                           <span key={`${hintStat}-s`} className="text-right">{hintStat}</span>,
                           <span key={`${hintStat}-m`} className="text-right">で補うなら あと</span>,
