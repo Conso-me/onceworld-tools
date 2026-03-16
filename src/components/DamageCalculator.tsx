@@ -538,23 +538,45 @@ export function DamageCalculator() {
             <span className={`text-sm px-2 py-0.5 rounded-lg border font-medium ${elementColors[scaled.element]}`}>{scaled.element}</span>
             <span className="text-sm bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-lg font-medium">{scaled.attackType}</span>
           </div>
-          <div className="grid grid-cols-4 gap-x-4 gap-y-1 text-sm">
-            <div><span className="text-gray-400">HP</span> <span className="font-semibold text-gray-700">{scaled.hp.toLocaleString()}</span></div>
-            <div><span className="text-gray-400">ATK</span> <span className="font-semibold text-gray-700">{scaled.scaledAtk.toLocaleString()}</span> <span className="text-xs text-gray-400">({scaled.atk})</span></div>
-            <div><span className="text-gray-400">INT</span> <span className="font-semibold text-gray-700">{scaled.scaledInt.toLocaleString()}</span> <span className="text-xs text-gray-400">({scaled.int})</span></div>
-            <div><span className="text-gray-400">DEF</span> <span className="font-semibold text-gray-700">{scaled.scaledDef.toLocaleString()}</span> <span className="text-xs text-gray-400">({scaled.def})</span></div>
-            <div><span className="text-gray-400">M-DEF</span> <span className="font-semibold text-gray-700">{scaled.scaledMdef.toLocaleString()}</span> <span className="text-xs text-gray-400">({scaled.mdef})</span></div>
-            <div><span className="text-gray-400">SPD</span> <span className="font-semibold text-gray-700">{scaled.scaledSpd.toLocaleString()}</span> <span className="text-xs text-gray-400">({scaled.spd})</span></div>
-            <div><span className="text-gray-400">LUCK</span> <span className="font-semibold text-gray-700">{scaled.scaledLuck.toLocaleString()}</span> <span className="text-xs text-gray-400">({scaled.luck})</span></div>
-            <div>
-              <span className="text-gray-400">EXP</span>{" "}
-              <span className="font-semibold text-gray-700">
-              {(
-                Math.max(
-                  Math.floor(Math.pow(monsterLevel, 1.1) * 0.2),
-                  1
-                ) * scaled.exp
-              ).toLocaleString()}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-2">
+            <div className="flex flex-col">
+              <span className="text-xs text-gray-400">HP</span>
+              <span className="text-sm font-semibold text-gray-700">{scaled.hp.toLocaleString()}</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xs text-gray-400">ATK</span>
+              <span className="text-sm font-semibold text-gray-700">{scaled.scaledAtk.toLocaleString()}</span>
+              <span className="text-xs text-gray-400">({scaled.atk})</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xs text-gray-400">INT</span>
+              <span className="text-sm font-semibold text-gray-700">{scaled.scaledInt.toLocaleString()}</span>
+              <span className="text-xs text-gray-400">({scaled.int})</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xs text-gray-400">DEF</span>
+              <span className="text-sm font-semibold text-gray-700">{scaled.scaledDef.toLocaleString()}</span>
+              <span className="text-xs text-gray-400">({scaled.def})</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xs text-gray-400">M-DEF</span>
+              <span className="text-sm font-semibold text-gray-700">{scaled.scaledMdef.toLocaleString()}</span>
+              <span className="text-xs text-gray-400">({scaled.mdef})</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xs text-gray-400">SPD</span>
+              <span className="text-sm font-semibold text-gray-700">{scaled.scaledSpd.toLocaleString()}</span>
+              <span className="text-xs text-gray-400">({scaled.spd})</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xs text-gray-400">LUCK</span>
+              <span className="text-sm font-semibold text-gray-700">{scaled.scaledLuck.toLocaleString()}</span>
+              <span className="text-xs text-gray-400">({scaled.luck})</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xs text-gray-400">EXP</span>
+              <span className="text-sm font-semibold text-gray-700">
+                {(Math.max(Math.floor(Math.pow(monsterLevel, 1.1) * 0.2), 1) * scaled.exp).toLocaleString()}
               </span>
             </div>
           </div>
