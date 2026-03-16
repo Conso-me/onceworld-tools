@@ -39,6 +39,7 @@ const STAT_FIELDS: Array<{ key: keyof MonsterBase; label: string }> = [
 export function MonsterEditor() {
   const [customs, setCustoms] = useState<MonsterBase[]>(() => getCustomMonsters());
   const [form, setForm] = useState<MonsterBase>(DEFAULT_FORM);
+  const [captureRateInput, setCaptureRateInput] = useState(String(DEFAULT_FORM.captureRate));
   const [editingName, setEditingName] = useState<string | null>(null);
   const [error, setError] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -73,12 +74,14 @@ export function MonsterEditor() {
       save([...customs, { ...form, name }]);
     }
     setForm(DEFAULT_FORM);
+    setCaptureRateInput(String(DEFAULT_FORM.captureRate));
     setEditingName(null);
     setError("");
   }
 
   function handleEdit(m: MonsterBase) {
     setForm({ ...m });
+    setCaptureRateInput(String(m.captureRate));
     setEditingName(m.name);
     setError("");
   }
@@ -88,12 +91,14 @@ export function MonsterEditor() {
     save(customs.filter(m => m.name !== name));
     if (editingName === name) {
       setForm(DEFAULT_FORM);
+      setCaptureRateInput(String(DEFAULT_FORM.captureRate));
       setEditingName(null);
     }
   }
 
   function handleCancel() {
     setForm(DEFAULT_FORM);
+    setCaptureRateInput(String(DEFAULT_FORM.captureRate));
     setEditingName(null);
     setError("");
   }
@@ -134,17 +139,18 @@ export function MonsterEditor() {
     setForm(f => ({ ...f, [field]: digits === "" ? 0 : parseInt(digits, 10) }));
   }
 
-  function setDecimal(field: keyof MonsterBase, value: string) {
-    const cleaned = value.replace(/[^0-9.]/g, "").replace(/^(\d*\.?\d*).*$/, "$1");
-    setForm(f => ({ ...f, [field]: cleaned === "" ? 0 : parseFloat(cleaned) }));
-  }
-
   function blockNonDigit(e: React.KeyboardEvent<HTMLInputElement>) {
     if (["e", "E", "+", "-", "."].includes(e.key)) e.preventDefault();
   }
 
   function blockNonDecimal(e: React.KeyboardEvent<HTMLInputElement>) {
     if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault();
+  }
+
+  function handleCaptureRateChange(raw: string) {
+    const cleaned = raw.replace(/[^0-9.]/g, "").replace(/^(\d*\.?\d*).*$/, "$1");
+    setCaptureRateInput(cleaned);
+    setForm(f => ({ ...f, captureRate: cleaned === "" ? 0 : parseFloat(cleaned) }));
   }
 
   const numHandlers = (field: keyof MonsterBase) => ({
@@ -159,17 +165,17 @@ export function MonsterEditor() {
     },
   });
 
-  const decimalHandlers = (field: keyof MonsterBase) => ({
+  const captureRateHandlers = {
     type: "text" as const,
     inputMode: "decimal" as const,
     onKeyDown: blockNonDecimal,
     onCompositionEnd: (e: React.CompositionEvent<HTMLInputElement>) => {
-      setDecimal(field, e.currentTarget.value);
+      handleCaptureRateChange(e.currentTarget.value);
     },
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (!(e.nativeEvent as InputEvent).isComposing) setDecimal(field, e.target.value);
+      if (!(e.nativeEvent as InputEvent).isComposing) handleCaptureRateChange(e.target.value);
     },
-  });
+  };
 
   return (
     <div className="max-w-lg mx-auto space-y-4 lg:max-w-none lg:space-y-0 lg:grid lg:grid-cols-[minmax(340px,400px)_1fr] lg:gap-2 lg:items-start">
@@ -264,8 +270,8 @@ export function MonsterEditor() {
           <div>
             <label className="text-xs text-gray-500 block mb-1">捕獲率(%)</label>
             <input
-              {...decimalHandlers("captureRate")}
-              value={form.captureRate || ""}
+              {...captureRateHandlers}
+              value={captureRateInput}
               className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-300 text-right"
             />
           </div>
