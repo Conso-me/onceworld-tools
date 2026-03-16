@@ -117,6 +117,7 @@ export interface StatBreakdown {
 export interface SimConfig extends Record<string, unknown> {
   charLevel: number;
   reinCount: number;              // 天命輪廻回数（上限なし）
+  tenseisCount: number;           // 転生回数（0-10）
   charElement: Element;           // 属性（ダメ計プリセット用）
   // 振り分けポイント（使える総量）
   hasCosmoCube: boolean;

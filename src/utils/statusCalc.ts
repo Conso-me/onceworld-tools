@@ -15,7 +15,8 @@ function zeroStats(): CoreStats {
 export function getAvailablePoints(cfg: SimConfig): number {
   const entry = statPointsData.levelPoints.find((e) => e.level === cfg.charLevel);
   const base = entry?.points ?? 0;
-  const multiplied = base * (1 + cfg.reinCount);
+  const rebirthBonus = cfg.reinCount < 10 ? cfg.tenseisCount * 30 : 0;
+  const multiplied = (base + rebirthBonus) * (1 + cfg.reinCount);
   const pinnacleBonus =
     statPointsData.extremeReincarnation.find((e) => e.count === cfg.reinCount)?.bonus ?? 0;
   const cosmoCubeBonus = cfg.hasCosmoCube ? cfg.reinCount * 10000 : 0;
