@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePersistedState, usePersistedGroup } from "../hooks/usePersistedState";
 import { useStatPresets } from "../hooks/useStatPresets";
 import { useSimPresets } from "../hooks/useSimPresets";
@@ -211,6 +211,24 @@ function NumInput({
   value: number; onChange: (v: number) => void;
   min?: number; max?: number; label?: string; error?: boolean; disabled?: boolean;
 }) {
+  const [localValue, setLocalValue] = useState(value.toLocaleString("ja-JP"));
+  const focused = useRef(false);
+
+  // 外部からvalueが変わったとき（リセット等）はフォーカス中でなければ同期
+  useEffect(() => {
+    if (!focused.current) {
+      setLocalValue(value.toLocaleString("ja-JP"));
+    }
+  }, [value]);
+
+  const commit = (str: string) => {
+    const raw = str.replace(/[^0-9]/g, "");
+    const v = raw === "" ? min : Number(raw);
+    const clamped = max !== undefined ? Math.max(min, Math.min(max, v)) : Math.max(min, v);
+    onChange(clamped);
+    setLocalValue(clamped.toLocaleString("ja-JP"));
+  };
+
   return (
     <div className="flex gap-1 items-end">
       <label className="space-y-1 flex-1 min-w-0">
@@ -220,12 +238,23 @@ function NumInput({
         <input
           type="text"
           inputMode="numeric"
-          value={value.toLocaleString("ja-JP")}
+          value={localValue}
           disabled={disabled}
+          onFocus={() => {
+            focused.current = true;
+            setLocalValue(String(value)); // カンマなしの生数値で編集しやすく
+          }}
           onChange={(e) => {
             const raw = e.target.value.replace(/[^0-9]/g, "");
-            const v = raw === "" ? min : Number(raw);
-            onChange(max !== undefined ? Math.max(min, Math.min(max, v)) : Math.max(min, v));
+            setLocalValue(raw); // 空文字も許容して入力をブロックしない
+            if (raw !== "") {
+              const v = Number(raw);
+              onChange(max !== undefined ? Math.max(min, Math.min(max, v)) : Math.max(min, v));
+            }
+          }}
+          onBlur={() => {
+            focused.current = false;
+            commit(localValue); // ブラー時にクランプ＆カンマ整形
           }}
           className={`w-full border rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 disabled:bg-gray-50 disabled:text-gray-300 ${error ? "border-red-300 focus:ring-red-300" : "border-gray-200 focus:ring-blue-300"}`}
         />
