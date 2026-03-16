@@ -166,7 +166,7 @@ function findDuplicateIssue(
 }
 
 // 新規 Issue を作成
-async function createIssue(feedback: FeedbackRow): Promise<number> {
+async function createIssue(feedback: FeedbackRow): Promise<{ number: number; url: string }> {
   const labels = ['feedback'];
   if (feedback.kind === 'バグ報告') labels.push('bug');
   if (feedback.kind === '改善提案') labels.push('enhancement');
@@ -191,7 +191,36 @@ async function createIssue(feedback: FeedbackRow): Promise<number> {
   });
 
   console.log(`  Created issue #${res.data.number}: ${feedback.title}`);
-  return res.data.number;
+  return { number: res.data.number, url: res.data.html_url };
+}
+
+// Discord に新規 Issue を通知
+async function notifyDiscord(feedback: FeedbackRow, issueNumber: number, issueUrl: string): Promise<void> {
+  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+  if (!webhookUrl) return;
+
+  const kindEmoji = feedback.kind === 'バグ報告' ? '🐛' : feedback.kind === '改善提案' ? '✨' : '💬';
+  const color = feedback.kind === 'バグ報告' ? 0xe74c3c : feedback.kind === '改善提案' ? 0x2ecc71 : 0x3498db;
+
+  await fetch(webhookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      embeds: [{
+        title: `${kindEmoji} ${feedback.title}`,
+        url: issueUrl,
+        color,
+        fields: [
+          { name: '種別', value: feedback.kind || '未指定', inline: true },
+          { name: '関連ツール', value: feedback.tool || '未指定', inline: true },
+        ],
+        footer: { text: `Issue #${issueNumber} • OnceWorld Tools フィードバック` },
+        timestamp: new Date().toISOString(),
+      }],
+    }),
+  });
+
+  console.log(`  Notified Discord for issue #${issueNumber}`);
 }
 
 // 既存 Issue にコメントを追加
@@ -253,7 +282,8 @@ async function main() {
         console.log(`  Duplicate detected → commenting on #${duplicateNumber}`);
         await addComment(duplicateNumber, feedback);
       } else {
-        await createIssue(feedback);
+        const { number, url } = await createIssue(feedback);
+        await notifyDiscord(feedback, number, url);
       }
 
       await markAsDone(sheets, feedback.rowIndex);
