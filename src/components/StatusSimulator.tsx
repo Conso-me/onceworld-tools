@@ -161,6 +161,7 @@ function defaultAccLevel(maxLevel: number): number {
 const DEFAULT_CONFIG: SimConfig = {
   charLevel: 100,
   reinCount: 0,
+  tenseisCount: 0,
   charElement: "火",
   hasCosmoCube: false,
   johaneCount: 0,
@@ -958,9 +959,11 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SetFie
           {/* キャラクター設定 */}
           <section className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
             <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">キャラクター設定</h3>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               <NumInput label="レベル" value={cfg.charLevel} min={1} max={200}
                 onChange={(v) => setField("charLevel", v)} />
+              <NumInput label="転生 (回数)" value={cfg.tenseisCount} min={0} max={10}
+                onChange={(v) => setField("tenseisCount", v)} />
               <NumInput label="天命輪廻 (回数)" value={cfg.reinCount} min={0}
                 onChange={(v) => setField("reinCount", v)} />
             </div>
