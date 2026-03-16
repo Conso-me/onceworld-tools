@@ -102,7 +102,7 @@ export function MonsterSelector({
             value={(() => { const n = parseInt(level, 10); return isNaN(n) ? "" : n.toLocaleString("ja-JP"); })()}
             onChange={(e) => handleLevelChange(e.target.value.replace(/[^0-9]/g, ""))}
             placeholder="1"
-            className="w-24 px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-center font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-20 px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-center font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
       </div>

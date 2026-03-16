@@ -321,35 +321,35 @@ export function FarmCalculator() {
         <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 px-4 py-3 space-y-2">
           <h3 className="text-xs font-semibold text-gray-500">周回設定</h3>
           {/* 3列グリッド: 行をまたいで列位置を揃える */}
-          <div className="grid grid-cols-3 gap-x-2 gap-y-2 text-xs items-center">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-2 gap-y-2 text-xs items-center">
             <label htmlFor="farm-seconds" className="flex items-center gap-1.5 bg-gray-50 rounded-lg px-2 py-1">
               <span className="font-bold text-gray-700 w-24 shrink-0">1周の秒数</span>
               <FormattedNumberInput id="farm-seconds" value={secondsPerRun} onChange={setSecondsPerRun}
-                className="w-20 px-2 py-1 border border-gray-200 rounded-lg text-center text-xs font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-400" />
+                className="flex-1 sm:w-20 px-2 py-1 border border-gray-200 rounded-lg text-center text-xs font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-400" />
             </label>
             <label htmlFor="farm-remaining-exp" className="flex items-center gap-1.5 bg-gray-50 rounded-lg px-2 py-1">
               <span className="font-bold text-gray-700 w-24 shrink-0">残り必要EXP</span>
               <FormattedNumberInput id="farm-remaining-exp" value={remainingExp} onChange={setRemainingExp}
                 placeholder="—"
-                className="w-32 px-2 py-1 border border-gray-200 rounded-lg text-center text-xs font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-400" />
+                className="flex-1 sm:w-32 px-2 py-1 border border-gray-200 rounded-lg text-center text-xs font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-400" />
             </label>
-            <div />
+            <div className="hidden sm:block" />
             <label htmlFor="farm-exp-bonus" className="flex items-center gap-1.5 bg-gray-50 rounded-lg px-2 py-1">
               <span className="font-bold text-gray-700 w-24 shrink-0">EXPボーナス</span>
               <FormattedNumberInput id="farm-exp-bonus" value={expBonus} onChange={setExpBonus}
-                className="w-20 px-2 py-1 border border-gray-200 rounded-lg text-center text-xs font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-400" />
+                className="flex-1 sm:w-20 px-2 py-1 border border-gray-200 rounded-lg text-center text-xs font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-400" />
               <span className="text-gray-400 ml-0.5">%</span>
             </label>
             <label htmlFor="farm-gold-bonus" className="flex items-center gap-1.5 bg-gray-50 rounded-lg px-2 py-1">
               <span className="font-bold text-gray-700 w-24 shrink-0">Gボーナス</span>
               <FormattedNumberInput id="farm-gold-bonus" value={goldBonus} onChange={setGoldBonus}
-                className="w-20 px-2 py-1 border border-gray-200 rounded-lg text-center text-xs font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-400" />
+                className="flex-1 sm:w-20 px-2 py-1 border border-gray-200 rounded-lg text-center text-xs font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-400" />
               <span className="text-gray-400 ml-0.5">%</span>
             </label>
             <label htmlFor="farm-drop-bonus" className="flex items-center gap-1.5 bg-gray-50 rounded-lg px-2 py-1">
               <span className="font-bold text-gray-700 w-24 shrink-0">ドロップボーナス</span>
               <FormattedNumberInput id="farm-drop-bonus" value={dropBonus} onChange={setDropBonus}
-                className="w-20 px-2 py-1 border border-gray-200 rounded-lg text-center text-xs font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-400" />
+                className="flex-1 sm:w-20 px-2 py-1 border border-gray-200 rounded-lg text-center text-xs font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-400" />
               <span className="text-gray-400 ml-0.5">%</span>
             </label>
           </div>
@@ -392,7 +392,7 @@ export function FarmCalculator() {
               </StatCard>
             </div>
             <StatCard title="素材ドロップ（時給期待値）" accent="purple">
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {(["normal", "rare", "superRare"] as const).map((rarity) => {
                   const items = dropsByItem.filter((d) => d.rarity === rarity);
                   return (

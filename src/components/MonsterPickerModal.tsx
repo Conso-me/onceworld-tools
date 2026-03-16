@@ -125,11 +125,11 @@ export function MonsterPickerModal({
                   {monster.attackType}
                 </span>
               </div>
-              <div className="flex items-center gap-3 shrink-0 ml-2">
-                <span className="text-xs font-medium text-indigo-600">
+              <div className="flex flex-col items-end sm:flex-row sm:items-center gap-0.5 sm:gap-3 shrink-0 ml-2">
+                <span className="text-xs font-medium text-indigo-600 whitespace-nowrap">
                   {monster.exp.toLocaleString()} EXP
                 </span>
-                <span className="text-xs font-medium text-yellow-600">
+                <span className="text-xs font-medium text-yellow-600 whitespace-nowrap">
                   {monster.gold.toLocaleString()} G
                 </span>
               </div>
