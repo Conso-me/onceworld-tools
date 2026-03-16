@@ -15,8 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-03-17",
     changes: [
-    { type: "improve", text: "Merge pull request #17 from Conso-me/fix/feedback-15" },
-    { type: "improve", text: "feat: レベル入力時に転生回数を自動推定・入力" },
+{ type: "improve", text: "feat: レベル入力時に転生回数を自動推定・入力" },
     { type: "improve", text: "fix: 天命輪廻10以上のとき転生回数入力を「転生の極致」表示に切り替え" },
     { type: "fix", text: "fix: ステータスポイントに転生ボーナスを加算して #15 を修正" },
     ],
