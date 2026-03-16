@@ -3,6 +3,7 @@ import { DamageCalculator } from "./components/DamageCalculator";
 import { FarmCalculator } from "./components/FarmCalculator";
 import { StatusSimulator } from "./components/StatusSimulator";
 import { ArenaCalculator } from "./components/ArenaCalculator";
+import { MonsterEditor } from "./components/MonsterEditor";
 import { TabNav, type Tab } from "./components/ui/TabNav";
 
 const tabs: Tab[] = [
@@ -10,6 +11,7 @@ const tabs: Tab[] = [
   { id: "arena", label: "裏路地", icon: "🏟" },
   { id: "status", label: "ステータス", icon: "✦" },
   { id: "farm", label: "周回計算", shortLabel: "周回計", icon: "♻" },
+  { id: "monsters", label: "モンスター登録", shortLabel: "MON登録", icon: "📋" },
 ];
 
 function App() {
@@ -65,6 +67,9 @@ function App() {
         </div>
         <div className={activeTab === "arena" ? "" : "hidden"}>
           <ArenaCalculator />
+        </div>
+        <div className={activeTab === "monsters" ? "" : "hidden"}>
+          <MonsterEditor />
         </div>
       </main>
 

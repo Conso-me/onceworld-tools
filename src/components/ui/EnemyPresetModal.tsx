@@ -1,18 +1,20 @@
 import { useState } from "react";
-import { enemyPresetGroups } from "../../data/enemyPresets";
+import type { EnemyPresetGroup } from "../../data/enemyPresets";
 
 interface Props {
   isOpen: boolean;
+  groups: EnemyPresetGroup[];
   onClose: () => void;
   onSelect: (groupIdx: number, presetIdx: number) => void;
 }
 
-export function EnemyPresetModal({ isOpen, onClose, onSelect }: Props) {
+export function EnemyPresetModal({ isOpen, groups, onClose, onSelect }: Props) {
   const [selectedGroup, setSelectedGroup] = useState(0);
 
   if (!isOpen) return null;
 
-  const group = enemyPresetGroups[selectedGroup];
+  const safeIdx = Math.min(selectedGroup, groups.length - 1);
+  const group = groups[safeIdx];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
@@ -35,7 +37,7 @@ export function EnemyPresetModal({ isOpen, onClose, onSelect }: Props) {
 
           {/* Mobile: 横スクロールエリアタブ */}
           <div className="sm:hidden flex overflow-x-auto gap-2 px-4 py-2 border-b border-gray-200 bg-gray-50 flex-shrink-0">
-            {enemyPresetGroups.map((g, idx) => (
+            {groups.map((g, idx) => (
               <button
                 key={idx}
                 onClick={() => setSelectedGroup(idx)}
@@ -52,7 +54,7 @@ export function EnemyPresetModal({ isOpen, onClose, onSelect }: Props) {
 
           {/* PC: 左サイドバー */}
           <div className="hidden sm:flex sm:flex-col w-44 flex-shrink-0 bg-gray-50 border-r border-gray-200 overflow-y-auto py-2">
-            {enemyPresetGroups.map((g, idx) => (
+            {groups.map((g, idx) => (
               <button
                 key={idx}
                 onClick={() => setSelectedGroup(idx)}
@@ -80,7 +82,7 @@ export function EnemyPresetModal({ isOpen, onClose, onSelect }: Props) {
               <button
                 key={pi}
                 onClick={() => {
-                  onSelect(selectedGroup, pi);
+                  onSelect(safeIdx, pi);
                   onClose();
                 }}
                 className="w-full px-5 py-3 hover:bg-indigo-50 border-b border-gray-100 text-left transition-colors group"

@@ -28,6 +28,7 @@ import { getElementAffinity } from "../data/elements";
 import { MAGIC_SPELLS } from "../data/magicSpells";
 import { enemyPresetGroups, formatPresetLabel } from "../data/enemyPresets";
 import { getMonsterByName } from "../data/monsters";
+import { useCustomMonsters } from "../hooks/useAllMonsters";
 import { InputField } from "./ui/InputField";
 import { StatCard } from "./ui/StatCard";
 import { ResultRow } from "./ui/ResultRow";
@@ -38,6 +39,22 @@ import { EnemyPresetModal } from "./ui/EnemyPresetModal";
 type PlayerAttackMode = "物理" | "魔弾" | "魔攻";
 
 export function DamageCalculator() {
+  const customMonsters = useCustomMonsters();
+  const allGroups = useMemo(() => {
+    if (customMonsters.length === 0) return enemyPresetGroups;
+    return [
+      ...enemyPresetGroups,
+      {
+        label: "カスタム",
+        presets: customMonsters.map((m) => ({
+          monsterName: m.name,
+          level: m.level,
+          location: "カスタム登録",
+        })),
+      },
+    ];
+  }, [customMonsters]);
+
   // モンスター選択
   const [selectedMonster, setSelectedMonster] = useState<MonsterBase | null>(null);
   const [monsterLevel, setMonsterLevel] = useState<number>(1);
@@ -133,7 +150,7 @@ export function DamageCalculator() {
   const [presetVersion, setPresetVersion] = useState(0);
 
   const handleEnemyPresetSelect = useCallback((groupIdx: number, presetIdx: number) => {
-    const preset = enemyPresetGroups[groupIdx]?.presets[presetIdx];
+    const preset = allGroups[groupIdx]?.presets[presetIdx];
     if (!preset) return;
 
     setSelectedPresetLabel(formatPresetLabel(preset));
@@ -153,7 +170,7 @@ export function DamageCalculator() {
       // 名称不明: レベルのみ設定、モンスター種別は手動選択
       setInjectedMonsterName(undefined);
     }
-  }, [handleMonsterSelect]);
+  }, [allGroups, handleMonsterSelect]);
 
   // レベルスケーリングされた敵ステータス
   const scaled = useMemo(() => {
@@ -389,6 +406,7 @@ export function DamageCalculator() {
           </button>
           <EnemyPresetModal
             isOpen={enemyModalOpen}
+            groups={allGroups}
             onClose={() => setEnemyModalOpen(false)}
             onSelect={handleEnemyPresetSelect}
           />

@@ -1,22 +1,50 @@
 import type { MonsterBase } from "../types/game";
 import monstersJson from "../../docs/data/monsters.json";
 
-const monsters: MonsterBase[] = monstersJson as MonsterBase[];
+const CUSTOM_KEY = "onceworld_custom_monsters";
+
+const _builtin: MonsterBase[] = monstersJson as MonsterBase[];
+
+function _loadCustom(): MonsterBase[] {
+  try {
+    const raw = localStorage.getItem(CUSTOM_KEY);
+    if (raw) return JSON.parse(raw) as MonsterBase[];
+  } catch {}
+  return [];
+}
+
+let _custom: MonsterBase[] = _loadCustom();
+let _all: MonsterBase[] = [..._builtin, ..._custom];
+
+function _refresh(): void {
+  _all = [..._builtin, ..._custom];
+}
+
+export function getCustomMonsters(): MonsterBase[] {
+  return _custom;
+}
+
+export function setCustomMonsters(custom: MonsterBase[]): void {
+  _custom = custom;
+  localStorage.setItem(CUSTOM_KEY, JSON.stringify(custom));
+  _refresh();
+  window.dispatchEvent(new CustomEvent("onceworld:monsters-updated"));
+}
 
 export function getMonsterByName(name: string): MonsterBase | undefined {
-  return monsters.find((m) => m.name === name);
+  return _all.find((m) => m.name === name);
 }
 
 export function getAllMonsters(): MonsterBase[] {
-  return monsters;
+  return _all;
 }
 
 export function getAllMonsterNames(): string[] {
-  return monsters.map((m) => m.name);
+  return _all.map((m) => m.name);
 }
 
 export function searchMonsters(query: string): MonsterBase[] {
-  if (!query) return monsters;
+  if (!query) return _all;
   const lower = query.toLowerCase();
-  return monsters.filter((m) => m.name.toLowerCase().includes(lower));
+  return _all.filter((m) => m.name.toLowerCase().includes(lower));
 }

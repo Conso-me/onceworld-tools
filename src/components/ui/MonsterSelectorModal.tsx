@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import type { MonsterBase } from "../../types/game";
-import { getAllMonsters } from "../../data/monsters";
+import { useAllMonsters } from "../../hooks/useAllMonsters";
 
 type ElementFilter = "すべて" | "火" | "水" | "木" | "光" | "闇";
 
@@ -32,7 +32,7 @@ export function MonsterSelectorModal({ isOpen, onClose, onSelect }: Props) {
   const [elementFilter, setElementFilter] = useState<ElementFilter>("すべて");
   const [query, setQuery] = useState("");
 
-  const allMonsters = useMemo(() => getAllMonsters(), []);
+  const allMonsters = useAllMonsters();
 
   const filtered = useMemo(() => {
     let list = allMonsters;

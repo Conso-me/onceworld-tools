@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import type { MonsterBase } from "../types/game";
-import { getAllMonsters } from "../data/monsters";
+import { useAllMonsters } from "../hooks/useAllMonsters";
 
 type SortKey = "exp_desc" | "exp_asc" | "gold_desc" | "gold_asc";
 
@@ -22,7 +22,7 @@ export function MonsterPickerModal({
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortKey>("exp_desc");
 
-  const allMonsters = useMemo(() => getAllMonsters(), []);
+  const allMonsters = useAllMonsters();
 
   const filtered = useMemo(() => {
     let list = allMonsters;
