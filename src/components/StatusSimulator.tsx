@@ -962,8 +962,15 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SetFie
             <div className="grid grid-cols-3 gap-2">
               <NumInput label="レベル" value={cfg.charLevel} min={1} max={200}
                 onChange={(v) => setField("charLevel", v)} />
-              <NumInput label="転生 (回数)" value={cfg.tenseisCount} min={0} max={10}
-                onChange={(v) => setField("tenseisCount", v)} />
+              {cfg.reinCount >= 10 ? (
+                <label className="space-y-1">
+                  <span className="text-xs text-gray-500">転生</span>
+                  <div className="text-xs text-gray-400 border border-gray-200 rounded px-2 py-1.5 bg-gray-50">転生の極致</div>
+                </label>
+              ) : (
+                <NumInput label="転生 (回数)" value={cfg.tenseisCount} min={0} max={10}
+                  onChange={(v) => setField("tenseisCount", v)} />
+              )}
               <NumInput label="天命輪廻 (回数)" value={cfg.reinCount} min={0}
                 onChange={(v) => setField("reinCount", v)} />
             </div>
