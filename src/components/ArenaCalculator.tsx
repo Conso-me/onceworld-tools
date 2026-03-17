@@ -4,10 +4,10 @@ import { useStatPresets } from "../hooks/useStatPresets";
 import { scaleMonster } from "../utils/monsterScaling";
 import {
   canNullifyDamage,
-  calcPhysicalDefenseRequirement,
-  calcMagicalDefenseRequirement,
+  calcAdditionalDefNeeded,
+  calcDamage,
 } from "../utils/defenseCalc";
-import type { DefenseRequirement } from "../utils/defenseCalc";
+import { calcMultiHitCount } from "../utils/damageCalc";
 import { getMonsterByName } from "../data/monsters";
 import { InputField } from "./ui/InputField";
 import type { MonsterBase, ScaledMonster } from "../types/game";
@@ -71,7 +71,7 @@ function calcMaxNullifyArenaLevel(
 
   const maxLv = (effective / (statBase * 1.75) - 1) / 0.1 + 1;
   const snapped = Math.floor(maxLv / 1000) * 1000;
-  return snapped < 10000 ? null : snapped;
+  return snapped < 1000 ? null : snapped;
 }
 
 // ────────────────────────────────────────────
@@ -85,7 +85,9 @@ type ArenaResult = {
   enemyStat: number;
   nullifiedNow: boolean;
   maxNullifyLv: number | null;
-  defReq: DefenseRequirement;
+  additionalDef: number;
+  additionalMdef: number;
+  hitsToSurvive: { worst: number; best: number } | null;
   lukEvasionLevel: LukEvasionLevel;
   scaledLuck: number;
 };
@@ -119,7 +121,7 @@ function LukEvasionBadge({ level, enemyLuk }: { level: LukEvasionLevel; enemyLuk
   );
 }
 
-function NullifyLvBadge({ lv }: { lv: number | null }) {
+function NullifyLvBadge({ lv, onClick }: { lv: number | null; onClick?: (lv: number) => void }) {
   if (lv === null) {
     return (
       <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-600 border border-red-200">
@@ -131,15 +133,67 @@ function NullifyLvBadge({ lv }: { lv: number | null }) {
     return <span className="text-gray-400 text-sm">∞</span>;
   }
   return (
-    <span className="text-sm font-medium text-gray-700">
+    <span
+      className={`text-sm font-medium text-gray-700${onClick ? " cursor-pointer hover:underline hover:text-indigo-600" : ""}`}
+      onClick={onClick ? () => onClick(lv) : undefined}
+    >
       Lv {lv.toLocaleString("ja-JP")}
     </span>
   );
 }
 
-function ArenaMonsterRow({ result }: { result: ArenaResult }) {
+function formatHitCount(n: number): string {
+  if (!isFinite(n)) return "∞";
+  if (n >= 1_000_000) return `${Math.floor(n / 1_000_000).toLocaleString("ja-JP")}M`;
+  if (n >= 100_000) return `${Math.floor(n / 10_000).toLocaleString("ja-JP")}万`;
+  if (n >= 10_000) return `${(n / 10_000).toFixed(1)}万`;
+  return n.toLocaleString("ja-JP");
+}
+
+function HitsToSurviveBadge({ hits, lukLevel }: { hits: { worst: number; best: number } | null; lukLevel: LukEvasionLevel }) {
+  if (hits === null) {
+    return <span className="text-gray-400">—</span>;
+  }
+  // 10万回以上は事実上死なないので簡潔に
+  if (hits.worst >= 100_000) {
+    return (
+      <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
+        余裕
+      </span>
+    );
+  }
+  // 5回未満 & LUK回避が「大体」(×4)に満たない → 危険
+  const isDangerous = hits.worst < 5 && lukLevel !== "ほぼほぼ" && lukLevel !== "大体";
+  const worstStr = formatHitCount(hits.worst);
+  const bestStr = formatHitCount(hits.best);
+  if (isDangerous) {
+    return (
+      <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-600 border border-red-200">
+        {worstStr === bestStr ? `${worstStr}回` : `${worstStr}~${bestStr}回`}
+      </span>
+    );
+  }
+  if (worstStr === bestStr) {
+    return <span className="text-sm text-gray-700">{worstStr}回</span>;
+  }
+  return (
+    <span className="text-sm text-gray-700">
+      {worstStr}~{bestStr}回
+    </span>
+  );
+}
+
+function ArenaMonsterRow({ result, onLevelClick }: { result: ArenaResult; onLevelClick?: (lv: number) => void }) {
+  const isDangerous =
+    result.hitsToSurvive !== null &&
+    result.hitsToSurvive.worst < 5 &&
+    result.lukEvasionLevel !== "ほぼほぼ" &&
+    result.lukEvasionLevel !== "大体";
+
   const rowBg = result.nullifiedNow
     ? "bg-green-50 border-green-200"
+    : isDangerous
+    ? "bg-red-100 border-red-300"
     : "bg-orange-50 border-orange-200";
 
   return (
@@ -171,13 +225,18 @@ function ArenaMonsterRow({ result }: { result: ArenaResult }) {
           <span className="text-orange-500 font-bold">✗</span>
         )}
       </td>
-      <td className="px-2 py-1.5 text-right whitespace-nowrap">
-        <NullifyLvBadge lv={result.maxNullifyLv} />
+      <td className="px-2 py-1.5 text-center whitespace-nowrap">
+        <HitsToSurviveBadge hits={result.hitsToSurvive} lukLevel={result.lukEvasionLevel} />
       </td>
-      <td className="px-2 py-1.5 text-right text-xs text-gray-500 whitespace-nowrap">
-        {result.isPhysical
-          ? result.defReq.defOnly.toLocaleString("ja-JP")
-          : result.defReq.mdefOnly.toLocaleString("ja-JP")}
+      <td className="px-2 py-1.5 text-right whitespace-nowrap">
+        <NullifyLvBadge lv={result.maxNullifyLv} onClick={onLevelClick} />
+      </td>
+      <td className="px-2 py-1.5 text-right text-xs whitespace-nowrap">
+        {result.isPhysical ? (
+          <span className="text-orange-600">{result.additionalDef.toLocaleString("ja-JP")}</span>
+        ) : (
+          <span className="text-purple-600">{result.additionalMdef.toLocaleString("ja-JP")}</span>
+        )}
       </td>
       <td className="px-2 py-1.5 text-center whitespace-nowrap">
         <LukEvasionBadge level={result.lukEvasionLevel} enemyLuk={result.scaledLuck} />
@@ -192,6 +251,7 @@ function ArenaMonsterRow({ result }: { result: ArenaResult }) {
 export function ArenaCalculator() {
   const [myDef, setMyDef] = usePersistedState("arena:def", "");
   const [myMdef, setMyMdef] = usePersistedState("arena:mdef", "");
+  const [myVit, setMyVit] = usePersistedState("arena:vit", "");
   const [myLuk, setMyLuk] = usePersistedState("arena:luk", "");
   const [syncWithDmg, setSyncWithDmg] = usePersistedState("arena:sync", false);
   const [arenaLevel, setArenaLevel] = usePersistedState(
@@ -212,17 +272,25 @@ export function ArenaCalculator() {
         JSON.parse(localStorage.getItem("owt:dmg:mdef") ?? '""') || "0"
       ) || 0
     : parseInt(myMdef) || 0;
+  const effectiveVit = syncWithDmg
+    ? parseInt(
+        JSON.parse(localStorage.getItem("owt:dmg:vit") ?? '""') || "0"
+      ) || 0
+    : parseInt(myVit) || 0;
   const effectiveLuk = syncWithDmg
     ? parseInt(
         JSON.parse(localStorage.getItem("owt:dmg:luck") ?? '""') || "0"
       ) || 0
     : parseInt(myLuk) || 0;
 
+  const playerHp = effectiveVit > 0 ? effectiveVit * 18 + 100 : 0;
+
   const handleLoadPreset = (id: string) => {
     const preset = loadPreset(id);
     if (!preset) return;
     setMyDef(preset.def);
     setMyMdef(preset.mdef);
+    setMyVit(preset.vit);
     setMyLuk(preset.luck);
     setSyncWithDmg(false);
     setSelectedPresetId(id);
@@ -246,9 +314,30 @@ export function ArenaCalculator() {
         effectiveDef,
         effectiveMdef
       );
-      const defReq = isPhysical
-        ? calcPhysicalDefenseRequirement(enemyStat)
-        : calcMagicalDefenseRequirement(enemyStat);
+
+      // 相互補正込みの追加必要DEF/MDEF
+      const additional = calcAdditionalDefNeeded(
+        enemyStat,
+        effectiveDef,
+        effectiveMdef,
+        isPhysical
+      );
+      const additionalDef = additional.additionalDef;
+      const additionalMdef = additional.additionalMdef;
+
+      // 耐久回数計算
+      let hitsToSurvive: { worst: number; best: number } | null = null;
+      if (playerHp > 0) {
+        const dmg = calcDamage(enemyStat, effectiveDef, effectiveMdef, isPhysical);
+        const multiHit = calcMultiHitCount(scaled.scaledSpd, false);
+        const dmgPerTurnMax = dmg.max * multiHit;
+        const dmgPerTurnMin = dmg.min * multiHit;
+        hitsToSurvive = {
+          worst: Math.ceil(playerHp / dmgPerTurnMax),
+          best: dmgPerTurnMin > 0 ? Math.floor(playerHp / dmgPerTurnMin) : Infinity,
+        };
+      }
+
       const scaledLuck = scaled.scaledLuck;
       const lukEvasionLevel = calcLukEvasion(effectiveLuk, scaledLuck);
       return {
@@ -259,12 +348,14 @@ export function ArenaCalculator() {
         enemyStat,
         nullifiedNow,
         maxNullifyLv,
-        defReq,
+        additionalDef,
+        additionalMdef,
+        hitsToSurvive,
         lukEvasionLevel,
         scaledLuck,
       } satisfies ArenaResult;
     });
-  }, [effectiveDef, effectiveMdef, effectiveLuk, arenaLevel]);
+  }, [effectiveDef, effectiveMdef, effectiveVit, effectiveLuk, arenaLevel, playerHp]);
 
   const arenaLevelNum = useMemo(
     () =>
@@ -360,19 +451,34 @@ export function ArenaCalculator() {
             )}
           </div>
 
-          {/* LUK 入力 */}
-          {syncWithDmg ? (
-            <div className="space-y-1.5 lg:space-y-1">
-              <label className="block text-sm lg:text-xs font-medium text-gray-400">
-                LUK（回避判定用）
-              </label>
-              <div className="w-full px-4 py-3 lg:py-2 bg-gray-50 border border-gray-200 rounded-xl text-lg lg:text-base font-medium text-gray-400">
-                {effectiveLuk > 0 ? effectiveLuk.toLocaleString("ja-JP") : "—"}
-              </div>
-            </div>
-          ) : (
-            <InputField label="LUK（回避判定用）" value={myLuk} onChange={setMyLuk} />
-          )}
+          {/* VIT / LUK 入力 */}
+          <div className="grid grid-cols-2 gap-4 lg:gap-2">
+            {syncWithDmg ? (
+              <>
+                <div className="space-y-1.5 lg:space-y-1">
+                  <label className="block text-sm lg:text-xs font-medium text-gray-400">
+                    VIT
+                  </label>
+                  <div className="w-full px-4 py-3 lg:py-2 bg-gray-50 border border-gray-200 rounded-xl text-lg lg:text-base font-medium text-gray-400">
+                    {effectiveVit > 0 ? effectiveVit.toLocaleString("ja-JP") : "—"}
+                  </div>
+                </div>
+                <div className="space-y-1.5 lg:space-y-1">
+                  <label className="block text-sm lg:text-xs font-medium text-gray-400">
+                    LUK（回避判定用）
+                  </label>
+                  <div className="w-full px-4 py-3 lg:py-2 bg-gray-50 border border-gray-200 rounded-xl text-lg lg:text-base font-medium text-gray-400">
+                    {effectiveLuk > 0 ? effectiveLuk.toLocaleString("ja-JP") : "—"}
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <InputField label="VIT" value={myVit} onChange={setMyVit} />
+                <InputField label="LUK（回避判定用）" value={myLuk} onChange={setMyLuk} />
+              </>
+            )}
+          </div>
 
           {/* ダメ計と同期トグル */}
           <div className="flex items-center gap-3">
@@ -434,7 +540,7 @@ export function ArenaCalculator() {
         </div>
 
         {/* サマリー */}
-        <div className="bg-white rounded-2xl shadow shadow-gray-200/50 p-4">
+        <div className="bg-white rounded-2xl shadow shadow-gray-200/50 p-4 space-y-1">
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600">無効化できているモンスター</span>
             <span
@@ -449,6 +555,14 @@ export function ArenaCalculator() {
               {nullifiedCount} / {arenaResults.length}
             </span>
           </div>
+          {playerHp > 0 && (
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">HP</span>
+              <span className="text-lg font-bold text-gray-700">
+                {playerHp.toLocaleString("ja-JP")}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -465,11 +579,14 @@ export function ArenaCalculator() {
                   Lv{arenaLevelNum.toLocaleString("ja-JP")}攻撃力
                 </th>
                 <th className="px-2 py-2 text-center font-medium">無効化</th>
+                <th className="px-2 py-2 text-center font-medium whitespace-nowrap">
+                  耐久回数
+                </th>
                 <th className="px-2 py-2 text-right font-medium whitespace-nowrap">
                   限界Lv
                 </th>
                 <th className="px-2 py-2 text-right font-medium whitespace-nowrap">
-                  無効化必要DEF
+                  あと必要DEF/MDEF
                 </th>
                 <th className="px-2 py-2 text-center font-medium whitespace-nowrap">
                   LUK回避
@@ -481,6 +598,7 @@ export function ArenaCalculator() {
                 <ArenaMonsterRow
                   key={result.base.name}
                   result={result}
+                  onLevelClick={(lv) => setArenaLevel(String(lv))}
                 />
               ))}
             </tbody>
@@ -498,7 +616,7 @@ export function ArenaCalculator() {
               <span className="w-3 h-3 rounded-sm bg-orange-100 border border-orange-200 inline-block" />
               未達成
             </span>
-            <span className="ml-auto">無効化必要DEF = 物理はDEF、魔法はM-DEFのみで換算</span>
+            <span className="ml-auto">あと必要 = <span className="text-orange-600">DEF</span> / <span className="text-purple-600">M-DEF</span> の追加必要値</span>
           </div>
           <div className="text-xs text-gray-400 space-y-0.5">
             <div className="flex flex-wrap gap-x-3 gap-y-0.5 items-center">
