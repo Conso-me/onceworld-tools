@@ -4,6 +4,7 @@ import { FarmCalculator } from "./components/FarmCalculator";
 import { StatusSimulator } from "./components/StatusSimulator";
 import { ArenaCalculator } from "./components/ArenaCalculator";
 import { MonsterEditor } from "./components/MonsterEditor";
+import { ArenaBattlePredictor } from "./components/ArenaBattlePredictor";
 import { TabNav, type Tab } from "./components/ui/TabNav";
 import { PatchNotesModal } from "./components/PatchNotesModal";
 
@@ -16,8 +17,12 @@ const tabs: Tab[] = [
 ];
 
 function App() {
+  // 隠しページ: タブには表示しないがハッシュで直接アクセス可能
+  const hiddenPages = ["battle-predictor"] as const;
+
   const [activeTab, setActiveTab] = useState(() => {
     const hash = window.location.hash.slice(1);
+    if ((hiddenPages as readonly string[]).includes(hash)) return hash;
     return tabs.find((t) => t.id === hash && !t.disabled)?.id ?? "damage";
   });
   const [showPatchNotes, setShowPatchNotes] = useState(false);
@@ -32,7 +37,9 @@ function App() {
       <header className="bg-gradient-to-b from-white to-gray-100 border-b border-gray-200 shadow-sm sticky top-0 z-10">
         <div className="max-w-3xl lg:max-w-[1400px] mx-auto px-4 py-3 space-y-2">
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-bold text-indigo-900 tracking-wide whitespace-nowrap">⚔ OnceWorld Tools</h1>
+            <h1 className="text-xl font-bold text-indigo-900 tracking-wide whitespace-nowrap">
+              ⚔ Once<span onDoubleClick={() => { setActiveTab("battle-predictor"); window.location.hash = "battle-predictor"; }} className="cursor-default">W</span>orld Tools
+            </h1>
             <div className="flex items-center gap-1.5">
               <a
                 href="https://docs.google.com/forms/d/e/1FAIpQLSf6NFySGmPNkQdFJEIwk11gtyvfiFVoJdwUVlwQ3MkN-vNHcg/viewform?usp=dialog"
@@ -79,6 +86,9 @@ function App() {
         </div>
         <div className={activeTab === "monsters" ? "" : "hidden"}>
           <MonsterEditor />
+        </div>
+        <div className={activeTab === "battle-predictor" ? "" : "hidden"}>
+          <ArenaBattlePredictor />
         </div>
       </main>
 
