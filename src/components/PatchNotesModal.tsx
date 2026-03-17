@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import type { PatchEntry, ChangeType } from "../data/patchNotes";
 import { patchNotes } from "../data/patchNotes";
 
@@ -111,7 +111,19 @@ function YearBlock({
   );
 }
 
+type TypeTab = "all" | ChangeType;
+
+const TYPE_TABS: { id: TypeTab; label: string }[] = [
+  { id: "all", label: "全て" },
+  { id: "feature", label: badgeLabel.feature },
+  { id: "fix", label: badgeLabel.fix },
+  { id: "improve", label: badgeLabel.improve },
+];
+
 export function PatchNotesModal({ onClose }: { onClose: () => void }) {
+  const [typeTab, setTypeTab] = useState<TypeTab>("all");
+  const [yearTab, setYearTab] = useState<string>("all");
+
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -120,7 +132,38 @@ export function PatchNotesModal({ onClose }: { onClose: () => void }) {
     return () => document.removeEventListener("keydown", handler);
   }, [onClose]);
 
-  const grouped = groupByYearMonth(patchNotes);
+  // タイプでフィルタ（変更を絞り込み）
+  const typeFiltered =
+    typeTab === "all"
+      ? patchNotes
+      : patchNotes
+          .map((entry) => ({
+            ...entry,
+            changes: entry.changes.filter((c) => c.type === typeTab),
+          }))
+          .filter((entry) => entry.changes.length > 0);
+
+  // 利用可能な年一覧（タイプフィルタ後）
+  const availableYears = [
+    ...new Set(typeFiltered.map((e) => e.date.split("-")[0])),
+  ].sort().reverse();
+
+  // yearTabが無効になった場合は "all" にフォールバック
+  const effectiveYearTab =
+    yearTab === "all" || availableYears.includes(yearTab) ? yearTab : "all";
+
+  // 年でフィルタ
+  const filtered =
+    effectiveYearTab === "all"
+      ? typeFiltered
+      : typeFiltered.filter((e) => e.date.startsWith(effectiveYearTab));
+
+  const grouped = groupByYearMonth(filtered);
+
+  const handleTypeTab = (tab: TypeTab) => {
+    setTypeTab(tab);
+    setYearTab("all");
+  };
 
   return (
     <div
@@ -142,16 +185,82 @@ export function PatchNotesModal({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
+        {/* タイプタブ（1段目・LODESTONEスタイル） */}
+        <div className="border-b border-gray-200 shrink-0">
+          <div className="flex -mb-px px-2">
+            {TYPE_TABS.map(({ id, label }) => (
+              <button
+                key={id}
+                onClick={() => handleTypeTab(id)}
+                className={`px-4 py-2.5 text-xs font-medium border-b-2 transition-colors ${
+                  typeTab === id
+                    ? "border-amber-500 text-amber-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* 年タブ（2段目・ピル型、年が複数ある時のみ表示） */}
+        {availableYears.length > 1 && (
+          <div className="flex items-center gap-1.5 px-4 py-2 border-b border-gray-100 shrink-0 flex-wrap">
+            <button
+              onClick={() => setYearTab("all")}
+              className={`px-2.5 py-0.5 text-xs rounded-full font-medium transition-colors ${
+                effectiveYearTab === "all"
+                  ? "bg-gray-700 text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              全期間
+            </button>
+            {availableYears.map((year) => (
+              <button
+                key={year}
+                onClick={() => setYearTab(year)}
+                className={`px-2.5 py-0.5 text-xs rounded-full font-medium transition-colors ${
+                  effectiveYearTab === year
+                    ? "bg-gray-700 text-white"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
+              >
+                {year}年
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* エントリリスト */}
         <div className="overflow-y-auto flex-1">
-          {[...grouped.entries()].map(([year, monthMap], i) => (
-            <YearBlock
-              key={year}
-              year={year}
-              monthMap={monthMap}
-              defaultOpen={i === 0}
-            />
-          ))}
+          {filtered.length === 0 ? (
+            <div className="px-4 py-8 text-center text-sm text-gray-400">
+              該当する更新はありません
+            </div>
+          ) : effectiveYearTab === "all" ? (
+            [...grouped.entries()].map(([year, monthMap], i) => (
+              <YearBlock
+                key={year}
+                year={year}
+                monthMap={monthMap}
+                defaultOpen={i === 0}
+              />
+            ))
+          ) : (
+            // 特定年選択時は月単位から表示（年ヘッダーは省略）
+            [...grouped.values()].flatMap((monthMap) =>
+              [...monthMap.entries()].map(([month, entries], i) => (
+                <MonthBlock
+                  key={month}
+                  month={month}
+                  entries={entries}
+                  defaultOpen={i === 0}
+                />
+              ))
+            )
+          )}
         </div>
 
         {/* フッター */}
