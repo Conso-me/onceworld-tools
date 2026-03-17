@@ -101,6 +101,7 @@ type ArenaResult = {
   lukEvasionLevel: LukEvasionLevel;
   scaledLuck: number;
   elementAffinity: number;
+  dmgReceived: { min: number; max: number };
 };
 
 function LukEvasionBadge({ level, enemyLuk }: { level: LukEvasionLevel; enemyLuk: number }) {
@@ -239,6 +240,17 @@ function ArenaMonsterRow({ result, onLevelClick }: { result: ArenaResult; onLeve
           <span className="text-orange-500 font-bold">✗</span>
         )}
       </td>
+      <td className="px-2 py-1.5 text-right whitespace-nowrap">
+        {result.nullifiedNow ? (
+          <span className="text-green-600 text-xs">1~9</span>
+        ) : (
+          <span className="text-sm text-gray-700">
+            {result.dmgReceived.min === result.dmgReceived.max
+              ? result.dmgReceived.min.toLocaleString("ja-JP")
+              : `${result.dmgReceived.min.toLocaleString("ja-JP")}~${result.dmgReceived.max.toLocaleString("ja-JP")}`}
+          </span>
+        )}
+      </td>
       <td className="px-2 py-1.5 text-center whitespace-nowrap">
         <HitsToSurviveBadge hits={result.hitsToSurvive} lukLevel={result.lukEvasionLevel} />
       </td>
@@ -344,11 +356,12 @@ export function ArenaCalculator() {
       const additionalDef = additional.additionalDef;
       const additionalMdef = additional.additionalMdef;
 
-      // 耐久回数計算
+      // 耐久回数・被ダメ計算
       const elementAffinity = getElementAffinity(base.element, effectiveElement);
+      const dmg = calcDamage(enemyStat, effectiveDef, effectiveMdef, isPhysical, elementAffinity);
+      const dmgReceived = { min: dmg.min, max: dmg.max };
       let hitsToSurvive: { worst: number; best: number } | null = null;
       if (playerHp > 0) {
-        const dmg = calcDamage(enemyStat, effectiveDef, effectiveMdef, isPhysical, elementAffinity);
         const multiHit = calcMultiHitCount(scaled.scaledSpd, false);
         const dmgPerTurnMax = dmg.max * multiHit;
         const dmgPerTurnMin = dmg.min * multiHit;
@@ -374,6 +387,7 @@ export function ArenaCalculator() {
         lukEvasionLevel,
         scaledLuck,
         elementAffinity,
+        dmgReceived,
       } satisfies ArenaResult;
     });
   }, [effectiveDef, effectiveMdef, effectiveVit, effectiveLuk, effectiveElement, arenaLevel, playerHp]);
@@ -427,6 +441,33 @@ export function ArenaCalculator() {
 
           <div className="border-t border-gray-100" />
 
+          {/* 主人公の属性 */}
+          <div className="space-y-1.5">
+            <label className="block text-sm lg:text-xs font-medium text-gray-600">主人公の属性</label>
+            {syncWithDmg ? (
+              <div className="flex gap-1.5">
+                {ELEMENTS.map((el) => (
+                  <div key={el} className={`flex-1 py-1.5 rounded-lg text-xs font-medium border text-center ${
+                    effectiveElement === el ? elementColors[el] : "bg-gray-50 text-gray-400 border-gray-200"
+                  }`}>
+                    {el}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex gap-1.5">
+                {ELEMENTS.map((el) => (
+                  <button key={el} onClick={() => setMyElement(el)}
+                    className={`flex-1 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                      myElement === el ? elementColors[el] : "bg-gray-50 text-gray-400 border-gray-200"
+                    }`}>
+                    {el}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* DEF / M-DEF 入力 */}
           <div className="grid grid-cols-2 gap-4 lg:gap-2">
             {syncWithDmg ? (
@@ -461,33 +502,6 @@ export function ArenaCalculator() {
                   onChange={setMyMdef}
                 />
               </>
-            )}
-          </div>
-
-          {/* 主人公の属性 */}
-          <div className="space-y-1.5">
-            <label className="block text-sm lg:text-xs font-medium text-gray-600">主人公の属性</label>
-            {syncWithDmg ? (
-              <div className="flex gap-1.5">
-                {ELEMENTS.map((el) => (
-                  <div key={el} className={`flex-1 py-1.5 rounded-lg text-xs font-medium border text-center ${
-                    effectiveElement === el ? elementColors[el] : "bg-gray-50 text-gray-400 border-gray-200"
-                  }`}>
-                    {el}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="flex gap-1.5">
-                {ELEMENTS.map((el) => (
-                  <button key={el} onClick={() => setMyElement(el)}
-                    className={`flex-1 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-                      myElement === el ? elementColors[el] : "bg-gray-50 text-gray-400 border-gray-200"
-                    }`}>
-                    {el}
-                  </button>
-                ))}
-              </div>
             )}
           </div>
 
@@ -619,6 +633,9 @@ export function ArenaCalculator() {
                   Lv{arenaLevelNum.toLocaleString("ja-JP")}攻撃力
                 </th>
                 <th className="px-2 py-2 text-center font-medium">無効化</th>
+                <th className="px-2 py-2 text-right font-medium whitespace-nowrap">
+                  被ダメ/回
+                </th>
                 <th className="px-2 py-2 text-center font-medium whitespace-nowrap">
                   耐久回数
                 </th>
