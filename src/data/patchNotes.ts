@@ -26,6 +26,7 @@ export const patchNotes: PatchEntry[] = [
     { type: "improve", text: "feat: パッチノートを年＞月＞日の階層表示に変更" },
     { type: "improve", text: "fix: パッチノートからMerge pull requestエントリを削除" },
     { type: "improve", text: "fix: パッチノート生成時にMerge pull requestコミットを除外" },
+    { type: "improve", text: "feat: 裏路地シミュレーター機能強化 (#22)" },
     ],
   },
 
