@@ -35,6 +35,8 @@ function getGitLog(): PatchEntry[] {
     if (!date || !subject) continue;
     if (subject.includes("[skip]")) continue;
     if (subject.startsWith("Merge pull request")) continue;
+    if (subject.startsWith("Merge branch")) continue;
+    if (/^chore(\(.+\))?:/.test(subject)) continue;
 
     const change: PatchChange = { type: classifyChange(subject), text: subject };
     if (!grouped.has(date)) grouped.set(date, []);
@@ -44,6 +46,18 @@ function getGitLog(): PatchEntry[] {
   return [...grouped.entries()]
     .sort((a, b) => b[0].localeCompare(a[0]))
     .map(([date, changes]) => ({ date, changes }));
+}
+
+function getExistingTexts(content: string): Set<string> {
+  const texts = new Set<string>();
+  for (const match of content.matchAll(/text:\s*"((?:[^"\\]|\\.)*)"/g)) {
+    texts.add(match[1].replace(/\\"/g, '"'));
+  }
+  // JSON.stringify形式（text: JSON.stringify(...)）の場合も対応
+  for (const match of content.matchAll(/text:\s*"((?:[^"\\]|\\.)*)"/g)) {
+    texts.add(JSON.parse(`"${match[1]}"`));
+  }
+  return texts;
 }
 
 function getExistingDates(content: string): Set<string> {
@@ -61,29 +75,57 @@ function serializeEntry(entry: PatchEntry): string {
   return `  {\n    date: "${entry.date}",\n    changes: [\n${changes}\n    ],\n  },`;
 }
 
+function serializeChanges(changes: PatchChange[]): string {
+  return changes
+    .map((c) => `    { type: "${c.type}", text: ${JSON.stringify(c.text)} },`)
+    .join("\n");
+}
+
 function main() {
   const existing = readFileSync(DATA_PATH, "utf-8");
   const existingDates = getExistingDates(existing);
+  const existingTexts = getExistingTexts(existing);
   const gitEntries = getGitLog();
 
-  const newEntries = gitEntries.filter((e) => !existingDates.has(e.date));
+  // 日付ごとに新規コミットのみ抽出
+  const newEntries: PatchEntry[] = [];
+  const appendToExisting: PatchEntry[] = []; // 既存日付に追加するもの
 
-  if (newEntries.length === 0) {
+  for (const entry of gitEntries) {
+    const newChanges = entry.changes.filter(
+      (c) => !existingTexts.has(c.text)
+    );
+    if (newChanges.length === 0) continue;
+
+    if (existingDates.has(entry.date)) {
+      appendToExisting.push({ date: entry.date, changes: newChanges });
+    } else {
+      newEntries.push({ date: entry.date, changes: newChanges });
+    }
+  }
+
+  if (newEntries.length === 0 && appendToExisting.length === 0) {
     console.log("新規エントリなし。patchNotes.ts はそのままです。");
     return;
   }
 
-  // 既存エントリの日付を取得し、全エントリを日付降順でマージ
-  // 既存エントリのうち最も古い日付より新しい新規エントリを先頭に追加
-  const firstExistingDate = [...existingDates].sort().reverse()[0];
+  let updated = existing;
 
-  // 既存エントリより新しいものと同じかそれ以前のものを分ける
+  // 既存日付への追記（その日付のchanges配列末尾に追加）
+  for (const entry of appendToExisting) {
+    const newLines = serializeChanges(entry.changes);
+    // 該当日付のブロック内 changes: [ ... ] の閉じ括弧の直前に挿入
+    updated = updated.replace(
+      new RegExp(`(date:\\s*"${entry.date}"[^}]*?changes:\\s*\\[)([\\s\\S]*?)(\\s*\\],)`, "m"),
+      (_, open, middle, close) => `${open}${middle}\n${newLines}${close}`
+    );
+  }
+
+  const firstExistingDate = [...existingDates].sort().reverse()[0];
   const newerEntries = newEntries.filter((e) => e.date > (firstExistingDate ?? ""));
   const olderEntries = newEntries.filter((e) => e.date <= (firstExistingDate ?? ""));
 
-  let updated = existing;
-
-  // 新しいエントリは先頭に追加
+  // 新しい日付のエントリは先頭に追加
   if (newerEntries.length > 0) {
     const newerBlocks = newerEntries.map(serializeEntry).join("\n") + "\n";
     updated = updated.replace(
@@ -92,16 +134,19 @@ function main() {
     );
   }
 
-  // 古いエントリは末尾（];の直前）に追加
+  // 古い日付のエントリは末尾に追加
   if (olderEntries.length > 0) {
-    // 日付昇順で末尾に追加（最も新しいものが先に来るよう降順にソート済み）
     const olderBlocks = "\n" + olderEntries.map(serializeEntry).join("\n");
     updated = updated.replace(/\n\];/, `${olderBlocks}\n];`);
   }
 
   writeFileSync(DATA_PATH, updated, "utf-8");
-  console.log(`${newEntries.length}件の新規エントリを追加しました:`);
-  for (const e of newEntries) {
+
+  const totalNew = newEntries.reduce((s, e) => s + e.changes.length, 0);
+  const totalAppend = appendToExisting.reduce((s, e) => s + e.changes.length, 0);
+  console.log(`${newEntries.length}件の新規日付エントリ、${appendToExisting.length}件の既存日付への追記を行いました`);
+  console.log(`合計 ${totalNew + totalAppend} 件の変更を追加:`);
+  for (const e of [...newEntries, ...appendToExisting]) {
     console.log(`  ${e.date} (${e.changes.length}件)`);
   }
 }
