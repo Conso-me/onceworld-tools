@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-03-17",
     changes: [
+      { type: "improve", text: "refactor: 全ページからタイトルヘッダーを削除して省スペース化" },
       { type: "improve", text: "feat: 裏路地シミュレーター機能強化 (#22)" },
       { type: "improve", text: "fix: パッチノート生成時にMerge pull requestコミットを除外" },
       { type: "improve", text: "fix: パッチノートからMerge pull requestエントリを削除" },
