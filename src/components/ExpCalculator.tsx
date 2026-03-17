@@ -85,13 +85,6 @@ export function ExpCalculator() {
 
   return (
     <div className="max-w-lg mx-auto space-y-6">
-      <div className="text-center space-y-1">
-        <h2 className="text-2xl font-bold text-gray-800">経験値計算機</h2>
-        <p className="text-sm text-gray-500">
-          周回効率・時給EXP・目標到達時間を計算
-        </p>
-      </div>
-
       {/* モンスター追加 */}
       <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 space-y-4">
         <MonsterSelector

@@ -204,12 +204,6 @@ export function FarmCalculator() {
 
   return (
     <div className="max-w-lg mx-auto space-y-6 lg:max-w-none lg:space-y-0 lg:grid lg:grid-cols-[minmax(340px,420px)_1fr] lg:gap-2 lg:items-start">
-      {/* ヘッダー */}
-      <div className="text-center space-y-1 lg:col-span-2 lg:flex lg:items-baseline lg:gap-3 lg:justify-center lg:space-y-0">
-        <h2 className="text-2xl font-bold text-gray-800">周回計算機</h2>
-        <p className="text-sm text-gray-500">EXP・ゴールド・素材効率を同時に計算</p>
-      </div>
-
       {/* Column 1: モンスターリスト */}
       <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-4">
         <button
