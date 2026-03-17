@@ -20,7 +20,6 @@ export const patchNotes: PatchEntry[] = [
     { type: "fix", text: "fix: ステータスポイントに転生ボーナスを加算して #15 を修正" },
     { type: "improve", text: "fix: パッチノートワークフローにPATを使用してブランチ保護をバイパス" },
     { type: "improve", text: "fix: パッチノート生成スクリプトをコミット単位のdedup方式に改善" },
-    { type: "feature", text: "feat: パッチノートにLODESTONEスタイルのタブフィルタを追加" },
     { type: "fix", text: "fix: 捕獲率で0や0.01など0始まりの小数が入力できない問題を修正" },
     { type: "fix", text: "fix: 捕獲率の入力で小数点以下を受け付けるよう修正" },
     { type: "improve", text: "feat: パッチノートを年＞月＞日の階層表示に変更" },

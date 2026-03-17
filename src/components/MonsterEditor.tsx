@@ -179,7 +179,6 @@ export function MonsterEditor() {
 
   return (
     <div className="max-w-lg mx-auto space-y-4 lg:max-w-none lg:space-y-0 lg:grid lg:grid-cols-[minmax(340px,400px)_1fr] lg:gap-2 lg:items-start">
-
       {/* 左：入力フォーム */}
       <div className="bg-white rounded-2xl shadow shadow-gray-200/50 p-4 space-y-3">
         <h2 className="text-sm font-bold text-gray-700">
