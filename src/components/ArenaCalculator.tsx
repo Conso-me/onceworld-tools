@@ -9,8 +9,18 @@ import {
 } from "../utils/defenseCalc";
 import { calcMultiHitCount } from "../utils/damageCalc";
 import { getMonsterByName } from "../data/monsters";
+import { getElementAffinity } from "../data/elements";
 import { InputField } from "./ui/InputField";
-import type { MonsterBase, ScaledMonster } from "../types/game";
+import type { Element, MonsterBase, ScaledMonster } from "../types/game";
+
+const ELEMENTS: Element[] = ["火", "水", "木", "光", "闇"];
+const elementColors: Record<Element, string> = {
+  火: "bg-red-100 text-red-600 border-red-200",
+  水: "bg-blue-100 text-blue-600 border-blue-200",
+  木: "bg-green-100 text-green-600 border-green-200",
+  光: "bg-yellow-100 text-yellow-700 border-yellow-200",
+  闇: "bg-purple-100 text-purple-600 border-purple-200",
+};
 
 // ────────────────────────────────────────────
 // アリーナ裏路地 固定モンスター定義
@@ -90,6 +100,7 @@ type ArenaResult = {
   hitsToSurvive: { worst: number; best: number } | null;
   lukEvasionLevel: LukEvasionLevel;
   scaledLuck: number;
+  elementAffinity: number;
 };
 
 function LukEvasionBadge({ level, enemyLuk }: { level: LukEvasionLevel; enemyLuk: number }) {
@@ -200,6 +211,9 @@ function ArenaMonsterRow({ result, onLevelClick }: { result: ArenaResult; onLeve
     <tr className={`border-b ${rowBg} text-sm`}>
       <td className="px-2 py-1.5 font-medium text-gray-800 whitespace-nowrap">
         {result.base.name}
+        <span className={`ml-1 inline-flex px-1 py-0.5 rounded text-xs border ${elementColors[result.base.element]}`}>
+          {result.base.element}
+        </span>
       </td>
       <td className="px-2 py-1.5 text-gray-500 whitespace-nowrap text-xs">
         {result.area}
@@ -253,6 +267,7 @@ export function ArenaCalculator() {
   const [myMdef, setMyMdef] = usePersistedState("arena:mdef", "");
   const [myVit, setMyVit] = usePersistedState("arena:vit", "");
   const [myLuk, setMyLuk] = usePersistedState("arena:luk", "");
+  const [myElement, setMyElement] = usePersistedState<Element>("arena:element", "火");
   const [syncWithDmg, setSyncWithDmg] = usePersistedState("arena:sync", false);
   const [arenaLevel, setArenaLevel] = usePersistedState(
     "arena:level",
@@ -282,6 +297,9 @@ export function ArenaCalculator() {
         JSON.parse(localStorage.getItem("owt:dmg:luck") ?? '""') || "0"
       ) || 0
     : parseInt(myLuk) || 0;
+  const effectiveElement: Element = syncWithDmg
+    ? (JSON.parse(localStorage.getItem("owt:dmg:element") ?? '"火"') as Element) || "火"
+    : myElement;
 
   const playerHp = effectiveVit > 0 ? effectiveVit * 18 + 100 : 0;
 
@@ -292,6 +310,7 @@ export function ArenaCalculator() {
     setMyMdef(preset.mdef);
     setMyVit(preset.vit);
     setMyLuk(preset.luck);
+    setMyElement(preset.element);
     setSyncWithDmg(false);
     setSelectedPresetId(id);
   };
@@ -326,9 +345,10 @@ export function ArenaCalculator() {
       const additionalMdef = additional.additionalMdef;
 
       // 耐久回数計算
+      const elementAffinity = getElementAffinity(base.element, effectiveElement);
       let hitsToSurvive: { worst: number; best: number } | null = null;
       if (playerHp > 0) {
-        const dmg = calcDamage(enemyStat, effectiveDef, effectiveMdef, isPhysical);
+        const dmg = calcDamage(enemyStat, effectiveDef, effectiveMdef, isPhysical, elementAffinity);
         const multiHit = calcMultiHitCount(scaled.scaledSpd, false);
         const dmgPerTurnMax = dmg.max * multiHit;
         const dmgPerTurnMin = dmg.min * multiHit;
@@ -353,9 +373,10 @@ export function ArenaCalculator() {
         hitsToSurvive,
         lukEvasionLevel,
         scaledLuck,
+        elementAffinity,
       } satisfies ArenaResult;
     });
-  }, [effectiveDef, effectiveMdef, effectiveVit, effectiveLuk, arenaLevel, playerHp]);
+  }, [effectiveDef, effectiveMdef, effectiveVit, effectiveLuk, effectiveElement, arenaLevel, playerHp]);
 
   const arenaLevelNum = useMemo(
     () =>
@@ -440,6 +461,33 @@ export function ArenaCalculator() {
                   onChange={setMyMdef}
                 />
               </>
+            )}
+          </div>
+
+          {/* 主人公の属性 */}
+          <div className="space-y-1.5">
+            <label className="block text-sm lg:text-xs font-medium text-gray-600">主人公の属性</label>
+            {syncWithDmg ? (
+              <div className="flex gap-1.5">
+                {ELEMENTS.map((el) => (
+                  <div key={el} className={`flex-1 py-1.5 rounded-lg text-xs font-medium border text-center ${
+                    effectiveElement === el ? elementColors[el] : "bg-gray-50 text-gray-400 border-gray-200"
+                  }`}>
+                    {el}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex gap-1.5">
+                {ELEMENTS.map((el) => (
+                  <button key={el} onClick={() => setMyElement(el)}
+                    className={`flex-1 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                      myElement === el ? elementColors[el] : "bg-gray-50 text-gray-400 border-gray-200"
+                    }`}>
+                    {el}
+                  </button>
+                ))}
+              </div>
             )}
           </div>
 
