@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths-ignore:
       - 'src/data/patchNotes.ts'  # このファイルの変更では再トリガーしない
+  workflow_dispatch:
 
 jobs:
   update:
