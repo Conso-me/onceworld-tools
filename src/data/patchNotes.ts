@@ -26,6 +26,8 @@ export const patchNotes: PatchEntry[] = [
     { type: "improve", text: "fix: パッチノートからMerge pull requestエントリを削除" },
     { type: "improve", text: "fix: パッチノート生成時にMerge pull requestコミットを除外" },
     { type: "improve", text: "feat: 裏路地シミュレーター機能強化 (#22)" },
+    { type: "improve", text: "refactor: 全ページからタイトルヘッダーを削除して省スペース化" },
+    { type: "feature", text: "feat: パッチノートにLODESTONEスタイルのタブフィルタを追加" },
     ],
   },
 
