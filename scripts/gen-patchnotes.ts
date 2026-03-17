@@ -117,7 +117,7 @@ function main() {
     // 該当日付のブロック内 changes: [ ... ] の閉じ括弧の直前に挿入
     updated = updated.replace(
       new RegExp(`(date:\\s*"${entry.date}"[^}]*?changes:\\s*\\[)([\\s\\S]*?)(\\s*\\],)`, "m"),
-      (_, open, middle, close) => `${open}${middle}\n${newLines}${close}`
+      (_, open, middle, close) => `${open}\n${newLines}${middle}${close}`
     );
   }
 
