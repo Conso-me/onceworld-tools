@@ -142,6 +142,8 @@ function autoDetectEncyclopediaGrid(
   const gridXScaled = dedupedPeaks[0];
   const cellWScaled = bestLag;
 
+  // (ピーク重複除去は gridX 検出の安定化のみに使用。cellW は autocorrelation のまま)
+
   // ── 水平プロジェクション → gridY, cellH ──────────────────────────
   const xR = Math.min(w, gridXScaled + cellWScaled * 4 + 5);
   const hProj = new Float64Array(h);
@@ -208,6 +210,7 @@ export function EncyclopediaRegistrationModal({ onClose }: Props) {
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
 
   // グリッドパラメータ
+  const gridDetectedRef = useRef(false);
   const [gridX, setGridX] = useState(0);
   const [gridY, setGridY] = useState(0);
   const [cellW, setCellW] = useState(0);
@@ -407,27 +410,32 @@ export function EncyclopediaRegistrationModal({ onClose }: Props) {
     img.onload = () => {
       imgRef.current = img;
 
-      // 自動検出を試行
-      const detected = autoDetectEncyclopediaGrid(img);
-      if (detected) {
-        setGridX(detected.gridX);
-        setGridY(detected.gridY);
-        setCellW(detected.cellW);
-        setCellH(detected.cellH);
-        // セルサイズから余白を自動計算
-        // 上: スタンプ+テキスト領域を除外、下: Lv.テキストを除外、左右: ボーダーを除外
-        setPadTop(Math.round(detected.cellH * 0.12));
-        setPadBottom(Math.round(detected.cellH * 0.25));
-        setPadLeft(Math.round(detected.cellW * 0.06));
-        setPadRight(Math.round(detected.cellW * 0.06));
-        // 自動切り出しをトリガー
+      // 既に検出済みなら gridY のみ再検出（スクロール位置が変わるため）
+      if (gridDetectedRef.current) {
+        const detected = autoDetectEncyclopediaGrid(img);
+        if (detected) setGridY(detected.gridY);
         setPendingAutoProcess(true);
       } else {
-        // フォールバック: デフォルト値
-        const x = Math.round(img.width * 0.02);
-        const y = Math.round(img.height * 0.15);
-        const w = Math.round((img.width * 0.93) / 4);
-        setGridX(x); setGridY(y); setCellW(w); setCellH(w);
+        // 初回: 自動検出を試行
+        const detected = autoDetectEncyclopediaGrid(img);
+        if (detected) {
+          setGridX(detected.gridX);
+          setGridY(detected.gridY);
+          setCellW(detected.cellW);
+          setCellH(detected.cellH);
+          setPadTop(Math.round(detected.cellH * 0.12));
+          setPadBottom(Math.round(detected.cellH * 0.50));
+          setPadLeft(Math.round(detected.cellW * 0.06));
+          setPadRight(Math.round(detected.cellW * 0.45));
+          gridDetectedRef.current = true;
+          setPendingAutoProcess(true);
+        } else {
+          // フォールバック: デフォルト値
+          const x = Math.round(img.width * 0.02);
+          const y = Math.round(img.height * 0.15);
+          const w = Math.round((img.width * 0.93) / 4);
+          setGridX(x); setGridY(y); setCellW(w); setCellH(w);
+        }
       }
 
       requestAnimationFrame(() => drawPreviewRef.current());
@@ -700,9 +708,10 @@ export function EncyclopediaRegistrationModal({ onClose }: Props) {
                         setGridX(detected.gridX); setGridY(detected.gridY);
                         setCellW(detected.cellW); setCellH(detected.cellH);
                         setPadTop(Math.round(detected.cellH * 0.12));
-                        setPadBottom(Math.round(detected.cellH * 0.25));
+                        setPadBottom(Math.round(detected.cellH * 0.50));
                         setPadLeft(Math.round(detected.cellW * 0.06));
-                        setPadRight(Math.round(detected.cellW * 0.06));
+                        setPadRight(Math.round(detected.cellW * 0.45));
+                        gridDetectedRef.current = true;
                       } else {
                         setError("グリッドを自動検出できませんでした");
                       }
