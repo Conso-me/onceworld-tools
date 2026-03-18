@@ -3,6 +3,7 @@ import type { MonsterBase, Element } from "../../types/game";
 import { MonsterSlot } from "./MonsterSlot";
 import { BulkInputModal } from "./BulkInputModal";
 import { ScreenshotOcrModal } from "./ScreenshotOcrModal";
+import { EncyclopediaRegistrationModal } from "./EncyclopediaRegistrationModal";
 
 export interface SlotData {
   monster: MonsterBase | null;
@@ -39,6 +40,7 @@ export function TeamInputPanel({
 }: Props) {
   const [bulkModalOpen, setBulkModalOpen] = useState(false);
   const [ocrModalOpen, setOcrModalOpen] = useState(false);
+  const [encyclopediaModalOpen, setEncyclopediaModalOpen] = useState(false);
 
   const updateSlot = (
     teamId: TeamId,
@@ -85,6 +87,15 @@ export function TeamInputPanel({
             チーム編成
           </h2>
           <div className="flex items-center gap-1">
+            <button
+              onClick={() => setEncyclopediaModalOpen(true)}
+              className="w-7 h-7 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+              title="図鑑テンプレート登録"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                <path d="M10.75 16.82A7.462 7.462 0 0 1 15 15.5c.71 0 1.396.098 2.046.282A.75.75 0 0 0 18 15.06V3.81a.75.75 0 0 0-.537-.72A9.006 9.006 0 0 0 15 2.8a9.005 9.005 0 0 0-4.25 1.065v12.955ZM9.25 4.865A9.005 9.005 0 0 0 5 3.8a9.006 9.006 0 0 0-2.463.28A.75.75 0 0 0 2 4.81v11.25a.75.75 0 0 0 .954.72A7.462 7.462 0 0 1 5 16.5a7.46 7.46 0 0 1 4.25 1.32V4.865Z" />
+              </svg>
+            </button>
             <button
               onClick={() => setBulkModalOpen(true)}
               className="w-7 h-7 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
@@ -180,6 +191,12 @@ export function TeamInputPanel({
         <ScreenshotOcrModal
           onApply={onTeamsChange}
           onClose={() => setOcrModalOpen(false)}
+        />
+      )}
+
+      {encyclopediaModalOpen && (
+        <EncyclopediaRegistrationModal
+          onClose={() => setEncyclopediaModalOpen(false)}
         />
       )}
     </div>

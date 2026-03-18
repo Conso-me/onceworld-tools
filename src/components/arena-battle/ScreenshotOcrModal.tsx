@@ -1,5 +1,7 @@
 import { useState, useCallback, useRef } from "react";
 import { ocrParseScreenshot, type OcrTeamResult } from "../../utils/ocrTeamParser";
+import { getMonsterByName } from "../../data/monsters";
+import { useMonsterTemplates } from "../../hooks/useMonsterTemplates";
 import type { TeamData, TeamId } from "./TeamInputPanel";
 
 const elementTextColors: Record<string, string> = {
@@ -22,6 +24,7 @@ export function ScreenshotOcrModal({ onApply, onClose }: Props) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { templateCount } = useMonsterTemplates();
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -57,7 +60,14 @@ export function ScreenshotOcrModal({ onApply, onClose }: Props) {
         teams[tid] = { slots: [{ monster: null, level: 1 }] };
       } else {
         teams[tid] = {
-          slots: slots.map((s) => ({ monster: null, level: s.level, detectedElement: s.element })),
+          slots: slots.map((s) => {
+            const monster = s.matchedMonster ? (getMonsterByName(s.matchedMonster) ?? null) : null;
+            return {
+              monster,
+              level: s.level,
+              detectedElement: monster ? undefined : s.element,
+            };
+          }),
         };
       }
     }
@@ -84,8 +94,14 @@ export function ScreenshotOcrModal({ onApply, onClose }: Props) {
         </div>
 
         <p className="text-xs text-gray-500">
-          アリーナ画面のスクリーンショットからレベルとチーム構成を自動読み取りします。モンスターは手動で選択してください。
+          アリーナ画面のスクリーンショットからレベル・チーム構成・モンスターを自動読み取りします。
         </p>
+
+        {templateCount === 0 && (
+          <p className="text-xs text-amber-600 bg-amber-50 rounded-lg p-2">
+            モンスターの自動認識にはテンプレート登録が必要です。チーム編成画面の📖ボタンから図鑑スクリーンショットを登録してください。
+          </p>
+        )}
 
         {/* Image upload */}
         <input
@@ -171,7 +187,16 @@ export function ScreenshotOcrModal({ onApply, onClose }: Props) {
                         {s.element ? (
                           <span className={elementTextColors[s.element]}>{s.element} </span>
                         ) : null}
-                        <span className="text-gray-400">モンスター未選択</span>{" "}
+                        {s.matchedMonster ? (
+                          <span className="font-medium text-gray-900">
+                            {s.matchedMonster}
+                            {s.matchConfidence === "low" && (
+                              <span className="text-amber-500 text-xs ml-0.5">(?)</span>
+                            )}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400">モンスター未選択</span>
+                        )}{" "}
                         Lv.{s.level}
                       </li>
                     ))}
