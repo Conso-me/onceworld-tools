@@ -46,6 +46,17 @@ function isDuplicateHash(hash: string, existing: CroppedIcon[]): boolean {
   return false;
 }
 
+function findDuplicateOf(hash: string, ...lists: CroppedIcon[][]): string | null {
+  const h = hexToHash(hash);
+  for (const list of lists) {
+    for (const icon of list) {
+      const dist = hammingDistance(h, hexToHash(icon.hash));
+      if (dist <= 5) return `${icon.assignedName}(dist=${dist},hash=${icon.hash})`;
+    }
+  }
+  return null;
+}
+
 // ── 図鑑グリッド自動検出 ──────────────────────────────────────────────────────
 
 function autoDetectEncyclopediaGrid(
@@ -99,9 +110,20 @@ function autoDetectEncyclopediaGrid(
   }
   if (peaks.length < 2) return null;
 
-  const gridXScaled = peaks[0];
+  // 近接ピーク(5px以内)を統合（最大値を残す）
+  const dedupedPeaks: number[] = [];
+  for (const p of peaks) {
+    if (dedupedPeaks.length > 0 && p - dedupedPeaks[dedupedPeaks.length - 1] < 5) {
+      if (smoothed[p] > smoothed[dedupedPeaks[dedupedPeaks.length - 1]]) {
+        dedupedPeaks[dedupedPeaks.length - 1] = p;
+      }
+    } else {
+      dedupedPeaks.push(p);
+    }
+  }
+  if (dedupedPeaks.length < 2) return null;
 
-  // autocorrelation で周期（cellW）を推定
+  // autocorrelation で大まかな cellW を推定
   const minLag = Math.round(w * 0.08);
   const maxLag = Math.round(w * 0.4);
   let bestLag = minLag;
@@ -116,6 +138,8 @@ function autoDetectEncyclopediaGrid(
       bestLag = lag;
     }
   }
+
+  const gridXScaled = dedupedPeaks[0];
   const cellWScaled = bestLag;
 
   // ── 水平プロジェクション → gridY, cellH ──────────────────────────
@@ -156,7 +180,7 @@ function autoDetectEncyclopediaGrid(
   const gridX = Math.round(gridXScaled / scale);
   const gridY = Math.round(gridYScaled / scale);
 
-  console.log(`[autoDetect] cellW=${cellW}, cellH=${cellH}, grid=(${gridX},${gridY})`);
+  console.log(`[autoDetect] peaks=${dedupedPeaks.length}, cellW=${cellW}, cellH=${cellH}, grid=(${gridX},${gridY})`);
   return { gridX, gridY, cellW, cellH };
 }
 
@@ -438,15 +462,28 @@ export function EncyclopediaRegistrationModal({ onClose }: Props) {
           const cw = cellW - padLeft - padRight;
           const ch = cellH - padTop - padBottom;
 
-          if (cx < 0 || cy < 0 || cx + cw > img.width || cy + ch > img.height || cw <= 0 || ch <= 0) continue;
+          if (cx < 0 || cy < 0 || cx + cw > img.width || cy + ch > img.height || cw <= 0 || ch <= 0) {
+            console.log(`[crop] SKIP row=${row} col=${col} reason=bounds cx=${cx} cy=${cy} cw=${cw} ch=${ch} imgW=${img.width} imgH=${img.height}`);
+            continue;
+          }
 
           const variance = getRegionVariance(ctx, cx, cy, cw, ch);
-          if (variance < 200) continue;
+          if (variance < 200) {
+            console.log(`[crop] SKIP row=${row} col=${col} reason=variance(${Math.round(variance)})`);
+            continue;
+          }
 
-          const hash = computeDHashFromRegion(ctx, cx, cy, cw, ch);
+          // ボーダー/暗背景の影響を排除するため中央70%からハッシュ計算
+          const hm = Math.round(cw * 0.15);
+          const vm = Math.round(ch * 0.15);
+          const hash = computeDHashFromRegion(ctx, cx + hm, cy + vm, cw - 2 * hm, ch - 2 * vm);
           const hashHex = hashToHex(hash);
 
-          if (isDuplicateHash(hashHex, icons) || isDuplicateHash(hashHex, newIcons)) continue;
+          const dupTarget = findDuplicateOf(hashHex, icons, newIcons);
+          if (dupTarget) {
+            console.log(`[crop] SKIP row=${row} col=${col} reason=duplicate hash=${hashHex} matchedWith=${dupTarget}`);
+            continue;
+          }
 
           const dataUrl = createThumbnail(canvas, cx, cy, cw, ch);
           const nameIdx = startIndex + icons.length + newIcons.length;
