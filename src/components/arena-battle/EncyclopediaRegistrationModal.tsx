@@ -16,21 +16,6 @@ interface Props {
 
 // ── ユーティリティ ──────────────────────────────────────────────────────────
 
-function getRegionVariance(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): number {
-  const sx = x + Math.floor(w * 0.2), sy = y + Math.floor(h * 0.2);
-  const sw = Math.floor(w * 0.6), sh = Math.floor(h * 0.6);
-  if (sw <= 0 || sh <= 0) return 0;
-  const data = ctx.getImageData(sx, sy, sw, sh).data;
-  const count = data.length / 4;
-  let sum = 0, sumSq = 0;
-  for (let i = 0; i < data.length; i += 4) {
-    const g = (data[i] + data[i + 1] + data[i + 2]) / 3;
-    sum += g; sumSq += g * g;
-  }
-  const mean = sum / count;
-  return sumSq / count - mean * mean;
-}
-
 function createThumbnail(canvas: HTMLCanvasElement, sx: number, sy: number, sw: number, sh: number): string {
   const c = document.createElement("canvas");
   c.width = 48; c.height = 48;
@@ -459,9 +444,18 @@ export function EncyclopediaRegistrationModal({ onClose }: Props) {
       const ctx = canvas.getContext("2d")!;
       ctx.drawImage(img, 0, 0);
 
+      // DB保存済みテンプレートを取得し、重複チェック用に変換
+      const dbTemplates = await getAllTemplates();
+      const dbIcons: CroppedIcon[] = dbTemplates.map((t) => ({
+        dataUrl: "",
+        hash: t.hash,
+        assignedName: t.name,
+      }));
+
       const names = monsterNames.current;
       const rows = Math.floor((img.height - gridY) / cellH);
       const newIcons: CroppedIcon[] = [];
+      let skippedRegistered = 0;
 
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < 4; col++) {
@@ -475,18 +469,21 @@ export function EncyclopediaRegistrationModal({ onClose }: Props) {
             continue;
           }
 
-          const variance = getRegionVariance(ctx, cx, cy, cw, ch);
-          if (variance < 200) {
-            console.log(`[crop] SKIP row=${row} col=${col} reason=variance(${Math.round(variance)})`);
-            continue;
-          }
-
           // ボーダー/暗背景の影響を排除するため中央70%からハッシュ計算
           const hm = Math.round(cw * 0.15);
           const vm = Math.round(ch * 0.15);
           const hash = computeDHashFromRegion(ctx, cx + hm, cy + vm, cw - 2 * hm, ch - 2 * vm);
           const hashHex = hashToHex(hash);
 
+          // DB保存済みテンプレートとの照合
+          const dbDup = findDuplicateOf(hashHex, dbIcons);
+          if (dbDup) {
+            console.log(`[crop] SKIP row=${row} col=${col} reason=already-registered matchedWith=${dbDup}`);
+            skippedRegistered++;
+            continue;
+          }
+
+          // 同一セッション内の重複チェック
           const dupTarget = findDuplicateOf(hashHex, icons, newIcons);
           if (dupTarget) {
             console.log(`[crop] SKIP row=${row} col=${col} reason=duplicate hash=${hashHex} matchedWith=${dupTarget}`);
@@ -501,9 +498,14 @@ export function EncyclopediaRegistrationModal({ onClose }: Props) {
       }
 
       if (newIcons.length === 0) {
-        setError("新しいアイコンが検出できませんでした（すべて登録済みか空セルです）");
+        setError(skippedRegistered > 0
+          ? `新しいアイコンが検出できませんでした（${skippedRegistered}体は登録済み）`
+          : "新しいアイコンが検出できませんでした（すべて登録済みか空セルです）");
       } else {
         setIcons((prev) => [...prev, ...newIcons]);
+        if (skippedRegistered > 0) {
+          setSavedMessage(`${skippedRegistered}体スキップ（登録済み）、${newIcons.length}体新規追加`);
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "処理に失敗しました");
@@ -531,8 +533,16 @@ export function EncyclopediaRegistrationModal({ onClose }: Props) {
   }, []);
 
   const removeIcon = useCallback((index: number) => {
-    setIcons((prev) => prev.filter((_, i) => i !== index));
-  }, []);
+    setIcons((prev) => {
+      const next = prev.filter((_, i) => i !== index);
+      const names = monsterNames.current;
+      for (let i = index; i < next.length; i++) {
+        const nameIdx = startIndex + i;
+        next[i] = { ...next[i], assignedName: nameIdx < names.length ? names[nameIdx] : `不明 ${nameIdx + 1}` };
+      }
+      return next;
+    });
+  }, [startIndex]);
 
   const resetIcons = useCallback(() => {
     setIcons([]);
