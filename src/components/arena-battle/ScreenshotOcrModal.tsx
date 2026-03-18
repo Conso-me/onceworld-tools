@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { ocrParseScreenshot, type OcrTeamResult } from "../../utils/ocrTeamParser";
 import { getMonsterByName } from "../../data/monsters";
 import { useMonsterTemplates } from "../../hooks/useMonsterTemplates";
@@ -24,7 +24,78 @@ export function ScreenshotOcrModal({ onApply, onClose }: Props) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const { templateCount } = useMonsterTemplates();
+
+  // デバッグオーバーレイ: マッチ領域とLv.位置を画像上に描画
+  useEffect(() => {
+    const img = imgRef.current;
+    const canvas = canvasRef.current;
+    if (!img || !canvas || !result) return;
+
+    const draw = () => {
+      const rect = img.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      // 画像の表示スケールを計算（object-contain対応）
+      const scaleX = rect.width / img.naturalWidth;
+      const scaleY = rect.height / img.naturalHeight;
+      const scale = Math.min(scaleX, scaleY);
+      const offsetX = (rect.width - img.naturalWidth * scale) / 2;
+      const offsetY = (rect.height - img.naturalHeight * scale) / 2;
+
+      const teamColors: Record<string, string> = { A: "#ef4444", B: "#3b82f6", C: "#22c55e" };
+
+      for (const tid of ["A", "B", "C"] as ("A" | "B" | "C")[]) {
+        const slots = result.teams[tid];
+        const color = teamColors[tid];
+
+        for (const slot of slots) {
+          // Lv.テキスト位置（小さい十字）
+          const lvX = offsetX + slot.x * scale;
+          const lvY = offsetY + slot.y * scale;
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(lvX - 4, lvY); ctx.lineTo(lvX + 4, lvY);
+          ctx.moveTo(lvX, lvY - 4); ctx.lineTo(lvX, lvY + 4);
+          ctx.stroke();
+
+          // マッチ領域の矩形
+          if (slot.matchRegion) {
+            const r = slot.matchRegion;
+            const rx = offsetX + r.x * scale;
+            const ry = offsetY + r.y * scale;
+            const rw = r.w * scale;
+            const rh = r.h * scale;
+
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.setLineDash([4, 2]);
+            ctx.strokeRect(rx, ry, rw, rh);
+            ctx.setLineDash([]);
+
+            // ラベル
+            const label = `${tid} Lv.${slot.level}`;
+            ctx.font = "10px sans-serif";
+            ctx.fillStyle = color;
+            ctx.fillText(label, rx, ry - 2);
+          }
+        }
+      }
+    };
+
+    // 画像読み込み完了後に描画
+    if (img.complete) {
+      draw();
+    } else {
+      img.onload = draw;
+    }
+  }, [result]);
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -99,7 +170,7 @@ export function ScreenshotOcrModal({ onApply, onClose }: Props) {
 
         {templateCount === 0 && (
           <p className="text-xs text-amber-600 bg-amber-50 rounded-lg p-2">
-            モンスターの自動認識にはテンプレート登録が必要です。チーム編成画面の📖ボタンから図鑑スクリーンショットを登録してください。
+            モンスターの自動認識にはテンプレート登録が必要です。チーム編成画面の📖ボタンからテンプレートを登録してください。
           </p>
         )}
 
@@ -115,9 +186,14 @@ export function ScreenshotOcrModal({ onApply, onClose }: Props) {
         {imageUrl ? (
           <div className="relative">
             <img
+              ref={imgRef}
               src={imageUrl}
               alt="Screenshot"
               className="w-full rounded-xl border border-gray-200 max-h-60 object-contain bg-gray-50"
+            />
+            <canvas
+              ref={canvasRef}
+              className="absolute inset-0 pointer-events-none rounded-xl"
             />
             <button
               onClick={() => inputRef.current?.click()}

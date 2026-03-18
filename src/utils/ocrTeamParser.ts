@@ -25,6 +25,7 @@ export interface OcrSlot {
   element?: Element; // 属性アイコンから検出した属性
   matchedMonster?: string; // テンプレート照合で特定したモンスター名
   matchConfidence?: MatchConfidence; // 照合の信頼度
+  matchRegion?: { x: number; y: number; w: number; h: number }; // デバッグ用マッチ領域
 }
 
 export interface OcrTeamResult {
@@ -275,8 +276,8 @@ function detectElementAtPosition(
 
 function classifyElementColor(r: number, g: number, b: number): Element | undefined {
   const hue = rgbToHue(r, g, b);
-  if (hue <= 30 || hue >= 330) return "火";
-  if (hue > 30 && hue <= 75) return "光";
+  if (hue <= 40 || hue >= 330) return "火";
+  if (hue > 40 && hue <= 75) return "光";
   if (hue > 75 && hue <= 165) return "木";
   if (hue > 165 && hue <= 260) return "水";
   if (hue > 260 && hue < 330) return "闇";
@@ -340,22 +341,25 @@ async function matchMonsterIcons(
   if (!ctx) return;
   ctx.drawImage(img, 0, 0);
 
-  // 全チームのスロット座標からアイコンサイズを推定
+  // チーム内のスロット間隔からアイコンサイズを推定（チーム間のギャップを除外）
   const allSlots: OcrSlot[] = [];
   for (const tid of ["A", "B", "C"] as TeamId[]) {
     allSlots.push(...teams[tid]);
   }
   let iconSize = Math.round(img.width * 0.08); // 画像幅ベースのデフォルト
-  if (allSlots.length >= 2) {
-    const sortedX = allSlots.map((s) => s.x).sort((a, b) => a - b);
-    const gaps: number[] = [];
+  const intraTeamGaps: number[] = [];
+  for (const tid of ["A", "B", "C"] as TeamId[]) {
+    const slots = teams[tid];
+    if (slots.length < 2) continue;
+    const sortedX = slots.map((s) => s.x).sort((a, b) => a - b);
     for (let i = 1; i < sortedX.length; i++) {
       const gap = sortedX[i] - sortedX[i - 1];
-      if (gap > 30 && gap < img.width * 0.3) gaps.push(gap);
+      if (gap > 30 && gap < img.width * 0.3) intraTeamGaps.push(gap);
     }
-    if (gaps.length > 0) {
-      iconSize = Math.round(gaps.reduce((a, b) => a + b, 0) / gaps.length);
-    }
+  }
+  if (intraTeamGaps.length > 0) {
+    intraTeamGaps.sort((a, b) => a - b);
+    iconSize = intraTeamGaps[Math.floor(intraTeamGaps.length / 2)]; // 中央値で外れ値耐性
   }
 
   console.log(`[matchMonsterIcons] img=${img.width}x${img.height}, iconSize=${iconSize}, slots=${allSlots.length}`);
@@ -367,6 +371,7 @@ async function matchMonsterIcons(
     for (const slot of slots) {
       // 複数の候補位置・サイズを試して最良マッチを採用
       let bestResult: MatchResult | null = null;
+      let bestRegion: { x: number; y: number; w: number; h: number } | null = null;
 
       // アイコンサイズの候補（推定値の80%~120%）
       const sizes = [iconSize, Math.round(iconSize * 0.8), Math.round(iconSize * 1.2)];
@@ -386,6 +391,7 @@ async function matchMonsterIcons(
             const result = matchMonsterIcon(ctx, ix, iy, iw, ih, slot.element);
             if (result && (!bestResult || result.distance < bestResult.distance)) {
               bestResult = result;
+              bestRegion = { x: ix, y: iy, w: iw, h: ih };
             }
           }
         }
@@ -394,7 +400,8 @@ async function matchMonsterIcons(
       if (bestResult) {
         slot.matchedMonster = bestResult.name;
         slot.matchConfidence = bestResult.confidence;
-        console.log(`[matchMonsterIcons] ${tid} Lv.${slot.level} → ${bestResult.name} (dist=${bestResult.distance}, ${bestResult.confidence})`);
+        slot.matchRegion = bestRegion!;
+        console.log(`[matchMonsterIcons] ${tid} Lv.${slot.level} → ${bestResult.name} (dist=${bestResult.distance}, ${bestResult.confidence}) region=${JSON.stringify(bestRegion)}`);
       } else {
         console.log(`[matchMonsterIcons] ${tid} Lv.${slot.level} → no match`);
       }

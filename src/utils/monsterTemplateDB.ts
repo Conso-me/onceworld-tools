@@ -93,6 +93,42 @@ export function getTemplatesEventName(): string {
   return TEMPLATES_EVENT;
 }
 
+// ── マイグレーション ─────────────────────────────────────────────────────
+
+const MIGRATION_FLAG = "onceworld:templates-migrated";
+
+/**
+ * 初回のみ: 組み込みモンスター名と一致するIndexedDBテンプレートを削除する。
+ * 静的JSONテンプレートが代替するため、カスタムモンスター名のみ保持する。
+ */
+export async function migrateBuiltinTemplates(
+  isBuiltin: (name: string) => boolean,
+): Promise<void> {
+  if (localStorage.getItem(MIGRATION_FLAG)) return;
+
+  const templates = await getAllTemplates();
+  const builtinNames = templates
+    .filter((t) => isBuiltin(t.name))
+    .map((t) => t.name);
+
+  if (builtinNames.length > 0) {
+    const db = await openDB();
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    const store = tx.objectStore(STORE_NAME);
+    for (const name of builtinNames) {
+      store.delete(name);
+    }
+    await new Promise<void>((resolve, reject) => {
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+    db.close();
+    console.log(`[migration] Removed ${builtinNames.length} builtin templates from IndexedDB`);
+  }
+
+  localStorage.setItem(MIGRATION_FLAG, "1");
+}
+
 // ── エクスポート / インポート ─────────────────────────────────────────────
 
 interface ExportData {

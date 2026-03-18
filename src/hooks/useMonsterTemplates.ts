@@ -4,12 +4,14 @@ import {
   getTemplatesEventName,
   type MonsterTemplate,
 } from "../utils/monsterTemplateDB";
+import staticTemplates from "../../docs/data/monsterTemplates.json";
 
 const EVENT = getTemplatesEventName();
 
 /**
  * IndexedDB のモンスターテンプレート一覧をリアクティブに取得する。
  * `onceworld:templates-updated` イベントで自動同期（useAllMonsters パターン踏襲）。
+ * templateCount は静的テンプレートとカスタムテンプレートのマージ後の件数。
  */
 export function useMonsterTemplates() {
   const [templates, setTemplates] = useState<MonsterTemplate[]>([]);
@@ -31,5 +33,12 @@ export function useMonsterTemplates() {
     return () => window.removeEventListener(EVENT, handler);
   }, [reload]);
 
-  return { templates, loading, templateCount: templates.length };
+  // マージ後の総テンプレート数（静的 + カスタム、同名はカスタム優先）
+  const customNames = new Set(templates.map((t) => t.name));
+  const staticCount = (staticTemplates as { name: string }[]).filter(
+    (t) => !customNames.has(t.name),
+  ).length;
+  const templateCount = staticCount + templates.length;
+
+  return { templates, loading, templateCount };
 }

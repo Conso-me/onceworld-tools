@@ -43,6 +43,14 @@ export function getAllMonsterNames(): string[] {
   return _all.map((m) => m.name);
 }
 
+export function isBuiltinMonster(name: string): boolean {
+  return _builtin.some((m) => m.name === name);
+}
+
+export function getBuiltinMonsterNames(): string[] {
+  return _builtin.map((m) => m.name);
+}
+
 export function searchMonsters(query: string): MonsterBase[] {
   if (!query) return _all;
   const lower = query.toLowerCase();

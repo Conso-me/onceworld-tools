@@ -1,15 +1,16 @@
 /**
  * モンスターアイコンのテンプレートマッチングエンジン。
  *
- * initMatcher() で IndexedDB からテンプレートを一括ロードしメモリキャッシュ。
+ * initMatcher() で静的JSON + IndexedDBカスタムをマージしメモリキャッシュ。
  * matchMonsterIcon() で dHash を計算し全テンプレートと比較。
  * 属性フィルタで候補を絞り込み、誤認識を防ぐ。
  */
 
 import type { Element } from "../types/game";
-import { getMonsterByName } from "../data/monsters";
+import { getMonsterByName, isBuiltinMonster } from "../data/monsters";
 import { computeDHashFromRegion, hammingDistance, hexToHash } from "./imageHash";
-import { getAllTemplates, type MonsterTemplate } from "./monsterTemplateDB";
+import { getAllTemplates, migrateBuiltinTemplates } from "./monsterTemplateDB";
+import staticTemplates from "../../docs/data/monsterTemplates.json";
 
 export type MatchConfidence = "high" | "medium" | "low";
 
@@ -29,12 +30,30 @@ let cache: CachedTemplate[] | null = null;
 
 /**
  * テンプレートキャッシュを初期化（またはリフレッシュ）する。
- * OCR実行前に1回呼ぶ。テンプレート未登録時は空配列。
- * 各テンプレートにモンスターの属性情報も紐づける。
+ * OCR実行前に1回呼ぶ。
+ *
+ * 1. 静的JSONテンプレートをロード（ビルド時バンドル）
+ * 2. IndexedDBからカスタムテンプレートを取得
+ * 3. マージ（同名はカスタム優先）
  */
 export async function initMatcher(): Promise<number> {
-  const templates = await getAllTemplates();
-  cache = templates.map((t) => {
+  // 初回マイグレーション: 組み込みモンスターのIndexedDBテンプレートを削除
+  await migrateBuiltinTemplates(isBuiltinMonster);
+
+  // 静的テンプレートをMapに投入
+  const merged = new Map<string, { name: string; hash: string }>();
+  for (const t of staticTemplates as { name: string; hash: string }[]) {
+    merged.set(t.name, t);
+  }
+
+  // カスタムテンプレートで上書き（同名はカスタム優先）
+  const customTemplates = await getAllTemplates();
+  for (const t of customTemplates) {
+    merged.set(t.name, { name: t.name, hash: t.hash });
+  }
+
+  // キャッシュに変換
+  cache = Array.from(merged.values()).map((t) => {
     const monster = getMonsterByName(t.name);
     return {
       name: t.name,
@@ -72,7 +91,13 @@ export function matchMonsterIcon(
 ): MatchResult | null {
   if (!cache || cache.length === 0) return null;
 
-  const iconHash = computeDHashFromRegion(ctx, x, y, w, h);
+  // テンプレートは中央70%クロップでハッシュ登録済み。
+  // アイコン位置推定のずれに対応するため、クロップ有り・無し両方のハッシュを計算し
+  // 各テンプレートとの距離の小さい方を採用する。
+  const iconHashFull = computeDHashFromRegion(ctx, x, y, w, h);
+  const hm = Math.round(w * 0.15);
+  const vm = Math.round(h * 0.15);
+  const iconHashCrop = computeDHashFromRegion(ctx, x + hm, y + vm, w - 2 * hm, h - 2 * vm);
 
   // 属性フィルタで候補を絞り込み
   let candidates = cache;
@@ -86,7 +111,10 @@ export function matchMonsterIcon(
   let bestName = "";
 
   for (const t of candidates) {
-    const dist = hammingDistance(iconHash, t.hash);
+    const dist = Math.min(
+      hammingDistance(iconHashCrop, t.hash),
+      hammingDistance(iconHashFull, t.hash),
+    );
     if (dist < bestDist) {
       bestDist = dist;
       bestName = t.name;
