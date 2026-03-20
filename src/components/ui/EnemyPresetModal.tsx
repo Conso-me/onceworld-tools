@@ -38,7 +38,7 @@ export function EnemyPresetModal({ isOpen, groups, onClose, onSelect }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col" style={{ height: "min(600px, 85vh)" }}>
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl flex flex-col" style={{ height: "min(640px, 85vh)" }}>
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 flex-shrink-0">
@@ -80,7 +80,7 @@ export function EnemyPresetModal({ isOpen, groups, onClose, onSelect }: Props) {
           </div>
 
           {/* PC: エリア列 */}
-          <div className="hidden sm:flex flex-col w-36 flex-shrink-0 bg-gray-50 border-r border-gray-200 overflow-y-auto py-2">
+          <div className="hidden sm:flex flex-col w-40 flex-shrink-0 bg-gray-50 border-r border-gray-200 overflow-y-auto py-2">
             {mapGroups.map(g => (
               <button key={g.globalIdx} onClick={() => setSelectedGroupIdx(g.globalIdx)}
                 className={`w-full text-left px-3 py-2.5 text-xs font-medium transition-colors ${selectedGroupIdx === g.globalIdx ? "bg-white text-indigo-700 border-r-2 border-indigo-400" : "text-gray-700 hover:bg-gray-100"}`}>
@@ -95,7 +95,7 @@ export function EnemyPresetModal({ isOpen, groups, onClose, onSelect }: Props) {
             <div className="hidden sm:flex items-center gap-3 px-5 py-2.5 border-b border-gray-200 bg-gray-50 sticky top-0">
               <span className="flex-1 text-xs font-bold text-gray-600 uppercase tracking-wide">名前</span>
               <span className="w-28 text-right text-xs font-bold text-gray-600 uppercase tracking-wide">レベル</span>
-              <span className="w-36 text-right text-xs font-bold text-gray-600 uppercase tracking-wide">出現場所</span>
+              <span className="w-44 text-right text-xs font-bold text-gray-600 uppercase tracking-wide">出現場所</span>
             </div>
             {group?.presets.map((preset, pi) => (
               <button key={pi} onClick={() => { onSelect(safeGroupIdx, pi); onClose(); }}
@@ -103,7 +103,7 @@ export function EnemyPresetModal({ isOpen, groups, onClose, onSelect }: Props) {
                 <div className="hidden sm:flex items-center gap-3">
                   <span className="flex-1 font-semibold text-gray-900 text-sm group-hover:text-indigo-700">{preset.monsterName ?? "(名称不明)"}</span>
                   <span className="w-28 text-right text-sm font-mono font-semibold text-indigo-600">{preset.level.toLocaleString()}</span>
-                  <span className="w-36 text-right text-sm text-gray-700">{preset.location}</span>
+                  <span className="w-44 text-right text-sm text-gray-700">{preset.location}</span>
                 </div>
                 <div className="sm:hidden">
                   <div className="font-semibold text-gray-900 text-sm group-hover:text-indigo-700">{preset.monsterName ?? "(名称不明)"}</div>
