@@ -45,6 +45,7 @@ export function DamageCalculator() {
     return [
       ...enemyPresetGroups,
       {
+        mapLabel: "カスタム",
         label: "カスタム",
         presets: customMonsters.map((m) => ({
           monsterName: m.name,
