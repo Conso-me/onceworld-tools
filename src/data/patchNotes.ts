@@ -13,6 +13,15 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-03-20",
+    changes: [
+    { type: "fix", text: "fix: スクロールバー出現によるレイアウトズレを修正" },
+    { type: "improve", text: "feat: PCモーダルを拡幅しモンスター一覧の表示領域を拡大" },
+    { type: "improve", text: "feat: 敵プリセット選択を3階層（マップ→エリア→モンスター）に変更 (close #31)" },
+    ],
+  },
+
+  {
     date: "2026-03-17",
     changes: [
     { type: "fix", text: "refactor: パッチノートの項目順を新しいものが上になるよう修正" },
