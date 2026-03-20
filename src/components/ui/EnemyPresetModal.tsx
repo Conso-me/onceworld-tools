@@ -70,7 +70,7 @@ export function EnemyPresetModal({ isOpen, groups, onClose, onSelect }: Props) {
         <div className="flex flex-1 overflow-hidden">
 
           {/* PC: マップ列 */}
-          <div className="hidden sm:flex flex-col w-28 flex-shrink-0 bg-gray-50 border-r border-gray-200 overflow-y-auto py-2">
+          <div className="hidden sm:flex flex-col w-28 flex-shrink-0 bg-gray-50 border-r border-gray-200 overflow-y-auto py-2" style={{ scrollbarGutter: "stable" }}>
             {maps.map(map => (
               <button key={map} onClick={() => handleMapSelect(map)}
                 className={`w-full text-left px-3 py-2.5 text-xs font-medium transition-colors ${selectedMap === map ? "bg-white text-indigo-600 border-r-2 border-indigo-500 shadow-sm" : "text-gray-700 hover:bg-gray-100"}`}>
@@ -80,7 +80,7 @@ export function EnemyPresetModal({ isOpen, groups, onClose, onSelect }: Props) {
           </div>
 
           {/* PC: エリア列 */}
-          <div className="hidden sm:flex flex-col w-40 flex-shrink-0 bg-gray-50 border-r border-gray-200 overflow-y-auto py-2">
+          <div className="hidden sm:flex flex-col w-40 flex-shrink-0 bg-gray-50 border-r border-gray-200 overflow-y-auto py-2" style={{ scrollbarGutter: "stable" }}>
             {mapGroups.map(g => (
               <button key={g.globalIdx} onClick={() => setSelectedGroupIdx(g.globalIdx)}
                 className={`w-full text-left px-3 py-2.5 text-xs font-medium transition-colors ${selectedGroupIdx === g.globalIdx ? "bg-white text-indigo-700 border-r-2 border-indigo-400" : "text-gray-700 hover:bg-gray-100"}`}>
@@ -90,7 +90,7 @@ export function EnemyPresetModal({ isOpen, groups, onClose, onSelect }: Props) {
           </div>
 
           {/* モンスター一覧 */}
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto" style={{ scrollbarGutter: "stable" }}>
             {/* PC: カラムヘッダー */}
             <div className="hidden sm:flex items-center gap-3 px-5 py-2.5 border-b border-gray-200 bg-gray-50 sticky top-0">
               <span className="flex-1 text-xs font-bold text-gray-600 uppercase tracking-wide">名前</span>
