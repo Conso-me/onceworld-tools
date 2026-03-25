@@ -264,7 +264,7 @@ export function ArenaCalculator() {
   const [myVit, setMyVit] = usePersistedState("arena:vit", "");
   const [myLuk, setMyLuk] = usePersistedState("arena:luk", "");
   const [syncWithDmg, setSyncWithDmg] = usePersistedState("arena:sync", false);
-  const [dmgStatMode] = usePersistedState<"manual" | "sim">("dmg:statMode", "manual");
+  const [syncMode, setSyncMode] = usePersistedState<"manual" | "sim">("arena:syncMode", "manual");
   const [simCfg] = useSharedSimConfig();
   const simResult = useMemo(() => calcStatus(simCfg), [simCfg]);
   const [arenaLevel, setArenaLevel] = usePersistedState(
@@ -274,24 +274,24 @@ export function ArenaCalculator() {
   const [selectedPresetId, setSelectedPresetId] = useState("");
   const { presets, loadPreset } = useStatPresets();
 
-  // syncON時はdmg:タブの値を読む（装備設定モード時はsim結果、手動モード時はlocalStorage直読み）
+  // syncON時はdmg:タブの値を読む（syncModeで手動入力/装備設定を選択）
   const effectiveDef = syncWithDmg
-    ? dmgStatMode === "sim"
+    ? syncMode === "sim"
       ? simResult.final.def
       : parseInt(JSON.parse(localStorage.getItem("owt:dmg:def") ?? '""') || "0") || 0
     : parseInt(myDef) || 0;
   const effectiveMdef = syncWithDmg
-    ? dmgStatMode === "sim"
+    ? syncMode === "sim"
       ? simResult.final.mdef
       : parseInt(JSON.parse(localStorage.getItem("owt:dmg:mdef") ?? '""') || "0") || 0
     : parseInt(myMdef) || 0;
   const effectiveVit = syncWithDmg
-    ? dmgStatMode === "sim"
+    ? syncMode === "sim"
       ? simResult.final.vit
       : parseInt(JSON.parse(localStorage.getItem("owt:dmg:vit") ?? '""') || "0") || 0
     : parseInt(myVit) || 0;
   const effectiveLuk = syncWithDmg
-    ? dmgStatMode === "sim"
+    ? syncMode === "sim"
       ? simResult.final.luck
       : parseInt(JSON.parse(localStorage.getItem("owt:dmg:luck") ?? '""') || "0") || 0
     : parseInt(myLuk) || 0;
@@ -486,7 +486,7 @@ export function ArenaCalculator() {
           </div>
 
           {/* ダメ計と同期トグル */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <span className="text-sm text-gray-600">{t("syncWithDmg")}</span>
             <button
               onClick={() => setSyncWithDmg(!syncWithDmg)}
@@ -507,6 +507,23 @@ export function ArenaCalculator() {
             >
               {syncWithDmg ? t("on") : t("off")}
             </span>
+            {syncWithDmg && (
+              <div className="flex rounded-lg overflow-hidden border border-indigo-200 text-xs">
+                {(["manual", "sim"] as const).map((mode) => (
+                  <button
+                    key={mode}
+                    onClick={() => setSyncMode(mode)}
+                    className={`px-2 py-1 font-medium transition-colors ${
+                      syncMode === mode
+                        ? "bg-indigo-500 text-white"
+                        : "bg-white text-gray-500 hover:bg-gray-50"
+                    }`}
+                  >
+                    {mode === "manual" ? t("syncModeManual") : t("syncModeSim")}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="border-t border-gray-100" />
