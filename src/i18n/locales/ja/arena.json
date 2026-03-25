@@ -3,6 +3,8 @@
   "syncWithDmg": "ダメ計と同期",
   "on": "ON",
   "off": "OFF",
+  "syncModeManual": "手動入力",
+  "syncModeSim": "装備設定",
   "displayLevel": "表示レベル",
   "thousandUnit": "(1,000単位)",
   "nullifiedMonsters": "無効化できているモンスター",

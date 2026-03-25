@@ -3,6 +3,8 @@
   "syncWithDmg": "Sync with DMG Calc",
   "on": "ON",
   "off": "OFF",
+  "syncModeManual": "Manual",
+  "syncModeSim": "Equipment",
   "displayLevel": "Display Level",
   "thousandUnit": "(×1,000)",
   "nullifiedMonsters": "Nullified Monsters",
