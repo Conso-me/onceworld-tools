@@ -15,6 +15,9 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-03-26",
     changes: [
+    { type: "improve", text: "fix: 言語ボタンを「切替先」から「現在の言語」表示に変更" },
+    { type: "improve", text: "feat: ダメ計の「自分のステータス」をモバイルで折り畳み可能に" },
+    { type: "improve", text: "feat: モバイル対応を強化 (close #35)" },
     { type: "improve", text: "fix: 裏路地同期ONかつ装備設定モード時にsim結果を連携" },
     { type: "feature", text: "feat: 割り振りポイントにリセットボタンを追加" },
     { type: "feature", text: "feat: DamageCalculatorに装備設定モードを追加（close #34）" },
