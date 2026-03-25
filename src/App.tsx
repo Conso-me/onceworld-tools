@@ -106,7 +106,7 @@ function App() {
                 onClick={() => i18n.changeLanguage(i18n.language === "ja" ? "en" : "ja")}
                 className="text-xs px-2.5 py-1 rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors font-medium"
               >
-                {i18n.language === "ja" ? "EN" : "JA"}
+                {i18n.language === "ja" ? "JA" : "EN"}
               </button>
               <div className="w-px h-4 bg-gray-300 mx-1.5" />
               <a
