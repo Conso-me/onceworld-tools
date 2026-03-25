@@ -66,6 +66,8 @@ export function DamageCalculator() {
   const [monsterLevel, setMonsterLevel] = useState<number>(1);
   // 魔攻モード時の右パネル切り替え
   const [defPanelTab, setDefPanelTab] = useState<"被ダメ" | "最低INT">("被ダメ");
+  // モバイルで「自分のステータス」を折り畳む
+  const [myStatusOpen, setMyStatusOpen] = useState(true);
 
   // 自キャラ ステータス（localStorage永続化）
   const [myAtk, setMyAtk] = usePersistedState("dmg:atk", "");
@@ -443,22 +445,39 @@ export function DamageCalculator() {
               <span className="text-blue-500 text-sm">{t("common:self")}</span>
             </div>
             <h3 className="font-semibold text-gray-800">{t("common:myStatus")}</h3>
-            {statMode === "manual" && (
+            <div className="ml-auto flex items-center gap-1.5">
+              {statMode === "manual" && (
+                <button
+                  onClick={() => setPresetModalOpen(true)}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-100 border border-gray-200 text-xs text-gray-600 hover:bg-gray-200 transition-colors"
+                >
+                  <span>
+                    {selectedPresetId
+                      ? presets.find((p) => p.id === selectedPresetId)?.name ?? t("common:preset")
+                      : t("common:preset")}
+                  </span>
+                  <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              )}
               <button
-                onClick={() => setPresetModalOpen(true)}
-                className="ml-auto flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-100 border border-gray-200 text-xs text-gray-600 hover:bg-gray-200 transition-colors"
+                onClick={() => setMyStatusOpen((v) => !v)}
+                className="lg:hidden p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                aria-label={myStatusOpen ? "折り畳む" : "展開する"}
               >
-                <span>
-                  {selectedPresetId
-                    ? presets.find((p) => p.id === selectedPresetId)?.name ?? t("common:preset")
-                    : t("common:preset")}
-                </span>
-                <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <svg
+                  className={`w-4 h-4 transition-transform duration-200 ${myStatusOpen ? "" : "rotate-180"}`}
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
                 </svg>
               </button>
-            )}
+            </div>
           </div>
+
+          {/* 折り畳みコンテンツ（モバイルのみ）*/}
+          <div className={myStatusOpen ? "" : "hidden lg:block"}>
 
           {/* 手動入力 / 装備設定 トグル */}
           <div className="flex rounded-lg overflow-hidden border border-gray-200 text-xs">
@@ -563,6 +582,8 @@ export function DamageCalculator() {
               />
             </div>
           )}
+
+          </div>{/* /折り畳みコンテンツ */}
         </div>
       </div>
 
