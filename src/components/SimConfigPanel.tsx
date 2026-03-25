@@ -1045,9 +1045,17 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
           <section className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">{t("allocationPoints")}</h3>
-              <span className={`text-xs font-mono px-2 py-0.5 rounded-full ${overflowed ? "bg-red-100 text-red-600" : "bg-green-100 text-green-700"}`}>
-                {t("remainingPoints", { value: remaining.toLocaleString() })}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className={`text-xs font-mono px-2 py-0.5 rounded-full ${overflowed ? "bg-red-100 text-red-600" : "bg-green-100 text-green-700"}`}>
+                  {t("remainingPoints", { value: remaining.toLocaleString() })}
+                </span>
+                <button
+                  onClick={() => ALLOC_KEYS.forEach(({ cfg: k }) => setField(k, 0))}
+                  className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors"
+                >
+                  {t("common:reset")}
+                </button>
+              </div>
             </div>
             <div className="grid grid-cols-3 gap-x-2 gap-y-1.5">
               {ALLOC_KEYS.map(({ cfg: cfgKey, label }) => {
