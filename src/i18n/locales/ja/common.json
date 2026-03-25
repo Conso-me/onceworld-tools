@@ -7,10 +7,11 @@
     "damageShort": "ダメ計",
     "arena": "裏路地",
     "status": "ステータス",
+    "statusShort": "ステ計",
     "farm": "周回計算",
     "farmShort": "周回計",
     "monsters": "モンスター登録",
-    "monstersShort": "MON登録"
+    "monstersShort": "図鑑"
   },
   "preparing": "準備中",
   "add": "追加",
