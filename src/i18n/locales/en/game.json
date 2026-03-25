@@ -1,0 +1,67 @@
+{
+  "element": {
+    "火": "Fire",
+    "水": "Water",
+    "木": "Wood",
+    "光": "Light",
+    "闇": "Dark"
+  },
+  "elementFilter": {
+    "all": "All"
+  },
+  "attackType": {
+    "物理": "Physical",
+    "魔弾": "Magic Bullet",
+    "魔攻": "Magic"
+  },
+  "attackLabel": {
+    "physical": "Physical",
+    "magic": "Magic"
+  },
+  "equipSlot": {
+    "武器": "Weapon",
+    "頭": "Head",
+    "服": "Body",
+    "手": "Hand",
+    "盾": "Shield",
+    "脚": "Foot"
+  },
+  "dropRarity": {
+    "normal": "Normal",
+    "rare": "Rare",
+    "superRare": "Super Rare",
+    "common": "Common"
+  },
+  "dropRarityShort": {
+    "normal": "N:",
+    "rare": "Rare:",
+    "superRare": "S.Rare:"
+  },
+  "monster": "Monster",
+  "selectMonsterPrompt": "Select an enemy and set level",
+  "selectMonster": "Select monster...",
+  "selectMonsterTitle": "Select Monster",
+  "searchByName": "Search by name...",
+  "searchMonster": "Search monster...",
+  "name": "Name",
+  "level": "Level",
+  "location": "Location",
+  "unknownName": "(Unknown)",
+  "noMatchingMonsters": "No matching monsters",
+  "sortBy": "Sort:",
+  "captureRate": "Capture Rate (%)",
+  "gold": "Gold",
+  "accSlot": {
+    "1": "Slot 1",
+    "2": "Slot 2",
+    "3": "Slot 3",
+    "4": "Slot 4"
+  },
+  "petSlot": {
+    "1": "Pet 1",
+    "2": "Pet 2",
+    "3": "Pet 3"
+  },
+  "noLimit": "No Limit",
+  "lvUpTo": "Lv~{{max}}"
+}

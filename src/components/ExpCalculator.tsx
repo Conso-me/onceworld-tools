@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import type { MonsterBase } from "../types/game";
 import {
   calcScaledExp,
@@ -22,6 +23,7 @@ interface MonsterRow {
 let nextId = 1;
 
 export function ExpCalculator() {
+  const { t } = useTranslation("farm");
   const [monsterRows, setMonsterRows] = useState<MonsterRow[]>([]);
   const [secondsPerRun, setSecondsPerRun] = usePersistedState("exp:seconds", "60");
   const [expBonus, setExpBonus] = usePersistedState("exp:bonus", "0");
@@ -93,7 +95,7 @@ export function ExpCalculator() {
         />
         <div className="flex items-end gap-3">
           <InputField
-            label="1周あたりの討伐数"
+            label={t("killsPerRun")}
             value={pendingCount}
             onChange={setPendingCount}
             placeholder="1"
@@ -104,7 +106,7 @@ export function ExpCalculator() {
             disabled={!pendingMonster}
             className="px-5 py-3 bg-indigo-500 text-white rounded-xl font-medium text-sm hover:bg-indigo-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
-            追加
+            {t("common:add")}
           </button>
         </div>
 
@@ -112,7 +114,7 @@ export function ExpCalculator() {
         {monsterRows.length > 0 && (
           <div className="space-y-2 pt-2 border-t border-gray-100">
             <h4 className="text-sm font-medium text-gray-600">
-              モンスターリスト
+              {t("common:monsterList")}
             </h4>
             {monsterRows.map((row) => {
               const scaledExp = calcScaledExp(row.monster.exp, row.level);
@@ -164,50 +166,50 @@ export function ExpCalculator() {
 
       {/* 周回設定 */}
       <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 space-y-4">
-        <h3 className="font-semibold text-gray-800">周回設定</h3>
+        <h3 className="font-semibold text-gray-800">{t("farmSettings")}</h3>
         <div className="grid grid-cols-2 gap-4">
           <InputField
-            label="1周の秒数"
+            label={t("secondsPerRun")}
             value={secondsPerRun}
             onChange={setSecondsPerRun}
             placeholder="60"
           />
           <InputField
-            label="EXPボーナス(%)"
+            label={t("expBonusLabel")}
             value={expBonus}
             onChange={setExpBonus}
             placeholder="0"
           />
         </div>
         <InputField
-          label="残り必要経験値"
+          label={t("remainingExpLabel")}
           value={remainingExp}
           onChange={setRemainingExp}
-          placeholder="手入力"
+          placeholder={t("manualInput")}
         />
       </div>
 
       {/* 結果 */}
       {monsterRows.length > 0 && (
         <div className="space-y-4">
-          <h3 className="font-semibold text-gray-700 px-1">計算結果</h3>
-          <StatCard title="経験値効率" accent="indigo">
+          <h3 className="font-semibold text-gray-700 px-1">{t("common:results")}</h3>
+          <StatCard title={t("expEfficiency")} accent="indigo">
             <div className="space-y-2">
               <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
-                <span className="text-sm text-gray-500">1周EXP</span>
+                <span className="text-sm text-gray-500">{t("expPerRun")}</span>
                 <span className="text-lg font-bold text-indigo-600">
                   {expPerRun.toLocaleString()}
                 </span>
               </div>
               <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
-                <span className="text-sm text-gray-500">時給EXP</span>
+                <span className="text-sm text-gray-500">{t("expPerHour")}</span>
                 <span className="text-lg font-bold text-indigo-600">
                   {expPerHour.toLocaleString()}
                 </span>
               </div>
               {remainingExpNum > 0 && (
                 <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
-                  <span className="text-sm text-gray-500">目標到達時間</span>
+                  <span className="text-sm text-gray-500">{t("timeToGoal")}</span>
                   <span className="text-lg font-bold text-green-600">
                     {timeToGoal}
                   </span>

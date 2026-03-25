@@ -1,7 +1,11 @@
 import { useState, useMemo, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import type { MonsterBase, Element } from "../types/game";
 import { usePersistedState } from "../hooks/usePersistedState";
+import { useSharedSimConfig } from "../hooks/useSharedSimConfig";
 import { useStatPresets } from "../hooks/useStatPresets";
+import { calcStatus } from "../utils/statusCalc";
+import { SimConfigPanel } from "./SimConfigPanel";
 import { scaleMonster } from "../utils/monsterScaling";
 import {
   calcPhysicalDamage,
@@ -39,22 +43,23 @@ import { EnemyPresetModal } from "./ui/EnemyPresetModal";
 type PlayerAttackMode = "物理" | "魔弾" | "魔攻";
 
 export function DamageCalculator() {
+  const { t } = useTranslation("damage");
   const customMonsters = useCustomMonsters();
   const allGroups = useMemo(() => {
     if (customMonsters.length === 0) return enemyPresetGroups;
     return [
       ...enemyPresetGroups,
       {
-        mapLabel: "カスタム",
-        label: "カスタム",
+        mapLabel: t("common:custom"),
+        label: t("common:custom"),
         presets: customMonsters.map((m) => ({
           monsterName: m.name,
           level: m.level,
-          location: "カスタム登録",
+          location: t("common:customRegistration"),
         })),
       },
     ];
-  }, [customMonsters]);
+  }, [customMonsters, t]);
 
   // モンスター選択
   const [selectedMonster, setSelectedMonster] = useState<MonsterBase | null>(null);
@@ -88,6 +93,21 @@ export function DamageCalculator() {
 
   const magicBaseInt = analysisBookNum * (1 + analysisAnalysisBookNum * 0.1);
 
+  // 装備設定モード
+  const [statMode, setStatMode] = usePersistedState<"manual" | "sim">("dmg:statMode", "manual");
+  const [simCfg, setSimField, resetSim, replaceAllSim] = useSharedSimConfig();
+  const simResult = useMemo(() => calcStatus(simCfg), [simCfg]);
+
+  // 実効ステータス（モードによって切り替え）
+  const effAtk     = statMode === "sim" ? simResult.final.atk  : myAtkNum;
+  const effInt     = statMode === "sim" ? simResult.final.int  : myIntNum;
+  const effDef     = statMode === "sim" ? simResult.final.def  : myDefNum;
+  const effMdef    = statMode === "sim" ? simResult.final.mdef : myMdefNum;
+  const effSpd     = statMode === "sim" ? simResult.final.spd  : mySpdNum;
+  const effLuck    = statMode === "sim" ? simResult.final.luck : myLuckNum;
+  const effElement: Element = statMode === "sim" ? simCfg.charElement : myElement;
+  const effPlayerHp = statMode === "sim" ? simResult.hp : playerHp;
+
   // プリセット
   const [presetName, setPresetName] = useState("");
   const [selectedPresetId, setSelectedPresetId] = useState("");
@@ -98,7 +118,7 @@ export function DamageCalculator() {
     if (!presetName.trim()) return;
     const name = presetName.trim();
     const existing = presets.find((p) => p.name === name);
-    if (existing && !window.confirm(`"${name}" を上書きしますか？`)) return;
+    if (existing && !window.confirm(t("common:overwriteConfirm", { name }))) return;
     savePreset(name, {
       atk: myAtk,
       int: myInt,
@@ -112,7 +132,7 @@ export function DamageCalculator() {
       analysisBook,
       analysisAnalysisBook,
     });
-  }, [presetName, presets, savePreset, myAtk, myInt, myDef, myMdef, mySpd, myVit, myLuck, myElement, myAttackMode, analysisBook, analysisAnalysisBook]);
+  }, [presetName, presets, savePreset, myAtk, myInt, myDef, myMdef, mySpd, myVit, myLuck, myElement, myAttackMode, analysisBook, analysisAnalysisBook, t]);
 
   const handleLoadPreset = useCallback(() => {
     const preset = loadPreset(selectedPresetId);
@@ -182,25 +202,25 @@ export function DamageCalculator() {
   // 属性倍率
   const selfToEnemyAffinity = useMemo(() => {
     if (!selectedMonster) return 1;
-    return getElementAffinity(myElement, selectedMonster.element);
-  }, [myElement, selectedMonster]);
+    return getElementAffinity(effElement, selectedMonster.element);
+  }, [effElement, selectedMonster]);
 
   const enemyToSelfAffinity = useMemo(() => {
     if (!selectedMonster) return 1;
-    return getElementAffinity(selectedMonster.element, myElement);
-  }, [myElement, selectedMonster]);
+    return getElementAffinity(selectedMonster.element, effElement);
+  }, [effElement, selectedMonster]);
 
   // ===== 与ダメージ計算 =====
   const offensiveResult = useMemo(() => {
     if (!scaled) return null;
 
-    const multiHit = calcMultiHitCount(mySpdNum, myAttackMode === "魔攻");
+    const multiHit = calcMultiHitCount(effSpd, myAttackMode === "魔攻");
 
     if (myAttackMode === "魔攻") {
       // 全魔法の結果を計算
       const spellResults = MAGIC_SPELLS.map((spell) => {
         const dmg = calcPlayerMagicDamage(
-          myIntNum,
+          effInt,
           magicBaseInt,
           spell.multiplier,
           scaled.scaledDef,
@@ -238,7 +258,7 @@ export function DamageCalculator() {
     let dmg;
     if (myAttackMode === "物理") {
       dmg = calcPhysicalDamage(
-        myAtkNum,
+        effAtk,
         scaled.scaledDef,
         scaled.scaledMdef,
         selfToEnemyAffinity
@@ -246,7 +266,7 @@ export function DamageCalculator() {
     } else {
       // 魔弾
       dmg = calcPetMagicDamage(
-        myIntNum,
+        effInt,
         scaled.scaledDef,
         scaled.scaledMdef,
         selfToEnemyAffinity
@@ -289,16 +309,16 @@ export function DamageCalculator() {
     });
 
     const hitRate = myAttackMode === "物理"
-      ? calcHitRate(myLuckNum, scaled.scaledLuck)
+      ? calcHitRate(effLuck, scaled.scaledLuck)
       : null;
 
     return { mode: myAttackMode as "物理" | "魔弾", dmg, multiHit, hitsToKill, minStat, targetStats, hitRate };
   }, [
     scaled,
-    myAtkNum,
-    myIntNum,
-    mySpdNum,
-    myLuckNum,
+    effAtk,
+    effInt,
+    effSpd,
+    effLuck,
     myAttackMode,
     selfToEnemyAffinity,
     magicBaseInt,
@@ -320,16 +340,16 @@ export function DamageCalculator() {
     // 現在の被ダメ
     const currentDmg = calcDefDamage(
       enemyStat,
-      myDefNum,
-      myMdefNum,
+      effDef,
+      effMdef,
       enemyIsPhysical,
       enemyToSelfAffinity
     );
 
     const nullified = canNullifyDamage(
       enemyStat,
-      myDefNum,
-      myMdefNum,
+      effDef,
+      effMdef,
       enemyIsPhysical
     );
 
@@ -338,14 +358,14 @@ export function DamageCalculator() {
       scaled.attackType === "魔攻"
     );
 
-    const hitsToTake = playerHp > 0
+    const hitsToTake = effPlayerHp > 0
       ? {
-          worst: Math.ceil(playerHp / Math.max(currentDmg.max * enemyMultiHit, 1)),
-          best: Math.floor(playerHp / Math.max(currentDmg.min * enemyMultiHit, 1)),
+          worst: Math.ceil(effPlayerHp / Math.max(currentDmg.max * enemyMultiHit, 1)),
+          best: Math.floor(effPlayerHp / Math.max(currentDmg.min * enemyMultiHit, 1)),
         }
       : null;
 
-    const additionalNeeded = calcAdditionalDefNeeded(enemyStat, myDefNum, myMdefNum, enemyIsPhysical);
+    const additionalNeeded = calcAdditionalDefNeeded(enemyStat, effDef, effMdef, enemyIsPhysical);
 
     return {
       defReq,
@@ -357,17 +377,17 @@ export function DamageCalculator() {
       hitsToTake,
       additionalNeeded,
     };
-  }, [scaled, myDefNum, myMdefNum, enemyToSelfAffinity, playerHp]);
+  }, [scaled, effDef, effMdef, enemyToSelfAffinity, effPlayerHp]);
 
   const hasMonster = !!scaled;
   const hasMyOffenseStats =
-    (myAttackMode === "物理" ? myAtkNum > 0 : myIntNum > 0) && hasMonster;
-  const hasMyDefenseStats = (myDefNum > 0 || myMdefNum > 0) && hasMonster;
+    (myAttackMode === "物理" ? effAtk > 0 : effInt > 0) && hasMonster;
+  const hasMyDefenseStats = (effDef > 0 || effMdef > 0) && hasMonster;
 
   const elements: Element[] = ["火", "水", "木", "光", "闇"];
   const attackModes: { value: PlayerAttackMode; label: string }[] = [
-    { value: "物理", label: "物理" },
-    { value: "魔攻", label: "魔法" },
+    { value: "物理", label: t("game:attackLabel.physical") },
+    { value: "魔攻", label: t("game:attackLabel.magic") },
   ];
 
   const elementColors: Record<Element, string> = {
@@ -385,13 +405,13 @@ export function DamageCalculator() {
       <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-6 lg:space-y-3">
         {/* 敵プリセット */}
         <div className="space-y-1.5">
-          <label className="block text-xs font-medium text-gray-500">敵プリセット</label>
+          <label className="block text-xs font-medium text-gray-500">{t("enemyPreset")}</label>
           <button
             onClick={() => setEnemyModalOpen(true)}
             className="w-full flex items-center justify-between px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm text-left hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
           >
             <span className={selectedPresetLabel ? "text-gray-800 truncate" : "text-gray-400"}>
-              {selectedPresetLabel ?? "プリセットから選択..."}
+              {selectedPresetLabel ?? t("common:selectPreset")}
             </span>
             <svg className="w-4 h-4 text-gray-400 flex-shrink-0 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -420,49 +440,70 @@ export function DamageCalculator() {
         <div className="space-y-4 lg:space-y-2">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-              <span className="text-blue-500 text-sm">自</span>
+              <span className="text-blue-500 text-sm">{t("common:self")}</span>
             </div>
-            <h3 className="font-semibold text-gray-800">自分のステータス</h3>
-            <button
-              onClick={() => setPresetModalOpen(true)}
-              className="ml-auto flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-100 border border-gray-200 text-xs text-gray-600 hover:bg-gray-200 transition-colors"
-            >
-              <span>
-                {selectedPresetId
-                  ? presets.find((p) => p.id === selectedPresetId)?.name ?? "プリセット"
-                  : "プリセット"}
-              </span>
-              <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
+            <h3 className="font-semibold text-gray-800">{t("common:myStatus")}</h3>
+            {statMode === "manual" && (
+              <button
+                onClick={() => setPresetModalOpen(true)}
+                className="ml-auto flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-100 border border-gray-200 text-xs text-gray-600 hover:bg-gray-200 transition-colors"
+              >
+                <span>
+                  {selectedPresetId
+                    ? presets.find((p) => p.id === selectedPresetId)?.name ?? t("common:preset")
+                    : t("common:preset")}
+                </span>
+                <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            )}
+          </div>
+
+          {/* 手動入力 / 装備設定 トグル */}
+          <div className="flex rounded-lg overflow-hidden border border-gray-200 text-xs">
+            {(["manual", "sim"] as const).map((mode) => (
+              <button
+                key={mode}
+                onClick={() => setStatMode(mode)}
+                className={`flex-1 py-1.5 font-medium transition-colors ${
+                  statMode === mode
+                    ? "bg-blue-500 text-white"
+                    : "bg-white text-gray-500 hover:bg-gray-50"
+                }`}
+              >
+                {mode === "manual" ? t("statModeManual") : t("statModeSim")}
+              </button>
+            ))}
           </div>
 
           {/* 属性・攻撃方法 */}
           <div className="space-y-3">
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-gray-600">
-                主人公の属性
-              </label>
-              <div className="flex gap-1.5">
-                {elements.map((el) => (
-                  <button
-                    key={el}
-                    onClick={() => setMyElement(el)}
-                    className={`flex-1 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-                      myElement === el
-                        ? elementColors[el]
-                        : "bg-gray-50 text-gray-400 border-gray-200"
-                    }`}
-                  >
-                    {el}
-                  </button>
-                ))}
+            {statMode === "manual" && (
+              <div className="space-y-1.5">
+                <label className="block text-sm font-medium text-gray-600">
+                  {t("heroElement")}
+                </label>
+                <div className="flex gap-1.5">
+                  {elements.map((el) => (
+                    <button
+                      key={el}
+                      onClick={() => setMyElement(el)}
+                      className={`flex-1 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                        myElement === el
+                          ? elementColors[el]
+                          : "bg-gray-50 text-gray-400 border-gray-200"
+                      }`}
+                    >
+                      {t(`game:element.${el}`)}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
             <div className="space-y-1.5">
               <label className="block text-sm font-medium text-gray-600">
-                攻撃方法
+                {t("attackMethod")}
               </label>
               <div className="flex gap-1.5">
                 {attackModes.map((mode) => (
@@ -482,28 +523,40 @@ export function DamageCalculator() {
             </div>
           </div>
 
-          {/* ステータス入力 */}
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-2">
-            <InputField label="ATK" value={myAtk} onChange={setMyAtk} />
-            <InputField label="INT" value={myInt} onChange={setMyInt} />
-            <InputField label="LUK" value={myLuck} onChange={setMyLuck} />
-            <InputField label="DEF" value={myDef} onChange={setMyDef} />
-            <InputField label="M-DEF" value={myMdef} onChange={setMyMdef} />
-            <InputField label="VIT" value={myVit} onChange={setMyVit} />
-            <InputField label="SPD" value={mySpd} onChange={setMySpd} />
-          </div>
+          {/* 装備設定モード: SimConfigPanel */}
+          {statMode === "sim" && (
+            <SimConfigPanel
+              cfg={simCfg}
+              setField={setSimField}
+              reset={resetSim}
+              replaceAll={replaceAllSim}
+            />
+          )}
+
+          {/* ステータス入力（手動モードのみ） */}
+          {statMode === "manual" && (
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-2">
+              <InputField label="ATK" value={myAtk} onChange={setMyAtk} />
+              <InputField label="INT" value={myInt} onChange={setMyInt} />
+              <InputField label="LUK" value={myLuck} onChange={setMyLuck} />
+              <InputField label="DEF" value={myDef} onChange={setMyDef} />
+              <InputField label="M-DEF" value={myMdef} onChange={setMyMdef} />
+              <InputField label="VIT" value={myVit} onChange={setMyVit} />
+              <InputField label="SPD" value={mySpd} onChange={setMySpd} />
+            </div>
+          )}
 
           {/* 魔法設定（魔攻モード時のみ） */}
           {myAttackMode === "魔攻" && (
             <div className="grid grid-cols-2 gap-4 pt-2 border-t border-gray-100">
               <InputField
-                label="魔法解析書"
+                label={t("analysisBook")}
                 value={analysisBook}
                 onChange={setAnalysisBook}
                 max={1000}
               />
               <InputField
-                label="解析書の解析書"
+                label={t("analysisAnalysisBook")}
                 value={analysisAnalysisBook}
                 onChange={setAnalysisAnalysisBook}
                 max={1000}
@@ -529,14 +582,14 @@ export function DamageCalculator() {
               d="M9 5l7 7-7 7"
             />
           </svg>
-          計算式を表示
+          {t("showFormula")}
         </summary>
         <div className="mt-3 p-4 bg-gray-50 rounded-2xl text-xs text-gray-500 space-y-1 font-mono">
-          <p>物理/魔弾: (ATK or INT)×1.75 - (DEF+M-DEF/10 or M-DEF+DEF/10)) × 4 × 属性</p>
-          <p>主人公魔法: (INT+解析書)×1.25×魔法倍率 - (M-DEF+DEF/10)) × 4 × 属性</p>
-          <p className="pt-2 text-gray-400">※ 乱数: ×0.9〜1.1 / クリティカル: ×2.5</p>
-          <p className="text-gray-400">※ 多段: SPD 3k→2, 10k→3, 30k→4, 100k→5</p>
-          <p className="text-gray-400">※ 計算結果≤0 → 被ダメ1〜9</p>
+          <p>{t("formulaPhysical")}</p>
+          <p>{t("formulaMagic")}</p>
+          <p className="pt-2 text-gray-400">{t("formulaNote1")}</p>
+          <p className="text-gray-400">{t("formulaNote2")}</p>
+          <p className="text-gray-400">{t("formulaNote3")}</p>
         </div>
       </details>
       </div>{/* /Column 1 */}
@@ -550,8 +603,8 @@ export function DamageCalculator() {
           <div className="flex items-center gap-2 flex-wrap mb-3">
             <span className="font-bold text-base text-gray-800">{scaled.name}</span>
             <span className="text-sm bg-gray-100 text-gray-600 px-2 py-0.5 rounded-lg font-medium">Lv{monsterLevel.toLocaleString()}</span>
-            <span className={`text-sm px-2 py-0.5 rounded-lg border font-medium ${elementColors[scaled.element]}`}>{scaled.element}</span>
-            <span className="text-sm bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-lg font-medium">{scaled.attackType}</span>
+            <span className={`text-sm px-2 py-0.5 rounded-lg border font-medium ${elementColors[scaled.element]}`}>{t(`game:element.${scaled.element}`)}</span>
+            <span className="text-sm bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-lg font-medium">{t(`game:attackType.${scaled.attackType}`)}</span>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-2">
             <div className="flex flex-col">
@@ -603,7 +656,7 @@ export function DamageCalculator() {
 
       {/* 与ダメージ */}
       <div className="space-y-2">
-        <h3 className="font-semibold text-gray-700 px-1">与ダメージ</h3>
+        <h3 className="font-semibold text-gray-700 px-1">{t("offensiveDamage")}</h3>
 
         {hasMonster && offensiveResult ? (<>
 
@@ -611,16 +664,16 @@ export function DamageCalculator() {
             /* ===== 魔攻モード: 全魔法テーブル ===== */
             <>
               <StatCard
-                title={`魔法攻撃 → ${scaled!.name} Lv${monsterLevel}`}
+                title={t("magicAttack") + " → " + scaled!.name + " Lv" + monsterLevel}
                 accent="green"
               >
                 {/* 属性アフィニティ表示 */}
                 <div className="flex items-center gap-1.5 text-xs mb-2 pb-2 border-b border-gray-100">
-                  <span className={`px-1.5 py-0.5 rounded border font-medium ${elementColors[myElement]}`}>{myElement}</span>
+                  <span className={`px-1.5 py-0.5 rounded border font-medium ${elementColors[effElement]}`}>{t(`game:element.${effElement}`)}</span>
                   <span className="text-gray-400">→</span>
-                  <span className={`px-1.5 py-0.5 rounded border font-medium ${elementColors[scaled!.element]}`}>{scaled!.element}</span>
+                  <span className={`px-1.5 py-0.5 rounded border font-medium ${elementColors[scaled!.element]}`}>{t(`game:element.${scaled!.element}`)}</span>
                   <span className={`font-semibold ${selfToEnemyAffinity > 1 ? "text-green-600" : selfToEnemyAffinity < 1 ? "text-red-500" : "text-gray-500"}`}>
-                    {selfToEnemyAffinity > 1 ? "弱点 ×1.2" : selfToEnemyAffinity < 1 ? "耐性 ×0.8" : "通常 ×1.0"}
+                    {selfToEnemyAffinity > 1 ? `${t("weakness")} ×1.2` : selfToEnemyAffinity < 1 ? `${t("resistance")} ×0.8` : `${t("normal")} ×1.0`}
                   </span>
                 </div>
                 {hasMyOffenseStats ? (
@@ -628,10 +681,10 @@ export function DamageCalculator() {
                     {offensiveResult.spellResults.map(({ spell, dmg, totalMin, totalMax, totalCritMin, totalCritMax, hitsToKill }) => (
                       <div key={spell.name} className="col-span-7 grid grid-cols-subgrid bg-white/60 rounded-lg py-1.5">
                         <div className="col-span-7 flex items-center gap-1 mb-1 px-2">
-                          <span className={`text-xs px-1 py-0.5 rounded border font-medium ${elementColors[spell.element]}`}>{spell.element}</span>
+                          <span className={`text-xs px-1 py-0.5 rounded border font-medium ${elementColors[spell.element]}`}>{t(`game:element.${spell.element}`)}</span>
                           <span className="text-sm font-medium text-gray-700">{spell.name}</span>
                           <span className="text-xs text-gray-400">
-                            ×{spell.multiplier}{spell.hits > 1 ? ` / ${spell.hits}連` : ""}
+                            ×{spell.multiplier}{spell.hits > 1 ? ` / ${spell.hits}${t("hits")}` : ""}
                           </span>
                           {!dmg.isNullified && (
                             <span className={`ml-auto text-sm font-bold px-2 py-0.5 rounded-full ${
@@ -639,18 +692,18 @@ export function DamageCalculator() {
                               hitsToKill <= 3 ? "bg-yellow-100 text-yellow-700" :
                               "bg-gray-100 text-gray-600"
                             }`}>
-                              {hitsToKill === Infinity ? "∞" : hitsToKill}回
+                              {hitsToKill === Infinity ? "∞" : `${hitsToKill}${t("common:times")}`}
                             </span>
                           )}
                         </div>
                         {dmg.isNullified ? (
-                          <span className="col-span-7 text-xs text-gray-400 px-2">防御貫通不可</span>
+                          <span className="col-span-7 text-xs text-gray-400 px-2">{t("cannotPenetrate")}</span>
                         ) : (
                           <>
                             <span className="pl-2 text-sm font-bold text-green-600 tabular-nums text-right self-center">{totalMin.toLocaleString()}</span>
                             <span className="text-sm text-green-600 text-center self-center">〜</span>
                             <span className="text-sm font-bold text-green-600 tabular-nums text-right self-center">{totalMax.toLocaleString()}</span>
-                            <span className="px-1 text-xs text-yellow-600 text-center self-center">クリ</span>
+                            <span className="px-1 text-xs text-yellow-600 text-center self-center">{t("critShort")}</span>
                             <span className="text-xs text-yellow-600 tabular-nums text-right self-center">{totalCritMin.toLocaleString()}</span>
                             <span className="text-xs text-yellow-600 text-center self-center">〜</span>
                             <span className="pr-2 text-xs text-yellow-600 tabular-nums text-right self-center">{totalCritMax.toLocaleString()}</span>
@@ -660,7 +713,7 @@ export function DamageCalculator() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-gray-400">INTを入力するとダメージが表示されます</p>
+                  <p className="text-xs text-gray-400">{t("enterIntForDamage")}</p>
                 )}
               </StatCard>
             </>
@@ -668,17 +721,17 @@ export function DamageCalculator() {
             /* ===== 物理 / 魔弾モード ===== */
             <>
               <StatCard
-                title={`${offensiveResult.mode === "物理" ? "物理" : "魔弾"}攻撃 → ${scaled!.name} Lv${monsterLevel}`}
+                title={`${offensiveResult.mode === "物理" ? t("physicalAttack") : t("magicBulletAttack")} → ${scaled!.name} Lv${monsterLevel}`}
                 accent="green"
               >
                 <div className="space-y-2">
                   {hasMyOffenseStats && (
                     <>
                       <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
-                        <span className="text-sm text-gray-500">ダメージ</span>
+                        <span className="text-sm text-gray-500">{t("damage")}</span>
                         {offensiveResult.dmg.isNullified ? (
                           <span className="text-sm text-gray-400">
-                            1〜9（防御貫通不可）
+                            {t("nullified")}
                           </span>
                         ) : (
                           <span className="text-lg font-bold text-green-600">
@@ -690,7 +743,7 @@ export function DamageCalculator() {
                       {!offensiveResult.dmg.isNullified && (
                         <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
                           <span className="text-sm text-gray-500">
-                            クリティカル
+                            {t("critical")}
                           </span>
                           <span className="text-lg font-bold text-yellow-600">
                             {offensiveResult.dmg.critMin.toLocaleString()} 〜{" "}
@@ -699,26 +752,26 @@ export function DamageCalculator() {
                         </div>
                       )}
                       <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
-                        <span className="text-sm text-gray-500">多段回数</span>
+                        <span className="text-sm text-gray-500">{t("multiHit")}</span>
                         <span className="font-bold text-gray-700">
-                          {offensiveResult.multiHit}回
+                          {offensiveResult.multiHit}{t("common:times")}
                         </span>
                       </div>
                       {!offensiveResult.dmg.isNullified && (
                         <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
                           <span className="text-sm text-gray-500">
-                            確殺回数
+                            {t("hitsToKill")}
                           </span>
                           <span className="font-bold text-gray-700">
                             {offensiveResult.hitsToKill === Infinity
                               ? "∞"
-                              : `${offensiveResult.hitsToKill}回`}
+                              : `${offensiveResult.hitsToKill}${t("common:times")}`}
                           </span>
                         </div>
                       )}
-                      {offensiveResult.hitRate !== null && myLuckNum > 0 && (
+                      {offensiveResult.hitRate !== null && effLuck > 0 && (
                         <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
-                          <span className="text-sm text-gray-500">命中率</span>
+                          <span className="text-sm text-gray-500">{t("hitRate")}</span>
                           <span className={`font-bold ${offensiveResult.hitRate >= 80 ? "text-green-600" : offensiveResult.hitRate < 20 ? "text-red-500" : "text-yellow-600"}`}>
                             {offensiveResult.hitRate}%
                           </span>
@@ -730,20 +783,20 @@ export function DamageCalculator() {
               </StatCard>
 
               {/* 最低必要ステータス */}
-              <StatCard title="最低必要ステータス" accent="purple">
+              <StatCard title={t("minRequiredStats")} accent="purple">
                 <div className="space-y-2">
                   <ResultRow
-                    label={`最低${offensiveResult.mode === "物理" ? "ATK" : "INT"}`}
+                    label={t("minStat", { stat: offensiveResult.mode === "物理" ? "ATK" : "INT" })}
                     value={offensiveResult.minStat}
-                    current={offensiveResult.mode === "物理" ? myAtkNum : myIntNum}
+                    current={offensiveResult.mode === "物理" ? effAtk : effInt}
                     color="purple"
                   />
                   {offensiveResult.targetStats.map((stat, i) => (
                     <ResultRow
                       key={i}
-                      label={`${i + 1}回確殺${offensiveResult.mode === "物理" ? "ATK" : "INT"}`}
+                      label={t("nHitsKill", { n: i + 1, stat: offensiveResult.mode === "物理" ? "ATK" : "INT" })}
                       value={stat}
-                      current={offensiveResult.mode === "物理" ? myAtkNum : myIntNum}
+                      current={offensiveResult.mode === "物理" ? effAtk : effInt}
                       color="purple"
                     />
                   ))}
@@ -753,7 +806,7 @@ export function DamageCalculator() {
           )}
         </>) : (
           <div className="bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 p-8 text-center">
-            <p className="text-sm text-gray-400">モンスターを選択すると与ダメージが表示されます</p>
+            <p className="text-sm text-gray-400">{t("selectMonsterOffense")}</p>
           </div>
         )}
       </div>{/* /与ダメージ */}
@@ -773,30 +826,30 @@ export function DamageCalculator() {
                       : "text-gray-400 hover:text-gray-600"
                   }`}
                 >
-                  {tab}
+                  {tab === "被ダメ" ? t("defensiveDamageShort") : t("minINTTab")}
                 </button>
               ))}
             </div>
           ) : (
-            <h3 className="font-semibold text-gray-700">被ダメージ</h3>
+            <h3 className="font-semibold text-gray-700">{t("defensiveDamage")}</h3>
           )}
         </div>
 
         {/* 最低必要INT パネル（魔攻 + 最低INTタブ時） */}
         {myAttackMode === "魔攻" && defPanelTab === "最低INT" && hasMonster && offensiveResult && offensiveResult.mode === "魔攻" && (
-          <StatCard title="最低必要INT（魔法別）" accent="purple">
+          <StatCard title={t("minINTBySpell")} accent="purple">
             <div className="space-y-1.5">
               {offensiveResult.spellResults.map(({ spell, minStat, targetStats }) => (
                 <div key={spell.name} className="py-1.5 px-2 bg-white/60 rounded-lg">
                   <div className="flex items-center gap-1 mb-0.5">
-                    <span className={`text-xs px-1 py-0.5 rounded border font-medium ${elementColors[spell.element]}`}>{spell.element}</span>
+                    <span className={`text-xs px-1 py-0.5 rounded border font-medium ${elementColors[spell.element]}`}>{t(`game:element.${spell.element}`)}</span>
                     <span className="text-xs font-medium text-gray-700">{spell.name}</span>
                   </div>
                   <div className="grid grid-cols-4 gap-1 text-xs">
-                    {[{ label: "最低", val: minStat }, { label: "1確殺", val: targetStats[0] }, { label: "2確殺", val: targetStats[1] }, { label: "3確殺", val: targetStats[2] }].map(({ label, val }) => (
+                    {[{ label: t("minLabel"), val: minStat }, { label: t("nKillLabel", { n: 1 }), val: targetStats[0] }, { label: t("nKillLabel", { n: 2 }), val: targetStats[1] }, { label: t("nKillLabel", { n: 3 }), val: targetStats[2] }].map(({ label, val }) => (
                       <div key={label} className="text-center">
                         <div className="text-gray-400">{label}</div>
-                        <div className={`font-bold ${val <= myIntNum ? "text-green-600" : "text-purple-600"}`}>
+                        <div className={`font-bold ${val <= effInt ? "text-green-600" : "text-purple-600"}`}>
                           {val.toLocaleString()}
                         </div>
                       </div>
@@ -811,7 +864,7 @@ export function DamageCalculator() {
         {/* 被ダメパネル（非魔攻 or 被ダメタブ時） */}
         {(myAttackMode !== "魔攻" || defPanelTab === "被ダメ") && hasMonster && defensiveResult ? (<>
           <StatCard
-            title={`${defensiveResult.enemyIsPhysical ? "物理" : "魔法"}攻撃（${scaled!.attackType} / ${defensiveResult.enemyIsPhysical ? "ATK" : "INT"}: ${defensiveResult.enemyStat.toLocaleString()}）`}
+            title={t("defensePanel.title", { type: defensiveResult.enemyIsPhysical ? t("game:attackLabel.physical") : t("game:attackLabel.magic"), attackType: t(`game:attackType.${scaled!.attackType}`), stat: defensiveResult.enemyIsPhysical ? "ATK" : "INT", value: defensiveResult.enemyStat.toLocaleString() })}
             accent="orange"
           >
             <div className="space-y-2">
@@ -820,12 +873,12 @@ export function DamageCalculator() {
                 <div className="mb-3">
                   <div className="flex justify-between text-xs text-gray-500 mb-1">
                     <span>
-                      {defensiveResult.enemyIsPhysical ? "DEF" : "M-DEF"}進捗
+                      {t("defensePanel.progress", { stat: defensiveResult.enemyIsPhysical ? "DEF" : "M-DEF" })}
                     </span>
                     <span>
                       {(defensiveResult.enemyIsPhysical
-                        ? myDefNum
-                        : myMdefNum
+                        ? effDef
+                        : effMdef
                       ).toLocaleString()}{" "}
                       /{" "}
                       {(defensiveResult.enemyIsPhysical
@@ -836,7 +889,7 @@ export function DamageCalculator() {
                   </div>
                   <ProgressBar
                     current={
-                      defensiveResult.enemyIsPhysical ? myDefNum : myMdefNum
+                      defensiveResult.enemyIsPhysical ? effDef : effMdef
                     }
                     target={
                       defensiveResult.enemyIsPhysical
@@ -851,18 +904,18 @@ export function DamageCalculator() {
                 const isPhys = defensiveResult.enemyIsPhysical;
                 const rows = [
                   {
-                    label: `${isPhys ? "DEF" : "M-DEF"}のみで無効化できる値`,
+                    label: t("defensePanel.nullifyByOnly", { stat: isPhys ? "DEF" : "M-DEF" }),
                     value: isPhys ? defensiveResult.defReq.defOnly : defensiveResult.defReq.mdefOnly,
-                    current: hasMyDefenseStats ? (isPhys ? myDefNum : myMdefNum) : undefined,
+                    current: hasMyDefenseStats ? (isPhys ? effDef : effMdef) : undefined,
                     hintStat: isPhys ? "M-DEF" : "DEF",
                     hintAmount: isPhys
                       ? `+${defensiveResult.additionalNeeded.additionalMdef.toLocaleString()}`
                       : `+${defensiveResult.additionalNeeded.additionalDef.toLocaleString()}`,
                   },
                   {
-                    label: `${isPhys ? "M-DEF" : "DEF"}のみで無効化できる値`,
+                    label: t("defensePanel.nullifyByOnly", { stat: isPhys ? "M-DEF" : "DEF" }),
                     value: isPhys ? defensiveResult.defReq.mdefOnly : defensiveResult.defReq.defOnly,
-                    current: hasMyDefenseStats ? (isPhys ? myMdefNum : myDefNum) : undefined,
+                    current: hasMyDefenseStats ? (isPhys ? effMdef : effDef) : undefined,
                     hintStat: isPhys ? "DEF" : "M-DEF",
                     hintAmount: isPhys
                       ? `+${defensiveResult.additionalNeeded.additionalDef.toLocaleString()}`
@@ -884,10 +937,10 @@ export function DamageCalculator() {
                           {remaining !== undefined ? (
                             <>
                               <span className={`text-xs text-right ${achieved ? "text-green-600" : "text-gray-400"}`}>
-                                {achieved ? "" : "あと"}
+                                {achieved ? "" : t("common:remainingLabel")}
                               </span>
                               <span className={`text-xs px-2 py-0.5 rounded-full text-right tabular-nums ${achieved ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-500"}`}>
-                                {achieved ? "達成" : remaining.toLocaleString()}
+                                {achieved ? t("common:achieved") : t("common:remaining", { value: remaining.toLocaleString() })}
                               </span>
                             </>
                           ) : <><span /><span /></>}
@@ -898,7 +951,7 @@ export function DamageCalculator() {
                       <div className="col-span-4 grid grid-cols-[auto_auto_auto_auto] gap-x-1 gap-y-0 text-xs text-blue-400 pl-3 justify-start">
                         {rows.map(({ hintStat, hintAmount }) => [
                           <span key={`${hintStat}-s`} className="text-right">{hintStat}</span>,
-                          <span key={`${hintStat}-m`} className="text-right">で補うなら あと</span>,
+                          <span key={`${hintStat}-m`} className="text-right">{t("defensePanel.supplementWith", { stat: hintStat })}</span>,
                           <span key={`${hintStat}-n`} className="text-right">{hintStat}</span>,
                           <span key={`${hintStat}-v`} className="text-right tabular-nums">{hintAmount}</span>,
                         ])}
@@ -914,13 +967,13 @@ export function DamageCalculator() {
           {hasMyDefenseStats && (
             <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 p-3 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-gray-600">現在の被ダメージ</span>
+                <span className="text-gray-600">{t("defensePanel.currentDamage")}</span>
                 {defensiveResult.nullified ? (
                   <div className="flex items-center gap-2">
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-700">
                       1〜9
                     </span>
-                    <span className="text-xs text-green-600">無効化達成</span>
+                    <span className="text-xs text-green-600">{t("defensePanel.nullifyAchieved")}</span>
                   </div>
                 ) : (
                   <div className="text-right">
@@ -936,10 +989,10 @@ export function DamageCalculator() {
                   </div>
                 )}
               </div>
-              {playerHp > 0 && (
+              {effPlayerHp > 0 && (
                 <div className="flex items-center justify-between py-1 px-3">
-                  <span className="text-xs text-gray-400">自HP</span>
-                  <span className="text-xs text-gray-500 tabular-nums">{playerHp.toLocaleString()}</span>
+                  <span className="text-xs text-gray-400">{t("defensePanel.selfHp")}</span>
+                  <span className="text-xs text-gray-500 tabular-nums">{effPlayerHp.toLocaleString()}</span>
                 </div>
               )}
               {defensiveResult.hitsToTake && (() => {
@@ -949,11 +1002,11 @@ export function DamageCalculator() {
                 return (
                   <div className={`flex items-center justify-between py-2 px-3 rounded-lg border ${isDanger ? "bg-red-100 border-red-400 animate-pulse" : "bg-white/60 border-gray-100"}`}>
                     <div className={`flex items-center gap-2 ${isDanger ? "text-red-700" : "text-gray-600"}`}>
-                      <span className="text-sm font-medium">{isDanger && "💀 "}受けられる回数</span>
-                      {isInstantDeath && <span className="text-xs font-bold text-red-600">ワンパン即死</span>}
+                      <span className="text-sm font-medium">{isDanger && "💀 "}{t("defensePanel.survivableHits")}</span>
+                      {isInstantDeath && <span className="text-xs font-bold text-red-600">{t("defensePanel.oneHitKill")}</span>}
                     </div>
                     <span className={`font-bold ${isDanger ? "text-red-600 text-base" : "text-blue-600"}`}>
-                      {worst}〜{best}回{isDanger && " ⚠️"}
+                      {worst}〜{best}{t("common:times")}{isDanger && " ⚠️"}
                     </span>
                   </div>
                 );
@@ -963,7 +1016,7 @@ export function DamageCalculator() {
         </>) : (
           (myAttackMode !== "魔攻" || defPanelTab === "被ダメ") && (
             <div className="bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 p-8 text-center">
-              <p className="text-sm text-gray-400">モンスターを選択すると被ダメージが表示されます</p>
+              <p className="text-sm text-gray-400">{t("selectMonsterDefense")}</p>
             </div>
           )
         )}
@@ -983,7 +1036,7 @@ export function DamageCalculator() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-gray-800">プリセット</h3>
+              <h3 className="font-semibold text-gray-800">{t("presetModal.title")}</h3>
               <button
                 onClick={() => setPresetModalOpen(false)}
                 className="text-gray-400 hover:text-gray-600"
@@ -996,14 +1049,14 @@ export function DamageCalculator() {
 
             {/* 読込・削除 */}
             <div className="space-y-1.5">
-              <p className="text-xs font-medium text-gray-500">読込 / 削除</p>
+              <p className="text-xs font-medium text-gray-500">{t("presetModal.loadDelete")}</p>
               <div className="flex gap-1.5">
                 <select
                   value={selectedPresetId}
                   onChange={(e) => setSelectedPresetId(e.target.value)}
                   className="flex-1 min-w-0 text-sm rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-gray-700"
                 >
-                  <option value="">選択...</option>
+                  <option value="">{t("common:select")}</option>
                   {presets.map((p) => (
                     <option key={p.id} value={p.id}>{p.name}</option>
                   ))}
@@ -1013,27 +1066,27 @@ export function DamageCalculator() {
                   disabled={!selectedPresetId}
                   className="px-3 py-1.5 text-xs rounded-lg bg-indigo-100 text-indigo-600 font-medium disabled:opacity-40 hover:bg-indigo-200 transition-colors"
                 >
-                  読込
+                  {t("common:load")}
                 </button>
                 <button
                   onClick={handleDeletePreset}
                   disabled={!selectedPresetId}
                   className="px-3 py-1.5 text-xs rounded-lg bg-red-100 text-red-600 font-medium disabled:opacity-40 hover:bg-red-200 transition-colors"
                 >
-                  削除
+                  {t("common:delete")}
                 </button>
               </div>
             </div>
 
             {/* 保存 */}
             <div className="space-y-1.5">
-              <p className="text-xs font-medium text-gray-500">保存</p>
+              <p className="text-xs font-medium text-gray-500">{t("presetModal.save")}</p>
               <div className="flex gap-1.5">
                 <input
                   type="text"
                   value={presetName}
                   onChange={(e) => setPresetName(e.target.value)}
-                  placeholder="プリセット名..."
+                  placeholder={t("common:presetNamePlaceholder")}
                   className="flex-1 min-w-0 text-sm rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-gray-700 placeholder-gray-300"
                 />
                 <button
@@ -1041,7 +1094,7 @@ export function DamageCalculator() {
                   disabled={!presetName.trim()}
                   className="px-3 py-1.5 text-xs rounded-lg bg-green-100 text-green-600 font-medium disabled:opacity-40 hover:bg-green-200 transition-colors"
                 >
-                  保存
+                  {t("common:save")}
                 </button>
               </div>
             </div>

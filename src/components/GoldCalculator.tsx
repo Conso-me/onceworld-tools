@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import type { MonsterBase } from "../types/game";
 import {
   calcGoldPerRun,
@@ -19,6 +20,7 @@ interface MonsterRow {
 let nextId = 1;
 
 export function GoldCalculator() {
+  const { t } = useTranslation("farm");
   const [monsterRows, setMonsterRows] = useState<MonsterRow[]>([]);
   const [secondsPerRun, setSecondsPerRun] = usePersistedState("gold:seconds", "60");
   const [goldBonus, setGoldBonus] = usePersistedState("gold:bonus", "0");
@@ -78,7 +80,7 @@ export function GoldCalculator() {
         />
         <div className="flex items-end gap-3">
           <InputField
-            label="1周あたりの討伐数"
+            label={t("killsPerRun")}
             value={pendingCount}
             onChange={setPendingCount}
             placeholder="1"
@@ -89,14 +91,14 @@ export function GoldCalculator() {
             disabled={!pendingMonster}
             className="px-5 py-3 bg-indigo-500 text-white rounded-xl font-medium text-sm hover:bg-indigo-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
-            追加
+            {t("common:add")}
           </button>
         </div>
 
         {monsterRows.length > 0 && (
           <div className="space-y-2 pt-2 border-t border-gray-100">
             <h4 className="text-sm font-medium text-gray-600">
-              モンスターリスト
+              {t("common:monsterList")}
             </h4>
             {monsterRows.map((row) => (
               <div
@@ -142,16 +144,16 @@ export function GoldCalculator() {
 
       {/* 周回設定 */}
       <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 space-y-4">
-        <h3 className="font-semibold text-gray-800">周回設定</h3>
+        <h3 className="font-semibold text-gray-800">{t("farmSettings")}</h3>
         <div className="grid grid-cols-2 gap-4">
           <InputField
-            label="1周の秒数"
+            label={t("secondsPerRun")}
             value={secondsPerRun}
             onChange={setSecondsPerRun}
             placeholder="60"
           />
           <InputField
-            label="ゴールドボーナス(%)"
+            label={t("goldBonusLabel")}
             value={goldBonus}
             onChange={setGoldBonus}
             placeholder="0"
@@ -162,17 +164,17 @@ export function GoldCalculator() {
       {/* 結果 */}
       {monsterRows.length > 0 && (
         <div className="space-y-4">
-          <h3 className="font-semibold text-gray-700 px-1">計算結果</h3>
-          <StatCard title="ゴールド効率" accent="green">
+          <h3 className="font-semibold text-gray-700 px-1">{t("common:results")}</h3>
+          <StatCard title={t("goldEfficiency")} accent="green">
             <div className="space-y-2">
               <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
-                <span className="text-sm text-gray-500">1周ゴールド</span>
+                <span className="text-sm text-gray-500">{t("goldPerRunLabel")}</span>
                 <span className="text-lg font-bold text-yellow-600">
                   {goldPerRun.toLocaleString()} G
                 </span>
               </div>
               <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
-                <span className="text-sm text-gray-500">時給ゴールド</span>
+                <span className="text-sm text-gray-500">{t("goldPerHourLabel")}</span>
                 <span className="text-lg font-bold text-yellow-600">
                   {goldPerHour.toLocaleString()} G
                 </span>

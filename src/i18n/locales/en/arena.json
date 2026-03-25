@@ -1,0 +1,40 @@
+{
+  "presetLoad": "Load Preset",
+  "syncWithDmg": "Sync with DMG Calc",
+  "on": "ON",
+  "off": "OFF",
+  "displayLevel": "Display Level",
+  "thousandUnit": "(×1,000)",
+  "nullifiedMonsters": "Nullified Monsters",
+  "tableHeaders": {
+    "monster": "Monster",
+    "location": "Area",
+    "type": "Type",
+    "attackPower": "Lv{{level}} ATK",
+    "nullify": "Nullify",
+    "endurance": "Survive",
+    "maxLv": "Max Lv",
+    "additionalDef": "Needed DEF/MDEF",
+    "lukEvasion": "LUK Evasion"
+  },
+  "nullifyAchieved": "Nullified",
+  "notAchieved": "Not Yet",
+  "cannotNullify": "Cannot Nullify",
+  "lukEvasionGuide": "LUK Evasion Guide:",
+  "lukLevel": {
+    "almost": "Almost",
+    "mostly": "Mostly",
+    "maybe": "Maybe"
+  },
+  "enemyLukMultiplier": "Enemy LUK×{{n}}",
+  "lukEvasionNote": "* LUK evasion formula is unofficial. No guaranteed evasion.",
+  "additionalNeeded": "Needed = additional <orange>DEF</orange> / <purple>M-DEF</purple>",
+  "area": {
+    "1中央/2ランダム": "1 Center/2 Random",
+    "1左右": "1 Left/Right",
+    "2中央": "2 Center",
+    "2ランダム": "2 Random"
+  },
+  "lukEvasionLabel": "LUK (for evasion)",
+  "comfy": "Safe"
+}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import type { PatchEntry, ChangeType } from "../data/patchNotes";
 import { patchNotes } from "../data/patchNotes";
 
@@ -8,11 +9,12 @@ const badgeClass: Record<ChangeType, string> = {
   improve: "bg-blue-100 text-blue-600",
 };
 
-const badgeLabel: Record<ChangeType, string> = {
-  fix: "修正",
-  feature: "追加",
-  improve: "改善",
+const BADGE_LABELS: Record<string, Record<ChangeType, string>> = {
+  ja: { fix: "修正", feature: "追加", improve: "改善" },
+  en: { fix: "Fix", feature: "New", improve: "Improve" },
 };
+
+const EN_MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 function groupByYearMonth(entries: PatchEntry[]): Map<string, Map<string, PatchEntry[]>> {
   const grouped = new Map<string, Map<string, PatchEntry[]>>();
@@ -29,9 +31,11 @@ function groupByYearMonth(entries: PatchEntry[]): Map<string, Map<string, PatchE
 function PatchEntryBlock({
   entry,
   defaultOpen,
+  badgeLabel,
 }: {
   entry: PatchEntry;
   defaultOpen: boolean;
+  badgeLabel: Record<ChangeType, string>;
 }) {
   return (
     <details open={defaultOpen} className="border-b border-gray-100 last:border-b-0">
@@ -40,7 +44,7 @@ function PatchEntryBlock({
         {entry.title && (
           <span className="text-sm font-semibold text-gray-700">{entry.title}</span>
         )}
-        <span className="ml-auto text-xs text-gray-400">{entry.changes.length}件</span>
+        <span className="ml-auto text-xs text-gray-400">{entry.changes.length}</span>
       </summary>
       <ul className="pl-8 pr-4 pb-3 space-y-1.5">
         {entry.changes.map((change, i) => (
@@ -62,21 +66,26 @@ function MonthBlock({
   month,
   entries,
   defaultOpen,
+  lang,
+  badgeLabel,
 }: {
   month: string;
   entries: PatchEntry[];
   defaultOpen: boolean;
+  lang: string;
+  badgeLabel: Record<ChangeType, string>;
 }) {
   const totalChanges = entries.reduce((sum, e) => sum + e.changes.length, 0);
+  const monthDisplay = lang === "ja" ? `${parseInt(month)}月` : EN_MONTHS[parseInt(month) - 1] ?? month;
   return (
     <details open={defaultOpen} className="border-b border-gray-100 last:border-b-0">
       <summary className="flex items-center gap-2 pl-5 pr-4 py-2 cursor-pointer hover:bg-gray-50 select-none list-none">
-        <span className="text-xs font-semibold text-gray-500">{parseInt(month)}月</span>
-        <span className="ml-auto text-xs text-gray-400">{totalChanges}件</span>
+        <span className="text-xs font-semibold text-gray-500">{monthDisplay}</span>
+        <span className="ml-auto text-xs text-gray-400">{totalChanges}</span>
       </summary>
       <div>
         {entries.map((entry, i) => (
-          <PatchEntryBlock key={entry.date} entry={entry} defaultOpen={defaultOpen && i === 0} />
+          <PatchEntryBlock key={entry.date} entry={entry} defaultOpen={defaultOpen && i === 0} badgeLabel={badgeLabel} />
         ))}
       </div>
     </details>
@@ -87,15 +96,20 @@ function YearBlock({
   year,
   monthMap,
   defaultOpen,
+  lang,
+  badgeLabel,
 }: {
   year: string;
   monthMap: Map<string, PatchEntry[]>;
   defaultOpen: boolean;
+  lang: string;
+  badgeLabel: Record<ChangeType, string>;
 }) {
+  const yearDisplay = lang === "ja" ? `${year}年` : year;
   return (
     <details open={defaultOpen} className="border-b border-gray-200 last:border-b-0">
       <summary className="flex items-center gap-2 px-4 py-2.5 cursor-pointer hover:bg-gray-50 select-none list-none">
-        <span className="text-sm font-semibold text-gray-700">{year}年</span>
+        <span className="text-sm font-semibold text-gray-700">{yearDisplay}</span>
       </summary>
       <div>
         {[...monthMap.entries()].map(([month, entries], i) => (
@@ -104,6 +118,8 @@ function YearBlock({
             month={month}
             entries={entries}
             defaultOpen={defaultOpen && i === 0}
+            lang={lang}
+            badgeLabel={badgeLabel}
           />
         ))}
       </div>
@@ -113,16 +129,20 @@ function YearBlock({
 
 type TypeTab = "all" | ChangeType;
 
-const TYPE_TABS: { id: TypeTab; label: string }[] = [
-  { id: "all", label: "全て" },
-  { id: "feature", label: badgeLabel.feature },
-  { id: "fix", label: badgeLabel.fix },
-  { id: "improve", label: badgeLabel.improve },
-];
-
 export function PatchNotesModal({ onClose }: { onClose: () => void }) {
+  const { t, i18n } = useTranslation();
   const [typeTab, setTypeTab] = useState<TypeTab>("all");
   const [yearTab, setYearTab] = useState<string>("all");
+
+  const lang = i18n.language.startsWith("ja") ? "ja" : "en";
+  const badgeLabel = BADGE_LABELS[lang] ?? BADGE_LABELS.ja;
+
+  const typeTabs: { id: TypeTab; label: string }[] = [
+    { id: "all", label: lang === "ja" ? "全て" : "All" },
+    { id: "feature", label: badgeLabel.feature },
+    { id: "fix", label: badgeLabel.fix },
+    { id: "improve", label: badgeLabel.improve },
+  ];
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -132,7 +152,6 @@ export function PatchNotesModal({ onClose }: { onClose: () => void }) {
     return () => document.removeEventListener("keydown", handler);
   }, [onClose]);
 
-  // タイプでフィルタ（変更を絞り込み）
   const typeFiltered =
     typeTab === "all"
       ? patchNotes
@@ -143,16 +162,13 @@ export function PatchNotesModal({ onClose }: { onClose: () => void }) {
           }))
           .filter((entry) => entry.changes.length > 0);
 
-  // 利用可能な年一覧（タイプフィルタ後）
   const availableYears = [
     ...new Set(typeFiltered.map((e) => e.date.split("-")[0])),
   ].sort().reverse();
 
-  // yearTabが無効になった場合は "all" にフォールバック
   const effectiveYearTab =
     yearTab === "all" || availableYears.includes(yearTab) ? yearTab : "all";
 
-  // 年でフィルタ
   const filtered =
     effectiveYearTab === "all"
       ? typeFiltered
@@ -176,7 +192,7 @@ export function PatchNotesModal({ onClose }: { onClose: () => void }) {
       >
         {/* ヘッダー */}
         <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-200 shrink-0">
-          <h3 className="text-sm font-semibold text-gray-700">更新履歴</h3>
+          <h3 className="text-sm font-semibold text-gray-700">{t("patchNotes")}</h3>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 text-xl leading-none px-1"
@@ -185,10 +201,10 @@ export function PatchNotesModal({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
-        {/* タイプタブ（1段目・LODESTONEスタイル） */}
+        {/* タイプタブ */}
         <div className="border-b border-gray-200 shrink-0">
           <div className="flex -mb-px px-2">
-            {TYPE_TABS.map(({ id, label }) => (
+            {typeTabs.map(({ id, label }) => (
               <button
                 key={id}
                 onClick={() => handleTypeTab(id)}
@@ -204,7 +220,7 @@ export function PatchNotesModal({ onClose }: { onClose: () => void }) {
           </div>
         </div>
 
-        {/* 年タブ（2段目・ピル型、年が複数ある時のみ表示） */}
+        {/* 年タブ */}
         {availableYears.length > 1 && (
           <div className="flex items-center gap-1.5 px-4 py-2 border-b border-gray-100 shrink-0 flex-wrap">
             <button
@@ -215,7 +231,7 @@ export function PatchNotesModal({ onClose }: { onClose: () => void }) {
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
-              全期間
+              {lang === "ja" ? "全期間" : "All"}
             </button>
             {availableYears.map((year) => (
               <button
@@ -227,7 +243,7 @@ export function PatchNotesModal({ onClose }: { onClose: () => void }) {
                     : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
-                {year}年
+                {lang === "ja" ? `${year}年` : year}
               </button>
             ))}
           </div>
@@ -237,7 +253,7 @@ export function PatchNotesModal({ onClose }: { onClose: () => void }) {
         <div className="overflow-y-auto flex-1">
           {filtered.length === 0 ? (
             <div className="px-4 py-8 text-center text-sm text-gray-400">
-              該当する更新はありません
+              {lang === "ja" ? "該当する更新はありません" : "No matching updates"}
             </div>
           ) : effectiveYearTab === "all" ? (
             [...grouped.entries()].map(([year, monthMap], i) => (
@@ -246,10 +262,11 @@ export function PatchNotesModal({ onClose }: { onClose: () => void }) {
                 year={year}
                 monthMap={monthMap}
                 defaultOpen={i === 0}
+                lang={lang}
+                badgeLabel={badgeLabel}
               />
             ))
           ) : (
-            // 特定年選択時は月単位から表示（年ヘッダーは省略）
             [...grouped.values()].flatMap((monthMap) =>
               [...monthMap.entries()].map(([month, entries], i) => (
                 <MonthBlock
@@ -257,6 +274,8 @@ export function PatchNotesModal({ onClose }: { onClose: () => void }) {
                   month={month}
                   entries={entries}
                   defaultOpen={i === 0}
+                  lang={lang}
+                  badgeLabel={badgeLabel}
                 />
               ))
             )
@@ -269,7 +288,7 @@ export function PatchNotesModal({ onClose }: { onClose: () => void }) {
             onClick={onClose}
             className="w-full text-xs py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors font-medium"
           >
-            閉じる
+            {t("close")}
           </button>
         </div>
       </div>

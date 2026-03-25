@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import type { MonsterBase, Element, AttackType } from "../types/game";
 import { getCustomMonsters, setCustomMonsters, getAllMonsters } from "../data/monsters";
 
@@ -37,6 +38,7 @@ const STAT_FIELDS: Array<{ key: keyof MonsterBase; label: string }> = [
 ];
 
 export function MonsterEditor() {
+  const { t } = useTranslation("monsters");
   const [customs, setCustoms] = useState<MonsterBase[]>(() => getCustomMonsters());
   const [form, setForm] = useState<MonsterBase>(DEFAULT_FORM);
   const [captureRateInput, setCaptureRateInput] = useState(String(DEFAULT_FORM.captureRate));
@@ -52,11 +54,11 @@ export function MonsterEditor() {
   function handleSubmit() {
     const name = form.name.trim();
     if (!name) {
-      setError("モンスター名を入力してください");
+      setError(t("nameRequired"));
       return;
     }
     if (form.level < 1) {
-      setError("レベルは1以上にしてください");
+      setError(t("levelMinOne"));
       return;
     }
     // 重複チェック（編集中のものは除外）
@@ -64,7 +66,7 @@ export function MonsterEditor() {
       .filter(m => m.name !== editingName)
       .map(m => m.name);
     if (allNames.includes(name)) {
-      setError("同名のモンスターが既に存在します");
+      setError(t("duplicateName"));
       return;
     }
 
@@ -87,7 +89,7 @@ export function MonsterEditor() {
   }
 
   function handleDelete(name: string) {
-    if (!window.confirm(`「${name}」を削除しますか？`)) return;
+    if (!window.confirm(t("confirmDelete", { name }))) return;
     save(customs.filter(m => m.name !== name));
     if (editingName === name) {
       setForm(DEFAULT_FORM);
@@ -125,9 +127,9 @@ export function MonsterEditor() {
         const imported = data.filter(m => m.name && !existing.has(m.name));
         const skipped = data.length - imported.length;
         save([...customs, ...imported]);
-        alert(`${imported.length}件インポート${skipped > 0 ? `、${skipped}件スキップ（重複）` : ""}`);
+        alert(t("importResult", { imported: imported.length }) + (skipped > 0 ? t("importSkipped", { skipped }) : ""));
       } catch {
-        alert("JSONの読み込みに失敗しました");
+        alert(t("importFailed"));
       }
     };
     reader.readAsText(file);
@@ -182,24 +184,24 @@ export function MonsterEditor() {
       {/* 左：入力フォーム */}
       <div className="bg-white rounded-2xl shadow shadow-gray-200/50 p-4 space-y-3">
         <h2 className="text-sm font-bold text-gray-700">
-          {editingName !== null ? `編集中：${editingName}` : "新規モンスター登録"}
+          {editingName !== null ? t("editing", { name: editingName }) : t("newRegistration")}
         </h2>
 
         {/* 名前 */}
         <div>
-          <label className="text-xs text-gray-500 block mb-1">モンスター名</label>
+          <label className="text-xs text-gray-500 block mb-1">{t("monsterName")}</label>
           <input
             type="text"
             value={form.name}
             onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
             className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
-            placeholder="例：グリーンスライム改"
+            placeholder={t("namePlaceholder")}
           />
         </div>
 
         {/* レベル */}
         <div>
-          <label className="text-xs text-gray-500 block mb-1">レベル</label>
+          <label className="text-xs text-gray-500 block mb-1">{t("level")}</label>
           <input
             {...numHandlers("level")}
             value={form.level || ""}
@@ -209,7 +211,7 @@ export function MonsterEditor() {
 
         {/* 属性 */}
         <div>
-          <label className="text-xs text-gray-500 block mb-1">属性</label>
+          <label className="text-xs text-gray-500 block mb-1">{t("element")}</label>
           <div className="flex gap-1">
             {ELEMENTS.map(el => (
               <button
@@ -221,7 +223,7 @@ export function MonsterEditor() {
                     : "bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100"
                 }`}
               >
-                {el}
+                {t(`game:element.${el}`)}
               </button>
             ))}
           </div>
@@ -229,19 +231,19 @@ export function MonsterEditor() {
 
         {/* 攻撃タイプ */}
         <div>
-          <label className="text-xs text-gray-500 block mb-1">攻撃タイプ</label>
+          <label className="text-xs text-gray-500 block mb-1">{t("attackType")}</label>
           <div className="flex gap-1">
-            {ATTACK_TYPES.map(t => (
+            {ATTACK_TYPES.map(at => (
               <button
-                key={t}
-                onClick={() => setForm(f => ({ ...f, attackType: t }))}
+                key={at}
+                onClick={() => setForm(f => ({ ...f, attackType: at }))}
                 className={`px-3 py-1 rounded-lg text-xs font-medium border transition-all ${
-                  form.attackType === t
+                  form.attackType === at
                     ? "bg-indigo-100 text-indigo-700 border-indigo-300"
                     : "bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100"
                 }`}
               >
-                {t}
+                {t(`game:attackType.${at}`)}
               </button>
             ))}
           </div>
@@ -249,7 +251,7 @@ export function MonsterEditor() {
 
         {/* ステータス */}
         <div>
-          <label className="text-xs text-gray-500 block mb-1">基本ステータス</label>
+          <label className="text-xs text-gray-500 block mb-1">{t("baseStats")}</label>
           <div className="grid grid-cols-4 gap-1.5">
             {STAT_FIELDS.map(({ key, label }) => (
               <div key={key}>
@@ -267,7 +269,7 @@ export function MonsterEditor() {
         {/* 捕獲率・EXP・ゴールド */}
         <div className="grid grid-cols-3 gap-2">
           <div>
-            <label className="text-xs text-gray-500 block mb-1">捕獲率(%)</label>
+            <label className="text-xs text-gray-500 block mb-1">{t("captureRate")}</label>
             <input
               {...captureRateHandlers}
               value={captureRateInput}
@@ -283,7 +285,7 @@ export function MonsterEditor() {
             />
           </div>
           <div>
-            <label className="text-xs text-gray-500 block mb-1">ゴールド</label>
+            <label className="text-xs text-gray-500 block mb-1">{t("game:gold")}</label>
             <input
               {...numHandlers("gold")}
               value={form.gold || ""}
@@ -300,14 +302,14 @@ export function MonsterEditor() {
             onClick={handleSubmit}
             className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2 rounded-lg transition-colors"
           >
-            {editingName !== null ? "更新" : "登録"}
+            {editingName !== null ? t("update") : t("register")}
           </button>
           {editingName !== null && (
             <button
               onClick={handleCancel}
               className="px-4 bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm font-medium py-2 rounded-lg transition-colors"
             >
-              キャンセル
+              {t("common:cancel")}
             </button>
           )}
         </div>
@@ -317,7 +319,7 @@ export function MonsterEditor() {
       <div className="bg-white rounded-2xl shadow shadow-gray-200/50 p-4 space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-bold text-gray-700">
-            登録済み（{customs.length}件）
+            {t("registered", { count: customs.length })}
           </h2>
           <div className="flex gap-1.5">
             <button
@@ -325,13 +327,13 @@ export function MonsterEditor() {
               disabled={customs.length === 0}
               className="text-xs px-3 py-1 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
-              エクスポート
+              {t("common:export")}
             </button>
             <button
               onClick={() => fileInputRef.current?.click()}
               className="text-xs px-3 py-1 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
             >
-              インポート
+              {t("common:import")}
             </button>
             <input
               ref={fileInputRef}
@@ -345,7 +347,7 @@ export function MonsterEditor() {
 
         {customs.length === 0 ? (
           <p className="text-sm text-gray-400 py-8 text-center">
-            カスタムモンスターはまだ登録されていません
+            {t("noCustomMonsters")}
           </p>
         ) : (
           <div className="space-y-1.5 overflow-y-auto max-h-[60vh]">
@@ -363,10 +365,10 @@ export function MonsterEditor() {
                     <span className="text-sm font-medium text-gray-800 truncate">{m.name}</span>
                     <span className="text-xs text-gray-400">Lv{m.level}</span>
                     <span className={`text-[10px] px-1.5 py-0.5 rounded border font-medium ${elementColors[m.element]}`}>
-                      {m.element}
+                      {t(`game:element.${m.element}`)}
                     </span>
                     <span className="text-[10px] px-1.5 py-0.5 rounded border bg-gray-100 text-gray-500 border-gray-200">
-                      {m.attackType}
+                      {t(`game:attackType.${m.attackType}`)}
                     </span>
                   </div>
                   <div className="text-[10px] text-gray-400 mt-0.5">
@@ -378,13 +380,13 @@ export function MonsterEditor() {
                     onClick={() => handleEdit(m)}
                     className="text-xs px-2 py-1 rounded-lg bg-white border border-gray-200 hover:bg-indigo-50 hover:border-indigo-300 text-gray-500 hover:text-indigo-600 transition-colors"
                   >
-                    編集
+                    {t("common:edit")}
                   </button>
                   <button
                     onClick={() => handleDelete(m.name)}
                     className="text-xs px-2 py-1 rounded-lg bg-white border border-gray-200 hover:bg-red-50 hover:border-red-300 text-gray-500 hover:text-red-500 transition-colors"
                   >
-                    削除
+                    {t("common:delete")}
                   </button>
                 </div>
               </div>
@@ -393,7 +395,7 @@ export function MonsterEditor() {
         )}
 
         <p className="text-[10px] text-gray-400 pt-1 border-t border-gray-100">
-          カスタムモンスターはブラウザに保存されます。ダメ計・周回計算でも使用できます。
+          {t("customMonsterNote")}
         </p>
       </div>
     </div>

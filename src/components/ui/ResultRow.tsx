@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 const colorClasses = {
   orange: "text-orange-600",
   purple: "text-purple-600",
@@ -16,6 +18,7 @@ export function ResultRow({
   current?: number;
   color?: keyof typeof colorClasses;
 }) {
+  const { t } = useTranslation();
   const remaining = current !== undefined ? value - current : undefined;
   const isAchieved = remaining !== undefined && remaining <= 0;
 
@@ -34,7 +37,7 @@ export function ResultRow({
                 : "bg-gray-100 text-gray-500"
             }`}
           >
-            {isAchieved ? "達成" : `あと${remaining.toLocaleString()}`}
+            {isAchieved ? t("achieved") : t("remaining", { value: remaining.toLocaleString() })}
           </span>
         )}
       </div>

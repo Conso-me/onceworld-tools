@@ -1,0 +1,67 @@
+{
+  "element": {
+    "火": "火",
+    "水": "水",
+    "木": "木",
+    "光": "光",
+    "闇": "闇"
+  },
+  "elementFilter": {
+    "all": "すべて"
+  },
+  "attackType": {
+    "物理": "物理",
+    "魔弾": "魔弾",
+    "魔攻": "魔攻"
+  },
+  "attackLabel": {
+    "physical": "物理",
+    "magic": "魔法"
+  },
+  "equipSlot": {
+    "武器": "武器",
+    "頭": "頭",
+    "服": "服",
+    "手": "手",
+    "盾": "盾",
+    "脚": "脚"
+  },
+  "dropRarity": {
+    "normal": "ノーマル",
+    "rare": "レア",
+    "superRare": "激レア",
+    "common": "共通"
+  },
+  "dropRarityShort": {
+    "normal": "ノ:",
+    "rare": "レア:",
+    "superRare": "激レア:"
+  },
+  "monster": "モンスター",
+  "selectMonsterPrompt": "敵を選択してレベルを指定",
+  "selectMonster": "モンスターを選択...",
+  "selectMonsterTitle": "モンスター選択",
+  "searchByName": "名前で検索...",
+  "searchMonster": "モンスター名を検索...",
+  "name": "名前",
+  "level": "レベル",
+  "location": "出現場所",
+  "unknownName": "(名称不明)",
+  "noMatchingMonsters": "該当するモンスターがいません",
+  "sortBy": "並び替え:",
+  "captureRate": "捕獲率(%)",
+  "gold": "ゴールド",
+  "accSlot": {
+    "1": "スロット1",
+    "2": "スロット2",
+    "3": "スロット3",
+    "4": "スロット4"
+  },
+  "petSlot": {
+    "1": "ペット1",
+    "2": "ペット2",
+    "3": "ペット3"
+  },
+  "noLimit": "上限なし",
+  "lvUpTo": "Lv~{{max}}"
+}

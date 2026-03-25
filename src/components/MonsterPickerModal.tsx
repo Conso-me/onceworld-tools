@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import type { MonsterBase } from "../types/game";
 import { useAllMonsters } from "../hooks/useAllMonsters";
 
@@ -19,6 +20,7 @@ export function MonsterPickerModal({
   onPick: (monster: MonsterBase) => void;
   onClose: () => void;
 }) {
+  const { t } = useTranslation("monsters");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortKey>("exp_desc");
 
@@ -46,10 +48,10 @@ export function MonsterPickerModal({
   }, [onClose]);
 
   const sortOptions: { key: SortKey; label: string }[] = [
-    { key: "exp_desc", label: "EXP↓" },
-    { key: "exp_asc", label: "EXP↑" },
-    { key: "gold_desc", label: "G↓" },
-    { key: "gold_asc", label: "G↑" },
+    { key: "exp_desc", label: t("sortOptions.expDesc") },
+    { key: "exp_asc", label: t("sortOptions.expAsc") },
+    { key: "gold_desc", label: t("sortOptions.goldDesc") },
+    { key: "gold_asc", label: t("sortOptions.goldAsc") },
   ];
 
   return (
@@ -63,7 +65,7 @@ export function MonsterPickerModal({
       >
         {/* ヘッダー */}
         <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-200 shrink-0">
-          <h3 className="text-sm font-semibold text-gray-700">モンスターを選択</h3>
+          <h3 className="text-sm font-semibold text-gray-700">{t("selectMonster")}</h3>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 text-xl leading-none px-1"
@@ -79,11 +81,11 @@ export function MonsterPickerModal({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             autoFocus
-            placeholder="モンスター名を検索..."
+            placeholder={t("game:searchMonster")}
             className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
           />
           <div className="flex items-center gap-1.5">
-            <span className="text-xs text-gray-400 shrink-0">並び替え:</span>
+            <span className="text-xs text-gray-400 shrink-0">{t("game:sortBy")}</span>
             {sortOptions.map((opt) => (
               <button
                 key={opt.key}
@@ -119,10 +121,10 @@ export function MonsterPickerModal({
                 <span
                   className={`text-xs px-1.5 py-0.5 rounded shrink-0 ${elementColors[monster.element] ?? "bg-gray-100 text-gray-500"}`}
                 >
-                  {monster.element}
+                  {t("game:element." + monster.element)}
                 </span>
                 <span className="text-xs text-gray-400 shrink-0">
-                  {monster.attackType}
+                  {t("game:attackType." + monster.attackType)}
                 </span>
               </div>
               <div className="flex flex-col items-end sm:flex-row sm:items-center gap-0.5 sm:gap-3 shrink-0 ml-2">
@@ -143,7 +145,7 @@ export function MonsterPickerModal({
             onClick={onClose}
             className="w-full text-xs py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors font-medium"
           >
-            閉じる
+            {t("common:close")}
           </button>
         </div>
       </div>

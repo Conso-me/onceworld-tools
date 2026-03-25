@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 export interface Tab {
   id: string;
@@ -15,6 +16,7 @@ export function TabNav({
   tabs: Tab[];
   onTabChange: (tabId: string) => void;
 }) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState(() => {
     const hash = window.location.hash.slice(1);
     const found = tabs.find((t) => t.id === hash && !t.disabled);
@@ -60,7 +62,7 @@ export function TabNav({
           <span className="sm:hidden">{tab.shortLabel ?? tab.label}</span>
           <span className="hidden sm:inline">{tab.label}</span>
           {tab.disabled && (
-            <span className="ml-1 text-xs text-gray-300">準備中</span>
+            <span className="ml-1 text-xs text-gray-300">{t("preparing")}</span>
           )}
         </button>
       ))}
