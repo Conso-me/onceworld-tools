@@ -13,6 +13,15 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-03-26",
+    changes: [
+    { type: "improve", text: "fix: 裏路地同期ONかつ装備設定モード時にsim結果を連携" },
+    { type: "feature", text: "feat: 割り振りポイントにリセットボタンを追加" },
+    { type: "feature", text: "feat: DamageCalculatorに装備設定モードを追加（close #34）" },
+    ],
+  },
+
+  {
     date: "2026-03-20",
     changes: [
     { type: "fix", text: "fix: スクロールバー出現によるレイアウトズレを修正" },
