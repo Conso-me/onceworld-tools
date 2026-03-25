@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { usePersistedState } from "../hooks/usePersistedState";
+import { useSharedSimConfig } from "../hooks/useSharedSimConfig";
 import { useStatPresets } from "../hooks/useStatPresets";
 import { scaleMonster } from "../utils/monsterScaling";
 import {
@@ -9,6 +10,7 @@ import {
   calcDamage,
 } from "../utils/defenseCalc";
 import { calcMultiHitCount } from "../utils/damageCalc";
+import { calcStatus } from "../utils/statusCalc";
 import { getMonsterByName } from "../data/monsters";
 import { InputField } from "./ui/InputField";
 import type { MonsterBase, ScaledMonster } from "../types/game";
@@ -262,6 +264,9 @@ export function ArenaCalculator() {
   const [myVit, setMyVit] = usePersistedState("arena:vit", "");
   const [myLuk, setMyLuk] = usePersistedState("arena:luk", "");
   const [syncWithDmg, setSyncWithDmg] = usePersistedState("arena:sync", false);
+  const [dmgStatMode] = usePersistedState<"manual" | "sim">("dmg:statMode", "manual");
+  const [simCfg] = useSharedSimConfig();
+  const simResult = useMemo(() => calcStatus(simCfg), [simCfg]);
   const [arenaLevel, setArenaLevel] = usePersistedState(
     "arena:level",
     "10000"
@@ -269,26 +274,26 @@ export function ArenaCalculator() {
   const [selectedPresetId, setSelectedPresetId] = useState("");
   const { presets, loadPreset } = useStatPresets();
 
-  // syncON時はdmg:タブのlocalStorage値を直接読む
+  // syncON時はdmg:タブの値を読む（装備設定モード時はsim結果、手動モード時はlocalStorage直読み）
   const effectiveDef = syncWithDmg
-    ? parseInt(
-        JSON.parse(localStorage.getItem("owt:dmg:def") ?? '""') || "0"
-      ) || 0
+    ? dmgStatMode === "sim"
+      ? simResult.final.def
+      : parseInt(JSON.parse(localStorage.getItem("owt:dmg:def") ?? '""') || "0") || 0
     : parseInt(myDef) || 0;
   const effectiveMdef = syncWithDmg
-    ? parseInt(
-        JSON.parse(localStorage.getItem("owt:dmg:mdef") ?? '""') || "0"
-      ) || 0
+    ? dmgStatMode === "sim"
+      ? simResult.final.mdef
+      : parseInt(JSON.parse(localStorage.getItem("owt:dmg:mdef") ?? '""') || "0") || 0
     : parseInt(myMdef) || 0;
   const effectiveVit = syncWithDmg
-    ? parseInt(
-        JSON.parse(localStorage.getItem("owt:dmg:vit") ?? '""') || "0"
-      ) || 0
+    ? dmgStatMode === "sim"
+      ? simResult.final.vit
+      : parseInt(JSON.parse(localStorage.getItem("owt:dmg:vit") ?? '""') || "0") || 0
     : parseInt(myVit) || 0;
   const effectiveLuk = syncWithDmg
-    ? parseInt(
-        JSON.parse(localStorage.getItem("owt:dmg:luck") ?? '""') || "0"
-      ) || 0
+    ? dmgStatMode === "sim"
+      ? simResult.final.luck
+      : parseInt(JSON.parse(localStorage.getItem("owt:dmg:luck") ?? '""') || "0") || 0
     : parseInt(myLuk) || 0;
 
   const playerHp = effectiveVit > 0 ? effectiveVit * 18 + 100 : 0;
