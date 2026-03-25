@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-03-26",
     changes: [
+    { type: "improve", text: "feat: 裏路地の同期先モードを手動で選択できるようにする" },
     { type: "improve", text: "fix: 言語ボタンを「切替先」から「現在の言語」表示に変更" },
     { type: "improve", text: "feat: ダメ計の「自分のステータス」をモバイルで折り畳み可能に" },
     { type: "improve", text: "feat: モバイル対応を強化 (close #35)" },
