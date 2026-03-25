@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { DamageCalculator } from "./components/DamageCalculator";
 import { FarmCalculator } from "./components/FarmCalculator";
@@ -14,10 +14,13 @@ function App() {
   const tabs: Tab[] = [
     { id: "damage", label: t("tabs.damage"), shortLabel: t("tabs.damageShort"), icon: "⚔" },
     { id: "arena", label: t("tabs.arena"), icon: "🏟" },
-    { id: "status", label: t("tabs.status"), icon: "✦" },
+    { id: "status", label: t("tabs.status"), shortLabel: t("tabs.statusShort"), icon: "✦" },
     { id: "farm", label: t("tabs.farm"), shortLabel: t("tabs.farmShort"), icon: "♻" },
     { id: "monsters", label: t("tabs.monsters"), shortLabel: t("tabs.monstersShort"), icon: "📋" },
   ];
+
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   const [activeTab, setActiveTab] = useState(() => {
     const hash = window.location.hash.slice(1);
@@ -34,6 +37,18 @@ function App() {
     document.documentElement.lang = i18n.language;
   }, [i18n.language]);
 
+  // Close mobile menu on outside click
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    function handleClick(e: MouseEvent) {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target as Node)) {
+        setMobileMenuOpen(false);
+      }
+    }
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
+  }, [mobileMenuOpen]);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       {/* ヘッダー */}
@@ -42,20 +57,51 @@ function App() {
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-bold text-indigo-900 tracking-wide whitespace-nowrap">⚔ OnceWorld Tools</h1>
             <div className="flex items-center gap-1.5">
+              {/* Desktop: フィードバック・更新履歴を直接表示 */}
               <a
                 href="https://docs.google.com/forms/d/e/1FAIpQLSf6NFySGmPNkQdFJEIwk11gtyvfiFVoJdwUVlwQ3MkN-vNHcg/viewform?usp=dialog"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs px-2.5 py-1 rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors font-medium"
+                className="hidden sm:inline-flex text-xs px-2.5 py-1 rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors font-medium"
               >
                 {t("feedback")}
               </a>
               <button
                 onClick={() => setShowPatchNotes(true)}
-                className="text-xs px-2.5 py-1 rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors font-medium"
+                className="hidden sm:inline-flex text-xs px-2.5 py-1 rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors font-medium"
               >
                 {t("patchNotes")}
               </button>
+
+              {/* Mobile: ⋯ ドロップダウンメニュー */}
+              <div ref={mobileMenuRef} className="relative sm:hidden">
+                <button
+                  onClick={(e) => { e.stopPropagation(); setMobileMenuOpen((v) => !v); }}
+                  className="text-xs px-2.5 py-1 rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors font-medium"
+                >
+                  ⋯
+                </button>
+                {mobileMenuOpen && (
+                  <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-20 py-1 min-w-[140px]">
+                    <a
+                      href="https://docs.google.com/forms/d/e/1FAIpQLSf6NFySGmPNkQdFJEIwk11gtyvfiFVoJdwUVlwQ3MkN-vNHcg/viewform?usp=dialog"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {t("feedback")}
+                    </a>
+                    <button
+                      onClick={() => { setShowPatchNotes(true); setMobileMenuOpen(false); }}
+                      className="w-full text-left px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50"
+                    >
+                      {t("patchNotes")}
+                    </button>
+                  </div>
+                )}
+              </div>
+
               <button
                 onClick={() => i18n.changeLanguage(i18n.language === "ja" ? "en" : "ja")}
                 className="text-xs px-2.5 py-1 rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors font-medium"

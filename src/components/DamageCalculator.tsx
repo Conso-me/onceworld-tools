@@ -466,7 +466,7 @@ export function DamageCalculator() {
               <button
                 key={mode}
                 onClick={() => setStatMode(mode)}
-                className={`flex-1 py-1.5 font-medium transition-colors ${
+                className={`flex-1 py-2 lg:py-1.5 font-medium transition-colors ${
                   statMode === mode
                     ? "bg-blue-500 text-white"
                     : "bg-white text-gray-500 hover:bg-gray-50"
@@ -489,7 +489,7 @@ export function DamageCalculator() {
                     <button
                       key={el}
                       onClick={() => setMyElement(el)}
-                      className={`flex-1 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                      className={`flex-1 py-2.5 lg:py-1.5 rounded-lg text-xs font-medium border transition-all ${
                         myElement === el
                           ? elementColors[el]
                           : "bg-gray-50 text-gray-400 border-gray-200"
@@ -510,7 +510,7 @@ export function DamageCalculator() {
                   <button
                     key={mode.value}
                     onClick={() => setMyAttackMode(mode.value)}
-                    className={`flex-1 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                    className={`flex-1 py-2.5 lg:py-1.5 rounded-lg text-xs font-medium border transition-all ${
                       myAttackMode === mode.value
                         ? "bg-indigo-100 text-indigo-600 border-indigo-200"
                         : "bg-gray-50 text-gray-400 border-gray-200"

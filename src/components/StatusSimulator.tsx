@@ -33,7 +33,7 @@ function StatTable({ breakdown, label }: { breakdown: ReturnType<typeof calcStat
       <table className="w-full text-sm border-collapse">
         <thead>
           <tr className="bg-gray-50 text-xs text-gray-500">
-            <th className="text-left px-3 py-2 border border-gray-100">{t("table.stat")}</th>
+            <th className="text-left px-3 py-2 border border-gray-100 sticky left-0 bg-gray-50 z-10">{t("table.stat")}</th>
             <th className="text-right px-3 py-2 border border-gray-100">{t("table.alloc")}</th>
             <th className="text-right px-3 py-2 border border-gray-100">{t("table.equipment")}</th>
             {showProtein && <th className="text-right px-3 py-2 border border-gray-100">{t("table.protein")}</th>}
@@ -46,8 +46,8 @@ function StatTable({ breakdown, label }: { breakdown: ReturnType<typeof calcStat
         </thead>
         <tbody>
           {STAT_LABELS.map(({ key, label: statLabel }) => (
-            <tr key={key} className="even:bg-gray-50/50 hover:bg-blue-50/40 transition-colors">
-              <td className="px-3 py-1.5 border border-gray-100 font-medium text-gray-600">{statLabel}</td>
+            <tr key={key} className="group even:bg-gray-50/50 hover:bg-blue-50/40 transition-colors">
+              <td className="px-3 py-1.5 border border-gray-100 font-medium text-gray-600 sticky left-0 bg-white group-even:bg-gray-50/50 group-hover:bg-blue-50/40 z-10">{statLabel}</td>
               <td className="px-3 py-1.5 border border-gray-100 text-right tabular-nums">{alloc[key].toLocaleString()}</td>
               <td className="px-3 py-1.5 border border-gray-100 text-right tabular-nums">{equipment[key].toLocaleString()}</td>
               {showProtein && <td className="px-3 py-1.5 border border-gray-100 text-right tabular-nums">{protein[key].toLocaleString()}</td>}
@@ -59,7 +59,7 @@ function StatTable({ breakdown, label }: { breakdown: ReturnType<typeof calcStat
             </tr>
           ))}
           <tr className="bg-red-50/60 hover:bg-red-50 transition-colors">
-            <td className="px-3 py-1.5 border border-gray-100 font-medium text-red-600">HP</td>
+            <td className="px-3 py-1.5 border border-gray-100 font-medium text-red-600 sticky left-0 bg-red-50/60 z-10">HP</td>
             <td colSpan={showProtein ? 7 : 6} className="px-3 py-1.5 border border-gray-100 text-right text-gray-400 text-xs">{t("table.hpFormula")}</td>
             <td className="px-3 py-1.5 border border-gray-100 text-right tabular-nums font-bold text-red-600">{hp.toLocaleString()}</td>
           </tr>
@@ -88,7 +88,7 @@ function CompareTable({ resultA, resultB }: { resultA: ReturnType<typeof calcSta
       <table className="w-full text-sm border-collapse">
         <thead>
           <tr className="bg-gray-50 text-xs text-gray-500">
-            <th className="text-left px-3 py-2 border border-gray-100">{t("table.stat")}</th>
+            <th className="text-left px-3 py-2 border border-gray-100 sticky left-0 bg-gray-50 z-10">{t("table.stat")}</th>
             <th className="text-right px-3 py-2 border border-gray-100 text-blue-600">{t("configLabel", { id: "A" })}</th>
             <th className="text-right px-3 py-2 border border-gray-100 text-orange-500">{t("configLabel", { id: "B" })}</th>
             <th className="text-right px-3 py-2 border border-gray-100">{t("table.diff")}</th>
@@ -100,8 +100,8 @@ function CompareTable({ resultA, resultB }: { resultA: ReturnType<typeof calcSta
             const b = resultB.final[key];
             const diff = b - a;
             return (
-              <tr key={key} className="even:bg-gray-50/50 hover:bg-gray-100/50 transition-colors">
-                <td className="px-3 py-1.5 border border-gray-100 font-medium text-gray-600">{label}</td>
+              <tr key={key} className="group even:bg-gray-50/50 hover:bg-gray-100/50 transition-colors">
+                <td className="px-3 py-1.5 border border-gray-100 font-medium text-gray-600 sticky left-0 bg-white group-even:bg-gray-50/50 group-hover:bg-gray-100/50 z-10">{label}</td>
                 <td className="px-3 py-1.5 border border-gray-100 text-right tabular-nums text-blue-700 font-medium">{a.toLocaleString()}</td>
                 <td className="px-3 py-1.5 border border-gray-100 text-right tabular-nums text-orange-600 font-medium">{b.toLocaleString()}</td>
                 <td className={`px-3 py-1.5 border border-gray-100 text-right tabular-nums font-bold ${diff > 0 ? "text-green-600" : diff < 0 ? "text-red-500" : "text-gray-400"}`}>
@@ -114,7 +114,7 @@ function CompareTable({ resultA, resultB }: { resultA: ReturnType<typeof calcSta
             const diff = resultB.hp - resultA.hp;
             return (
               <tr className="even:bg-gray-50/50 hover:bg-gray-100/50 transition-colors">
-                <td className="px-3 py-1.5 border border-gray-100 font-medium text-red-600">HP</td>
+                <td className="px-3 py-1.5 border border-gray-100 font-medium text-red-600 sticky left-0 bg-white z-10">HP</td>
                 <td className="px-3 py-1.5 border border-gray-100 text-right tabular-nums text-blue-700 font-medium">{resultA.hp.toLocaleString()}</td>
                 <td className="px-3 py-1.5 border border-gray-100 text-right tabular-nums text-orange-600 font-medium">{resultB.hp.toLocaleString()}</td>
                 <td className={`px-3 py-1.5 border border-gray-100 text-right tabular-nums font-bold ${diff > 0 ? "text-green-600" : diff < 0 ? "text-red-500" : "text-gray-400"}`}>
