@@ -1,0 +1,30 @@
+{
+  "editing": "Editing: {{name}}",
+  "newRegistration": "New Monster",
+  "monsterName": "Monster Name",
+  "namePlaceholder": "e.g. Green Slime+",
+  "level": "Level",
+  "element": "Element",
+  "attackType": "Attack Type",
+  "baseStats": "Base Stats",
+  "captureRate": "Capture Rate (%)",
+  "update": "Update",
+  "register": "Register",
+  "registered": "Registered ({{count}})",
+  "noCustomMonsters": "No custom monsters registered yet",
+  "customMonsterNote": "Custom monsters are saved in browser. Usable in DMG calc & farming.",
+  "confirmDelete": "Delete \"{{name}}\"?",
+  "nameRequired": "Please enter a monster name",
+  "levelMinOne": "Level must be at least 1",
+  "duplicateName": "A monster with this name already exists",
+  "importResult": "{{imported}} imported",
+  "importSkipped": ", {{skipped}} skipped (duplicate)",
+  "importFailed": "Failed to load JSON",
+  "selectMonster": "Select Monster",
+  "sortOptions": {
+    "expDesc": "EXP↓",
+    "expAsc": "EXP↑",
+    "goldDesc": "G↓",
+    "goldAsc": "G↑"
+  }
+}

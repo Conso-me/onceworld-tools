@@ -1,4 +1,5 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { DamageCalculator } from "./components/DamageCalculator";
 import { FarmCalculator } from "./components/FarmCalculator";
 import { StatusSimulator } from "./components/StatusSimulator";
@@ -7,15 +8,17 @@ import { MonsterEditor } from "./components/MonsterEditor";
 import { TabNav, type Tab } from "./components/ui/TabNav";
 import { PatchNotesModal } from "./components/PatchNotesModal";
 
-const tabs: Tab[] = [
-  { id: "damage", label: "ダメージ計算", shortLabel: "ダメ計", icon: "⚔" },
-  { id: "arena", label: "裏路地", icon: "🏟" },
-  { id: "status", label: "ステータス", icon: "✦" },
-  { id: "farm", label: "周回計算", shortLabel: "周回計", icon: "♻" },
-  { id: "monsters", label: "モンスター登録", shortLabel: "MON登録", icon: "📋" },
-];
-
 function App() {
+  const { t, i18n } = useTranslation();
+
+  const tabs: Tab[] = [
+    { id: "damage", label: t("tabs.damage"), shortLabel: t("tabs.damageShort"), icon: "⚔" },
+    { id: "arena", label: t("tabs.arena"), icon: "🏟" },
+    { id: "status", label: t("tabs.status"), icon: "✦" },
+    { id: "farm", label: t("tabs.farm"), shortLabel: t("tabs.farmShort"), icon: "♻" },
+    { id: "monsters", label: t("tabs.monsters"), shortLabel: t("tabs.monstersShort"), icon: "📋" },
+  ];
+
   const [activeTab, setActiveTab] = useState(() => {
     const hash = window.location.hash.slice(1);
     return tabs.find((t) => t.id === hash && !t.disabled)?.id ?? "damage";
@@ -25,6 +28,11 @@ function App() {
   const handleTabChange = useCallback((tabId: string) => {
     setActiveTab(tabId);
   }, []);
+
+  // Sync <html lang> with current language
+  useEffect(() => {
+    document.documentElement.lang = i18n.language;
+  }, [i18n.language]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
@@ -40,13 +48,19 @@ function App() {
                 rel="noopener noreferrer"
                 className="text-xs px-2.5 py-1 rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors font-medium"
               >
-                フィードバック
+                {t("feedback")}
               </a>
               <button
                 onClick={() => setShowPatchNotes(true)}
                 className="text-xs px-2.5 py-1 rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors font-medium"
               >
-                更新履歴
+                {t("patchNotes")}
+              </button>
+              <button
+                onClick={() => i18n.changeLanguage(i18n.language === "ja" ? "en" : "ja")}
+                className="text-xs px-2.5 py-1 rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors font-medium"
+              >
+                {i18n.language === "ja" ? "EN" : "JA"}
               </button>
               <div className="w-px h-4 bg-gray-300 mx-1.5" />
               <a
@@ -63,7 +77,7 @@ function App() {
         </div>
       </header>
 
-      {/* メインコンテンツ - 全タブを常にマウントし、非アクティブはCSSで隠す */}
+      {/* メインコンテンツ */}
       <main className="max-w-3xl lg:max-w-[1400px] mx-auto px-4 py-6 lg:py-2">
         <div className={activeTab === "damage" ? "" : "hidden"}>
           <DamageCalculator />
@@ -84,7 +98,7 @@ function App() {
 
       {/* フッター */}
       <footer className="mt-auto py-3 text-center text-xs text-gray-400">
-        <p>OnceWorld 計算ツール</p>
+        <p>{t("footer")}</p>
       </footer>
 
       {showPatchNotes && <PatchNotesModal onClose={() => setShowPatchNotes(false)} />}

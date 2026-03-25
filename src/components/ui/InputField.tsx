@@ -17,7 +17,7 @@ export function InputField({
 }) {
   const [focused, setFocused] = useState(false);
   const num = parseInt(value || "", 10);
-  const formatted = isNaN(num) ? "" : num.toLocaleString("ja-JP");
+  const formatted = isNaN(num) ? "" : num.toLocaleString();
 
   // フォーカス中はコンマなし（カーソル追跡不要）、フォーカス外はコンマ付き
   const display = focused ? (value || "") : formatted;

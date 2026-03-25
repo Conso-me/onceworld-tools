@@ -1,0 +1,30 @@
+{
+  "editing": "編集中：{{name}}",
+  "newRegistration": "新規モンスター登録",
+  "monsterName": "モンスター名",
+  "namePlaceholder": "例：グリーンスライム改",
+  "level": "レベル",
+  "element": "属性",
+  "attackType": "攻撃タイプ",
+  "baseStats": "基本ステータス",
+  "captureRate": "捕獲率(%)",
+  "update": "更新",
+  "register": "登録",
+  "registered": "登録済み（{{count}}件）",
+  "noCustomMonsters": "カスタムモンスターはまだ登録されていません",
+  "customMonsterNote": "カスタムモンスターはブラウザに保存されます。ダメ計・周回計算でも使用できます。",
+  "confirmDelete": "「{{name}}」を削除しますか？",
+  "nameRequired": "モンスター名を入力してください",
+  "levelMinOne": "レベルは1以上にしてください",
+  "duplicateName": "同名のモンスターが既に存在します",
+  "importResult": "{{imported}}件インポート",
+  "importSkipped": "、{{skipped}}件スキップ（重複）",
+  "importFailed": "JSONの読み込みに失敗しました",
+  "selectMonster": "モンスターを選択",
+  "sortOptions": {
+    "expDesc": "EXP↓",
+    "expAsc": "EXP↑",
+    "goldDesc": "G↓",
+    "goldAsc": "G↑"
+  }
+}

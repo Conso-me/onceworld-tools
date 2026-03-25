@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import type { MonsterBase } from "../types/game";
 import {
   calcScaledExp,
@@ -53,7 +54,7 @@ function FormattedNumberInput({
   id?: string; value: string; onChange: (v: string) => void; placeholder?: string; className: string;
 }) {
   const num = parseInt(value.replace(/,/g, ""), 10);
-  const display = isNaN(num) ? "" : num.toLocaleString("ja-JP");
+  const display = isNaN(num) ? "" : num.toLocaleString();
   return (
     <input
       id={id}
@@ -75,6 +76,7 @@ function fmtDrop(n: number): string {
 }
 
 export function FarmCalculator() {
+  const { t } = useTranslation("farm");
   const [monsterRows, setMonsterRows] = useState<MonsterRow[]>([]);
   const [secondsPerRun, setSecondsPerRun] = usePersistedState("farm:seconds", "60");
   const [expBonus, setExpBonus] = usePersistedState("farm:expBonus", "0");
@@ -210,7 +212,7 @@ export function FarmCalculator() {
           onClick={() => setModalOpen(true)}
           className="w-full py-2.5 bg-indigo-500 text-white rounded-xl font-medium text-sm hover:bg-indigo-600 transition-colors"
         >
-          ＋ モンスターを追加
+          {t("addMonster")}
         </button>
         {modalOpen && (
           <MonsterPickerModal
@@ -243,20 +245,20 @@ export function FarmCalculator() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <label className="flex items-center gap-1 text-xs text-gray-500">
                       Lv
-                      <input type="text" inputMode="numeric" min="1" value={row.level.toLocaleString("ja-JP")}
+                      <input type="text" inputMode="numeric" min="1" value={row.level.toLocaleString()}
                         onChange={(e) => updateRow(row.id, "level", e.target.value.replace(/[^0-9]/g, ""))}
                         className="w-14 px-1.5 py-0.5 bg-white border border-gray-200 rounded-lg text-center text-xs font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-400"
                       />
                     </label>
                     <label className="flex items-center gap-1 text-xs text-gray-500">
                       ×
-                      <input type="text" inputMode="numeric" min="1" value={row.count.toLocaleString("ja-JP")}
+                      <input type="text" inputMode="numeric" min="1" value={row.count.toLocaleString()}
                         onChange={(e) => updateRow(row.id, "count", e.target.value.replace(/[^0-9]/g, ""))}
                         className="w-14 px-1.5 py-0.5 bg-white border border-gray-200 rounded-lg text-center text-xs font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-400"
                       />
                     </label>
                     <label className="flex items-center gap-1 text-xs text-gray-500">
-                      ドロ
+                      {t("dropLabel")}
                       <input type="number" min="0" max="100" step="0.1" value={row.dropRate}
                         onChange={(e) => updateRow(row.id, "dropRate", e.target.value)}
                         className="w-16 px-1.5 py-0.5 bg-white border border-gray-200 rounded-lg text-center text-xs font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-400"
@@ -275,7 +277,7 @@ export function FarmCalculator() {
                     <div className="flex flex-col gap-0.5 border-t border-gray-100 pt-1.5">
                       {row.normalDrop && (
                         <div className="flex items-center text-xs gap-1">
-                          <span className="text-gray-400 shrink-0 w-12">ノ:</span>
+                          <span className="text-gray-400 shrink-0 w-12">{t("game:dropRarityShort.normal")}</span>
                           <span className="text-gray-700 flex-1 truncate">{row.normalDrop}</span>
                           {runsPerHour > 0 && (
                             <span className="text-indigo-500 shrink-0">{fmtDrop(effectiveRate * killsPerHour)}/h</span>
@@ -284,7 +286,7 @@ export function FarmCalculator() {
                       )}
                       {row.rareDrop && (
                         <div className="flex items-center text-xs gap-1">
-                          <span className="text-purple-400 shrink-0 w-12">レア:</span>
+                          <span className="text-purple-400 shrink-0 w-12">{t("game:dropRarityShort.rare")}</span>
                           <span className="text-gray-700 flex-1 truncate">{row.rareDrop}</span>
                           {runsPerHour > 0 && (
                             <span className="text-purple-500 shrink-0">{fmtDrop((effectiveRate / 10) * killsPerHour)}/h</span>
@@ -293,7 +295,7 @@ export function FarmCalculator() {
                       )}
                       {row.superRareDrop && (
                         <div className="flex items-center text-xs gap-1">
-                          <span className="text-orange-400 shrink-0 w-12">激レア:</span>
+                          <span className="text-orange-400 shrink-0 w-12">{t("game:dropRarityShort.superRare")}</span>
                           <span className="text-gray-700 flex-1 truncate">{row.superRareDrop}</span>
                           {runsPerHour > 0 && (
                             <span className="text-orange-500 shrink-0">{fmtDrop((effectiveRate / 100) * killsPerHour)}/h</span>
@@ -313,35 +315,35 @@ export function FarmCalculator() {
       <div className="space-y-4 lg:space-y-2">
         {/* 周回設定 */}
         <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 px-4 py-3 space-y-2">
-          <h3 className="text-xs font-semibold text-gray-500">周回設定</h3>
+          <h3 className="text-xs font-semibold text-gray-500">{t("farmSettings")}</h3>
           {/* 3列グリッド: 行をまたいで列位置を揃える */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-2 gap-y-2 text-xs items-center">
             <label htmlFor="farm-seconds" className="flex items-center gap-1.5 bg-gray-50 rounded-lg px-2 py-1">
-              <span className="font-bold text-gray-700 w-24 shrink-0">1周の秒数</span>
+              <span className="font-bold text-gray-700 w-24 shrink-0">{t("secondsPerRun")}</span>
               <FormattedNumberInput id="farm-seconds" value={secondsPerRun} onChange={setSecondsPerRun}
                 className="flex-1 sm:w-20 px-2 py-1 border border-gray-200 rounded-lg text-center text-xs font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-400" />
             </label>
             <label htmlFor="farm-remaining-exp" className="flex items-center gap-1.5 bg-gray-50 rounded-lg px-2 py-1">
-              <span className="font-bold text-gray-700 w-24 shrink-0">残り必要EXP</span>
+              <span className="font-bold text-gray-700 w-24 shrink-0">{t("remainingExp")}</span>
               <FormattedNumberInput id="farm-remaining-exp" value={remainingExp} onChange={setRemainingExp}
                 placeholder="—"
                 className="flex-1 sm:w-32 px-2 py-1 border border-gray-200 rounded-lg text-center text-xs font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-400" />
             </label>
             <div className="hidden sm:block" />
             <label htmlFor="farm-exp-bonus" className="flex items-center gap-1.5 bg-gray-50 rounded-lg px-2 py-1">
-              <span className="font-bold text-gray-700 w-24 shrink-0">EXPボーナス</span>
+              <span className="font-bold text-gray-700 w-24 shrink-0">{t("expBonus")}</span>
               <FormattedNumberInput id="farm-exp-bonus" value={expBonus} onChange={setExpBonus}
                 className="flex-1 sm:w-20 px-2 py-1 border border-gray-200 rounded-lg text-center text-xs font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-400" />
               <span className="text-gray-400 ml-0.5">%</span>
             </label>
             <label htmlFor="farm-gold-bonus" className="flex items-center gap-1.5 bg-gray-50 rounded-lg px-2 py-1">
-              <span className="font-bold text-gray-700 w-24 shrink-0">Gボーナス</span>
+              <span className="font-bold text-gray-700 w-24 shrink-0">{t("goldBonus")}</span>
               <FormattedNumberInput id="farm-gold-bonus" value={goldBonus} onChange={setGoldBonus}
                 className="flex-1 sm:w-20 px-2 py-1 border border-gray-200 rounded-lg text-center text-xs font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-400" />
               <span className="text-gray-400 ml-0.5">%</span>
             </label>
             <label htmlFor="farm-drop-bonus" className="flex items-center gap-1.5 bg-gray-50 rounded-lg px-2 py-1">
-              <span className="font-bold text-gray-700 w-24 shrink-0">ドロップボーナス</span>
+              <span className="font-bold text-gray-700 w-24 shrink-0">{t("dropBonus")}</span>
               <FormattedNumberInput id="farm-drop-bonus" value={dropBonus} onChange={setDropBonus}
                 className="flex-1 sm:w-20 px-2 py-1 border border-gray-200 rounded-lg text-center text-xs font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-400" />
               <span className="text-gray-400 ml-0.5">%</span>
@@ -353,46 +355,46 @@ export function FarmCalculator() {
         {hasMonsters ? (
           <div className="space-y-2">
             <div className="grid grid-cols-2 gap-2">
-              <StatCard title="経験値効率" accent="indigo">
+              <StatCard title={t("expEfficiency")} accent="indigo">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
-                    <span className="text-sm text-gray-500">1周EXP</span>
+                    <span className="text-sm text-gray-500">{t("expPerRun")}</span>
                     <span className="text-lg font-bold text-indigo-600">{expPerRun.toLocaleString()}</span>
                   </div>
                   <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
-                    <span className="text-sm text-gray-500">時給EXP</span>
+                    <span className="text-sm text-gray-500">{t("expPerHour")}</span>
                     <span className="text-lg font-bold text-indigo-600">{expPerHour.toLocaleString()}</span>
                   </div>
                   {remainingExpNum > 0 && (
                     <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
-                      <span className="text-sm text-gray-500">目標到達時間</span>
+                      <span className="text-sm text-gray-500">{t("timeToGoal")}</span>
                       <span className="text-lg font-bold text-green-600">{timeToGoal}</span>
                     </div>
                   )}
                 </div>
               </StatCard>
-              <StatCard title="ゴールド効率" accent="green">
+              <StatCard title={t("goldEfficiency")} accent="green">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
-                    <span className="text-sm text-gray-500">1周期待G</span>
+                    <span className="text-sm text-gray-500">{t("expectedGoldPerRun")}</span>
                     <span className="text-lg font-bold text-yellow-600">{Math.floor(goldPerRun).toLocaleString()} G</span>
                   </div>
                   <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
-                    <span className="text-sm text-gray-500">時給G</span>
+                    <span className="text-sm text-gray-500">{t("goldPerHour")}</span>
                     <span className="text-lg font-bold text-yellow-600">{goldPerHour.toLocaleString()} G</span>
                   </div>
-                  <p className="text-xs text-gray-400 px-1">※ ドロップ率30%の期待値</p>
+                  <p className="text-xs text-gray-400 px-1">{t("goldDropNote")}</p>
                 </div>
               </StatCard>
             </div>
-            <StatCard title="素材ドロップ（時給期待値）" accent="purple">
+            <StatCard title={t("materialDrop")} accent="purple">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {(["normal", "rare", "superRare"] as const).map((rarity) => {
                   const items = dropsByItem.filter((d) => d.rarity === rarity);
                   return (
                     <div key={rarity}>
                       <p className={`text-xs font-semibold mb-1.5 ${RARITY_VALUE_STYLE[rarity]}`}>
-                        {rarity === "normal" ? "ノーマル" : rarity === "rare" ? "レア" : "激レア"}
+                        {t(`game:dropRarity.${rarity}`)}
                       </p>
                       <div className="space-y-1">
                         {items.length === 0 ? (
@@ -411,7 +413,7 @@ export function FarmCalculator() {
                 })}
                 {/* 共通素材 */}
                 <div>
-                  <p className="text-xs font-semibold mb-1.5 text-teal-600">共通</p>
+                  <p className="text-xs font-semibold mb-1.5 text-teal-600">{t("game:dropRarity.common")}</p>
                   <div className="space-y-1">
                     {commonDropsPerHour.map(({ name, note, count }) => (
                       <div key={name} className="bg-white/60 rounded-lg px-2 py-1.5">
@@ -423,13 +425,13 @@ export function FarmCalculator() {
                 </div>
               </div>
               <p className="text-xs text-gray-400 px-1 mt-2">
-                固有ドロップ率×(1+ボーナス%)で計算。
+                {t("dropCalcNote")}
               </p>
             </StatCard>
           </div>
         ) : (
           <div className="bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 p-8 text-center">
-            <p className="text-sm text-gray-400">モンスターを追加すると計算結果が表示されます</p>
+            <p className="text-sm text-gray-400">{t("noMonsterPrompt")}</p>
           </div>
         )}
       </div>

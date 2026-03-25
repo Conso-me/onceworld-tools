@@ -1,0 +1,40 @@
+{
+  "presetLoad": "プリセット読み込み",
+  "syncWithDmg": "ダメ計と同期",
+  "on": "ON",
+  "off": "OFF",
+  "displayLevel": "表示レベル",
+  "thousandUnit": "(1,000単位)",
+  "nullifiedMonsters": "無効化できているモンスター",
+  "tableHeaders": {
+    "monster": "モンスター",
+    "location": "場所",
+    "type": "種別",
+    "attackPower": "Lv{{level}}攻撃力",
+    "nullify": "無効化",
+    "endurance": "耐久回数",
+    "maxLv": "限界Lv",
+    "additionalDef": "あと必要DEF/MDEF",
+    "lukEvasion": "LUK回避"
+  },
+  "nullifyAchieved": "無効化達成",
+  "notAchieved": "未達成",
+  "cannotNullify": "無効化不可",
+  "lukEvasionGuide": "LUK回避目安：",
+  "lukLevel": {
+    "almost": "ほぼほぼ",
+    "mostly": "大体",
+    "maybe": "たぶん"
+  },
+  "enemyLukMultiplier": "敵LUK×{{n}}",
+  "lukEvasionNote": "※ LUK回避の計算式は非公式です。当たっても知らないよ！確定回避にはなりません。",
+  "additionalNeeded": "あと必要 = <orange>DEF</orange> / <purple>M-DEF</purple> の追加必要値",
+  "area": {
+    "1中央/2ランダム": "1中央/2ランダム",
+    "1左右": "1左右",
+    "2中央": "2中央",
+    "2ランダム": "2ランダム"
+  },
+  "lukEvasionLabel": "LUK（回避判定用）",
+  "comfy": "余裕"
+}

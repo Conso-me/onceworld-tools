@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { usePersistedState } from "../hooks/usePersistedState";
 import { useStatPresets } from "../hooks/useStatPresets";
 import { scaleMonster } from "../utils/monsterScaling";
@@ -11,6 +12,7 @@ import { calcMultiHitCount } from "../utils/damageCalc";
 import { getMonsterByName } from "../data/monsters";
 import { InputField } from "./ui/InputField";
 import type { MonsterBase, ScaledMonster } from "../types/game";
+import type { TFunction } from "i18next";
 
 // ────────────────────────────────────────────
 // アリーナ裏路地 固定モンスター定義
@@ -92,40 +94,40 @@ type ArenaResult = {
   scaledLuck: number;
 };
 
-function LukEvasionBadge({ level, enemyLuk }: { level: LukEvasionLevel; enemyLuk: number }) {
+function LukEvasionBadge({ level, enemyLuk, t }: { level: LukEvasionLevel; enemyLuk: number; t: TFunction }) {
   if (level === "ほぼほぼ") {
     return (
       <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
-        ほぼほぼ
+        {t("lukLevel.almost")}
       </span>
     );
   }
   if (level === "大体") {
     return (
       <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700 border border-yellow-200">
-        大体
+        {t("lukLevel.mostly")}
       </span>
     );
   }
   if (level === "たぶん") {
     return (
       <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-bold bg-orange-100 text-orange-600 border border-orange-200">
-        たぶん
+        {t("lukLevel.maybe")}
       </span>
     );
   }
   return (
     <span className="text-xs text-gray-400">
-      {enemyLuk > 0 ? `×3: ${(enemyLuk * 3).toLocaleString("ja-JP")}` : "—"}
+      {enemyLuk > 0 ? `×3: ${(enemyLuk * 3).toLocaleString()}` : "—"}
     </span>
   );
 }
 
-function NullifyLvBadge({ lv, onClick }: { lv: number | null; onClick?: (lv: number) => void }) {
+function NullifyLvBadge({ lv, onClick, t }: { lv: number | null; onClick?: (lv: number) => void; t: TFunction }) {
   if (lv === null) {
     return (
       <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-600 border border-red-200">
-        無効化不可
+        {t("cannotNullify")}
       </span>
     );
   }
@@ -137,20 +139,24 @@ function NullifyLvBadge({ lv, onClick }: { lv: number | null; onClick?: (lv: num
       className={`text-sm font-medium text-gray-700${onClick ? " cursor-pointer hover:underline hover:text-indigo-600" : ""}`}
       onClick={onClick ? () => onClick(lv) : undefined}
     >
-      Lv {lv.toLocaleString("ja-JP")}
+      Lv {lv.toLocaleString()}
     </span>
   );
 }
 
-function formatHitCount(n: number): string {
+function formatHitCount(n: number, lang: string): string {
   if (!isFinite(n)) return "∞";
-  if (n >= 1_000_000) return `${Math.floor(n / 1_000_000).toLocaleString("ja-JP")}M`;
-  if (n >= 100_000) return `${Math.floor(n / 10_000).toLocaleString("ja-JP")}万`;
-  if (n >= 10_000) return `${(n / 10_000).toFixed(1)}万`;
-  return n.toLocaleString("ja-JP");
+  if (n >= 1_000_000) return `${Math.floor(n / 1_000_000).toLocaleString()}M`;
+  if (lang === "ja") {
+    if (n >= 100_000) return `${Math.floor(n / 10_000).toLocaleString()}万`;
+    if (n >= 10_000) return `${(n / 10_000).toFixed(1)}万`;
+  } else {
+    if (n >= 10_000) return `${Math.floor(n / 1_000).toLocaleString()}K`;
+  }
+  return n.toLocaleString();
 }
 
-function HitsToSurviveBadge({ hits, lukLevel }: { hits: { worst: number; best: number } | null; lukLevel: LukEvasionLevel }) {
+function HitsToSurviveBadge({ hits, lukLevel, lang, t }: { hits: { worst: number; best: number } | null; lukLevel: LukEvasionLevel; lang: string; t: TFunction }) {
   if (hits === null) {
     return <span className="text-gray-400">—</span>;
   }
@@ -158,32 +164,33 @@ function HitsToSurviveBadge({ hits, lukLevel }: { hits: { worst: number; best: n
   if (hits.worst >= 100_000) {
     return (
       <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
-        余裕
+        {t("comfy")}
       </span>
     );
   }
   // 5回未満 & LUK回避が「大体」(×4)に満たない → 危険
   const isDangerous = hits.worst < 5 && lukLevel !== "ほぼほぼ" && lukLevel !== "大体";
-  const worstStr = formatHitCount(hits.worst);
-  const bestStr = formatHitCount(hits.best);
+  const times = t("common:times");
+  const worstStr = formatHitCount(hits.worst, lang);
+  const bestStr = formatHitCount(hits.best, lang);
   if (isDangerous) {
     return (
       <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-600 border border-red-200">
-        {worstStr === bestStr ? `${worstStr}回` : `${worstStr}~${bestStr}回`}
+        {worstStr === bestStr ? `${worstStr}${times}` : `${worstStr}~${bestStr}${times}`}
       </span>
     );
   }
   if (worstStr === bestStr) {
-    return <span className="text-sm text-gray-700">{worstStr}回</span>;
+    return <span className="text-sm text-gray-700">{worstStr}{times}</span>;
   }
   return (
     <span className="text-sm text-gray-700">
-      {worstStr}~{bestStr}回
+      {worstStr}~{bestStr}{times}
     </span>
   );
 }
 
-function ArenaMonsterRow({ result, onLevelClick }: { result: ArenaResult; onLevelClick?: (lv: number) => void }) {
+function ArenaMonsterRow({ result, onLevelClick, t, lang }: { result: ArenaResult; onLevelClick?: (lv: number) => void; t: TFunction; lang: string }) {
   const isDangerous =
     result.hitsToSurvive !== null &&
     result.hitsToSurvive.worst < 5 &&
@@ -202,7 +209,7 @@ function ArenaMonsterRow({ result, onLevelClick }: { result: ArenaResult; onLeve
         {result.base.name}
       </td>
       <td className="px-2 py-1.5 text-gray-500 whitespace-nowrap text-xs">
-        {result.area}
+        {t(`area.${result.area}`)}
       </td>
       <td className="px-2 py-1.5 whitespace-nowrap">
         <span
@@ -212,11 +219,11 @@ function ArenaMonsterRow({ result, onLevelClick }: { result: ArenaResult; onLeve
               : "bg-blue-100 text-blue-700 border-blue-200"
           }`}
         >
-          {result.isPhysical ? "物理" : "魔法"}
+          {result.isPhysical ? t("game:attackLabel.physical") : t("game:attackLabel.magic")}
         </span>
       </td>
       <td className="px-2 py-1.5 text-right font-medium text-gray-700 whitespace-nowrap">
-        {result.enemyStat.toLocaleString("ja-JP")}
+        {result.enemyStat.toLocaleString()}
       </td>
       <td className="px-2 py-1.5 text-center whitespace-nowrap">
         {result.nullifiedNow ? (
@@ -226,20 +233,20 @@ function ArenaMonsterRow({ result, onLevelClick }: { result: ArenaResult; onLeve
         )}
       </td>
       <td className="px-2 py-1.5 text-center whitespace-nowrap">
-        <HitsToSurviveBadge hits={result.hitsToSurvive} lukLevel={result.lukEvasionLevel} />
+        <HitsToSurviveBadge hits={result.hitsToSurvive} lukLevel={result.lukEvasionLevel} lang={lang} t={t} />
       </td>
       <td className="px-2 py-1.5 text-right whitespace-nowrap">
-        <NullifyLvBadge lv={result.maxNullifyLv} onClick={onLevelClick} />
+        <NullifyLvBadge lv={result.maxNullifyLv} onClick={onLevelClick} t={t} />
       </td>
       <td className="px-2 py-1.5 text-right text-xs whitespace-nowrap">
         {result.isPhysical ? (
-          <span className="text-orange-600">{result.additionalDef.toLocaleString("ja-JP")}</span>
+          <span className="text-orange-600">{result.additionalDef.toLocaleString()}</span>
         ) : (
-          <span className="text-purple-600">{result.additionalMdef.toLocaleString("ja-JP")}</span>
+          <span className="text-purple-600">{result.additionalMdef.toLocaleString()}</span>
         )}
       </td>
       <td className="px-2 py-1.5 text-center whitespace-nowrap">
-        <LukEvasionBadge level={result.lukEvasionLevel} enemyLuk={result.scaledLuck} />
+        <LukEvasionBadge level={result.lukEvasionLevel} enemyLuk={result.scaledLuck} t={t} />
       </td>
     </tr>
   );
@@ -249,6 +256,7 @@ function ArenaMonsterRow({ result, onLevelClick }: { result: ArenaResult; onLeve
 // メインコンポーネント
 // ────────────────────────────────────────────
 export function ArenaCalculator() {
+  const { t, i18n } = useTranslation("arena");
   const [myDef, setMyDef] = usePersistedState("arena:def", "");
   const [myMdef, setMyMdef] = usePersistedState("arena:mdef", "");
   const [myVit, setMyVit] = usePersistedState("arena:vit", "");
@@ -371,15 +379,15 @@ export function ArenaCalculator() {
         <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-5 lg:space-y-3">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
-              <span className="text-indigo-500 text-sm">自</span>
+              <span className="text-indigo-500 text-sm">{t("common:self")}</span>
             </div>
-            <h3 className="font-semibold text-gray-800">自分のステータス</h3>
+            <h3 className="font-semibold text-gray-800">{t("common:myStatus")}</h3>
           </div>
 
           {/* プリセット読み込み */}
           <div className="space-y-1.5">
             <label className="block text-xs font-medium text-gray-500">
-              プリセット読み込み
+              {t("presetLoad")}
             </label>
             <div className="flex gap-1.5">
               <select
@@ -387,7 +395,7 @@ export function ArenaCalculator() {
                 onChange={(e) => setSelectedPresetId(e.target.value)}
                 className="flex-1 min-w-0 text-sm rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-gray-700"
               >
-                <option value="">選択...</option>
+                <option value="">{t("common:select")}</option>
                 {presets.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name}
@@ -399,7 +407,7 @@ export function ArenaCalculator() {
                 disabled={!selectedPresetId}
                 className="px-3 py-1.5 text-xs rounded-lg bg-indigo-100 text-indigo-600 font-medium disabled:opacity-40 hover:bg-indigo-200 transition-colors"
               >
-                読み込み
+                {t("common:load")}
               </button>
             </div>
           </div>
@@ -416,7 +424,7 @@ export function ArenaCalculator() {
                   </label>
                   <div className="w-full px-4 py-3 lg:py-2 bg-gray-50 border border-gray-200 rounded-xl text-lg lg:text-base font-medium text-gray-400">
                     {effectiveDef > 0
-                      ? effectiveDef.toLocaleString("ja-JP")
+                      ? effectiveDef.toLocaleString()
                       : "—"}
                   </div>
                 </div>
@@ -426,7 +434,7 @@ export function ArenaCalculator() {
                   </label>
                   <div className="w-full px-4 py-3 lg:py-2 bg-gray-50 border border-gray-200 rounded-xl text-lg lg:text-base font-medium text-gray-400">
                     {effectiveMdef > 0
-                      ? effectiveMdef.toLocaleString("ja-JP")
+                      ? effectiveMdef.toLocaleString()
                       : "—"}
                   </div>
                 </div>
@@ -452,29 +460,29 @@ export function ArenaCalculator() {
                     VIT
                   </label>
                   <div className="w-full px-4 py-3 lg:py-2 bg-gray-50 border border-gray-200 rounded-xl text-lg lg:text-base font-medium text-gray-400">
-                    {effectiveVit > 0 ? effectiveVit.toLocaleString("ja-JP") : "—"}
+                    {effectiveVit > 0 ? effectiveVit.toLocaleString() : "—"}
                   </div>
                 </div>
                 <div className="space-y-1.5 lg:space-y-1">
                   <label className="block text-sm lg:text-xs font-medium text-gray-400">
-                    LUK（回避判定用）
+                    {t("lukEvasionLabel")}
                   </label>
                   <div className="w-full px-4 py-3 lg:py-2 bg-gray-50 border border-gray-200 rounded-xl text-lg lg:text-base font-medium text-gray-400">
-                    {effectiveLuk > 0 ? effectiveLuk.toLocaleString("ja-JP") : "—"}
+                    {effectiveLuk > 0 ? effectiveLuk.toLocaleString() : "—"}
                   </div>
                 </div>
               </>
             ) : (
               <>
                 <InputField label="VIT" value={myVit} onChange={setMyVit} />
-                <InputField label="LUK（回避判定用）" value={myLuk} onChange={setMyLuk} />
+                <InputField label={t("lukEvasionLabel")} value={myLuk} onChange={setMyLuk} />
               </>
             )}
           </div>
 
           {/* ダメ計と同期トグル */}
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-600">ダメ計と同期</span>
+            <span className="text-sm text-gray-600">{t("syncWithDmg")}</span>
             <button
               onClick={() => setSyncWithDmg(!syncWithDmg)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
@@ -492,7 +500,7 @@ export function ArenaCalculator() {
                 syncWithDmg ? "text-indigo-600" : "text-gray-400"
               }`}
             >
-              {syncWithDmg ? "ON" : "OFF"}
+              {syncWithDmg ? t("on") : t("off")}
             </span>
           </div>
 
@@ -501,9 +509,9 @@ export function ArenaCalculator() {
           {/* アリーナレベル */}
           <div className="space-y-1.5">
             <label className="block text-sm lg:text-xs font-medium text-gray-600">
-              表示レベル
+              {t("displayLevel")}
               <span className="ml-1 text-xs text-gray-400 font-normal">
-                (1,000単位)
+                {t("thousandUnit")}
               </span>
             </label>
             <input
@@ -511,7 +519,7 @@ export function ArenaCalculator() {
               inputMode="numeric"
               value={(() => {
                 const n = parseInt(arenaLevel, 10);
-                return isNaN(n) ? "" : n.toLocaleString("ja-JP");
+                return isNaN(n) ? "" : n.toLocaleString();
               })()}
               onChange={(e) => {
                 const raw = e.target.value.replace(/[^0-9]/g, "");
@@ -534,7 +542,7 @@ export function ArenaCalculator() {
         {/* サマリー */}
         <div className="bg-white rounded-2xl shadow shadow-gray-200/50 p-4 space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">無効化できているモンスター</span>
+            <span className="text-sm text-gray-600">{t("nullifiedMonsters")}</span>
             <span
               className={`text-lg font-bold ${
                 nullifiedCount === arenaResults.length
@@ -551,7 +559,7 @@ export function ArenaCalculator() {
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">HP</span>
               <span className="text-lg font-bold text-gray-700">
-                {playerHp.toLocaleString("ja-JP")}
+                {playerHp.toLocaleString()}
               </span>
             </div>
           )}
@@ -564,24 +572,24 @@ export function ArenaCalculator() {
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr className="bg-gray-50 text-xs text-gray-500 border-b border-gray-200">
-                <th className="px-2 py-2 text-left font-medium">モンスター</th>
-                <th className="px-2 py-2 text-left font-medium">場所</th>
-                <th className="px-2 py-2 text-left font-medium">種別</th>
+                <th className="px-2 py-2 text-left font-medium">{t("tableHeaders.monster")}</th>
+                <th className="px-2 py-2 text-left font-medium">{t("tableHeaders.location")}</th>
+                <th className="px-2 py-2 text-left font-medium">{t("tableHeaders.type")}</th>
                 <th className="px-2 py-2 text-right font-medium whitespace-nowrap">
-                  Lv{arenaLevelNum.toLocaleString("ja-JP")}攻撃力
+                  {t("tableHeaders.attackPower", { level: arenaLevelNum.toLocaleString() })}
                 </th>
-                <th className="px-2 py-2 text-center font-medium">無効化</th>
+                <th className="px-2 py-2 text-center font-medium">{t("tableHeaders.nullify")}</th>
                 <th className="px-2 py-2 text-center font-medium whitespace-nowrap">
-                  耐久回数
+                  {t("tableHeaders.endurance")}
                 </th>
                 <th className="px-2 py-2 text-right font-medium whitespace-nowrap">
-                  限界Lv
+                  {t("tableHeaders.maxLv")}
                 </th>
                 <th className="px-2 py-2 text-right font-medium whitespace-nowrap">
-                  あと必要DEF/MDEF
+                  {t("tableHeaders.additionalDef")}
                 </th>
                 <th className="px-2 py-2 text-center font-medium whitespace-nowrap">
-                  LUK回避
+                  {t("tableHeaders.lukEvasion")}
                 </th>
               </tr>
             </thead>
@@ -591,6 +599,8 @@ export function ArenaCalculator() {
                   key={result.base.name}
                   result={result}
                   onLevelClick={(lv) => setArenaLevel(String(lv))}
+                  t={t}
+                  lang={i18n.language}
                 />
               ))}
             </tbody>
@@ -602,31 +612,31 @@ export function ArenaCalculator() {
           <div className="flex gap-4 text-xs text-gray-400">
             <span className="flex items-center gap-1">
               <span className="w-3 h-3 rounded-sm bg-green-100 border border-green-200 inline-block" />
-              無効化達成
+              {t("nullifyAchieved")}
             </span>
             <span className="flex items-center gap-1">
               <span className="w-3 h-3 rounded-sm bg-orange-100 border border-orange-200 inline-block" />
-              未達成
+              {t("notAchieved")}
             </span>
-            <span className="ml-auto">あと必要 = <span className="text-orange-600">DEF</span> / <span className="text-purple-600">M-DEF</span> の追加必要値</span>
+            <span className="ml-auto">{t("tableHeaders.additionalDef")} = <span className="text-orange-600">DEF</span> / <span className="text-purple-600">M-DEF</span></span>
           </div>
           <div className="text-xs text-gray-400 space-y-0.5">
             <div className="flex flex-wrap gap-x-3 gap-y-0.5 items-center">
-              <span className="font-medium text-gray-500">LUK回避目安：</span>
+              <span className="font-medium text-gray-500">{t("lukEvasionGuide")}</span>
               <span className="flex items-center gap-1">
-                <span className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-bold bg-orange-100 text-orange-600 border border-orange-200">たぶん</span>
-                敵LUK×3
+                <span className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-bold bg-orange-100 text-orange-600 border border-orange-200">{t("lukLevel.maybe")}</span>
+                {t("enemyLukMultiplier", { n: 3 })}
               </span>
               <span className="flex items-center gap-1">
-                <span className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700 border border-yellow-200">大体</span>
-                敵LUK×4
+                <span className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700 border border-yellow-200">{t("lukLevel.mostly")}</span>
+                {t("enemyLukMultiplier", { n: 4 })}
               </span>
               <span className="flex items-center gap-1">
-                <span className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">ほぼほぼ</span>
-                敵LUK×5
+                <span className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">{t("lukLevel.almost")}</span>
+                {t("enemyLukMultiplier", { n: 5 })}
               </span>
             </div>
-            <p className="text-gray-400">※ LUK回避の計算式は非公式です。当たっても知らないよ！確定回避にはなりません。</p>
+            <p className="text-gray-400">{t("lukEvasionNote")}</p>
           </div>
         </div>
       </div>
