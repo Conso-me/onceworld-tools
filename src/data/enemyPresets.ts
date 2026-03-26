@@ -132,7 +132,7 @@ export const enemyPresetGroups: EnemyPresetGroup[] = [
       { monsterName: "翡翠竜", level: 99999, location: "アイスリッジ氷葬" },
       { monsterName: "ブタ天使", level: 165000, location: "アイスリッジ氷葬" },
       { monsterName: "氷結晶", level: 165000, location: "アイスリッジ氷葬" },
-      { monsterName: "超越者　リガミア", level: 222222, location: "アイスリッジ氷葬" },
+      { monsterName: "超越者リガミア", level: 222222, location: "アイスリッジ氷葬" },
     ],
   },
 ];
