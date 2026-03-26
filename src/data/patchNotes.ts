@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-03-27",
     changes: [
+    { type: "improve", text: "fix: 超越者リガミアのプリセット名に混入した全角スペースを削除" },
     { type: "feature", text: "feat: Vitestテスト基盤を追加（179テスト）" },
     ],
   },
