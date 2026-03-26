@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-03-27",
+    changes: [
+    { type: "feature", text: "feat: Vitestテスト基盤を追加（179テスト）" },
+    ],
+  },
+
+  {
     date: "2026-03-26",
     changes: [
     { type: "improve", text: "feat: 裏路地の同期先モードを手動で選択できるようにする" },
