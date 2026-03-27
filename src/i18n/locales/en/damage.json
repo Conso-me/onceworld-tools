@@ -5,6 +5,7 @@
   "attackMethod": "Attack Method",
   "analysisBook": "Magic Analysis Book",
   "analysisAnalysisBook": "Analysis of Analysis Book",
+  "crystalCube": "Magic Crystal Cube",
   "showFormula": "Show Formulas",
   "formulaPhysical": "Physical/M.Bullet: (ATK or INT)×1.75 - (DEF+M-DEF/10 or M-DEF+DEF/10)) × 4 × Element",
   "formulaMagic": "Hero Magic: (INT+Book)×1.25×Spell Mult - (M-DEF+DEF/10)) × 4 × Element",

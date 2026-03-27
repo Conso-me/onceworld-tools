@@ -1851,5 +1851,39 @@
     "captureRate": 0.01,
     "exp": 1999999,
     "gold": 5
+  },
+  {
+    "name": "禁域のワイバーン",
+    "level": 0,
+    "element": "水",
+    "attackType": "物理",
+    "vit": 110,
+    "spd": 190,
+    "atk": 80,
+    "int": 40,
+    "def": 210,
+    "mdef": 160,
+    "luck": 170,
+    "mov": 30,
+    "captureRate": 0.1,
+    "exp": 28800,
+    "gold": 10000
+  },
+  {
+    "name": "グラビティスライム",
+    "level": 0,
+    "element": "闇",
+    "attackType": "物理",
+    "vit": 261,
+    "spd": 56,
+    "atk": 186,
+    "int": 24,
+    "def": 221,
+    "mdef": 246,
+    "luck": 117,
+    "mov": 23,
+    "captureRate": 0.1,
+    "exp": 111100,
+    "gold": 8000
   }
 ]
