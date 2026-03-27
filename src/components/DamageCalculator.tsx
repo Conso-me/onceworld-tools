@@ -792,7 +792,7 @@ export function DamageCalculator() {
                             ) : (
                               <>
                                 <span className="text-xs text-gray-400">
-                                  オーバーキル: INT {overkillStatNeeded.toLocaleString()} 必要
+                                  Overkill: INT {overkillStatNeeded.toLocaleString()} 必要
                                 </span>
                                 <span className="text-xs text-orange-500 font-semibold">
                                   (あと +{Math.max(0, overkillStatNeeded - effInt).toLocaleString()})
@@ -868,7 +868,7 @@ export function DamageCalculator() {
                         const shortfall = Math.max(0, needed - currentStat);
                         return (
                           <div className={`flex items-start justify-between py-2 px-3 rounded-lg gap-2 ${offensiveResult.overkillGuaranteed ? "bg-orange-50" : "bg-gray-50"}`}>
-                            <span className={`text-sm font-medium ${offensiveResult.overkillGuaranteed ? "text-orange-700" : "text-gray-500"}`}>オーバーキル</span>
+                            <span className={`text-sm font-medium ${offensiveResult.overkillGuaranteed ? "text-orange-700" : "text-gray-500"}`}>Overkill</span>
                             <div className="flex flex-col items-end gap-0.5">
                               <span className={`text-sm font-bold px-2 py-0.5 rounded-full ${
                                 offensiveResult.overkillGuaranteed
