@@ -21,7 +21,6 @@ export type StatPreset = {
   attackMode: PlayerAttackMode;
   analysisBook: string;
   analysisAnalysisBook: string;
-  crystalCube: string;
 };
 
 function loadFromStorage(): StatPreset[] {

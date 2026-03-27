@@ -81,7 +81,6 @@ export function DamageCalculator() {
   const [myAttackMode, setMyAttackMode] = usePersistedState<PlayerAttackMode>("dmg:attackMode", "物理");
   const [analysisBook, setAnalysisBook] = usePersistedState("dmg:analysisBook", "");
   const [analysisAnalysisBook, setAnalysisAnalysisBook] = usePersistedState("dmg:analysisAnalysisBook", "");
-  const [crystalCube, setCrystalCube] = usePersistedState("dmg:crystalCube", "");
 
   const myAtkNum = parseInt(myAtk) || 0;
   const myIntNum = parseInt(myInt) || 0;
@@ -93,10 +92,8 @@ export function DamageCalculator() {
   const playerHp = myVitNum > 0 ? myVitNum * 18 + 100 : 0;
   const analysisBookNum = parseInt(analysisBook) || 0;
   const analysisAnalysisBookNum = parseInt(analysisAnalysisBook) || 0;
-  const crystalCubeNum = Math.min(parseInt(crystalCube) || 0, 1000);
 
   const magicBaseInt = analysisBookNum * (1 + analysisAnalysisBookNum * 0.1);
-  const crystalCubeMult = 1 + crystalCubeNum * 0.01;
 
   // 装備設定モード
   const [statMode, setStatMode] = usePersistedState<"manual" | "sim">("dmg:statMode", "manual");
@@ -136,9 +133,8 @@ export function DamageCalculator() {
       attackMode: myAttackMode,
       analysisBook,
       analysisAnalysisBook,
-      crystalCube,
     });
-  }, [presetName, presets, savePreset, myAtk, myInt, myDef, myMdef, mySpd, myVit, myLuck, myElement, myAttackMode, analysisBook, analysisAnalysisBook, crystalCube, t]);
+  }, [presetName, presets, savePreset, myAtk, myInt, myDef, myMdef, mySpd, myVit, myLuck, myElement, myAttackMode, analysisBook, analysisAnalysisBook, t]);
 
   const handleLoadPreset = useCallback(() => {
     const preset = loadPreset(selectedPresetId);
@@ -154,8 +150,7 @@ export function DamageCalculator() {
     setMyAttackMode(preset.attackMode);
     setAnalysisBook(preset.analysisBook);
     setAnalysisAnalysisBook(preset.analysisAnalysisBook);
-    setCrystalCube(preset.crystalCube ?? "");
-  }, [selectedPresetId, loadPreset, setMyAtk, setMyInt, setMyDef, setMyMdef, setMySpd, setMyVit, setMyLuck, setMyElement, setMyAttackMode, setAnalysisBook, setAnalysisAnalysisBook, setCrystalCube]);
+  }, [selectedPresetId, loadPreset, setMyAtk, setMyInt, setMyDef, setMyMdef, setMySpd, setMyVit, setMyLuck, setMyElement, setMyAttackMode, setAnalysisBook, setAnalysisAnalysisBook]);
 
   const handleDeletePreset = useCallback(() => {
     deletePreset(selectedPresetId);
@@ -226,11 +221,10 @@ export function DamageCalculator() {
     if (myAttackMode === "魔攻") {
       // 全魔法の結果を計算
       const spellResults = MAGIC_SPELLS.map((spell) => {
-        const effectiveMult = spell.multiplier * crystalCubeMult;
         const dmg = calcPlayerMagicDamage(
           effInt,
           magicBaseInt,
-          effectiveMult,
+          spell.multiplier,
           scaled.scaledDef,
           scaled.scaledMdef,
           selfToEnemyAffinity
@@ -243,7 +237,7 @@ export function DamageCalculator() {
         const minStat = calcMinIntToHit(
           scaled.scaledDef,
           scaled.scaledMdef,
-          effectiveMult,
+          spell.multiplier,
           magicBaseInt
         );
         // N回確殺: hits>1の魔法はN回の使用でN*hits回ヒット
@@ -253,7 +247,7 @@ export function DamageCalculator() {
             scaled.scaledDef,
             scaled.scaledMdef,
             selfToEnemyAffinity,
-            effectiveMult,
+            spell.multiplier,
             magicBaseInt,
             n * spell.hits
           )
@@ -584,12 +578,6 @@ export function DamageCalculator() {
                 label={t("analysisAnalysisBook")}
                 value={analysisAnalysisBook}
                 onChange={setAnalysisAnalysisBook}
-                max={1000}
-              />
-              <InputField
-                label={t("crystalCube")}
-                value={crystalCube}
-                onChange={setCrystalCube}
                 max={1000}
               />
             </div>
