@@ -289,7 +289,8 @@ export function DamageCalculator() {
         effInt,
         scaled.scaledDef,
         scaled.scaledMdef,
-        selfToEnemyAffinity
+        selfToEnemyAffinity,
+        crystalCubeMult
       );
     }
 
@@ -300,7 +301,7 @@ export function DamageCalculator() {
     if (myAttackMode === "物理") {
       minStat = calcMinAtkToHit(scaled.scaledDef, scaled.scaledMdef);
     } else {
-      minStat = calcMinIntToHitMadan(scaled.scaledDef, scaled.scaledMdef);
+      minStat = calcMinIntToHitMadan(scaled.scaledDef, scaled.scaledMdef, crystalCubeMult);
     }
 
     // N回確殺用ステータス（1〜3回分）
@@ -324,7 +325,7 @@ export function DamageCalculator() {
         const requiredDmgPerTurn = Math.ceil(scaled.hp / n);
         const requiredBase =
           requiredDmgPerTurn / 4 / selfToEnemyAffinity / 0.9 / multiHit;
-        return Math.max(Math.ceil((requiredBase + effectiveDef) / 1.75), 0);
+        return Math.max(Math.ceil((requiredBase + effectiveDef) / 1.75 / crystalCubeMult), 0);
       }
     });
 
@@ -342,10 +343,10 @@ export function DamageCalculator() {
     if (myAttackMode === "物理") {
       overkillStatNeeded = calcAtkForKill(scaled.hp * 10, scaled.scaledDef, scaled.scaledMdef, selfToEnemyAffinity, multiHit, 1);
     } else {
-      // 魔弾: (int * 1.75 - effectiveDef) * 4 * affinity * 0.9 * multiHit >= hp * 10
+      // 魔弾: (int * 1.75 * mult - effectiveDef) * 4 * affinity * 0.9 * multiHit >= hp * 10
       const effectiveDef = calcEffectiveDef(scaled.scaledDef, scaled.scaledMdef, false);
       const requiredBase = (scaled.hp * 10) / 4 / selfToEnemyAffinity / 0.9 / multiHit;
-      overkillStatNeeded = Math.max(Math.ceil((requiredBase + effectiveDef) / 1.75), 0);
+      overkillStatNeeded = Math.max(Math.ceil((requiredBase + effectiveDef) / 1.75 / crystalCubeMult), 0);
     }
 
     return { mode: myAttackMode as "物理" | "魔弾", dmg, multiHit, hitsToKill, minStat, targetStats, hitRate, overkillGuaranteed, overkillPossible, overkillStatNeeded };

@@ -71,16 +71,17 @@ export function calcPlayerMagicDamage(
 
 /**
  * ペット/敵の魔弾ダメージ計算
- * (INT × 1.75 - effectiveDef) × 4 × elementAffinity
+ * (INT × 1.75 × mult - effectiveDef) × 4 × elementAffinity
  */
 export function calcPetMagicDamage(
   int: number,
   enemyDef: number,
   enemyMdef: number,
-  elementAffinity: number = 1.0
+  elementAffinity: number = 1.0,
+  mult: number = 1.0
 ): DamageRange {
   const effectiveDef = calcEffectiveDef(enemyDef, enemyMdef, false);
-  const base = Math.max(int * 1.75 - effectiveDef, 0) * 4 * elementAffinity;
+  const base = Math.max(int * 1.75 * mult - effectiveDef, 0) * 4 * elementAffinity;
   return makeDamageRange(base);
 }
 
@@ -156,10 +157,11 @@ export function calcMinAtkToHit(
  */
 export function calcMinIntToHitMadan(
   enemyDef: number,
-  enemyMdef: number
+  enemyMdef: number,
+  mult: number = 1.0
 ): number {
   const effectiveDef = calcEffectiveDef(enemyDef, enemyMdef, false);
-  return Math.ceil(effectiveDef / 1.75);
+  return Math.ceil(effectiveDef / (1.75 * mult));
 }
 
 /**
