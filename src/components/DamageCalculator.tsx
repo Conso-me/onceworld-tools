@@ -586,12 +586,14 @@ export function DamageCalculator() {
                 onChange={setAnalysisAnalysisBook}
                 max={1000}
               />
+              {/* 魔晶立方体: 実装確認中のため一時非表示
               <InputField
                 label={t("crystalCube")}
                 value={crystalCube}
                 onChange={setCrystalCube}
                 max={1000}
               />
+              */}
             </div>
           )}
 
