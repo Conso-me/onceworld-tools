@@ -7,6 +7,8 @@ export function InputField({
   placeholder = "0",
   className = "",
   max,
+  showReset,
+  showMax,
 }: {
   label: string;
   value: string;
@@ -14,6 +16,8 @@ export function InputField({
   placeholder?: string;
   className?: string;
   max?: number;
+  showReset?: boolean;
+  showMax?: boolean;
 }) {
   const [focused, setFocused] = useState(false);
   const num = parseInt(value || "", 10);
@@ -35,7 +39,31 @@ export function InputField({
 
   return (
     <div className={`space-y-1.5 lg:space-y-1 ${className}`}>
-      <label className="block text-sm lg:text-xs font-medium text-gray-600">{label}</label>
+      <div className="flex items-center justify-between gap-1">
+        <label className="block text-sm lg:text-xs font-medium text-gray-600">{label}</label>
+        {(showReset || showMax) && (
+          <div className="flex gap-1">
+            {showReset && (
+              <button
+                type="button"
+                onClick={() => onChange("")}
+                className="text-xs px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors leading-none"
+              >
+                ✕
+              </button>
+            )}
+            {showMax && max !== undefined && (
+              <button
+                type="button"
+                onClick={() => onChange(String(max))}
+                className="text-xs px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-600 hover:bg-indigo-200 transition-colors leading-none font-medium"
+              >
+                MAX
+              </button>
+            )}
+          </div>
+        )}
+      </div>
       <input
         ref={inputRef}
         type="text"
