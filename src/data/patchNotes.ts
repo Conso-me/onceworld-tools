@@ -15,6 +15,12 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-03-27",
     changes: [
+    { type: "feature", text: "feat: 魔晶立方体（魔法ダメージ+1%/個、最大1000個）を追加" },
+    { type: "feature", text: "Revert \"feat: 魔晶立方体（魔法ダメージ+1%/個、最大1000個）を追加\"" },
+    { type: "feature", text: "Revert \"chore: 魔晶立方体のUI入力欄を一時非表示（実装確認中）\"" },
+    { type: "feature", text: "feat: 魔晶立方体（魔法ダメージ+1%/個、最大1000個）を追加" },
+    { type: "improve", text: "fix: 暴君シリーズを装備設定に表示・既存暴君盾をシリーズ分類に変更" },
+    { type: "feature", text: "feat: ver1.7.0コンテンツを追加" },
     { type: "improve", text: "fix: 超越者リガミアのプリセット名に混入した全角スペースを削除" },
     { type: "feature", text: "feat: Vitestテスト基盤を追加（179テスト）" },
     ],
