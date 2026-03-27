@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-03-27",
     changes: [
+    { type: "feature", text: "feat: ダメージ計算結果のSNSシェア用テキストコピー機能を追加" },
     { type: "improve", text: "fix: ダメージ計算の与ダメージ結果を常時全表示に変更" },
     { type: "feature", text: "Revert \"feat: 魔晶立方体（魔法ダメージ+1%/個、最大1000個）を追加\"" },
     { type: "feature", text: "Revert \"chore: 魔晶立方体のUI入力欄を一時非表示（実装確認中）\"" },
