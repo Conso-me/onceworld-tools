@@ -135,6 +135,36 @@ export const enemyPresetGroups: EnemyPresetGroup[] = [
       { monsterName: "超越者リガミア", level: 222222, location: "アイスリッジ氷葬" },
     ],
   },
+  {
+    mapLabel: "雪山【禁域】",
+    label: "雪山【禁域】",
+    presets: [
+      { monsterName: "禁域のワイバーン", level: 35000, location: "雪山【禁域】" },
+      { monsterName: "BOX", level: 50000, location: "雪山【禁域】" },
+      { monsterName: "浮遊イカ", level: 15000, location: "雪山【禁域】" },
+      { monsterName: "雪だるまん", level: 15000, location: "雪山【禁域】" },
+      { monsterName: "マッドシャーク", level: 17000, location: "雪山【禁域】" },
+      { monsterName: "キメラキング", level: 32000, location: "雪山【禁域】" },
+      { monsterName: "時空竜クロノゼリウス", level: 28000, location: "雪山【禁域】" },
+    ],
+  },
+  {
+    mapLabel: "循環宇宙",
+    label: "循環宇宙",
+    presets: [
+      { monsterName: "零の者", level: 999, location: "循環宇宙" },
+      { monsterName: "黎明神トモダチ", level: 999, location: "循環宇宙" },
+      { monsterName: "残燃モエコ", level: 999, location: "循環宇宙" },
+      { monsterName: "朽ちざる竜骸イゾ", level: 999, location: "循環宇宙" },
+    ],
+  },
+  {
+    mapLabel: "循環宇宙２",
+    label: "循環宇宙２",
+    presets: [
+      { monsterName: "グラビティスライム", level: 118000, location: "循環宇宙２" },
+    ],
+  },
 ];
 
 export function formatPresetLabel(preset: EnemyPreset): string {
