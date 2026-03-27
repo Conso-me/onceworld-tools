@@ -25,5 +25,15 @@
   "manualInput": "Manual",
   "goldPerRunLabel": "Gold/Run",
   "goldPerHourLabel": "Gold/Hour",
-  "overKillNote": "On OVER KILL"
+  "overKillNote": "On OVER KILL",
+  "fromAreaPreset": "By Area",
+  "areaPresetTitle": "Area Presets",
+  "addAllInGroup": "Add This Group",
+  "selectMap": "Select Area",
+  "customPresets": "Custom Presets",
+  "savePreset": "Save",
+  "loadPreset": "Load",
+  "deletePreset": "Delete",
+  "presetNamePlaceholder": "Enter preset name",
+  "noSavedPresets": "No saved presets"
 }
