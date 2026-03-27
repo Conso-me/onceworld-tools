@@ -83,6 +83,8 @@ export function DamageCalculator() {
   const [analysisAnalysisBook, setAnalysisAnalysisBook] = usePersistedState("dmg:analysisAnalysisBook", "");
   const [crystalCube, setCrystalCube] = usePersistedState("dmg:crystalCube", "");
   const [crystalCubeMode, setCrystalCubeMode] = usePersistedState<"pre-def" | "final">("dmg:crystalCubeMode", "final");
+  // 物理オーバーキル計算に多段攻撃を含めるか（現状ゲーム内では多段でOKが発生しないためデフォルトOFF）
+  const [physOverkillMultiHit, setPhysOverkillMultiHit] = usePersistedState("dmg:physOverkillMultiHit", false);
 
   const myAtkNum = parseInt(myAtk) || 0;
   const myIntNum = parseInt(myInt) || 0;
@@ -345,18 +347,22 @@ export function DamageCalculator() {
       : null;
 
     const overkillThreshold = scaled.hp * 10;
-    const totalMinDmg = dmg.isNullified ? 0 : dmg.min * multiHit;
-    const totalMaxDmg = dmg.isNullified ? 0 : dmg.max * multiHit;
+    // 物理は多段OKフラグで切り替え、魔弾は常に多段適用
+    // 物理：トグルで切り替え（デフォルト単発のみ）
+    // 魔弾：各着弾は個別の単発扱いのため常に1
+    const overkillHitCount = myAttackMode === "物理" ? (physOverkillMultiHit ? multiHit : 1) : 1;
+    const totalMinDmg = dmg.isNullified ? 0 : dmg.min * overkillHitCount;
+    const totalMaxDmg = dmg.isNullified ? 0 : dmg.max * overkillHitCount;
     const overkillGuaranteed = !dmg.isNullified && totalMinDmg >= overkillThreshold;
     const overkillPossible = !dmg.isNullified && totalMaxDmg >= overkillThreshold;
 
     let overkillStatNeeded: number;
     if (myAttackMode === "物理") {
-      overkillStatNeeded = calcAtkForKill(scaled.hp * 10, scaled.scaledDef, scaled.scaledMdef, selfToEnemyAffinity, multiHit, 1);
+      overkillStatNeeded = calcAtkForKill(scaled.hp * 10, scaled.scaledDef, scaled.scaledMdef, selfToEnemyAffinity, overkillHitCount, 1);
     } else {
       // 魔弾: (int * 1.75 * preMult - effectiveDef) * 4 * affinity * 0.9 * multiHit * finalMult >= hp * 10
       const effectiveDef = calcEffectiveDef(scaled.scaledDef, scaled.scaledMdef, false);
-      const requiredBase = (scaled.hp * 10) / 4 / selfToEnemyAffinity / 0.9 / multiHit;
+      const requiredBase = (scaled.hp * 10) / 4 / selfToEnemyAffinity / 0.9 / overkillHitCount;
       overkillStatNeeded = Math.max(Math.ceil((requiredBase / crystalCubeFinalMult + effectiveDef) / (1.75 * crystalCubePreMult)), 0);
     }
 
@@ -372,6 +378,7 @@ export function DamageCalculator() {
     magicBaseInt,
     crystalCubeMult,
     crystalCubeMode,
+    physOverkillMultiHit,
   ]);
 
   // ===== 被ダメージ計算 =====
@@ -998,7 +1005,22 @@ export function DamageCalculator() {
                         const shortfall = Math.max(0, needed - currentStat);
                         return (
                           <div className={`flex items-start justify-between py-2 px-3 rounded-lg gap-2 ${offensiveResult.overkillGuaranteed ? "bg-orange-50" : "bg-gray-50"}`}>
-                            <span className={`text-sm font-medium ${offensiveResult.overkillGuaranteed ? "text-orange-700" : "text-gray-500"}`}>Overkill</span>
+                            <div className="flex flex-col gap-0.5">
+                              <span className={`text-sm font-medium ${offensiveResult.overkillGuaranteed ? "text-orange-700" : "text-gray-500"}`}>Overkill</span>
+                              {offensiveResult.mode === "物理" && (
+                                <button
+                                  onClick={() => setPhysOverkillMultiHit(!physOverkillMultiHit)}
+                                  className={`text-xs px-1.5 py-0.5 rounded border transition-colors ${
+                                    physOverkillMultiHit
+                                      ? "bg-orange-100 border-orange-300 text-orange-600"
+                                      : "bg-gray-100 border-gray-300 text-gray-500"
+                                  }`}
+                                  title="物理オーバーキル計算に多段攻撃を含めるか切り替え"
+                                >
+                                  {physOverkillMultiHit ? "多段可" : "単発のみ"}
+                                </button>
+                              )}
+                            </div>
                             <div className="flex flex-col items-end gap-0.5">
                               <span className={`text-sm font-bold px-2 py-0.5 rounded-full ${
                                 offensiveResult.overkillGuaranteed
