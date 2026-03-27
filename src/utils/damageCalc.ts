@@ -73,17 +73,20 @@ export function calcPlayerMagicDamage(
 
 /**
  * ペット/敵の魔弾ダメージ計算
- * (INT × 1.75 - effectiveDef) × 4 × elementAffinity × finalMult
+ * (INT × 1.75 × preMult - effectiveDef) × 4 × elementAffinity × finalMult
+ * preMult: 防御計算前に掛ける倍率（魔晶立方体・防御前モード時）
+ * finalMult: 最終ダメージに掛ける倍率（魔晶立方体・最終モード時）
  */
 export function calcPetMagicDamage(
   int: number,
   enemyDef: number,
   enemyMdef: number,
   elementAffinity: number = 1.0,
-  finalMult: number = 1.0
+  finalMult: number = 1.0,
+  preMult: number = 1.0
 ): DamageRange {
   const effectiveDef = calcEffectiveDef(enemyDef, enemyMdef, false);
-  const base = Math.max(int * 1.75 - effectiveDef, 0) * 4 * elementAffinity * finalMult;
+  const base = Math.max(int * 1.75 * preMult - effectiveDef, 0) * 4 * elementAffinity * finalMult;
   return makeDamageRange(base);
 }
 
@@ -156,14 +159,15 @@ export function calcMinAtkToHit(
 
 /**
  * 魔弾ダメージを1にする最低INT
- * 最終乗算は最低ダメージラインに影響しないため mult は不要
+ * preMult: 防御前モード時は crystalCubeMult を渡す（最終モード時は1）
  */
 export function calcMinIntToHitMadan(
   enemyDef: number,
-  enemyMdef: number
+  enemyMdef: number,
+  preMult: number = 1.0
 ): number {
   const effectiveDef = calcEffectiveDef(enemyDef, enemyMdef, false);
-  return Math.ceil(effectiveDef / 1.75);
+  return Math.ceil(effectiveDef / (1.75 * preMult));
 }
 
 /**
