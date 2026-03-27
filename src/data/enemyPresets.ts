@@ -136,7 +136,7 @@ export const enemyPresetGroups: EnemyPresetGroup[] = [
     ],
   },
   {
-    mapLabel: "雪山【禁域】",
+    mapLabel: "アイスリッジ山",
     label: "雪山【禁域】",
     presets: [
       { monsterName: "禁域のワイバーン", level: 35000, location: "雪山【禁域】" },
@@ -159,7 +159,7 @@ export const enemyPresetGroups: EnemyPresetGroup[] = [
     ],
   },
   {
-    mapLabel: "循環宇宙２",
+    mapLabel: "循環宇宙",
     label: "循環宇宙２",
     presets: [
       { monsterName: "グラビティスライム", level: 118000, location: "循環宇宙２" },
