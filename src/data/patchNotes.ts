@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-03-27",
     changes: [
+    { type: "feature", text: "feat: 周回計算にエリアプリセット追加とカスタムプリセット保存機能を実装" },
     { type: "improve", text: "feat: 魔晶立方体の計算タイミングを画面で切替可能に" },
     { type: "improve", text: "fix: 魔晶立方体を最終ダメージへの乗算として正しく反映" },
     { type: "improve", text: "fix: 魔弾モードに魔晶立方体の効果を反映" },
