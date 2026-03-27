@@ -25,5 +25,15 @@
   "manualInput": "手入力",
   "goldPerRunLabel": "1周ゴールド",
   "goldPerHourLabel": "時給ゴールド",
-  "overKillNote": "OVER KILL時"
+  "overKillNote": "OVER KILL時",
+  "fromAreaPreset": "エリアから",
+  "areaPresetTitle": "エリアプリセット",
+  "addAllInGroup": "この構成を追加",
+  "selectMap": "エリア選択",
+  "customPresets": "カスタムプリセット",
+  "savePreset": "保存",
+  "loadPreset": "読み込む",
+  "deletePreset": "削除",
+  "presetNamePlaceholder": "プリセット名を入力",
+  "noSavedPresets": "保存済みプリセットなし"
 }

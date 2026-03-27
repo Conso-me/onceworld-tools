@@ -14,9 +14,11 @@ import {
   type MonsterGoldEntry,
 } from "../utils/goldCalc";
 import { getMonsterDropInfo } from "../data/monsterDrops";
+import { getMonsterByName } from "../data/monsters";
 import { usePersistedState } from "../hooks/usePersistedState";
 import { StatCard } from "./ui/StatCard";
 import { MonsterPickerModal } from "./MonsterPickerModal";
+import { AreaPresetModal, type AreaMonsterEntry } from "./AreaPresetModal";
 
 interface MonsterRow {
   id: number;
@@ -27,6 +29,35 @@ interface MonsterRow {
   normalDrop: string;
   rareDrop: string;
   superRareDrop: string;
+}
+
+interface FarmCustomPreset {
+  id: string;
+  name: string;
+  savedAt: number;
+  rows: Array<{
+    monsterName: string;
+    level: number;
+    count: number;
+    dropRate: number;
+    normalDrop: string;
+    rareDrop: string;
+    superRareDrop: string;
+  }>;
+}
+
+const CUSTOM_PRESETS_KEY = "farm:custom_presets";
+
+function loadCustomPresets(): FarmCustomPreset[] {
+  try {
+    const raw = localStorage.getItem(CUSTOM_PRESETS_KEY);
+    if (raw) return JSON.parse(raw) as FarmCustomPreset[];
+  } catch {}
+  return [];
+}
+
+function saveCustomPresets(presets: FarmCustomPreset[]): void {
+  localStorage.setItem(CUSTOM_PRESETS_KEY, JSON.stringify(presets));
 }
 
 const COMMON_DROPS = [
@@ -85,6 +116,10 @@ export function FarmCalculator() {
   const [remainingExp, setRemainingExp] = usePersistedState("farm:remaining", "");
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [areaModalOpen, setAreaModalOpen] = useState(false);
+  const [customPresets, setCustomPresets] = useState<FarmCustomPreset[]>(loadCustomPresets);
+  const [presetPanelOpen, setPresetPanelOpen] = useState(false);
+  const [presetName, setPresetName] = useState("");
 
   const handleMonsterPick = useCallback((monster: MonsterBase) => {
     const dropInfo = getMonsterDropInfo(monster.name);
@@ -102,6 +137,70 @@ export function FarmCalculator() {
       },
     ]);
   }, []);
+
+  const handleAreaPresetPick = useCallback((entries: AreaMonsterEntry[]) => {
+    setMonsterRows((prev) => [
+      ...prev,
+      ...entries.map((e) => ({
+        id: nextId++,
+        monster: e.monster,
+        level: e.level,
+        count: e.count,
+        dropRate: e.dropRate,
+        normalDrop: e.normalDrop,
+        rareDrop: e.rareDrop,
+        superRareDrop: e.superRareDrop,
+      })),
+    ]);
+  }, []);
+
+  const savePreset = useCallback(() => {
+    const name = presetName.trim();
+    if (!name || monsterRows.length === 0) return;
+    const preset: FarmCustomPreset = {
+      id: Date.now().toString(),
+      name,
+      savedAt: Date.now(),
+      rows: monsterRows.map((r) => ({
+        monsterName: r.monster.name,
+        level: r.level,
+        count: r.count,
+        dropRate: r.dropRate,
+        normalDrop: r.normalDrop,
+        rareDrop: r.rareDrop,
+        superRareDrop: r.superRareDrop,
+      })),
+    };
+    const updated = [...customPresets, preset];
+    setCustomPresets(updated);
+    saveCustomPresets(updated);
+    setPresetName("");
+  }, [presetName, monsterRows, customPresets]);
+
+  const loadPreset = useCallback((preset: FarmCustomPreset) => {
+    const rows: MonsterRow[] = [];
+    for (const r of preset.rows) {
+      const monster = getMonsterByName(r.monsterName);
+      if (!monster) continue;
+      rows.push({
+        id: nextId++,
+        monster,
+        level: r.level,
+        count: r.count,
+        dropRate: r.dropRate,
+        normalDrop: r.normalDrop,
+        rareDrop: r.rareDrop,
+        superRareDrop: r.superRareDrop,
+      });
+    }
+    setMonsterRows(rows);
+  }, []);
+
+  const deletePreset = useCallback((id: string) => {
+    const updated = customPresets.filter((p) => p.id !== id);
+    setCustomPresets(updated);
+    saveCustomPresets(updated);
+  }, [customPresets]);
 
   const removeMonster = (id: number) => {
     setMonsterRows((prev) => prev.filter((r) => r.id !== id));
@@ -208,16 +307,30 @@ export function FarmCalculator() {
     <div className="max-w-lg mx-auto space-y-6 lg:max-w-none lg:space-y-0 lg:grid lg:grid-cols-[minmax(340px,420px)_1fr] lg:gap-2 lg:items-start">
       {/* Column 1: モンスターリスト */}
       <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-4">
-        <button
-          onClick={() => setModalOpen(true)}
-          className="w-full py-2.5 bg-indigo-500 text-white rounded-xl font-medium text-sm hover:bg-indigo-600 transition-colors"
-        >
-          {t("addMonster")}
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setModalOpen(true)}
+            className="flex-1 py-2.5 bg-indigo-500 text-white rounded-xl font-medium text-sm hover:bg-indigo-600 transition-colors"
+          >
+            {t("addMonster")}
+          </button>
+          <button
+            onClick={() => setAreaModalOpen(true)}
+            className="flex-1 py-2.5 bg-indigo-100 text-indigo-600 rounded-xl font-medium text-sm hover:bg-indigo-200 transition-colors"
+          >
+            {t("fromAreaPreset")}
+          </button>
+        </div>
         {modalOpen && (
           <MonsterPickerModal
             onPick={handleMonsterPick}
             onClose={() => setModalOpen(false)}
+          />
+        )}
+        {areaModalOpen && (
+          <AreaPresetModal
+            onPickGroup={handleAreaPresetPick}
+            onClose={() => setAreaModalOpen(false)}
           />
         )}
 
@@ -309,6 +422,78 @@ export function FarmCalculator() {
             })}
           </div>
         )}
+        {/* カスタムプリセット */}
+        <div className="border-t border-gray-100 pt-3">
+          <button
+            onClick={() => setPresetPanelOpen((v) => !v)}
+            className="flex items-center justify-between w-full text-xs font-semibold text-gray-500 hover:text-gray-700 transition-colors"
+          >
+            <span>{t("customPresets")}</span>
+            <svg
+              className={`w-3.5 h-3.5 transition-transform ${presetPanelOpen ? "rotate-180" : ""}`}
+              fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          {presetPanelOpen && (
+            <div className="mt-2 space-y-2">
+              {/* 保存フォーム */}
+              {hasMonsters && (
+                <div className="flex gap-1.5">
+                  <input
+                    type="text"
+                    value={presetName}
+                    onChange={(e) => setPresetName(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter") savePreset(); }}
+                    placeholder={t("presetNamePlaceholder")}
+                    className="flex-1 px-2.5 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-400"
+                  />
+                  <button
+                    onClick={savePreset}
+                    disabled={!presetName.trim()}
+                    className="px-3 py-1.5 bg-indigo-500 text-white text-xs font-medium rounded-lg hover:bg-indigo-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {t("savePreset")}
+                  </button>
+                </div>
+              )}
+
+              {/* 保存済みプリセット一覧 */}
+              {customPresets.length === 0 ? (
+                <p className="text-xs text-gray-300 text-center py-1">{t("noSavedPresets")}</p>
+              ) : (
+                <div className="space-y-1">
+                  {customPresets.map((preset) => (
+                    <div key={preset.id} className="flex items-center gap-1.5 bg-gray-50 rounded-lg px-2.5 py-1.5">
+                      <span className="flex-1 text-xs text-gray-700 truncate" title={preset.name}>
+                        {preset.name}
+                      </span>
+                      <span className="text-[10px] text-gray-400 shrink-0">
+                        {preset.rows.length}体
+                      </span>
+                      <button
+                        onClick={() => loadPreset(preset)}
+                        className="text-xs text-indigo-500 hover:text-indigo-700 font-medium shrink-0"
+                      >
+                        {t("loadPreset")}
+                      </button>
+                      <button
+                        onClick={() => deletePreset(preset.id)}
+                        className="text-gray-300 hover:text-red-400 transition-colors shrink-0"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Column 2: 周回設定 + 結果 */}
