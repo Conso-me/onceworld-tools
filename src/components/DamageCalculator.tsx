@@ -82,6 +82,7 @@ export function DamageCalculator() {
   const [analysisBook, setAnalysisBook] = usePersistedState("dmg:analysisBook", "");
   const [analysisAnalysisBook, setAnalysisAnalysisBook] = usePersistedState("dmg:analysisAnalysisBook", "");
   const [crystalCube, setCrystalCube] = usePersistedState("dmg:crystalCube", "");
+  const [crystalCubeMode, setCrystalCubeMode] = usePersistedState<"pre-def" | "final">("dmg:crystalCubeMode", "final");
 
   const myAtkNum = parseInt(myAtk) || 0;
   const myIntNum = parseInt(myInt) || 0;
@@ -97,6 +98,9 @@ export function DamageCalculator() {
 
   const magicBaseInt = analysisBookNum * (1 + analysisAnalysisBookNum * 0.1);
   const crystalCubeMult = 1 + crystalCubeNum * 0.01;
+  // 計算タイミングに応じて分配
+  const crystalCubePreMult  = crystalCubeMode === "pre-def" ? crystalCubeMult : 1;
+  const crystalCubeFinalMult = crystalCubeMode === "final"   ? crystalCubeMult : 1;
 
   // 装備設定モード
   const [statMode, setStatMode] = usePersistedState<"manual" | "sim">("dmg:statMode", "manual");
@@ -226,14 +230,15 @@ export function DamageCalculator() {
     if (myAttackMode === "魔攻") {
       // 全魔法の結果を計算
       const spellResults = MAGIC_SPELLS.map((spell) => {
-        const effectiveMult = spell.multiplier * crystalCubeMult;
+        const effectiveMult = spell.multiplier * crystalCubePreMult;
         const dmg = calcPlayerMagicDamage(
           effInt,
           magicBaseInt,
           effectiveMult,
           scaled.scaledDef,
           scaled.scaledMdef,
-          selfToEnemyAffinity
+          selfToEnemyAffinity,
+          crystalCubeFinalMult
         );
         const hitsToKill = calcHitsToKill(scaled.hp, dmg.isNullified ? 1 : dmg.min, spell.hits);
         const totalMin = dmg.isNullified ? spell.hits : dmg.min * spell.hits;
@@ -255,7 +260,8 @@ export function DamageCalculator() {
             selfToEnemyAffinity,
             effectiveMult,
             magicBaseInt,
-            n * spell.hits
+            n * spell.hits,
+            crystalCubeFinalMult
           )
         );
         const overkillThreshold = scaled.hp * 10;
@@ -268,7 +274,8 @@ export function DamageCalculator() {
           selfToEnemyAffinity,
           effectiveMult,
           magicBaseInt,
-          spell.hits
+          spell.hits,
+          crystalCubeFinalMult
         );
         return { spell, dmg, totalMin, totalMax, totalCritMin, totalCritMax, hitsToKill, minStat, targetStats, overkillGuaranteed, overkillPossible, overkillStatNeeded };
       });
@@ -289,7 +296,9 @@ export function DamageCalculator() {
         effInt,
         scaled.scaledDef,
         scaled.scaledMdef,
-        selfToEnemyAffinity
+        selfToEnemyAffinity,
+        crystalCubeFinalMult,
+        crystalCubePreMult
       );
     }
 
@@ -300,7 +309,7 @@ export function DamageCalculator() {
     if (myAttackMode === "物理") {
       minStat = calcMinAtkToHit(scaled.scaledDef, scaled.scaledMdef);
     } else {
-      minStat = calcMinIntToHitMadan(scaled.scaledDef, scaled.scaledMdef);
+      minStat = calcMinIntToHitMadan(scaled.scaledDef, scaled.scaledMdef, crystalCubePreMult);
     }
 
     // N回確殺用ステータス（1〜3回分）
@@ -324,7 +333,9 @@ export function DamageCalculator() {
         const requiredDmgPerTurn = Math.ceil(scaled.hp / n);
         const requiredBase =
           requiredDmgPerTurn / 4 / selfToEnemyAffinity / 0.9 / multiHit;
-        return Math.max(Math.ceil((requiredBase + effectiveDef) / 1.75), 0);
+        // (INT×1.75×preMult - def)×4×aff×0.9×multi×finalMult >= hp/n
+        // INT >= (requiredBase/finalMult + def) / (1.75×preMult)
+        return Math.max(Math.ceil((requiredBase / crystalCubeFinalMult + effectiveDef) / (1.75 * crystalCubePreMult)), 0);
       }
     });
 
@@ -342,10 +353,10 @@ export function DamageCalculator() {
     if (myAttackMode === "物理") {
       overkillStatNeeded = calcAtkForKill(scaled.hp * 10, scaled.scaledDef, scaled.scaledMdef, selfToEnemyAffinity, multiHit, 1);
     } else {
-      // 魔弾: (int * 1.75 - effectiveDef) * 4 * affinity * 0.9 * multiHit >= hp * 10
+      // 魔弾: (int * 1.75 * preMult - effectiveDef) * 4 * affinity * 0.9 * multiHit * finalMult >= hp * 10
       const effectiveDef = calcEffectiveDef(scaled.scaledDef, scaled.scaledMdef, false);
       const requiredBase = (scaled.hp * 10) / 4 / selfToEnemyAffinity / 0.9 / multiHit;
-      overkillStatNeeded = Math.max(Math.ceil((requiredBase + effectiveDef) / 1.75), 0);
+      overkillStatNeeded = Math.max(Math.ceil((requiredBase / crystalCubeFinalMult + effectiveDef) / (1.75 * crystalCubePreMult)), 0);
     }
 
     return { mode: myAttackMode as "物理" | "魔弾", dmg, multiHit, hitsToKill, minStat, targetStats, hitRate, overkillGuaranteed, overkillPossible, overkillStatNeeded };
@@ -358,6 +369,8 @@ export function DamageCalculator() {
     myAttackMode,
     selfToEnemyAffinity,
     magicBaseInt,
+    crystalCubeMult,
+    crystalCubeMode,
   ]);
 
   // ===== 被ダメージ計算 =====
@@ -599,7 +612,7 @@ export function DamageCalculator() {
             </div>
           )}
 
-          {/* 魔法設定（魔攻モード時のみ） */}
+          {/* 魔法設定（魔攻モード: 解析書） */}
           {myAttackMode === "魔攻" && (
             <div className="grid grid-cols-2 gap-4 pt-2 border-t border-gray-100">
               <InputField
@@ -618,14 +631,47 @@ export function DamageCalculator() {
                 showReset
                 showMax
               />
-              <InputField
-                label={t("crystalCube")}
-                value={crystalCube}
-                onChange={setCrystalCube}
-                max={1000}
-                showReset
-                showMax
-              />
+            </div>
+          )}
+
+          {/* 魔晶立方体（魔攻・魔弾共通） */}
+          {(myAttackMode === "魔攻" || myAttackMode === "魔弾") && (
+            <div className="pt-2 border-t border-gray-100 space-y-2">
+              <div className="grid grid-cols-2 gap-4">
+                <InputField
+                  label={t("crystalCube")}
+                  value={crystalCube}
+                  onChange={setCrystalCube}
+                  max={1000}
+                  showReset
+                  showMax
+                />
+              </div>
+              <div className="flex items-center gap-3 text-xs text-gray-500">
+                <span>計算タイミング:</span>
+                <label className="flex items-center gap-1 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="crystalCubeMode"
+                    value="final"
+                    checked={crystalCubeMode === "final"}
+                    onChange={() => setCrystalCubeMode("final")}
+                    className="accent-blue-500"
+                  />
+                  <span className={crystalCubeMode === "final" ? "text-blue-600" : ""}>最終ダメージ</span>
+                </label>
+                <label className="flex items-center gap-1 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="crystalCubeMode"
+                    value="pre-def"
+                    checked={crystalCubeMode === "pre-def"}
+                    onChange={() => setCrystalCubeMode("pre-def")}
+                    className="accent-blue-500"
+                  />
+                  <span className={crystalCubeMode === "pre-def" ? "text-blue-600" : ""}>防御計算前</span>
+                </label>
+              </div>
             </div>
           )}
 

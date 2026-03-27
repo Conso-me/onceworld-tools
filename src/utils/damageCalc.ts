@@ -50,7 +50,7 @@ export function calcPhysicalDamage(
 
 /**
  * 主人公魔法ダメージ計算
- * ((INT + analysisBook) × 1.25 × magicMult - effectiveDef) × 4 × elementAffinity
+ * ((INT + analysisBook) × 1.25 × magicMult - effectiveDef) × 4 × elementAffinity × finalMult
  */
 export function calcPlayerMagicDamage(
   int: number,
@@ -58,29 +58,35 @@ export function calcPlayerMagicDamage(
   magicMult: number,
   enemyDef: number,
   enemyMdef: number,
-  elementAffinity: number = 1.0
+  elementAffinity: number = 1.0,
+  finalMult: number = 1.0
 ): DamageRange {
   const effectiveDef = calcEffectiveDef(enemyDef, enemyMdef, false);
   const rawAtk = int + analysisBook;
   const base =
     Math.max(rawAtk * 1.25 * magicMult - effectiveDef, 0) *
     4 *
-    elementAffinity;
+    elementAffinity *
+    finalMult;
   return makeDamageRange(base);
 }
 
 /**
  * ペット/敵の魔弾ダメージ計算
- * (INT × 1.75 - effectiveDef) × 4 × elementAffinity
+ * (INT × 1.75 × preMult - effectiveDef) × 4 × elementAffinity × finalMult
+ * preMult: 防御計算前に掛ける倍率（魔晶立方体・防御前モード時）
+ * finalMult: 最終ダメージに掛ける倍率（魔晶立方体・最終モード時）
  */
 export function calcPetMagicDamage(
   int: number,
   enemyDef: number,
   enemyMdef: number,
-  elementAffinity: number = 1.0
+  elementAffinity: number = 1.0,
+  finalMult: number = 1.0,
+  preMult: number = 1.0
 ): DamageRange {
   const effectiveDef = calcEffectiveDef(enemyDef, enemyMdef, false);
-  const base = Math.max(int * 1.75 - effectiveDef, 0) * 4 * elementAffinity;
+  const base = Math.max(int * 1.75 * preMult - effectiveDef, 0) * 4 * elementAffinity * finalMult;
   return makeDamageRange(base);
 }
 
@@ -153,13 +159,15 @@ export function calcMinAtkToHit(
 
 /**
  * 魔弾ダメージを1にする最低INT
+ * preMult: 防御前モード時は crystalCubeMult を渡す（最終モード時は1）
  */
 export function calcMinIntToHitMadan(
   enemyDef: number,
-  enemyMdef: number
+  enemyMdef: number,
+  preMult: number = 1.0
 ): number {
   const effectiveDef = calcEffectiveDef(enemyDef, enemyMdef, false);
-  return Math.ceil(effectiveDef / 1.75);
+  return Math.ceil(effectiveDef / (1.75 * preMult));
 }
 
 /**
@@ -217,12 +225,13 @@ export function calcIntForKill(
   elementAffinity: number,
   magicMult: number,
   analysisBook: number,
-  targetTurns: number
+  targetTurns: number,
+  finalMult: number = 1.0
 ): number {
   const effectiveDef = calcEffectiveDef(enemyDef, enemyMdef, false);
   // プレイヤー魔法は多段なし
   const requiredDmgPerTurn = Math.ceil(enemyHP / targetTurns);
-  const requiredBase = requiredDmgPerTurn / 4 / elementAffinity / 0.9;
+  const requiredBase = requiredDmgPerTurn / 4 / elementAffinity / 0.9 / finalMult;
   return Math.max(
     Math.ceil((requiredBase + effectiveDef) / (1.25 * magicMult) - analysisBook),
     0
