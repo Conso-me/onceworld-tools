@@ -226,14 +226,14 @@ export function DamageCalculator() {
     if (myAttackMode === "魔攻") {
       // 全魔法の結果を計算
       const spellResults = MAGIC_SPELLS.map((spell) => {
-        const effectiveMult = spell.multiplier * crystalCubeMult;
         const dmg = calcPlayerMagicDamage(
           effInt,
           magicBaseInt,
-          effectiveMult,
+          spell.multiplier,
           scaled.scaledDef,
           scaled.scaledMdef,
-          selfToEnemyAffinity
+          selfToEnemyAffinity,
+          crystalCubeMult
         );
         const hitsToKill = calcHitsToKill(scaled.hp, dmg.isNullified ? 1 : dmg.min, spell.hits);
         const totalMin = dmg.isNullified ? spell.hits : dmg.min * spell.hits;
@@ -243,7 +243,7 @@ export function DamageCalculator() {
         const minStat = calcMinIntToHit(
           scaled.scaledDef,
           scaled.scaledMdef,
-          effectiveMult,
+          spell.multiplier,
           magicBaseInt
         );
         // N回確殺: hits>1の魔法はN回の使用でN*hits回ヒット
@@ -253,9 +253,10 @@ export function DamageCalculator() {
             scaled.scaledDef,
             scaled.scaledMdef,
             selfToEnemyAffinity,
-            effectiveMult,
+            spell.multiplier,
             magicBaseInt,
-            n * spell.hits
+            n * spell.hits,
+            crystalCubeMult
           )
         );
         const overkillThreshold = scaled.hp * 10;
@@ -266,9 +267,10 @@ export function DamageCalculator() {
           scaled.scaledDef,
           scaled.scaledMdef,
           selfToEnemyAffinity,
-          effectiveMult,
+          spell.multiplier,
           magicBaseInt,
-          spell.hits
+          spell.hits,
+          crystalCubeMult
         );
         return { spell, dmg, totalMin, totalMax, totalCritMin, totalCritMax, hitsToKill, minStat, targetStats, overkillGuaranteed, overkillPossible, overkillStatNeeded };
       });
@@ -301,7 +303,7 @@ export function DamageCalculator() {
     if (myAttackMode === "物理") {
       minStat = calcMinAtkToHit(scaled.scaledDef, scaled.scaledMdef);
     } else {
-      minStat = calcMinIntToHitMadan(scaled.scaledDef, scaled.scaledMdef, crystalCubeMult);
+      minStat = calcMinIntToHitMadan(scaled.scaledDef, scaled.scaledMdef);
     }
 
     // N回確殺用ステータス（1〜3回分）
@@ -325,7 +327,7 @@ export function DamageCalculator() {
         const requiredDmgPerTurn = Math.ceil(scaled.hp / n);
         const requiredBase =
           requiredDmgPerTurn / 4 / selfToEnemyAffinity / 0.9 / multiHit;
-        return Math.max(Math.ceil((requiredBase + effectiveDef) / 1.75 / crystalCubeMult), 0);
+        return Math.max(Math.ceil((requiredBase / crystalCubeMult + effectiveDef) / 1.75), 0);
       }
     });
 
@@ -343,10 +345,10 @@ export function DamageCalculator() {
     if (myAttackMode === "物理") {
       overkillStatNeeded = calcAtkForKill(scaled.hp * 10, scaled.scaledDef, scaled.scaledMdef, selfToEnemyAffinity, multiHit, 1);
     } else {
-      // 魔弾: (int * 1.75 * mult - effectiveDef) * 4 * affinity * 0.9 * multiHit >= hp * 10
+      // 魔弾: (int * 1.75 - effectiveDef) * 4 * affinity * 0.9 * multiHit * crystalCubeMult >= hp * 10
       const effectiveDef = calcEffectiveDef(scaled.scaledDef, scaled.scaledMdef, false);
       const requiredBase = (scaled.hp * 10) / 4 / selfToEnemyAffinity / 0.9 / multiHit;
-      overkillStatNeeded = Math.max(Math.ceil((requiredBase + effectiveDef) / 1.75 / crystalCubeMult), 0);
+      overkillStatNeeded = Math.max(Math.ceil((requiredBase / crystalCubeMult + effectiveDef) / 1.75), 0);
     }
 
     return { mode: myAttackMode as "物理" | "魔弾", dmg, multiHit, hitsToKill, minStat, targetStats, hitRate, overkillGuaranteed, overkillPossible, overkillStatNeeded };
@@ -359,6 +361,7 @@ export function DamageCalculator() {
     myAttackMode,
     selfToEnemyAffinity,
     magicBaseInt,
+    crystalCubeMult,
   ]);
 
   // ===== 被ダメージ計算 =====
