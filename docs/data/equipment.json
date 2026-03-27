@@ -692,7 +692,7 @@
   {
     "name": "暴君盾",
     "slot": "盾",
-    "series": null,
+    "series": "暴君",
     "material": "強化できない",
     "vit": 99000,
     "spd": 0,
@@ -940,21 +940,6 @@
     "int": 400,
     "def": 950,
     "mdef": 0,
-    "luck": 0,
-    "mov": 0,
-    "special": null
-  },
-  {
-    "name": "暴君盾",
-    "slot": "盾",
-    "series": "暴君",
-    "material": "強化できない",
-    "vit": 99000,
-    "spd": 0,
-    "atk": 99000,
-    "int": 0,
-    "def": 99000,
-    "mdef": 99000,
     "luck": 0,
     "mov": 0,
     "special": null
