@@ -15,6 +15,9 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-03-27",
     changes: [
+    { type: "fix", text: "fix: 魔攻スペルのオーバーキルstat行が消える問題を修正" },
+    { type: "improve", text: "feat: オーバーキル表示を改善" },
+    { type: "feature", text: "feat: 魔法設定のリセット/MAXボタンとオーバーキル表示を追加" },
     { type: "feature", text: "feat: 魔晶立方体（魔法ダメージ+1%/個、最大1000個）を追加" },
     { type: "feature", text: "Revert \"feat: 魔晶立方体（魔法ダメージ+1%/個、最大1000個）を追加\"" },
     { type: "feature", text: "Revert \"chore: 魔晶立方体のUI入力欄を一時非表示（実装確認中）\"" },
