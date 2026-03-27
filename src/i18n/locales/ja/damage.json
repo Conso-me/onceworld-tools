@@ -5,6 +5,7 @@
   "attackMethod": "攻撃方法",
   "analysisBook": "魔法解析書",
   "analysisAnalysisBook": "解析書の解析書",
+  "crystalCube": "魔晶立方体",
   "showFormula": "計算式を表示",
   "formulaPhysical": "物理/魔弾: (ATK or INT)×1.75 - (DEF+M-DEF/10 or M-DEF+DEF/10)) × 4 × 属性",
   "formulaMagic": "主人公魔法: (INT+解析書)×1.25×魔法倍率 - (M-DEF+DEF/10)) × 4 × 属性",
