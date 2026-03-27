@@ -15,6 +15,9 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-03-27",
     changes: [
+    { type: "improve", text: "fix: ダメージ計算の与ダメージ結果を常時全表示に変更" },
+    { type: "feature", text: "Revert \"feat: 魔晶立方体（魔法ダメージ+1%/個、最大1000個）を追加\"" },
+    { type: "feature", text: "Revert \"chore: 魔晶立方体のUI入力欄を一時非表示（実装確認中）\"" },
     { type: "feature", text: "feat: 周回計算にエリアプリセット追加とカスタムプリセット保存機能を実装" },
     { type: "improve", text: "feat: 魔晶立方体の計算タイミングを画面で切替可能に" },
     { type: "improve", text: "fix: 魔晶立方体を最終ダメージへの乗算として正しく反映" },
