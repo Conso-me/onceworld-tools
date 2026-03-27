@@ -121,6 +121,7 @@ export function DamageCalculator() {
   const [presetName, setPresetName] = useState("");
   const [selectedPresetId, setSelectedPresetId] = useState("");
   const [presetModalOpen, setPresetModalOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
   const { presets, savePreset, loadPreset, deletePreset } = useStatPresets();
 
   const handleSavePreset = useCallback(() => {
@@ -432,6 +433,63 @@ export function DamageCalculator() {
   const hasMyOffenseStats =
     (myAttackMode === "物理" ? effAtk > 0 : effInt > 0) && hasMonster;
   const hasMyDefenseStats = (effDef > 0 || effMdef > 0) && hasMonster;
+
+  const handleCopyShareText = useCallback(async () => {
+    if (!scaled || !offensiveResult) return;
+
+    const lines: string[] = [];
+    lines.push("【OnceWorld ダメージ計算】");
+    lines.push(`vs ${scaled.name} Lv${monsterLevel}(${scaled.element})`);
+
+    const statLabel = myAttackMode === "物理" ? `ATK${effAtk.toLocaleString()}` : `INT${effInt.toLocaleString()}`;
+    lines.push(`自: ${myAttackMode}/${effElement} | ${statLabel} DEF${effDef.toLocaleString()} M${effMdef.toLocaleString()} SPD${effSpd.toLocaleString()}`);
+
+    if (statMode === "sim") {
+      const equips = [simCfg.equipWeapon, simCfg.equipHead, simCfg.equipBody, simCfg.equipHand, simCfg.equipShield, simCfg.equipFoot]
+        .filter(Boolean).join("/");
+      const accs = [simCfg.acc1, simCfg.acc2, simCfg.acc3, simCfg.acc4].filter(Boolean).join("/");
+      if (equips) lines.push(`装備: ${equips}`);
+      if (accs) lines.push(`アクセ: ${accs}`);
+    }
+
+    if (offensiveResult.mode === "魔攻") {
+      const validSpells = offensiveResult.spellResults.filter((r) => !r.dmg.isNullified);
+      if (validSpells.length > 0) {
+        lines.push("与ダメ（魔攻）:");
+        validSpells.forEach(({ spell, totalMin, totalMax, totalCritMin, totalCritMax, hitsToKill }) => {
+          const killStr = hitsToKill === Infinity ? "∞確殺" : `${hitsToKill}確殺`;
+          lines.push(`  ${spell.name}: ${totalMin.toLocaleString()}〜${totalMax.toLocaleString()} (クリ${totalCritMin.toLocaleString()}〜${totalCritMax.toLocaleString()}) ${killStr}`);
+        });
+      } else {
+        lines.push("与ダメ: 防御貫通不可");
+      }
+    } else {
+      if (!offensiveResult.dmg.isNullified) {
+        const { min, max, critMin, critMax } = offensiveResult.dmg;
+        lines.push(`与ダメ: ${min.toLocaleString()}〜${max.toLocaleString()} (クリ${critMin.toLocaleString()}〜${critMax.toLocaleString()})`);
+        const killStr = offensiveResult.hitsToKill === Infinity ? "∞" : `${offensiveResult.hitsToKill}`;
+        lines.push(`${offensiveResult.multiHit}段攻撃 / ${killStr}回確殺`);
+      } else {
+        lines.push("与ダメ: 防御貫通不可");
+      }
+    }
+
+    lines.push("#OnceWorld");
+
+    const text = lines.join("\n");
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [scaled, offensiveResult, monsterLevel, myAttackMode, effElement, effAtk, effInt, effDef, effMdef, effSpd, statMode, simCfg]);
 
   const elements: Element[] = ["火", "水", "木", "光", "闇"];
   const attackModes: { value: PlayerAttackMode; label: string }[] = [
@@ -769,7 +827,35 @@ export function DamageCalculator() {
 
       {/* 与ダメージ */}
       <div className="space-y-2">
-        <h3 className="font-semibold text-gray-700 px-1">{t("offensiveDamage")}</h3>
+        <div className="flex items-center justify-between px-1">
+          <h3 className="font-semibold text-gray-700">{t("offensiveDamage")}</h3>
+          {hasMonster && offensiveResult && (
+            <button
+              onClick={handleCopyShareText}
+              className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium transition-all ${
+                copied
+                  ? "bg-green-100 text-green-600"
+                  : "bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700"
+              }`}
+            >
+              {copied ? (
+                <>
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
+                  コピー済
+                </>
+              ) : (
+                <>
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  シェア
+                </>
+              )}
+            </button>
+          )}
+        </div>
 
         {hasMonster && offensiveResult ? (<>
 
