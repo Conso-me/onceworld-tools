@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-03-27",
     changes: [
+    { type: "improve", text: "fix: 敵プリセットのマップグループを整理" },
     { type: "fix", text: "fix: 物理オーバーキル計算を単発基準に修正、多段切り替えトグルを追加" },
     { type: "feature", text: "feat: ダメージ計算結果のSNSシェア用テキストコピー機能を追加" },
     { type: "improve", text: "fix: ダメージ計算の与ダメージ結果を常時全表示に変更" },
