@@ -895,19 +895,17 @@ export function DamageCalculator() {
                           {offensiveResult.multiHit}{t("common:times")}
                         </span>
                       </div>
-                      {!offensiveResult.dmg.isNullified && (
-                        <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
-                          <span className="text-sm text-gray-500">
-                            {t("hitsToKill")}
-                          </span>
-                          <span className="font-bold text-gray-700">
-                            {offensiveResult.hitsToKill === Infinity
-                              ? "∞"
-                              : `${offensiveResult.hitsToKill}${t("common:times")}`}
-                          </span>
-                        </div>
-                      )}
-                      {!offensiveResult.dmg.isNullified && (() => {
+                      <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
+                        <span className="text-sm text-gray-500">
+                          {t("hitsToKill")}
+                        </span>
+                        <span className="font-bold text-gray-700">
+                          {offensiveResult.hitsToKill === Infinity
+                            ? "∞"
+                            : `${offensiveResult.hitsToKill}${t("common:times")}`}
+                        </span>
+                      </div>
+                      {(() => {
                         const statLabel = offensiveResult.mode === "物理" ? "ATK" : "INT";
                         const currentStat = offensiveResult.mode === "物理" ? effAtk : effInt;
                         const needed = offensiveResult.overkillStatNeeded;
@@ -939,7 +937,7 @@ export function DamageCalculator() {
                           </div>
                         );
                       })()}
-                      {offensiveResult.hitRate !== null && effLuck > 0 && (
+                      {offensiveResult.hitRate !== null && (
                         <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
                           <span className="text-sm text-gray-500">{t("hitRate")}</span>
                           <span className={`font-bold ${offensiveResult.hitRate >= 80 ? "text-green-600" : offensiveResult.hitRate < 20 ? "text-red-500" : "text-yellow-600"}`}>
