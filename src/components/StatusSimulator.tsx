@@ -168,6 +168,7 @@ export function StatusSimulator() {
       attackMode: attackModeForExport,
       analysisBook: "0",
       analysisAnalysisBook: "0",
+      crystalCube: "0",
     });
     setPresetName("");
   }
