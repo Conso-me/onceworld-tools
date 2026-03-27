@@ -258,7 +258,19 @@ export function DamageCalculator() {
             n * spell.hits
           )
         );
-        return { spell, dmg, totalMin, totalMax, totalCritMin, totalCritMax, hitsToKill, minStat, targetStats };
+        const overkillThreshold = scaled.hp * 10;
+        const overkillGuaranteed = !dmg.isNullified && totalMin >= overkillThreshold;
+        const overkillPossible = !dmg.isNullified && totalMax >= overkillThreshold;
+        const overkillStatNeeded = calcIntForKill(
+          scaled.hp * 10,
+          scaled.scaledDef,
+          scaled.scaledMdef,
+          selfToEnemyAffinity,
+          effectiveMult,
+          magicBaseInt,
+          spell.hits
+        );
+        return { spell, dmg, totalMin, totalMax, totalCritMin, totalCritMax, hitsToKill, minStat, targetStats, overkillGuaranteed, overkillPossible, overkillStatNeeded };
       });
       return { mode: "魔攻" as const, spellResults };
     }
@@ -320,7 +332,23 @@ export function DamageCalculator() {
       ? calcHitRate(effLuck, scaled.scaledLuck)
       : null;
 
-    return { mode: myAttackMode as "物理" | "魔弾", dmg, multiHit, hitsToKill, minStat, targetStats, hitRate };
+    const overkillThreshold = scaled.hp * 10;
+    const totalMinDmg = dmg.isNullified ? 0 : dmg.min * multiHit;
+    const totalMaxDmg = dmg.isNullified ? 0 : dmg.max * multiHit;
+    const overkillGuaranteed = !dmg.isNullified && totalMinDmg >= overkillThreshold;
+    const overkillPossible = !dmg.isNullified && totalMaxDmg >= overkillThreshold;
+
+    let overkillStatNeeded: number;
+    if (myAttackMode === "物理") {
+      overkillStatNeeded = calcAtkForKill(scaled.hp * 10, scaled.scaledDef, scaled.scaledMdef, selfToEnemyAffinity, multiHit, 1);
+    } else {
+      // 魔弾: (int * 1.75 - effectiveDef) * 4 * affinity * 0.9 * multiHit >= hp * 10
+      const effectiveDef = calcEffectiveDef(scaled.scaledDef, scaled.scaledMdef, false);
+      const requiredBase = (scaled.hp * 10) / 4 / selfToEnemyAffinity / 0.9 / multiHit;
+      overkillStatNeeded = Math.max(Math.ceil((requiredBase + effectiveDef) / 1.75), 0);
+    }
+
+    return { mode: myAttackMode as "物理" | "魔弾", dmg, multiHit, hitsToKill, minStat, targetStats, hitRate, overkillGuaranteed, overkillPossible, overkillStatNeeded };
   }, [
     scaled,
     effAtk,
@@ -579,18 +607,24 @@ export function DamageCalculator() {
                 value={analysisBook}
                 onChange={setAnalysisBook}
                 max={1000}
+                showReset
+                showMax
               />
               <InputField
                 label={t("analysisAnalysisBook")}
                 value={analysisAnalysisBook}
                 onChange={setAnalysisAnalysisBook}
                 max={1000}
+                showReset
+                showMax
               />
               <InputField
                 label={t("crystalCube")}
                 value={crystalCube}
                 onChange={setCrystalCube}
                 max={1000}
+                showReset
+                showMax
               />
             </div>
           )}
@@ -711,7 +745,7 @@ export function DamageCalculator() {
                 </div>
                 {hasMyOffenseStats ? (
                   <div className="grid grid-cols-[1fr_auto_auto_auto_auto_auto_auto] gap-y-1.5 gap-x-1">
-                    {offensiveResult.spellResults.map(({ spell, dmg, totalMin, totalMax, totalCritMin, totalCritMax, hitsToKill }) => (
+                    {offensiveResult.spellResults.map(({ spell, dmg, totalMin, totalMax, totalCritMin, totalCritMax, hitsToKill, overkillGuaranteed, overkillPossible, overkillStatNeeded }) => (
                       <div key={spell.name} className="col-span-7 grid grid-cols-subgrid bg-white/60 rounded-lg py-1.5">
                         <div className="col-span-7 flex items-center gap-1 mb-1 px-2">
                           <span className={`text-xs px-1 py-0.5 rounded border font-medium ${elementColors[spell.element]}`}>{t(`game:element.${spell.element}`)}</span>
@@ -719,6 +753,13 @@ export function DamageCalculator() {
                           <span className="text-xs text-gray-400">
                             ×{spell.multiplier}{spell.hits > 1 ? ` / ${spell.hits}${t("hits")}` : ""}
                           </span>
+                          {!dmg.isNullified && (overkillGuaranteed || overkillPossible) && (
+                            <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${
+                              overkillGuaranteed ? "bg-orange-500 text-white" : "bg-orange-100 text-orange-600"
+                            }`}>
+                              {overkillGuaranteed ? "OK!" : "OK?"}
+                            </span>
+                          )}
                           {!dmg.isNullified && (
                             <span className={`ml-auto text-sm font-bold px-2 py-0.5 rounded-full ${
                               hitsToKill === 1 ? "bg-green-100 text-green-700" :
@@ -741,6 +782,16 @@ export function DamageCalculator() {
                             <span className="text-xs text-yellow-600 text-center self-center">〜</span>
                             <span className="pr-2 text-xs text-yellow-600 tabular-nums text-right self-center">{totalCritMax.toLocaleString()}</span>
                           </>
+                        )}
+                        {!dmg.isNullified && !overkillGuaranteed && (
+                          <div className="col-span-7 flex items-center justify-end gap-1 px-2 pt-0.5">
+                            <span className="text-xs text-gray-400">
+                              オーバーキル: INT {overkillStatNeeded.toLocaleString()} 必要
+                            </span>
+                            <span className="text-xs text-orange-500 font-semibold">
+                              (あと +{Math.max(0, overkillStatNeeded - effInt).toLocaleString()})
+                            </span>
+                          </div>
                         )}
                       </div>
                     ))}
@@ -802,6 +853,34 @@ export function DamageCalculator() {
                           </span>
                         </div>
                       )}
+                      {!offensiveResult.dmg.isNullified && (() => {
+                        const statLabel = offensiveResult.mode === "物理" ? "ATK" : "INT";
+                        const currentStat = offensiveResult.mode === "物理" ? effAtk : effInt;
+                        const needed = offensiveResult.overkillStatNeeded;
+                        const shortfall = Math.max(0, needed - currentStat);
+                        return (
+                          <div className={`flex items-start justify-between py-2 px-3 rounded-lg gap-2 ${offensiveResult.overkillGuaranteed ? "bg-orange-50" : "bg-gray-50"}`}>
+                            <span className={`text-sm font-medium ${offensiveResult.overkillGuaranteed ? "text-orange-700" : "text-gray-500"}`}>オーバーキル</span>
+                            <div className="flex flex-col items-end gap-0.5">
+                              <span className={`text-sm font-bold px-2 py-0.5 rounded-full ${
+                                offensiveResult.overkillGuaranteed
+                                  ? "bg-orange-500 text-white"
+                                  : offensiveResult.overkillPossible
+                                  ? "bg-orange-100 text-orange-600"
+                                  : "bg-gray-100 text-gray-500"
+                              }`}>
+                                {offensiveResult.overkillGuaranteed ? "確定" : offensiveResult.overkillPossible ? "可能性あり" : "不可"}
+                              </span>
+                              {!offensiveResult.overkillGuaranteed && (
+                                <span className="text-xs text-gray-400">
+                                  {statLabel} {needed.toLocaleString()} 必要
+                                  <span className="text-orange-500 font-semibold ml-1">(あと +{shortfall.toLocaleString()})</span>
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })()}
                       {offensiveResult.hitRate !== null && effLuck > 0 && (
                         <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
                           <span className="text-sm text-gray-500">{t("hitRate")}</span>
