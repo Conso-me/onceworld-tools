@@ -783,7 +783,7 @@ export function DamageCalculator() {
                             <span className="pr-2 text-xs text-yellow-600 tabular-nums text-right self-center">{totalCritMax.toLocaleString()}</span>
                           </>
                         )}
-                        {!dmg.isNullified && (overkillGuaranteed || overkillPossible) && (
+                        {!dmg.isNullified && (
                           <div className="col-span-7 flex items-center justify-end gap-1 px-2 pt-0.5">
                             {overkillGuaranteed ? (
                               <span className="text-xs text-orange-500 font-semibold">
