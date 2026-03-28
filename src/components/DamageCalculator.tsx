@@ -210,9 +210,10 @@ export function DamageCalculator() {
   useEffect(() => {
     const encoded = getShareParam();
     if (!encoded) return;
-    const state = decodeShareState(encoded);
-    if (!state) return;
-    clearShareParam();
+    (async () => {
+      const state = await decodeShareState(encoded);
+      if (!state) return;
+      clearShareParam();
 
     if (state.monsterName) {
       const monster = getMonsterByName(state.monsterName);
@@ -258,6 +259,7 @@ export function DamageCalculator() {
         if (state.comparisonSpell) setComparisonSpell(state.comparisonSpell);
       }
     }
+    })();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 比較リスト内エントリのキーセット（プリセットモーダル用）
@@ -629,7 +631,7 @@ export function DamageCalculator() {
       if (comparisonSpell) state.comparisonSpell = comparisonSpell;
     }
 
-    const url = buildShareUrl(state);
+    const url = await buildShareUrl(state);
     try {
       await navigator.clipboard.writeText(url);
     } catch {
