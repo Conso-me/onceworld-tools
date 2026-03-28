@@ -33,12 +33,19 @@ import { MAGIC_SPELLS } from "../data/magicSpells";
 import { enemyPresetGroups, formatPresetLabel } from "../data/enemyPresets";
 import { getMonsterByName } from "../data/monsters";
 import { useCustomMonsters } from "../hooks/useAllMonsters";
+import {
+  calcOffensiveComparison,
+  calcDefensiveComparison,
+} from "../utils/multiDamageCalc";
+import type { MultiMonsterEntry } from "../utils/multiDamageCalc";
+import { OffensiveComparisonTable } from "./damage/OffensiveComparisonTable";
+import { DefensiveComparisonTable } from "./damage/DefensiveComparisonTable";
 import { InputField } from "./ui/InputField";
 import { StatCard } from "./ui/StatCard";
 import { ResultRow } from "./ui/ResultRow";
 import { ProgressBar } from "./ui/ProgressBar";
 import { MonsterSelector } from "./ui/MonsterSelector";
-import { EnemyPresetModal } from "./ui/EnemyPresetModal";
+import { EnemyPresetModal, presetKey } from "./ui/EnemyPresetModal";
 
 type PlayerAttackMode = "物理" | "魔弾" | "魔攻";
 
@@ -183,6 +190,56 @@ export function DamageCalculator() {
   const [enemyModalOpen, setEnemyModalOpen] = useState(false);
   const [selectedPresetLabel, setSelectedPresetLabel] = useState<string | null>(null);
   const [presetVersion, setPresetVersion] = useState(0);
+
+  // 複数モンスター比較
+  const [comparisonMonsters, setComparisonMonsters] = useState<MultiMonsterEntry[]>([]);
+  const [comparisonActive, setComparisonActive] = useState(false);
+  const [comparisonTab, setComparisonTab] = useState<"与ダメ" | "被ダメ">("与ダメ");
+
+  // 比較リスト内エントリのキーセット（プリセットモーダル用）
+  const comparisonKeys = useMemo(
+    () => new Set(comparisonMonsters.map((e) => presetKey({ monsterName: e.monster.name, level: e.level, location: e.location }))),
+    [comparisonMonsters]
+  );
+
+  const handleAddToComparison = useCallback(() => {
+    if (!selectedMonster) return;
+    setComparisonMonsters((prev) => {
+      const key = presetKey({ monsterName: selectedMonster.name, level: monsterLevel, location: "" });
+      if (prev.some((e) => presetKey({ monsterName: e.monster.name, level: e.level, location: e.location }) === key)) return prev;
+      return [...prev, { monster: selectedMonster, level: monsterLevel, location: "" }];
+    });
+  }, [selectedMonster, monsterLevel]);
+
+  const handleToggleComparison = useCallback((groupIdx: number, presetIdx: number) => {
+    const preset = allGroups[groupIdx]?.presets[presetIdx];
+    if (!preset || !preset.monsterName) return;
+    const monster = getMonsterByName(preset.monsterName);
+    if (!monster) return;
+    const key = presetKey(preset);
+    setComparisonMonsters((prev) => {
+      const exists = prev.some((e) => presetKey({ monsterName: e.monster.name, level: e.level, location: e.location }) === key);
+      if (exists) {
+        return prev.filter((e) => presetKey({ monsterName: e.monster.name, level: e.level, location: e.location }) !== key);
+      }
+      return [...prev, { monster, level: preset.level, location: preset.location }];
+    });
+  }, [allGroups]);
+
+  const handleConfirmComparison = useCallback(() => {
+    if (comparisonMonsters.length >= 2) {
+      setComparisonActive(true);
+    }
+  }, [comparisonMonsters.length]);
+
+  const handleRemoveFromComparison = useCallback((index: number) => {
+    setComparisonMonsters((prev) => prev.filter((_, i) => i !== index));
+  }, []);
+
+  const handleClearComparison = useCallback(() => {
+    setComparisonMonsters([]);
+    setComparisonActive(false);
+  }, []);
 
   const handleEnemyPresetSelect = useCallback((groupIdx: number, presetIdx: number) => {
     const preset = allGroups[groupIdx]?.presets[presetIdx];
@@ -436,6 +493,36 @@ export function DamageCalculator() {
     };
   }, [scaled, effDef, effMdef, enemyToSelfAffinity, effPlayerHp]);
 
+  // ===== エリア一括比較計算 =====
+  const offensiveComparison = useMemo(() => {
+    if (!comparisonActive || comparisonMonsters.length === 0) return null;
+    return calcOffensiveComparison(
+      comparisonMonsters,
+      { atk: effAtk, int: effInt, spd: effSpd, luck: effLuck, element: effElement },
+      myAttackMode,
+      { magicBaseInt, crystalCubePreMult, crystalCubeFinalMult }
+    );
+  }, [comparisonActive, comparisonMonsters, effAtk, effInt, effSpd, effLuck, effElement, myAttackMode, magicBaseInt, crystalCubePreMult, crystalCubeFinalMult]);
+
+  const defensiveComparison = useMemo(() => {
+    if (!comparisonActive || comparisonMonsters.length === 0) return null;
+    return calcDefensiveComparison(
+      comparisonMonsters,
+      { def: effDef, mdef: effMdef, element: effElement, hp: effPlayerHp }
+    );
+  }, [comparisonActive, comparisonMonsters, effDef, effMdef, effElement, effPlayerHp]);
+
+  const handleComparisonSelectMonster = useCallback((index: number) => {
+    const entry = comparisonMonsters[index];
+    if (!entry) return;
+    // 単体詳細に切り替え（比較リストは保持）
+    setComparisonActive(false);
+    handleMonsterSelect(entry.monster, entry.level);
+    setPresetVersion((v) => v + 1);
+    setInjectedLevel(entry.level);
+    setInjectedMonsterName(entry.monster.name);
+  }, [comparisonMonsters, handleMonsterSelect]);
+
   const hasMonster = !!scaled;
   const hasMyOffenseStats =
     (myAttackMode === "物理" ? effAtk > 0 : effInt > 0) && hasMonster;
@@ -536,17 +623,85 @@ export function DamageCalculator() {
             groups={allGroups}
             onClose={() => setEnemyModalOpen(false)}
             onSelect={handleEnemyPresetSelect}
+            comparisonKeys={comparisonKeys}
+            onToggleComparison={handleToggleComparison}
+            onConfirmComparison={handleConfirmComparison}
+            comparisonCount={comparisonMonsters.length}
           />
         </div>
 
-        <MonsterSelector
-          onSelect={handleMonsterSelect}
-          onMonsterPick={() => setSelectedPresetLabel(null)}
-          selectedMonster={selectedMonster}
-          externalLevel={injectedLevel}
-          externalMonsterName={injectedMonsterName}
-          presetVersion={presetVersion}
-        />
+        <div className="flex items-end gap-1.5">
+          <div className="flex-1 min-w-0">
+            <MonsterSelector
+              onSelect={handleMonsterSelect}
+              onMonsterPick={() => setSelectedPresetLabel(null)}
+              selectedMonster={selectedMonster}
+              externalLevel={injectedLevel}
+              externalMonsterName={injectedMonsterName}
+              presetVersion={presetVersion}
+            />
+          </div>
+          {/* 比較に追加（+アイコン） */}
+          {selectedMonster && (
+            <button
+              onClick={handleAddToComparison}
+              disabled={comparisonKeys.has(presetKey({ monsterName: selectedMonster.name, level: monsterLevel, location: "" }))}
+              title={t("addToComparison")}
+              className="flex-shrink-0 mb-0.5 w-8 h-8 flex items-center justify-center rounded-lg border border-indigo-300 text-indigo-500 hover:bg-indigo-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+            </button>
+          )}
+        </div>
+
+        {/* 比較リスト */}
+        {comparisonMonsters.length > 0 && (
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-gray-500">
+                {t("comparisonList")}（{comparisonMonsters.length}{t("common:monsterCount")}）
+              </span>
+              <div className="flex items-center gap-1">
+                {comparisonMonsters.length >= 2 && (
+                  <button
+                    onClick={() => setComparisonActive(true)}
+                    className="text-xs px-2 py-0.5 rounded-md bg-indigo-100 text-indigo-600 font-medium hover:bg-indigo-200 transition-colors"
+                  >
+                    {t("showComparison")}
+                  </button>
+                )}
+                <button
+                  onClick={handleClearComparison}
+                  className="text-xs px-2 py-0.5 rounded-md bg-gray-100 text-gray-400 hover:text-gray-600 hover:bg-gray-200 transition-colors"
+                >
+                  {t("common:reset")}
+                </button>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-1">
+              {comparisonMonsters.map((entry, idx) => (
+                <span
+                  key={idx}
+                  className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-100 text-xs text-gray-700"
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full ${
+                    { 火: "bg-red-400", 水: "bg-blue-400", 木: "bg-green-400", 光: "bg-yellow-400", 闇: "bg-purple-400" }[entry.monster.element]
+                  }`} />
+                  {entry.monster.name}
+                  <span className="text-gray-400">Lv{entry.level.toLocaleString()}</span>
+                  <button
+                    onClick={() => handleRemoveFromComparison(idx)}
+                    className="text-gray-300 hover:text-gray-500 ml-0.5"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="border-t border-gray-100" />
 
@@ -774,6 +929,56 @@ export function DamageCalculator() {
 
       {/* ===== 右エリア: 敵ステータス + 与ダメ/被ダメ ===== */}
       <div className="space-y-4 lg:space-y-2">
+
+      {/* 複数モンスター比較モード */}
+      {comparisonActive && offensiveComparison && defensiveComparison ? (
+        <div className="space-y-2">
+          {/* ヘッダー */}
+          <div className="flex items-center justify-between px-1">
+            <h3 className="font-semibold text-gray-700">
+              {t("comparisonList")}（{comparisonMonsters.length}{t("common:monsterCount")}）
+            </h3>
+            <button
+              onClick={() => setComparisonActive(false)}
+              className="text-xs text-gray-400 hover:text-gray-600 px-2 py-1 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              {t("backToSingle")}
+            </button>
+          </div>
+
+          {/* タブ切替 */}
+          <div className="flex bg-gray-100 rounded-lg p-0.5 gap-0.5">
+            {(["与ダメ", "被ダメ"] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setComparisonTab(tab)}
+                className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
+                  comparisonTab === tab
+                    ? "bg-white text-gray-700 shadow-sm"
+                    : "text-gray-400 hover:text-gray-500"
+                }`}
+              >
+                {tab === "与ダメ" ? t("offensiveDamage") : t("defensiveDamage")}
+              </button>
+            ))}
+          </div>
+
+          {/* テーブル */}
+          <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
+            {comparisonTab === "与ダメ" ? (
+              <OffensiveComparisonTable
+                rows={offensiveComparison}
+                onSelectMonster={handleComparisonSelectMonster}
+              />
+            ) : (
+              <DefensiveComparisonTable
+                rows={defensiveComparison}
+                onSelectMonster={handleComparisonSelectMonster}
+              />
+            )}
+          </div>
+        </div>
+      ) : (<>
 
       {/* 敵ステータス */}
       {scaled && (
@@ -1299,6 +1504,7 @@ export function DamageCalculator() {
       </div>{/* /被ダメージ・最低INT */}
 
       </div>{/* /与ダメ・被ダメ 2カラム */}
+      </>)}
       </div>{/* /右エリア */}
 
       {/* プリセットモーダル */}

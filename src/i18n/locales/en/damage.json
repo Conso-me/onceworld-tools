@@ -59,5 +59,11 @@
   "normal": "Normal",
   "comfy": "Safe",
   "statModeManual": "Manual",
-  "statModeSim": "Equipment"
+  "statModeSim": "Equipment",
+  "addToComparison": "Add to comparison",
+  "comparisonList": "Comparison",
+  "showComparison": "Compare",
+  "backToSingle": "Back to single view",
+  "multiSelectMode": "Multi-select",
+  "selected": " selected"
 }
