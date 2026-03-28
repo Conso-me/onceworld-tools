@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-03-29",
+    changes: [
+    { type: "improve", text: "fix: 比較モードOFF時にアクティブ設定をAにリセットする" },
+    ],
+  },
+
+  {
     date: "2026-03-28",
     changes: [
     { type: "improve", text: "fix: 素材.jsonのドロップ元モンスターの記載不足を補完" },
