@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-03-28",
+    changes: [
+    { type: "improve", text: "fix: 素材.jsonのドロップ元モンスターの記載不足を補完" },
+    ],
+  },
+
+  {
     date: "2026-03-27",
     changes: [
     { type: "improve", text: "fix: 敵プリセットのマップグループを整理" },
