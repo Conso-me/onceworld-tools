@@ -207,7 +207,11 @@ export function StatusSimulator() {
         <div className="flex items-center justify-between">
           <h2 className="text-base font-bold text-gray-700">{t("calcResult")}</h2>
           <button
-            onClick={() => setCompareMode(!compareMode)}
+            onClick={() => {
+              const next = !compareMode;
+              setCompareMode(next);
+              if (!next) setActiveConfig("A");
+            }}
             className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors ${
               compareMode
                 ? "bg-purple-500 text-white hover:bg-purple-600"
