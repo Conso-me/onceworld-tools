@@ -1,5 +1,111 @@
 import type { SimConfig } from "../types/game";
 import { DEFAULT_SIM_CONFIG } from "../hooks/useSharedSimConfig";
+import equipmentData from "../../docs/data/equipment.json";
+import accessoriesData from "../../docs/data/accessories.json";
+import petSkillsData from "../../docs/data/pet-skills.json";
+import monstersData from "../../docs/data/monsters.json";
+
+// ── サイト内部ID（配列インデックス = 安定ID、末尾追加のみ） ──────────────
+
+function buildLookup(items: { name: string }[]) {
+  const nameToId = new Map<string, number>();
+  const idToName: string[] = [];
+  items.forEach((item, i) => {
+    nameToId.set(item.name, i);
+    idToName[i] = item.name;
+  });
+  return { nameToId, idToName };
+}
+
+const equipLookup   = buildLookup(equipmentData  as { name: string }[]);
+const accLookup     = buildLookup(accessoriesData as { name: string }[]);
+const petLookup     = buildLookup(petSkillsData   as { name: string }[]);
+const monsterLookup = buildLookup(monstersData    as { name: string }[]);
+
+const EQUIP_FIELDS = ["equipWeapon","equipHead","equipBody","equipHand","equipShield","equipFoot"] as const;
+const ACC_FIELDS   = ["acc1","acc2","acc3","acc4"] as const;
+const PET_FIELDS   = ["petName","pet2Name","pet3Name"] as const;
+
+type SimRecord = Record<string, unknown>;
+
+/** JSON直前: 名前 → ID に変換 */
+function namesToIds(state: DamageShareState): unknown {
+  const result: SimRecord = { ...state };
+
+  if (typeof result.monsterName === "string") {
+    const id = monsterLookup.nameToId.get(result.monsterName);
+    if (id !== undefined) result.monsterName = id;
+  }
+
+  if (Array.isArray(result.comparisonMonsters)) {
+    result.comparisonMonsters = (result.comparisonMonsters as { name: string; level: number; location: string }[])
+      .map((e) => {
+        const id = monsterLookup.nameToId.get(e.name);
+        return { ...e, name: id !== undefined ? id : e.name };
+      });
+  }
+
+  if (result.sim && typeof result.sim === "object") {
+    const sim: SimRecord = { ...result.sim as SimRecord };
+    for (const f of EQUIP_FIELDS) {
+      const name = sim[f];
+      if (typeof name === "string" && name) {
+        const id = equipLookup.nameToId.get(name);
+        if (id !== undefined) sim[f] = id;
+      }
+    }
+    for (const f of ACC_FIELDS) {
+      const name = sim[f];
+      if (typeof name === "string" && name) {
+        const id = accLookup.nameToId.get(name);
+        if (id !== undefined) sim[f] = id;
+      }
+    }
+    for (const f of PET_FIELDS) {
+      const name = sim[f];
+      if (typeof name === "string" && name) {
+        const id = petLookup.nameToId.get(name);
+        if (id !== undefined) sim[f] = id;
+      }
+    }
+    result.sim = sim;
+  }
+  return result;
+}
+
+/** JSON直後: ID → 名前 に変換 */
+function idsToNames(data: SimRecord): DamageShareState {
+  const result: SimRecord = { ...data };
+
+  if (typeof result.monsterName === "number") {
+    result.monsterName = monsterLookup.idToName[result.monsterName] ?? "";
+  }
+
+  if (Array.isArray(result.comparisonMonsters)) {
+    result.comparisonMonsters = (result.comparisonMonsters as { name: string | number; level: number; location: string }[])
+      .map((e) => ({
+        ...e,
+        name: typeof e.name === "number" ? (monsterLookup.idToName[e.name] ?? "") : e.name,
+      }));
+  }
+
+  if (result.sim && typeof result.sim === "object") {
+    const sim: SimRecord = { ...result.sim as SimRecord };
+    for (const f of EQUIP_FIELDS) {
+      if (typeof sim[f] === "number") sim[f] = equipLookup.idToName[sim[f] as number] ?? "";
+    }
+    for (const f of ACC_FIELDS) {
+      if (typeof sim[f] === "number") sim[f] = accLookup.idToName[sim[f] as number] ?? "";
+    }
+    for (const f of PET_FIELDS) {
+      if (typeof sim[f] === "number") sim[f] = petLookup.idToName[sim[f] as number] ?? "";
+    }
+    result.sim = sim;
+  }
+  return result as unknown as DamageShareState;
+}
+
+// ── SimConfig デフォルト値除去 ────────────────────────────────────────────
 
 /** デフォルト値と同じフィールドを除いてサイズを削減 */
 export function compactSimConfig(cfg: SimConfig): Partial<SimConfig> {
@@ -16,6 +122,8 @@ export function compactSimConfig(cfg: SimConfig): Partial<SimConfig> {
 export function expandSimConfig(partial: Partial<SimConfig>): SimConfig {
   return { ...DEFAULT_SIM_CONFIG, ...partial };
 }
+
+// ── 共有状態の型 ──────────────────────────────────────────────────────────
 
 export interface DamageShareState {
   v: 1;
@@ -84,18 +192,16 @@ const COMPRESSED_PREFIX = "z.";
 
 export async function encodeShareState(state: DamageShareState): Promise<string> {
   try {
-    const json = JSON.stringify(state);
+    const json = JSON.stringify(namesToIds(state));
     const raw = new TextEncoder().encode(json);
     const compressed = await deflate(raw);
-    // 圧縮後が大きくなる場合は非圧縮フォールバック
     if (compressed.length >= raw.length) {
       return bytesToBase64Url(raw);
     }
     return COMPRESSED_PREFIX + bytesToBase64Url(compressed);
   } catch {
-    // CompressionStream 非対応環境のフォールバック
     try {
-      const raw = new TextEncoder().encode(JSON.stringify(state));
+      const raw = new TextEncoder().encode(JSON.stringify(namesToIds(state)));
       return bytesToBase64Url(raw);
     } catch {
       return "";
@@ -114,7 +220,7 @@ export async function decodeShareState(encoded: string): Promise<DamageShareStat
     const json = new TextDecoder().decode(bytes);
     const parsed = JSON.parse(json);
     if (parsed?.v !== 1) return null;
-    return parsed as DamageShareState;
+    return idsToNames(parsed as SimRecord);
   } catch {
     return null;
   }
