@@ -19,6 +19,10 @@ export interface DamageShareState {
   crystalCube?: string;
   crystalCubeMode?: "pre-def" | "final";
   sim?: SimConfig;
+  comparisonMonsters?: { name: string; level: number; location: string }[];
+  comparisonActive?: boolean;
+  comparisonTab?: "与ダメ" | "被ダメ";
+  comparisonSpell?: string;
 }
 
 function toBase64(str: string): string {

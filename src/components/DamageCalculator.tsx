@@ -198,6 +198,12 @@ export function DamageCalculator() {
   const [selectedPresetLabel, setSelectedPresetLabel] = useState<string | null>(null);
   const [presetVersion, setPresetVersion] = useState(0);
 
+  // 複数モンスター比較
+  const [comparisonMonsters, setComparisonMonsters] = useState<MultiMonsterEntry[]>([]);
+  const [comparisonActive, setComparisonActive] = useState(false);
+  const [comparisonTab, setComparisonTab] = useState<"与ダメ" | "被ダメ">("与ダメ");
+  const [comparisonSpell, setComparisonSpell] = useState<string | null>(null);
+
   // URLシェアパラメータからの状態復元（マウント時1回）
   useEffect(() => {
     const encoded = getShareParam();
@@ -236,13 +242,21 @@ export function DamageCalculator() {
     } else if (state.statMode === "sim" && state.sim) {
       replaceAllSim(state.sim);
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // 複数モンスター比較
-  const [comparisonMonsters, setComparisonMonsters] = useState<MultiMonsterEntry[]>([]);
-  const [comparisonActive, setComparisonActive] = useState(false);
-  const [comparisonTab, setComparisonTab] = useState<"与ダメ" | "被ダメ">("与ダメ");
-  const [comparisonSpell, setComparisonSpell] = useState<string | null>(null);
+    if (state.comparisonMonsters && state.comparisonMonsters.length >= 2) {
+      const entries: MultiMonsterEntry[] = [];
+      for (const { name, level, location } of state.comparisonMonsters) {
+        const monster = getMonsterByName(name);
+        if (monster) entries.push({ monster, level, location });
+      }
+      if (entries.length >= 2) {
+        setComparisonMonsters(entries);
+        if (state.comparisonActive) setComparisonActive(true);
+        if (state.comparisonTab) setComparisonTab(state.comparisonTab);
+        if (state.comparisonSpell) setComparisonSpell(state.comparisonSpell);
+      }
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 比較リスト内エントリのキーセット（プリセットモーダル用）
   const comparisonKeys = useMemo(
@@ -602,6 +616,17 @@ export function DamageCalculator() {
       state.sim = simCfg;
     }
 
+    if (comparisonMonsters.length > 0) {
+      state.comparisonMonsters = comparisonMonsters.map((e) => ({
+        name: e.monster.name,
+        level: e.level,
+        location: e.location,
+      }));
+      state.comparisonActive = comparisonActive;
+      state.comparisonTab = comparisonTab;
+      if (comparisonSpell) state.comparisonSpell = comparisonSpell;
+    }
+
     const url = buildShareUrl(state);
     try {
       await navigator.clipboard.writeText(url);
@@ -615,7 +640,7 @@ export function DamageCalculator() {
     }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  }, [selectedMonster, monsterLevel, statMode, myAtk, myInt, myDef, myMdef, mySpd, myVit, myLuck, myElement, myAttackMode, analysisBook, analysisAnalysisBook, crystalCube, crystalCubeMode, simCfg]);
+  }, [selectedMonster, monsterLevel, statMode, myAtk, myInt, myDef, myMdef, mySpd, myVit, myLuck, myElement, myAttackMode, analysisBook, analysisAnalysisBook, crystalCube, crystalCubeMode, simCfg, comparisonMonsters, comparisonActive, comparisonTab, comparisonSpell]);
 
   const elements: Element[] = ["火", "水", "木", "光", "闇"];
   const attackModes: { value: PlayerAttackMode; label: string }[] = [
