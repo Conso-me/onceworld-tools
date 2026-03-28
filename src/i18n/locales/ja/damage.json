@@ -59,5 +59,11 @@
   "normal": "通常",
   "comfy": "余裕",
   "statModeManual": "手動入力",
-  "statModeSim": "装備設定"
+  "statModeSim": "装備設定",
+  "addToComparison": "比較リストに追加",
+  "comparisonList": "比較リスト",
+  "showComparison": "比較表示",
+  "backToSingle": "単体表示に戻す",
+  "multiSelectMode": "複数選択",
+  "selected": "選択中"
 }

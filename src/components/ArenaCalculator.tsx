@@ -4,6 +4,7 @@ import { usePersistedState } from "../hooks/usePersistedState";
 import { useSharedSimConfig } from "../hooks/useSharedSimConfig";
 import { useStatPresets } from "../hooks/useStatPresets";
 import { scaleMonster } from "../utils/monsterScaling";
+import { formatHitCount } from "../utils/formatNumber";
 import {
   canNullifyDamage,
   calcAdditionalDefNeeded,
@@ -146,17 +147,6 @@ function NullifyLvBadge({ lv, onClick, t }: { lv: number | null; onClick?: (lv: 
   );
 }
 
-function formatHitCount(n: number, lang: string): string {
-  if (!isFinite(n)) return "∞";
-  if (n >= 1_000_000) return `${Math.floor(n / 1_000_000).toLocaleString()}M`;
-  if (lang === "ja") {
-    if (n >= 100_000) return `${Math.floor(n / 10_000).toLocaleString()}万`;
-    if (n >= 10_000) return `${(n / 10_000).toFixed(1)}万`;
-  } else {
-    if (n >= 10_000) return `${Math.floor(n / 1_000).toLocaleString()}K`;
-  }
-  return n.toLocaleString();
-}
 
 function HitsToSurviveBadge({ hits, lukLevel, lang, t }: { hits: { worst: number; best: number } | null; lukLevel: LukEvasionLevel; lang: string; t: TFunction }) {
   if (hits === null) {

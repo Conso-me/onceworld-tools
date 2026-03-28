@@ -46,5 +46,7 @@
   "max": "MAX",
   "allMax": "全MAX",
   "self": "自",
-  "myStatus": "自分のステータス"
+  "myStatus": "自分のステータス",
+  "monster": "モンスター",
+  "monsterCount": "体"
 }

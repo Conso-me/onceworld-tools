@@ -46,5 +46,7 @@
   "max": "MAX",
   "allMax": "All MAX",
   "self": "Me",
-  "myStatus": "My Stats"
+  "myStatus": "My Stats",
+  "monster": "Monster",
+  "monsterCount": ""
 }
