@@ -15,6 +15,8 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-03-29",
     changes: [
+    { type: "improve", text: "feat: 魔攻比較時に魔法を手動選択できるようにし、ダメージ表記を万単位に統一" },
+    { type: "improve", text: "feat: ダメージ計算で複数モンスターを同時比較できるようにする" },
     { type: "improve", text: "fix: 比較モードOFF時にアクティブ設定をAにリセットする" },
     ],
   },
