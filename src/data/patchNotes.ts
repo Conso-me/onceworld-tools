@@ -15,6 +15,14 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-03-29",
     changes: [
+    { type: "feature", text: "docs: データJSONの末尾追加ルールをSKILLとCLAUDE.mdに明記" },
+    { type: "improve", text: "perf: 装備・アクセ・ペット・モンスター名をIDに置換してURL短縮" },
+    { type: "improve", text: "perf: deflate圧縮でシェアURLをさらに短縮（776→476文字）" },
+    { type: "improve", text: "perf: SimConfigのデフォルト値を除いてシェアURLを短縮" },
+    { type: "improve", text: "feat: シェアボタンを「自分のステータス」ヘッダーに常時表示" },
+    { type: "improve", text: "feat: 比較モードのモンスター一覧もURLシェアに含める" },
+    { type: "improve", text: "docs: URLシェア機能の説明をREADMEに追記" },
+    { type: "improve", text: "feat: ダメージ計算の状態をURLで共有できるようにする (#54)" },
     { type: "improve", text: "feat: 魔攻比較時に魔法を手動選択できるようにし、ダメージ表記を万単位に統一" },
     { type: "improve", text: "feat: ダメージ計算で複数モンスターを同時比較できるようにする" },
     { type: "improve", text: "fix: 比較モードOFF時にアクティブ設定をAにリセットする" },
