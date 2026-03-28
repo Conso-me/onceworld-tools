@@ -770,6 +770,30 @@ export function DamageCalculator() {
             </div>
             <h3 className="font-semibold text-gray-800">{t("common:myStatus")}</h3>
             <div className="ml-auto flex items-center gap-1.5">
+              <button
+                onClick={handleCopyShareUrl}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
+                  copied
+                    ? "bg-green-100 text-green-600"
+                    : "bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700"
+                }`}
+              >
+                {copied ? (
+                  <>
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                    コピー済
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    </svg>
+                    URLをコピー
+                  </>
+                )}
+              </button>
               {statMode === "manual" && (
                 <button
                   onClick={() => setPresetModalOpen(true)}
@@ -1098,34 +1122,8 @@ export function DamageCalculator() {
 
       {/* 与ダメージ */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between px-1">
+        <div className="flex items-center px-1">
           <h3 className="font-semibold text-gray-700">{t("offensiveDamage")}</h3>
-          {hasMonster && (
-            <button
-              onClick={handleCopyShareUrl}
-              className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium transition-all ${
-                copied
-                  ? "bg-green-100 text-green-600"
-                  : "bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700"
-              }`}
-            >
-              {copied ? (
-                <>
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                  </svg>
-                  コピー済
-                </>
-              ) : (
-                <>
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                  </svg>
-                  URLをコピー
-                </>
-              )}
-            </button>
-          )}
         </div>
 
         {hasMonster && offensiveResult ? (<>
