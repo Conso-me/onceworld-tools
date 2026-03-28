@@ -195,6 +195,7 @@ export function DamageCalculator() {
   const [comparisonMonsters, setComparisonMonsters] = useState<MultiMonsterEntry[]>([]);
   const [comparisonActive, setComparisonActive] = useState(false);
   const [comparisonTab, setComparisonTab] = useState<"与ダメ" | "被ダメ">("与ダメ");
+  const [comparisonSpell, setComparisonSpell] = useState<string | null>(null);
 
   // 比較リスト内エントリのキーセット（プリセットモーダル用）
   const comparisonKeys = useMemo(
@@ -969,6 +970,8 @@ export function DamageCalculator() {
               <OffensiveComparisonTable
                 rows={offensiveComparison}
                 onSelectMonster={handleComparisonSelectMonster}
+                selectedSpellName={comparisonSpell}
+                onSpellSelect={setComparisonSpell}
               />
             ) : (
               <DefensiveComparisonTable
