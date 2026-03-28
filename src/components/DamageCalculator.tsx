@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import type { MonsterBase, Element } from "../types/game";
 import { usePersistedState } from "../hooks/usePersistedState";
@@ -46,6 +46,15 @@ import { ResultRow } from "./ui/ResultRow";
 import { ProgressBar } from "./ui/ProgressBar";
 import { MonsterSelector } from "./ui/MonsterSelector";
 import { EnemyPresetModal, presetKey } from "./ui/EnemyPresetModal";
+import {
+  buildShareUrl,
+  decodeShareState,
+  getShareParam,
+  clearShareParam,
+  compactSimConfig,
+  expandSimConfig,
+  type DamageShareState,
+} from "../utils/shareState";
 
 type PlayerAttackMode = "物理" | "魔弾" | "魔攻";
 
@@ -196,6 +205,62 @@ export function DamageCalculator() {
   const [comparisonActive, setComparisonActive] = useState(false);
   const [comparisonTab, setComparisonTab] = useState<"与ダメ" | "被ダメ">("与ダメ");
   const [comparisonSpell, setComparisonSpell] = useState<string | null>(null);
+
+  // URLシェアパラメータからの状態復元（マウント時1回）
+  useEffect(() => {
+    const encoded = getShareParam();
+    if (!encoded) return;
+    (async () => {
+      const state = await decodeShareState(encoded);
+      if (!state) return;
+      clearShareParam();
+
+    if (state.monsterName) {
+      const monster = getMonsterByName(state.monsterName);
+      if (monster) {
+        const level = state.monsterLevel ?? 1;
+        setSelectedMonster(monster);
+        setMonsterLevel(level);
+        setInjectedMonsterName(state.monsterName);
+        setInjectedLevel(level);
+      }
+    }
+
+    setStatMode(state.statMode);
+
+    if (state.statMode === "manual") {
+      if (state.atk !== undefined) setMyAtk(state.atk);
+      if (state.int !== undefined) setMyInt(state.int);
+      if (state.def !== undefined) setMyDef(state.def);
+      if (state.mdef !== undefined) setMyMdef(state.mdef);
+      if (state.spd !== undefined) setMySpd(state.spd);
+      if (state.vit !== undefined) setMyVit(state.vit);
+      if (state.luck !== undefined) setMyLuck(state.luck);
+      if (state.element) setMyElement(state.element as Element);
+      if (state.attackMode) setMyAttackMode(state.attackMode as PlayerAttackMode);
+      if (state.analysisBook !== undefined) setAnalysisBook(state.analysisBook);
+      if (state.analysisAnalysisBook !== undefined) setAnalysisAnalysisBook(state.analysisAnalysisBook);
+      if (state.crystalCube !== undefined) setCrystalCube(state.crystalCube);
+      if (state.crystalCubeMode) setCrystalCubeMode(state.crystalCubeMode);
+    } else if (state.statMode === "sim" && state.sim) {
+      replaceAllSim(expandSimConfig(state.sim));
+    }
+
+    if (state.comparisonMonsters && state.comparisonMonsters.length >= 2) {
+      const entries: MultiMonsterEntry[] = [];
+      for (const { name, level, location } of state.comparisonMonsters) {
+        const monster = getMonsterByName(name);
+        if (monster) entries.push({ monster, level, location });
+      }
+      if (entries.length >= 2) {
+        setComparisonMonsters(entries);
+        if (state.comparisonActive) setComparisonActive(true);
+        if (state.comparisonTab) setComparisonTab(state.comparisonTab);
+        if (state.comparisonSpell) setComparisonSpell(state.comparisonSpell);
+      }
+    }
+    })();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 比較リスト内エントリのキーセット（プリセットモーダル用）
   const comparisonKeys = useMemo(
@@ -529,54 +594,49 @@ export function DamageCalculator() {
     (myAttackMode === "物理" ? effAtk > 0 : effInt > 0) && hasMonster;
   const hasMyDefenseStats = (effDef > 0 || effMdef > 0) && hasMonster;
 
-  const handleCopyShareText = useCallback(async () => {
-    if (!scaled || !offensiveResult) return;
+  const handleCopyShareUrl = useCallback(async () => {
+    const state: DamageShareState = {
+      v: 1,
+      monsterName: selectedMonster?.name,
+      monsterLevel: monsterLevel !== 1 ? monsterLevel : undefined,
+      statMode,
+    };
 
-    const lines: string[] = [];
-    lines.push("【OnceWorld ダメージ計算】");
-    lines.push(`vs ${scaled.name} Lv${monsterLevel}(${scaled.element})`);
-
-    const statLabel = myAttackMode === "物理" ? `ATK${effAtk.toLocaleString()}` : `INT${effInt.toLocaleString()}`;
-    lines.push(`自: ${myAttackMode}/${effElement} | ${statLabel} DEF${effDef.toLocaleString()} M${effMdef.toLocaleString()} SPD${effSpd.toLocaleString()}`);
-
-    if (statMode === "sim") {
-      const equips = [simCfg.equipWeapon, simCfg.equipHead, simCfg.equipBody, simCfg.equipHand, simCfg.equipShield, simCfg.equipFoot]
-        .filter(Boolean).join("/");
-      const accs = [simCfg.acc1, simCfg.acc2, simCfg.acc3, simCfg.acc4].filter(Boolean).join("/");
-      if (equips) lines.push(`装備: ${equips}`);
-      if (accs) lines.push(`アクセ: ${accs}`);
-    }
-
-    if (offensiveResult.mode === "魔攻") {
-      const validSpells = offensiveResult.spellResults.filter((r) => !r.dmg.isNullified);
-      if (validSpells.length > 0) {
-        lines.push("与ダメ（魔攻）:");
-        validSpells.forEach(({ spell, totalMin, totalMax, totalCritMin, totalCritMax, hitsToKill }) => {
-          const killStr = hitsToKill === Infinity ? "∞確殺" : `${hitsToKill}確殺`;
-          lines.push(`  ${spell.name}: ${totalMin.toLocaleString()}〜${totalMax.toLocaleString()} (クリ${totalCritMin.toLocaleString()}〜${totalCritMax.toLocaleString()}) ${killStr}`);
-        });
-      } else {
-        lines.push("与ダメ: 防御貫通不可");
-      }
+    if (statMode === "manual") {
+      state.atk = myAtk;
+      state.int = myInt;
+      state.def = myDef;
+      state.mdef = myMdef;
+      state.spd = mySpd;
+      state.vit = myVit;
+      state.luck = myLuck;
+      state.element = myElement;
+      state.attackMode = myAttackMode;
+      state.analysisBook = analysisBook;
+      state.analysisAnalysisBook = analysisAnalysisBook;
+      state.crystalCube = crystalCube;
+      state.crystalCubeMode = crystalCubeMode;
     } else {
-      if (!offensiveResult.dmg.isNullified) {
-        const { min, max, critMin, critMax } = offensiveResult.dmg;
-        lines.push(`与ダメ: ${min.toLocaleString()}〜${max.toLocaleString()} (クリ${critMin.toLocaleString()}〜${critMax.toLocaleString()})`);
-        const killStr = offensiveResult.hitsToKill === Infinity ? "∞" : `${offensiveResult.hitsToKill}`;
-        lines.push(`${offensiveResult.multiHit}段攻撃 / ${killStr}回確殺`);
-      } else {
-        lines.push("与ダメ: 防御貫通不可");
-      }
+      state.sim = compactSimConfig(simCfg);
     }
 
-    lines.push("#OnceWorld");
+    if (comparisonMonsters.length > 0) {
+      state.comparisonMonsters = comparisonMonsters.map((e) => ({
+        name: e.monster.name,
+        level: e.level,
+        location: e.location,
+      }));
+      state.comparisonActive = comparisonActive;
+      state.comparisonTab = comparisonTab;
+      if (comparisonSpell) state.comparisonSpell = comparisonSpell;
+    }
 
-    const text = lines.join("\n");
+    const url = await buildShareUrl(state);
     try {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(url);
     } catch {
       const ta = document.createElement("textarea");
-      ta.value = text;
+      ta.value = url;
       document.body.appendChild(ta);
       ta.select();
       document.execCommand("copy");
@@ -584,7 +644,7 @@ export function DamageCalculator() {
     }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  }, [scaled, offensiveResult, monsterLevel, myAttackMode, effElement, effAtk, effInt, effDef, effMdef, effSpd, statMode, simCfg]);
+  }, [selectedMonster, monsterLevel, statMode, myAtk, myInt, myDef, myMdef, mySpd, myVit, myLuck, myElement, myAttackMode, analysisBook, analysisAnalysisBook, crystalCube, crystalCubeMode, simCfg, comparisonMonsters, comparisonActive, comparisonTab, comparisonSpell]);
 
   const elements: Element[] = ["火", "水", "木", "光", "闇"];
   const attackModes: { value: PlayerAttackMode; label: string }[] = [
@@ -714,6 +774,30 @@ export function DamageCalculator() {
             </div>
             <h3 className="font-semibold text-gray-800">{t("common:myStatus")}</h3>
             <div className="ml-auto flex items-center gap-1.5">
+              <button
+                onClick={handleCopyShareUrl}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
+                  copied
+                    ? "bg-green-100 text-green-600"
+                    : "bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700"
+                }`}
+              >
+                {copied ? (
+                  <>
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                    コピー済
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    </svg>
+                    URLをコピー
+                  </>
+                )}
+              </button>
               {statMode === "manual" && (
                 <button
                   onClick={() => setPresetModalOpen(true)}
@@ -1042,34 +1126,8 @@ export function DamageCalculator() {
 
       {/* 与ダメージ */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between px-1">
+        <div className="flex items-center px-1">
           <h3 className="font-semibold text-gray-700">{t("offensiveDamage")}</h3>
-          {hasMonster && offensiveResult && (
-            <button
-              onClick={handleCopyShareText}
-              className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium transition-all ${
-                copied
-                  ? "bg-green-100 text-green-600"
-                  : "bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700"
-              }`}
-            >
-              {copied ? (
-                <>
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                  </svg>
-                  コピー済
-                </>
-              ) : (
-                <>
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                  シェア
-                </>
-              )}
-            </button>
-          )}
         </div>
 
         {hasMonster && offensiveResult ? (<>
