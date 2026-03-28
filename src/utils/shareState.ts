@@ -1,4 +1,21 @@
 import type { SimConfig } from "../types/game";
+import { DEFAULT_SIM_CONFIG } from "../hooks/useSharedSimConfig";
+
+/** デフォルト値と同じフィールドを除いてサイズを削減 */
+export function compactSimConfig(cfg: SimConfig): Partial<SimConfig> {
+  const compact: Partial<SimConfig> = {};
+  for (const key of Object.keys(DEFAULT_SIM_CONFIG) as (keyof SimConfig)[]) {
+    if (cfg[key] !== DEFAULT_SIM_CONFIG[key]) {
+      (compact as Record<string, unknown>)[key] = cfg[key];
+    }
+  }
+  return compact;
+}
+
+/** デフォルト値を補完してフル SimConfig に戻す */
+export function expandSimConfig(partial: Partial<SimConfig>): SimConfig {
+  return { ...DEFAULT_SIM_CONFIG, ...partial };
+}
 
 export interface DamageShareState {
   v: 1;
@@ -18,7 +35,7 @@ export interface DamageShareState {
   analysisAnalysisBook?: string;
   crystalCube?: string;
   crystalCubeMode?: "pre-def" | "final";
-  sim?: SimConfig;
+  sim?: Partial<SimConfig>;
   comparisonMonsters?: { name: string; level: number; location: string }[];
   comparisonActive?: boolean;
   comparisonTab?: "与ダメ" | "被ダメ";

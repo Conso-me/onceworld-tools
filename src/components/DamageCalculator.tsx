@@ -51,6 +51,8 @@ import {
   decodeShareState,
   getShareParam,
   clearShareParam,
+  compactSimConfig,
+  expandSimConfig,
   type DamageShareState,
 } from "../utils/shareState";
 
@@ -240,7 +242,7 @@ export function DamageCalculator() {
       if (state.crystalCube !== undefined) setCrystalCube(state.crystalCube);
       if (state.crystalCubeMode) setCrystalCubeMode(state.crystalCubeMode);
     } else if (state.statMode === "sim" && state.sim) {
-      replaceAllSim(state.sim);
+      replaceAllSim(expandSimConfig(state.sim));
     }
 
     if (state.comparisonMonsters && state.comparisonMonsters.length >= 2) {
@@ -613,7 +615,7 @@ export function DamageCalculator() {
       state.crystalCube = crystalCube;
       state.crystalCubeMode = crystalCubeMode;
     } else {
-      state.sim = simCfg;
+      state.sim = compactSimConfig(simCfg);
     }
 
     if (comparisonMonsters.length > 0) {
