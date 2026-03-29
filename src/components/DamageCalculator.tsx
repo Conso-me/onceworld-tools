@@ -98,7 +98,6 @@ export function DamageCalculator() {
   const [analysisBook, setAnalysisBook] = usePersistedState("dmg:analysisBook", "");
   const [analysisAnalysisBook, setAnalysisAnalysisBook] = usePersistedState("dmg:analysisAnalysisBook", "");
   const [crystalCube, setCrystalCube] = usePersistedState("dmg:crystalCube", "");
-  const [crystalCubeMode, setCrystalCubeMode] = usePersistedState<"pre-def" | "final">("dmg:crystalCubeMode", "final");
   // 物理オーバーキル計算に多段攻撃を含めるか（現状ゲーム内では多段でOKが発生しないためデフォルトOFF）
   const [physOverkillMultiHit, setPhysOverkillMultiHit] = usePersistedState("dmg:physOverkillMultiHit", false);
 
@@ -116,9 +115,9 @@ export function DamageCalculator() {
 
   const magicBaseInt = analysisBookNum * (1 + analysisAnalysisBookNum * 0.1);
   const crystalCubeMult = 1 + crystalCubeNum * 0.01;
-  // 計算タイミングに応じて分配
-  const crystalCubePreMult  = crystalCubeMode === "pre-def" ? crystalCubeMult : 1;
-  const crystalCubeFinalMult = crystalCubeMode === "final"   ? crystalCubeMult : 1;
+  // 魔晶立方体は防御計算前に適用（検証済み）
+  const crystalCubePreMult  = crystalCubeMult;
+  const crystalCubeFinalMult = 1;
 
   // 装備設定モード
   const [statMode, setStatMode] = usePersistedState<"manual" | "sim">("dmg:statMode", "manual");
@@ -241,7 +240,6 @@ export function DamageCalculator() {
       if (state.analysisBook !== undefined) setAnalysisBook(state.analysisBook);
       if (state.analysisAnalysisBook !== undefined) setAnalysisAnalysisBook(state.analysisAnalysisBook);
       if (state.crystalCube !== undefined) setCrystalCube(state.crystalCube);
-      if (state.crystalCubeMode) setCrystalCubeMode(state.crystalCubeMode);
     } else if (state.statMode === "sim" && state.sim) {
       replaceAllSim(expandSimConfig(state.sim));
     }
@@ -500,7 +498,6 @@ export function DamageCalculator() {
     selfToEnemyAffinity,
     magicBaseInt,
     crystalCubeMult,
-    crystalCubeMode,
     physOverkillMultiHit,
   ]);
 
@@ -615,7 +612,6 @@ export function DamageCalculator() {
       state.analysisBook = analysisBook;
       state.analysisAnalysisBook = analysisAnalysisBook;
       state.crystalCube = crystalCube;
-      state.crystalCubeMode = crystalCubeMode;
     } else {
       state.sim = compactSimConfig(simCfg);
     }
@@ -644,7 +640,7 @@ export function DamageCalculator() {
     }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  }, [selectedMonster, monsterLevel, statMode, myAtk, myInt, myDef, myMdef, mySpd, myVit, myLuck, myElement, myAttackMode, analysisBook, analysisAnalysisBook, crystalCube, crystalCubeMode, simCfg, comparisonMonsters, comparisonActive, comparisonTab, comparisonSpell]);
+  }, [selectedMonster, monsterLevel, statMode, myAtk, myInt, myDef, myMdef, mySpd, myVit, myLuck, myElement, myAttackMode, analysisBook, analysisAnalysisBook, crystalCube, simCfg, comparisonMonsters, comparisonActive, comparisonTab, comparisonSpell]);
 
   const elements: Element[] = ["火", "水", "木", "光", "闇"];
   const attackModes: { value: PlayerAttackMode; label: string }[] = [
@@ -941,7 +937,7 @@ export function DamageCalculator() {
 
           {/* 魔晶立方体（魔攻・魔弾共通） */}
           {(myAttackMode === "魔攻" || myAttackMode === "魔弾") && (
-            <div className="pt-2 border-t border-gray-100 space-y-2">
+            <div className="pt-2 border-t border-gray-100">
               <div className="grid grid-cols-2 gap-4">
                 <InputField
                   label={t("crystalCube")}
@@ -951,31 +947,6 @@ export function DamageCalculator() {
                   showReset
                   showMax
                 />
-              </div>
-              <div className="flex items-center gap-3 text-xs text-gray-500">
-                <span>計算タイミング:</span>
-                <label className="flex items-center gap-1 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="crystalCubeMode"
-                    value="final"
-                    checked={crystalCubeMode === "final"}
-                    onChange={() => setCrystalCubeMode("final")}
-                    className="accent-blue-500"
-                  />
-                  <span className={crystalCubeMode === "final" ? "text-blue-600" : ""}>最終ダメージ</span>
-                </label>
-                <label className="flex items-center gap-1 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="crystalCubeMode"
-                    value="pre-def"
-                    checked={crystalCubeMode === "pre-def"}
-                    onChange={() => setCrystalCubeMode("pre-def")}
-                    className="accent-blue-500"
-                  />
-                  <span className={crystalCubeMode === "pre-def" ? "text-blue-600" : ""}>防御計算前</span>
-                </label>
               </div>
             </div>
           )}

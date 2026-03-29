@@ -20,7 +20,7 @@ export interface DamageRange {
 /**
  * 有効防御値を計算
  * 物理: DEF + floor(M-DEF / 10)
- * 魔法/魔弾: M-DEF + floor(DEF / 10)
+ * 魔法/魔弾: M-DEF + ceil(DEF / 10)
  */
 export function calcEffectiveDef(
   def: number,
@@ -30,7 +30,7 @@ export function calcEffectiveDef(
   if (isPhysical) {
     return def + Math.floor(mdef / 10);
   }
-  return mdef + Math.floor(def / 10);
+  return mdef + Math.ceil(def / 10);
 }
 
 /**

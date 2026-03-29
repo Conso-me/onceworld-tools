@@ -22,8 +22,8 @@ describe("calcEffectiveDef", () => {
     expect(calcEffectiveDef(100, 50, true)).toBe(100 + Math.floor(50 / 10)); // 105
   });
 
-  it("magical: M-DEF + floor(DEF / 10)", () => {
-    expect(calcEffectiveDef(100, 50, false)).toBe(50 + Math.floor(100 / 10)); // 60
+  it("magical: M-DEF + ceil(DEF / 10)", () => {
+    expect(calcEffectiveDef(100, 50, false)).toBe(50 + Math.ceil(100 / 10)); // 60
   });
 
   it("physical with zero mdef", () => {
@@ -44,9 +44,9 @@ describe("calcEffectiveDef", () => {
     expect(calcEffectiveDef(100, 77, true)).toBe(107);
   });
 
-  it("floors fractional def/10 for magical", () => {
-    // 33 / 10 = 3.3 → floor → 3
-    expect(calcEffectiveDef(33, 100, false)).toBe(103);
+  it("ceils fractional def/10 for magical", () => {
+    // 33 / 10 = 3.3 → ceil → 4
+    expect(calcEffectiveDef(33, 100, false)).toBe(104);
   });
 });
 
