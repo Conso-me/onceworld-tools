@@ -142,7 +142,6 @@ export interface DamageShareState {
   analysisBook?: string;
   analysisAnalysisBook?: string;
   crystalCube?: string;
-  crystalCubeMode?: "pre-def" | "final";
   sim?: Partial<SimConfig>;
   comparisonMonsters?: { name: string; level: number; location: string }[];
   comparisonActive?: boolean;
