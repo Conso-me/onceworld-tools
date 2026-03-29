@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-03-29",
     changes: [
+    { type: "fix", text: "fix: 魔晶立方体を防御計算前適用に確定・魔法effectiveDefをceilに修正 (#45)" },
     { type: "feature", text: "docs: データJSONの末尾追加ルールをSKILLとCLAUDE.mdに明記" },
     { type: "improve", text: "perf: 装備・アクセ・ペット・モンスター名をIDに置換してURL短縮" },
     { type: "improve", text: "perf: deflate圧縮でシェアURLをさらに短縮（776→476文字）" },
