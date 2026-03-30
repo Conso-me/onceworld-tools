@@ -234,7 +234,7 @@ function ArenaMonsterRow({ result, onLevelClick, t, lang }: { result: ArenaResul
       <td className="px-2 py-1.5 text-right text-xs whitespace-nowrap">
         {result.playerDamage ? (
           <span className="text-sm text-gray-700">
-            {formatHitCount(result.playerDamage.min, lang)}~{formatHitCount(result.playerDamage.max, lang)}
+            {formatHitCount(result.playerDamage.min, lang)}~
           </span>
         ) : (
           <span className="text-gray-400">—</span>
