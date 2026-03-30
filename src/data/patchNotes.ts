@@ -15,6 +15,10 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-03-31",
     changes: [
+    { type: "improve", text: "refactor: 裏路地テーブルの防御/攻撃カラムを縦線で区切る" },
+    { type: "improve", text: "refactor: 裏路地の想定与ダメを最低値〜のみ表示に変更" },
+    { type: "improve", text: "refactor: 裏路地UIを整理" },
+    { type: "feature", text: "feat: 裏路地に物理攻撃の想定与ダメとHIT率カラムを追加" },
     { type: "improve", text: "fix: 裏路地のプリセット読み込みをビルドプリセット（装備シミュレータ）に統一" },
     ],
   },
