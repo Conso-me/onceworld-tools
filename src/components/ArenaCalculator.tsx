@@ -10,7 +10,7 @@ import {
   calcAdditionalDefNeeded,
   calcDamage,
 } from "../utils/defenseCalc";
-import { calcMultiHitCount } from "../utils/damageCalc";
+import { calcMultiHitCount, calcPhysicalDamage, calcHitRate } from "../utils/damageCalc";
 import { calcStatus } from "../utils/statusCalc";
 import { getMonsterByName } from "../data/monsters";
 import { InputField } from "./ui/InputField";
@@ -95,6 +95,8 @@ type ArenaResult = {
   hitsToSurvive: { worst: number; best: number } | null;
   lukEvasionLevel: LukEvasionLevel;
   scaledLuck: number;
+  playerDamage: { min: number; max: number } | null;
+  attackHitRate: number | null;
 };
 
 function LukEvasionBadge({ level, enemyLuk, t }: { level: LukEvasionLevel; enemyLuk: number; t: TFunction }) {
@@ -240,6 +242,26 @@ function ArenaMonsterRow({ result, onLevelClick, t, lang }: { result: ArenaResul
       <td className="px-2 py-1.5 text-center whitespace-nowrap">
         <LukEvasionBadge level={result.lukEvasionLevel} enemyLuk={result.scaledLuck} t={t} />
       </td>
+      <td className="px-2 py-1.5 text-right text-xs whitespace-nowrap">
+        {result.playerDamage ? (
+          <span className="text-sm text-gray-700">
+            {result.playerDamage.min === result.playerDamage.max
+              ? result.playerDamage.min.toLocaleString()
+              : `${result.playerDamage.min.toLocaleString()}~${result.playerDamage.max.toLocaleString()}`}
+          </span>
+        ) : (
+          <span className="text-gray-400">—</span>
+        )}
+      </td>
+      <td className="px-2 py-1.5 text-right whitespace-nowrap">
+        {result.attackHitRate !== null ? (
+          <span className={`text-sm font-medium ${result.attackHitRate === 100 ? "text-emerald-600" : result.attackHitRate < 50 ? "text-red-500" : "text-gray-700"}`}>
+            {result.attackHitRate}%
+          </span>
+        ) : (
+          <span className="text-gray-400">—</span>
+        )}
+      </td>
     </tr>
   );
 }
@@ -253,6 +275,8 @@ export function ArenaCalculator() {
   const [myMdef, setMyMdef] = usePersistedState("arena:mdef", "");
   const [myVit, setMyVit] = usePersistedState("arena:vit", "");
   const [myLuk, setMyLuk] = usePersistedState("arena:luk", "");
+  const [myAtk, setMyAtk] = usePersistedState("arena:atk", "");
+  const [mySpd, setMySpd] = usePersistedState("arena:spd", "");
   const [syncWithDmg, setSyncWithDmg] = usePersistedState("arena:sync", false);
   const [syncMode, setSyncMode] = usePersistedState<"manual" | "sim">("arena:syncMode", "manual");
   const [simCfg] = useSharedSimConfig();
@@ -285,6 +309,16 @@ export function ArenaCalculator() {
       ? simResult.final.luck
       : parseInt(JSON.parse(localStorage.getItem("owt:dmg:luck") ?? '""') || "0") || 0
     : parseInt(myLuk) || 0;
+  const effectiveAtk = syncWithDmg
+    ? syncMode === "sim"
+      ? simResult.final.atk
+      : parseInt(JSON.parse(localStorage.getItem("owt:dmg:atk") ?? '""') || "0") || 0
+    : parseInt(myAtk) || 0;
+  const effectiveSpd = syncWithDmg
+    ? syncMode === "sim"
+      ? simResult.final.spd
+      : parseInt(JSON.parse(localStorage.getItem("owt:dmg:spd") ?? '""') || "0") || 0
+    : parseInt(mySpd) || 0;
 
   const playerHp = effectiveVit > 0 ? effectiveVit * 18 + 100 : 0;
 
@@ -344,6 +378,21 @@ export function ArenaCalculator() {
 
       const scaledLuck = scaled.scaledLuck;
       const lukEvasionLevel = calcLukEvasion(effectiveLuk, scaledLuck);
+
+      // プレイヤーの物理攻撃によるダメージ
+      let playerDamage: { min: number; max: number } | null = null;
+      if (effectiveAtk > 0) {
+        const dmg = calcPhysicalDamage(effectiveAtk, scaled.scaledDef, scaled.scaledMdef);
+        const multiHit = calcMultiHitCount(effectiveSpd, false);
+        playerDamage = {
+          min: dmg.min * multiHit,
+          max: dmg.max * multiHit,
+        };
+      }
+
+      // 攻撃命中率（物理攻撃）
+      const attackHitRate = effectiveLuk > 0 ? calcHitRate(effectiveLuk, scaledLuck) : null;
+
       return {
         base,
         area,
@@ -357,9 +406,11 @@ export function ArenaCalculator() {
         hitsToSurvive,
         lukEvasionLevel,
         scaledLuck,
+        playerDamage,
+        attackHitRate,
       } satisfies ArenaResult;
     });
-  }, [effectiveDef, effectiveMdef, effectiveVit, effectiveLuk, arenaLevel, playerHp]);
+  }, [effectiveDef, effectiveMdef, effectiveVit, effectiveLuk, effectiveAtk, effectiveSpd, arenaLevel, playerHp]);
 
   const arenaLevelNum = useMemo(
     () =>
@@ -472,6 +523,35 @@ export function ArenaCalculator() {
               <>
                 <InputField label="VIT" value={myVit} onChange={setMyVit} />
                 <InputField label={t("lukEvasionLabel")} value={myLuk} onChange={setMyLuk} />
+              </>
+            )}
+          </div>
+
+          {/* ATK / SPD 入力 */}
+          <div className="grid grid-cols-2 gap-4 lg:gap-2">
+            {syncWithDmg ? (
+              <>
+                <div className="space-y-1.5 lg:space-y-1">
+                  <label className="block text-sm lg:text-xs font-medium text-gray-400">
+                    ATK
+                  </label>
+                  <div className="w-full px-4 py-3 lg:py-2 bg-gray-50 border border-gray-200 rounded-xl text-lg lg:text-base font-medium text-gray-400">
+                    {effectiveAtk > 0 ? effectiveAtk.toLocaleString() : "—"}
+                  </div>
+                </div>
+                <div className="space-y-1.5 lg:space-y-1">
+                  <label className="block text-sm lg:text-xs font-medium text-gray-400">
+                    SPD
+                  </label>
+                  <div className="w-full px-4 py-3 lg:py-2 bg-gray-50 border border-gray-200 rounded-xl text-lg lg:text-base font-medium text-gray-400">
+                    {effectiveSpd > 0 ? effectiveSpd.toLocaleString() : "—"}
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <InputField label="ATK" value={myAtk} onChange={setMyAtk} />
+                <InputField label="SPD" value={mySpd} onChange={setMySpd} />
               </>
             )}
           </div>
@@ -603,6 +683,12 @@ export function ArenaCalculator() {
                 </th>
                 <th className="px-2 py-2 text-center font-medium whitespace-nowrap">
                   {t("tableHeaders.lukEvasion")}
+                </th>
+                <th className="px-2 py-2 text-right font-medium whitespace-nowrap">
+                  {t("tableHeaders.attackDmg")}
+                </th>
+                <th className="px-2 py-2 text-right font-medium whitespace-nowrap">
+                  {t("tableHeaders.hitRate")}
                 </th>
               </tr>
             </thead>

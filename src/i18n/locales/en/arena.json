@@ -17,7 +17,9 @@
     "endurance": "Survive",
     "maxLv": "Max Lv",
     "additionalDef": "Needed DEF/MDEF",
-    "lukEvasion": "LUK Evasion"
+    "lukEvasion": "LUK Evasion",
+    "attackDmg": "Exp. DMG",
+    "hitRate": "HIT%"
   },
   "nullifyAchieved": "Nullified",
   "notAchieved": "Not Yet",
