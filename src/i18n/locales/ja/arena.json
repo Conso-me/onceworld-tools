@@ -16,8 +16,10 @@
     "nullify": "無効化",
     "endurance": "耐久回数",
     "maxLv": "限界Lv",
-    "additionalDef": "あと必要DEF/MDEF",
-    "lukEvasion": "LUK回避"
+    "additionalDef": "要求DEF/MDEF",
+    "lukEvasion": "LUK回避",
+    "attackDmg": "想定与ダメ",
+    "hitRate": "HIT率"
   },
   "nullifyAchieved": "無効化達成",
   "notAchieved": "未達成",

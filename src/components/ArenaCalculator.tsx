@@ -10,7 +10,7 @@ import {
   calcAdditionalDefNeeded,
   calcDamage,
 } from "../utils/defenseCalc";
-import { calcMultiHitCount } from "../utils/damageCalc";
+import { calcMultiHitCount, calcPhysicalDamage, calcHitRate } from "../utils/damageCalc";
 import { calcStatus } from "../utils/statusCalc";
 import { getMonsterByName } from "../data/monsters";
 import { InputField } from "./ui/InputField";
@@ -95,6 +95,8 @@ type ArenaResult = {
   hitsToSurvive: { worst: number; best: number } | null;
   lukEvasionLevel: LukEvasionLevel;
   scaledLuck: number;
+  playerDamage: { min: number; max: number } | null;
+  attackHitRate: number | null;
 };
 
 function LukEvasionBadge({ level, enemyLuk, t }: { level: LukEvasionLevel; enemyLuk: number; t: TFunction }) {
@@ -164,22 +166,14 @@ function HitsToSurviveBadge({ hits, lukLevel, lang, t }: { hits: { worst: number
   const isDangerous = hits.worst < 5 && lukLevel !== "ほぼほぼ" && lukLevel !== "大体";
   const times = t("common:times");
   const worstStr = formatHitCount(hits.worst, lang);
-  const bestStr = formatHitCount(hits.best, lang);
   if (isDangerous) {
     return (
       <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-600 border border-red-200">
-        {worstStr === bestStr ? `${worstStr}${times}` : `${worstStr}~${bestStr}${times}`}
+        {worstStr}{times}~
       </span>
     );
   }
-  if (worstStr === bestStr) {
-    return <span className="text-sm text-gray-700">{worstStr}{times}</span>;
-  }
-  return (
-    <span className="text-sm text-gray-700">
-      {worstStr}~{bestStr}{times}
-    </span>
-  );
+  return <span className="text-sm text-gray-700">{worstStr}{times}~</span>;
 }
 
 function ArenaMonsterRow({ result, onLevelClick, t, lang }: { result: ArenaResult; onLevelClick?: (lv: number) => void; t: TFunction; lang: string }) {
@@ -199,9 +193,6 @@ function ArenaMonsterRow({ result, onLevelClick, t, lang }: { result: ArenaResul
     <tr className={`border-b ${rowBg} text-sm`}>
       <td className="px-2 py-1.5 font-medium text-gray-800 whitespace-nowrap">
         {result.base.name}
-      </td>
-      <td className="px-2 py-1.5 text-gray-500 whitespace-nowrap text-xs">
-        {t(`area.${result.area}`)}
       </td>
       <td className="px-2 py-1.5 whitespace-nowrap">
         <span
@@ -240,6 +231,24 @@ function ArenaMonsterRow({ result, onLevelClick, t, lang }: { result: ArenaResul
       <td className="px-2 py-1.5 text-center whitespace-nowrap">
         <LukEvasionBadge level={result.lukEvasionLevel} enemyLuk={result.scaledLuck} t={t} />
       </td>
+      <td className="px-2 py-1.5 text-right text-xs whitespace-nowrap border-l-2 border-l-gray-300">
+        {result.playerDamage ? (
+          <span className="text-sm text-gray-700">
+            {formatHitCount(result.playerDamage.min, lang)}~
+          </span>
+        ) : (
+          <span className="text-gray-400">—</span>
+        )}
+      </td>
+      <td className="px-2 py-1.5 text-right whitespace-nowrap">
+        {result.attackHitRate !== null ? (
+          <span className={`text-sm font-medium ${result.attackHitRate === 100 ? "text-emerald-600" : result.attackHitRate < 50 ? "text-red-500" : "text-gray-700"}`}>
+            {result.attackHitRate}%
+          </span>
+        ) : (
+          <span className="text-gray-400">—</span>
+        )}
+      </td>
     </tr>
   );
 }
@@ -253,6 +262,8 @@ export function ArenaCalculator() {
   const [myMdef, setMyMdef] = usePersistedState("arena:mdef", "");
   const [myVit, setMyVit] = usePersistedState("arena:vit", "");
   const [myLuk, setMyLuk] = usePersistedState("arena:luk", "");
+  const [myAtk, setMyAtk] = usePersistedState("arena:atk", "");
+  const [mySpd, setMySpd] = usePersistedState("arena:spd", "");
   const [syncWithDmg, setSyncWithDmg] = usePersistedState("arena:sync", false);
   const [syncMode, setSyncMode] = usePersistedState<"manual" | "sim">("arena:syncMode", "manual");
   const [simCfg] = useSharedSimConfig();
@@ -285,6 +296,16 @@ export function ArenaCalculator() {
       ? simResult.final.luck
       : parseInt(JSON.parse(localStorage.getItem("owt:dmg:luck") ?? '""') || "0") || 0
     : parseInt(myLuk) || 0;
+  const effectiveAtk = syncWithDmg
+    ? syncMode === "sim"
+      ? simResult.final.atk
+      : parseInt(JSON.parse(localStorage.getItem("owt:dmg:atk") ?? '""') || "0") || 0
+    : parseInt(myAtk) || 0;
+  const effectiveSpd = syncWithDmg
+    ? syncMode === "sim"
+      ? simResult.final.spd
+      : parseInt(JSON.parse(localStorage.getItem("owt:dmg:spd") ?? '""') || "0") || 0
+    : parseInt(mySpd) || 0;
 
   const playerHp = effectiveVit > 0 ? effectiveVit * 18 + 100 : 0;
 
@@ -344,6 +365,21 @@ export function ArenaCalculator() {
 
       const scaledLuck = scaled.scaledLuck;
       const lukEvasionLevel = calcLukEvasion(effectiveLuk, scaledLuck);
+
+      // プレイヤーの物理攻撃によるダメージ
+      let playerDamage: { min: number; max: number } | null = null;
+      if (effectiveAtk > 0) {
+        const dmg = calcPhysicalDamage(effectiveAtk, scaled.scaledDef, scaled.scaledMdef);
+        const multiHit = calcMultiHitCount(effectiveSpd, false);
+        playerDamage = {
+          min: dmg.min * multiHit,
+          max: dmg.max * multiHit,
+        };
+      }
+
+      // 攻撃命中率（物理攻撃）
+      const attackHitRate = effectiveLuk > 0 ? calcHitRate(effectiveLuk, scaledLuck) : null;
+
       return {
         base,
         area,
@@ -357,9 +393,11 @@ export function ArenaCalculator() {
         hitsToSurvive,
         lukEvasionLevel,
         scaledLuck,
+        playerDamage,
+        attackHitRate,
       } satisfies ArenaResult;
     });
-  }, [effectiveDef, effectiveMdef, effectiveVit, effectiveLuk, arenaLevel, playerHp]);
+  }, [effectiveDef, effectiveMdef, effectiveVit, effectiveLuk, effectiveAtk, effectiveSpd, arenaLevel, playerHp]);
 
   const arenaLevelNum = useMemo(
     () =>
@@ -410,69 +448,28 @@ export function ArenaCalculator() {
 
           <div className="border-t border-gray-100" />
 
-          {/* DEF / M-DEF 入力 */}
+          {/* ステータス入力 (割り振り順: VIT→SPD→ATK→DEF→M-DEF→LUCK) */}
           <div className="grid grid-cols-2 gap-4 lg:gap-2">
-            {syncWithDmg ? (
-              <>
-                <div className="space-y-1.5 lg:space-y-1">
-                  <label className="block text-sm lg:text-xs font-medium text-gray-400">
-                    DEF
-                  </label>
+            {(
+              [
+                { label: "VIT",              val: effectiveVit,  raw: myVit,  set: setMyVit  },
+                { label: "SPD",              val: effectiveSpd,  raw: mySpd,  set: setMySpd  },
+                { label: "ATK",              val: effectiveAtk,  raw: myAtk,  set: setMyAtk  },
+                { label: "DEF",              val: effectiveDef,  raw: myDef,  set: setMyDef  },
+                { label: "M-DEF",            val: effectiveMdef, raw: myMdef, set: setMyMdef },
+                { label: t("lukEvasionLabel"), val: effectiveLuk, raw: myLuk,  set: setMyLuk  },
+              ] as const
+            ).map(({ label, val, raw, set }) =>
+              syncWithDmg ? (
+                <div key={label} className="space-y-1.5 lg:space-y-1">
+                  <label className="block text-sm lg:text-xs font-medium text-gray-400">{label}</label>
                   <div className="w-full px-4 py-3 lg:py-2 bg-gray-50 border border-gray-200 rounded-xl text-lg lg:text-base font-medium text-gray-400">
-                    {effectiveDef > 0
-                      ? effectiveDef.toLocaleString()
-                      : "—"}
+                    {val > 0 ? val.toLocaleString() : "—"}
                   </div>
                 </div>
-                <div className="space-y-1.5 lg:space-y-1">
-                  <label className="block text-sm lg:text-xs font-medium text-gray-400">
-                    M-DEF
-                  </label>
-                  <div className="w-full px-4 py-3 lg:py-2 bg-gray-50 border border-gray-200 rounded-xl text-lg lg:text-base font-medium text-gray-400">
-                    {effectiveMdef > 0
-                      ? effectiveMdef.toLocaleString()
-                      : "—"}
-                  </div>
-                </div>
-              </>
-            ) : (
-              <>
-                <InputField label="DEF" value={myDef} onChange={setMyDef} />
-                <InputField
-                  label="M-DEF"
-                  value={myMdef}
-                  onChange={setMyMdef}
-                />
-              </>
-            )}
-          </div>
-
-          {/* VIT / LUK 入力 */}
-          <div className="grid grid-cols-2 gap-4 lg:gap-2">
-            {syncWithDmg ? (
-              <>
-                <div className="space-y-1.5 lg:space-y-1">
-                  <label className="block text-sm lg:text-xs font-medium text-gray-400">
-                    VIT
-                  </label>
-                  <div className="w-full px-4 py-3 lg:py-2 bg-gray-50 border border-gray-200 rounded-xl text-lg lg:text-base font-medium text-gray-400">
-                    {effectiveVit > 0 ? effectiveVit.toLocaleString() : "—"}
-                  </div>
-                </div>
-                <div className="space-y-1.5 lg:space-y-1">
-                  <label className="block text-sm lg:text-xs font-medium text-gray-400">
-                    {t("lukEvasionLabel")}
-                  </label>
-                  <div className="w-full px-4 py-3 lg:py-2 bg-gray-50 border border-gray-200 rounded-xl text-lg lg:text-base font-medium text-gray-400">
-                    {effectiveLuk > 0 ? effectiveLuk.toLocaleString() : "—"}
-                  </div>
-                </div>
-              </>
-            ) : (
-              <>
-                <InputField label="VIT" value={myVit} onChange={setMyVit} />
-                <InputField label={t("lukEvasionLabel")} value={myLuk} onChange={setMyLuk} />
-              </>
+              ) : (
+                <InputField key={label} label={label} value={raw} onChange={set} />
+              )
             )}
           </div>
 
@@ -586,7 +583,6 @@ export function ArenaCalculator() {
             <thead>
               <tr className="bg-gray-50 text-xs text-gray-500 border-b border-gray-200">
                 <th className="px-2 py-2 text-left font-medium">{t("tableHeaders.monster")}</th>
-                <th className="px-2 py-2 text-left font-medium">{t("tableHeaders.location")}</th>
                 <th className="px-2 py-2 text-left font-medium">{t("tableHeaders.type")}</th>
                 <th className="px-2 py-2 text-right font-medium whitespace-nowrap">
                   {t("tableHeaders.attackPower", { level: arenaLevelNum.toLocaleString() })}
@@ -603,6 +599,12 @@ export function ArenaCalculator() {
                 </th>
                 <th className="px-2 py-2 text-center font-medium whitespace-nowrap">
                   {t("tableHeaders.lukEvasion")}
+                </th>
+                <th className="px-2 py-2 text-right font-medium whitespace-nowrap border-l-2 border-l-gray-300">
+                  {t("tableHeaders.attackDmg")}
+                </th>
+                <th className="px-2 py-2 text-right font-medium whitespace-nowrap">
+                  {t("tableHeaders.hitRate")}
                 </th>
               </tr>
             </thead>
