@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-03-31",
+    changes: [
+    { type: "improve", text: "fix: 裏路地のプリセット読み込みをビルドプリセット（装備シミュレータ）に統一" },
+    ],
+  },
+
+  {
     date: "2026-03-29",
     changes: [
     { type: "fix", text: "fix: 魔晶立方体を防御計算前適用に確定・魔法effectiveDefをceilに修正 (#45)" },
