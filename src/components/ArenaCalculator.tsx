@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { usePersistedState } from "../hooks/usePersistedState";
 import { useSharedSimConfig } from "../hooks/useSharedSimConfig";
-import { useStatPresets } from "../hooks/useStatPresets";
+import { useSimPresets } from "../hooks/useSimPresets";
 import { scaleMonster } from "../utils/monsterScaling";
 import { formatHitCount } from "../utils/formatNumber";
 import {
@@ -261,8 +261,8 @@ export function ArenaCalculator() {
     "arena:level",
     "10000"
   );
-  const [selectedPresetId, setSelectedPresetId] = useState("");
-  const { presets, loadPreset } = useStatPresets();
+  const [selectedSimPresetId, setSelectedSimPresetId] = useState("");
+  const { presets: simPresets, loadPreset: loadSimPreset } = useSimPresets();
 
   // syncON時はdmg:タブの値を読む（syncModeで手動入力/装備設定を選択）
   const effectiveDef = syncWithDmg
@@ -288,15 +288,16 @@ export function ArenaCalculator() {
 
   const playerHp = effectiveVit > 0 ? effectiveVit * 18 + 100 : 0;
 
-  const handleLoadPreset = (id: string) => {
-    const preset = loadPreset(id);
-    if (!preset) return;
-    setMyDef(preset.def);
-    setMyMdef(preset.mdef);
-    setMyVit(preset.vit);
-    setMyLuk(preset.luck);
+  const handleLoadSimPreset = (id: string) => {
+    const simPreset = loadSimPreset(id);
+    if (!simPreset) return;
+    const result = calcStatus(simPreset.config);
+    setMyDef(String(result.final.def));
+    setMyMdef(String(result.final.mdef));
+    setMyVit(String(result.final.vit));
+    setMyLuk(String(result.final.luck));
     setSyncWithDmg(false);
-    setSelectedPresetId(id);
+    setSelectedSimPresetId(id);
   };
 
   const arenaResults = useMemo(() => {
@@ -379,27 +380,27 @@ export function ArenaCalculator() {
             <h3 className="font-semibold text-gray-800">{t("common:myStatus")}</h3>
           </div>
 
-          {/* プリセット読み込み */}
+          {/* ビルドプリセット読み込み（装備シミュレータ） */}
           <div className="space-y-1.5">
             <label className="block text-xs font-medium text-gray-500">
               {t("presetLoad")}
             </label>
             <div className="flex gap-1.5">
               <select
-                value={selectedPresetId}
-                onChange={(e) => setSelectedPresetId(e.target.value)}
+                value={selectedSimPresetId}
+                onChange={(e) => setSelectedSimPresetId(e.target.value)}
                 className="flex-1 min-w-0 text-sm rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-gray-700"
               >
                 <option value="">{t("common:select")}</option>
-                {presets.map((p) => (
+                {simPresets.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name}
                   </option>
                 ))}
               </select>
               <button
-                onClick={() => handleLoadPreset(selectedPresetId)}
-                disabled={!selectedPresetId}
+                onClick={() => handleLoadSimPreset(selectedSimPresetId)}
+                disabled={!selectedSimPresetId}
                 className="px-3 py-1.5 text-xs rounded-lg bg-indigo-100 text-indigo-600 font-medium disabled:opacity-40 hover:bg-indigo-200 transition-colors"
               >
                 {t("common:load")}
