@@ -231,7 +231,7 @@ function ArenaMonsterRow({ result, onLevelClick, t, lang }: { result: ArenaResul
       <td className="px-2 py-1.5 text-center whitespace-nowrap">
         <LukEvasionBadge level={result.lukEvasionLevel} enemyLuk={result.scaledLuck} t={t} />
       </td>
-      <td className="px-2 py-1.5 text-right text-xs whitespace-nowrap">
+      <td className="px-2 py-1.5 text-right text-xs whitespace-nowrap border-l-2 border-l-gray-300">
         {result.playerDamage ? (
           <span className="text-sm text-gray-700">
             {formatHitCount(result.playerDamage.min, lang)}~
@@ -600,7 +600,7 @@ export function ArenaCalculator() {
                 <th className="px-2 py-2 text-center font-medium whitespace-nowrap">
                   {t("tableHeaders.lukEvasion")}
                 </th>
-                <th className="px-2 py-2 text-right font-medium whitespace-nowrap">
+                <th className="px-2 py-2 text-right font-medium whitespace-nowrap border-l-2 border-l-gray-300">
                   {t("tableHeaders.attackDmg")}
                 </th>
                 <th className="px-2 py-2 text-right font-medium whitespace-nowrap">
