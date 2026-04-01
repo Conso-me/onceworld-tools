@@ -4,7 +4,7 @@ import { resolve } from "path";
 
 const DATA_PATH = resolve(import.meta.dirname, "../src/data/patchNotes.ts");
 
-type ChangeType = "fix" | "feature" | "improve";
+type ChangeType = "fix" | "feature" | "improve" | "feedback" | "wip";
 
 interface PatchChange {
   type: ChangeType;
@@ -17,6 +17,7 @@ interface PatchEntry {
 }
 
 function classifyChange(subject: string): ChangeType {
+  if (/\[feedback\]/i.test(subject)) return "feedback";
   if (/修正|バグ/.test(subject)) return "fix";
   if (/追加|実装|新規/.test(subject)) return "feature";
   return "improve";
@@ -38,7 +39,8 @@ function getGitLog(): PatchEntry[] {
     if (subject.startsWith("Merge branch")) continue;
     if (/^chore(\(.+\))?:/.test(subject)) continue;
 
-    const change: PatchChange = { type: classifyChange(subject), text: subject };
+    const cleanSubject = subject.replace(/\[feedback\]\s*/i, "").trim();
+    const change: PatchChange = { type: classifyChange(subject), text: cleanSubject };
     if (!grouped.has(date)) grouped.set(date, []);
     grouped.get(date)!.push(change);
   }

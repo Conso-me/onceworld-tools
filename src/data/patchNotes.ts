@@ -1,4 +1,4 @@
-export type ChangeType = "fix" | "feature" | "improve";
+export type ChangeType = "fix" | "feature" | "improve" | "feedback" | "wip";
 
 export interface PatchChange {
   type: ChangeType;
@@ -12,6 +12,15 @@ export interface PatchEntry {
 }
 
 export const patchNotes: PatchEntry[] = [
+  {
+    date: "2026-04-02",
+    changes: [
+    { type: "feedback", text: "ステータスポイントの計算ミスを修正（Lv200・天命輪廻0・羽ペン0時に5275→4975と表示される不具合）" },
+    { type: "wip", text: "天命輪廻12→13回でステータスポイントが減少する問題：原因特定済み・計算式を検証中" },
+    { type: "feedback", text: "ダメージ計算にOver Killラインを追加（魔結晶収集に必要なATK/INT目安を表示）" },
+    ],
+  },
+
   {
     date: "2026-03-31",
     changes: [
