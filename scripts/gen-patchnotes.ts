@@ -4,7 +4,7 @@ import { resolve } from "path";
 
 const DATA_PATH = resolve(import.meta.dirname, "../src/data/patchNotes.ts");
 
-type ChangeType = "fix" | "feature" | "improve" | "feedback";
+type ChangeType = "fix" | "feature" | "improve" | "feedback" | "wip";
 
 interface PatchChange {
   type: ChangeType;
