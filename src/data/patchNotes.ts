@@ -1,4 +1,4 @@
-export type ChangeType = "fix" | "feature" | "improve";
+export type ChangeType = "fix" | "feature" | "improve" | "feedback";
 
 export interface PatchChange {
   type: ChangeType;

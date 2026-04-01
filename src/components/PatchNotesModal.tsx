@@ -7,11 +7,12 @@ const badgeClass: Record<ChangeType, string> = {
   fix: "bg-red-100 text-red-600",
   feature: "bg-green-100 text-green-600",
   improve: "bg-blue-100 text-blue-600",
+  feedback: "bg-orange-100 text-orange-600",
 };
 
 const BADGE_LABELS: Record<string, Record<ChangeType, string>> = {
-  ja: { fix: "修正", feature: "追加", improve: "改善" },
-  en: { fix: "Fix", feature: "New", improve: "Improve" },
+  ja: { fix: "修正", feature: "追加", improve: "改善", feedback: "FB対応" },
+  en: { fix: "Fix", feature: "New", improve: "Improve", feedback: "Feedback" },
 };
 
 const EN_MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -142,6 +143,7 @@ export function PatchNotesModal({ onClose }: { onClose: () => void }) {
     { id: "feature", label: badgeLabel.feature },
     { id: "fix", label: badgeLabel.fix },
     { id: "improve", label: badgeLabel.improve },
+    { id: "feedback", label: badgeLabel.feedback },
   ];
 
   useEffect(() => {
