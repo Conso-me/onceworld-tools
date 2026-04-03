@@ -141,6 +141,7 @@ export const enemyPresetGroups: EnemyPresetGroup[] = [
     presets: [
       { monsterName: "禁域のワイバーン", level: 35000, location: "雪山【禁域】" },
       { monsterName: "BOX", level: 50000, location: "雪山【禁域】" },
+      { monsterName: "BOX", level: 100000, location: "雪山【禁域】" },
       { monsterName: "浮遊イカ", level: 15000, location: "雪山【禁域】" },
       { monsterName: "雪だるまん", level: 15000, location: "雪山【禁域】" },
       { monsterName: "マッドシャーク", level: 17000, location: "雪山【禁域】" },
