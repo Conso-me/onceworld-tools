@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-04-03",
+    changes: [
+    { type: "feature", text: "feat: 雪山禁域にBOX Lv.100000プリセットを追加" },
+    ],
+  },
+
+  {
     date: "2026-04-02",
     changes: [
     { type: "feature", text: "feat: フィードバック対応状況をパッチノートに追加" },
