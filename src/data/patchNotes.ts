@@ -13,6 +13,18 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-04-04",
+    changes: [
+    { type: "improve", text: "fix: 比較テーブルのヘッダーラベルを全て左揃えに統一" },
+    { type: "feature", text: "feat: 数値表記を億・兆まで対応（英語はB・T追加）" },
+    { type: "improve", text: "fix: ダメージ値のwrap防止（万が改行される問題）" },
+    { type: "improve", text: "fix: 被ダメ・与ダメの最小値/最大値を列で揃える" },
+    { type: "fix", text: "fix: 無効化DEF/MDEF・必要LUCK を専用列に分離、受けられる回数ラベル改行修正" },
+    { type: "fix", text: "fix: 被ダメ表示幅修正・無効化必要DEF/MDEF表示追加 (close #66)" },
+    ],
+  },
+
+  {
     date: "2026-04-03",
     changes: [
     { type: "feature", text: "feat: 雪山禁域にBOX Lv.100000プリセットを追加" },
