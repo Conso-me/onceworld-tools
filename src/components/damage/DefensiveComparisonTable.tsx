@@ -27,7 +27,7 @@ export function DefensiveComparisonTable({ rows, onSelectMonster }: Props) {
       {/* ヘッダー */}
       <div className="grid grid-cols-[1fr_auto_auto_auto] gap-x-2 px-3 py-2 bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wide">
         <span>{t("common:monster")}</span>
-        <span className="text-right w-24">{t("defensePanel.currentDamage")}</span>
+        <span className="text-right w-28">{t("defensePanel.currentDamage")}</span>
         <span className="text-right w-16">{t("defensePanel.survivableHits")}</span>
         <span className="text-right w-12"></span>
       </div>
@@ -73,10 +73,22 @@ export function DefensiveComparisonTable({ rows, onSelectMonster }: Props) {
                     </span>
                   )}
                 </div>
+                {/* 無効化に必要なDEF/MDEF */}
+                <div className="mt-0.5">
+                  <span className="text-[10px] text-gray-400">
+                    {row.enemyIsPhysical ? "無効化DEF" : "無効化MDEF"}:{" "}
+                    {row.nullifyDef.toLocaleString()}
+                    {row.additionalDefNeeded > 0 && (
+                      <span className="text-orange-500">
+                        {" "}(あと{Math.ceil(row.additionalDefNeeded).toLocaleString()}必要)
+                      </span>
+                    )}
+                  </span>
+                </div>
               </div>
 
               {/* 被ダメ */}
-              <div className="text-right w-24">
+              <div className="text-right w-28">
                 {row.nullified ? (
                   <span className="text-xs text-green-600 font-medium">1〜9</span>
                 ) : (

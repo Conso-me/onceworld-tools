@@ -137,6 +137,12 @@ export interface DefensiveComparisonRow {
   currentDmg: { min: number; max: number };
   enemyMultiHit: number;
   hitsToTake: { worst: number; best: number } | null;
+  /** 無効化に必要な DEF（物理）または MDEF（魔法） */
+  nullifyDef: number;
+  /** 現在の有効防御値（物理: DEF + MDEF/10、魔法: MDEF + DEF/10） */
+  effectiveSelfDef: number;
+  /** あといくつ必要か（0なら既に無効化） */
+  additionalDefNeeded: number;
 }
 
 export function calcDefensiveComparison(
@@ -181,6 +187,15 @@ export function calcDefensiveComparison(
         }
       : null;
 
+    // 無効化に必要な DEF/MDEF (H26: ceil(enemyStat * 1.75))
+    const nullifyDef = Math.ceil(enemyStat * 1.75);
+    // 現在の有効防御値 (物理: DEF + MDEF/10、魔法: MDEF + DEF/10)
+    const effectiveSelfDef = enemyIsPhysical
+      ? playerStats.def + playerStats.mdef / 10
+      : playerStats.mdef + playerStats.def / 10;
+    // あといくつ必要か (H34: max(nullifyDef - effectiveSelfDef, 0))
+    const additionalDefNeeded = Math.max(nullifyDef - effectiveSelfDef, 0);
+
     return {
       entry,
       scaled,
@@ -191,6 +206,9 @@ export function calcDefensiveComparison(
       currentDmg,
       enemyMultiHit,
       hitsToTake,
+      nullifyDef,
+      effectiveSelfDef,
+      additionalDefNeeded,
     };
   });
 }
