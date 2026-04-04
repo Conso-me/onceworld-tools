@@ -104,11 +104,11 @@ export function DefensiveComparisonTable({ rows, onSelectMonster }: Props) {
                   </div>
                 ) : (
                   <div className="grid grid-cols-[1fr_auto_1fr] items-center">
-                    <span className="tabular-nums text-sm font-semibold text-red-500 text-right">
+                    <span className="tabular-nums text-sm font-semibold text-red-500 text-right whitespace-nowrap">
                       {formatHitCount(row.currentDmg.min, lang)}
                     </span>
                     <span className="text-sm font-semibold text-red-500 px-0.5">〜</span>
-                    <span className="tabular-nums text-sm font-semibold text-red-500 text-right">
+                    <span className="tabular-nums text-sm font-semibold text-red-500 text-right whitespace-nowrap">
                       {formatHitCount(row.currentDmg.max, lang)}
                     </span>
                   </div>

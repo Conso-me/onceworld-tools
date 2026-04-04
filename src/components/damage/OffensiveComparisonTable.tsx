@@ -168,11 +168,11 @@ export function OffensiveComparisonTable({ rows, onSelectMonster, selectedSpellN
                   </div>
                 ) : (
                   <div className="grid grid-cols-[1fr_auto_1fr] items-center">
-                    <span className="tabular-nums text-sm font-semibold text-gray-700 text-right">
+                    <span className="tabular-nums text-sm font-semibold text-gray-700 text-right whitespace-nowrap">
                       {formatHitCount(dmgMin, lang)}
                     </span>
                     <span className="text-sm font-semibold text-gray-700 px-0.5">〜</span>
-                    <span className="tabular-nums text-sm font-semibold text-gray-700 text-right">
+                    <span className="tabular-nums text-sm font-semibold text-gray-700 text-right whitespace-nowrap">
                       {formatHitCount(dmgMax, lang)}
                     </span>
                   </div>
