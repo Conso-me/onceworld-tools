@@ -27,10 +27,10 @@ export function DefensiveComparisonTable({ rows, onSelectMonster }: Props) {
       {/* ヘッダー */}
       <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-x-2 px-3 py-2 bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wide">
         <span>{t("common:monster")}</span>
-        <span className="text-right w-20 whitespace-nowrap">無効化</span>
-        <span className="text-right w-28">{t("defensePanel.currentDamage")}</span>
-        <span className="text-right w-24 whitespace-nowrap">{t("defensePanel.survivableHits")}</span>
-        <span className="text-right w-12"></span>
+        <span className="w-20 whitespace-nowrap">無効化</span>
+        <span className="w-28">{t("defensePanel.currentDamage")}</span>
+        <span className="w-24 whitespace-nowrap">{t("defensePanel.survivableHits")}</span>
+        <span className="w-12"></span>
       </div>
 
       {/* 行 */}
