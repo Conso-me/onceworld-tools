@@ -95,13 +95,23 @@ export function DefensiveComparisonTable({ rows, onSelectMonster }: Props) {
               </div>
 
               {/* 被ダメ */}
-              <div className="text-right w-28">
+              <div className="w-28">
                 {row.nullified ? (
-                  <span className="text-xs text-green-600 font-medium">1〜9</span>
+                  <div className="grid grid-cols-[1fr_auto_1fr] items-center">
+                    <span className="tabular-nums text-xs text-green-600 font-medium text-right">1</span>
+                    <span className="text-xs text-green-600 font-medium px-0.5">〜</span>
+                    <span className="tabular-nums text-xs text-green-600 font-medium text-right">9</span>
+                  </div>
                 ) : (
-                  <span className="text-sm font-semibold text-red-500 tabular-nums">
-                    {formatHitCount(row.currentDmg.min, lang)}〜{formatHitCount(row.currentDmg.max, lang)}
-                  </span>
+                  <div className="grid grid-cols-[1fr_auto_1fr] items-center">
+                    <span className="tabular-nums text-sm font-semibold text-red-500 text-right">
+                      {formatHitCount(row.currentDmg.min, lang)}
+                    </span>
+                    <span className="text-sm font-semibold text-red-500 px-0.5">〜</span>
+                    <span className="tabular-nums text-sm font-semibold text-red-500 text-right">
+                      {formatHitCount(row.currentDmg.max, lang)}
+                    </span>
+                  </div>
                 )}
               </div>
 

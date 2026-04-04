@@ -161,13 +161,19 @@ export function OffensiveComparisonTable({ rows, onSelectMonster, selectedSpellN
               )}
 
               {/* ダメージ */}
-              <div className="text-right w-32">
+              <div className="w-32">
                 {isNullified ? (
-                  <span className="text-xs text-gray-400">{t("cannotPenetrate")}</span>
+                  <div className="text-right">
+                    <span className="text-xs text-gray-400">{t("cannotPenetrate")}</span>
+                  </div>
                 ) : (
-                  <div>
-                    <span className="text-sm font-semibold text-gray-700 tabular-nums">
-                      {formatHitCount(dmgMin, lang)}〜{formatHitCount(dmgMax, lang)}
+                  <div className="grid grid-cols-[1fr_auto_1fr] items-center">
+                    <span className="tabular-nums text-sm font-semibold text-gray-700 text-right">
+                      {formatHitCount(dmgMin, lang)}
+                    </span>
+                    <span className="text-sm font-semibold text-gray-700 px-0.5">〜</span>
+                    <span className="tabular-nums text-sm font-semibold text-gray-700 text-right">
+                      {formatHitCount(dmgMax, lang)}
                     </span>
                   </div>
                 )}
