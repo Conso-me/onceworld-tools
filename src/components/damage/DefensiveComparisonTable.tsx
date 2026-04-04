@@ -25,11 +25,12 @@ export function DefensiveComparisonTable({ rows, onSelectMonster }: Props) {
   return (
     <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 overflow-hidden">
       {/* ヘッダー */}
-      <div className="grid grid-cols-[1fr_auto_auto_auto] gap-x-2 px-3 py-2 bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wide">
+      <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-x-2 px-3 py-2 bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wide">
         <span>{t("common:monster")}</span>
-        <span className="text-right w-24">{t("defensePanel.currentDamage")}</span>
-        <span className="text-right w-16">{t("defensePanel.survivableHits")}</span>
-        <span className="text-right w-12"></span>
+        <span className="w-20 whitespace-nowrap">無効化</span>
+        <span className="w-28">{t("defensePanel.currentDamage")}</span>
+        <span className="w-24 whitespace-nowrap">{t("defensePanel.survivableHits")}</span>
+        <span className="w-12"></span>
       </div>
 
       {/* 行 */}
@@ -48,7 +49,7 @@ export function DefensiveComparisonTable({ rows, onSelectMonster }: Props) {
             <button
               key={idx}
               onClick={() => onSelectMonster(idx)}
-              className={`w-full grid grid-cols-[1fr_auto_auto_auto] gap-x-2 px-3 py-2 text-left hover:bg-indigo-50 transition-colors items-center ${rowBg}`}
+              className={`w-full grid grid-cols-[1fr_auto_auto_auto_auto] gap-x-2 px-3 py-2 text-left hover:bg-indigo-50 transition-colors items-center ${rowBg}`}
             >
               {/* モンスター名 + 属性 + Lv + 攻撃種 */}
               <div className="min-w-0">
@@ -75,19 +76,47 @@ export function DefensiveComparisonTable({ rows, onSelectMonster }: Props) {
                 </div>
               </div>
 
+              {/* 無効化に必要なDEF/MDEF */}
+              <div className="text-right w-20">
+                <div className={`text-xs font-semibold tabular-nums ${row.nullified ? "text-green-600" : "text-gray-700"}`}>
+                  {row.enemyIsPhysical ? "DEF" : "MDEF"}
+                </div>
+                <div className={`text-xs font-bold tabular-nums ${row.nullified ? "text-green-600" : "text-gray-800"}`}>
+                  {row.nullifyDef.toLocaleString()}
+                </div>
+                {!row.nullified && row.additionalDefNeeded > 0 && (
+                  <div className="text-[10px] text-orange-500 tabular-nums whitespace-nowrap">
+                    あと{Math.ceil(row.additionalDefNeeded).toLocaleString()}
+                  </div>
+                )}
+                {row.nullified && (
+                  <div className="text-[10px] text-green-600">達成</div>
+                )}
+              </div>
+
               {/* 被ダメ */}
-              <div className="text-right w-24">
+              <div className="w-28">
                 {row.nullified ? (
-                  <span className="text-xs text-green-600 font-medium">1〜9</span>
+                  <div className="grid grid-cols-[1fr_auto_1fr] items-center">
+                    <span className="tabular-nums text-xs text-green-600 font-medium text-right">1</span>
+                    <span className="text-xs text-green-600 font-medium px-0.5">〜</span>
+                    <span className="tabular-nums text-xs text-green-600 font-medium text-right">9</span>
+                  </div>
                 ) : (
-                  <span className="text-sm font-semibold text-red-500 tabular-nums">
-                    {formatHitCount(row.currentDmg.min, lang)}〜{formatHitCount(row.currentDmg.max, lang)}
-                  </span>
+                  <div className="grid grid-cols-[1fr_auto_1fr] items-center">
+                    <span className="tabular-nums text-sm font-semibold text-red-500 text-right whitespace-nowrap">
+                      {formatHitCount(row.currentDmg.min, lang)}
+                    </span>
+                    <span className="text-sm font-semibold text-red-500 px-0.5">〜</span>
+                    <span className="tabular-nums text-sm font-semibold text-red-500 text-right whitespace-nowrap">
+                      {formatHitCount(row.currentDmg.max, lang)}
+                    </span>
+                  </div>
                 )}
               </div>
 
               {/* 耐えられる回数 */}
-              <div className="text-right w-16">
+              <div className="text-right w-24">
                 {row.nullified ? (
                   <span className="text-xs text-green-600 font-medium">{t("defensePanel.nullifyAchieved")}</span>
                 ) : row.hitsToTake ? (

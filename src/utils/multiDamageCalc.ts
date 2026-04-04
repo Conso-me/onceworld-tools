@@ -46,6 +46,9 @@ export interface OffensiveComparisonRow {
   hitsToKill?: number;
   hitRate?: number | null;
   overkillGuaranteed?: boolean;
+  // 物理のみ: 命中に必要な幸運
+  requiredHitLuck?: number;
+  additionalLuckNeeded?: number;
   // 魔攻: 全魔法の結果 + 最良の魔法
   spellResults?: OffensiveSpellResult[];
   bestSpell?: OffensiveSpellResult;
@@ -120,8 +123,10 @@ export function calcOffensiveComparison(
     const hitRate = attackMode === "物理" ? calcHitRate(playerStats.luck, scaled.scaledLuck) : null;
     const overkillThreshold = scaled.hp * 10;
     const overkillGuaranteed = !dmg.isNullified && dmg.min >= overkillThreshold;
+    const requiredHitLuck = attackMode === "物理" ? scaled.scaledLuck : undefined;
+    const additionalLuckNeeded = attackMode === "物理" ? Math.max(scaled.scaledLuck - playerStats.luck, 0) : undefined;
 
-    return { entry, scaled, affinity, mode: attackMode, dmg, multiHit, hitsToKill, hitRate, overkillGuaranteed };
+    return { entry, scaled, affinity, mode: attackMode, dmg, multiHit, hitsToKill, hitRate, overkillGuaranteed, requiredHitLuck, additionalLuckNeeded };
   });
 }
 
@@ -137,6 +142,12 @@ export interface DefensiveComparisonRow {
   currentDmg: { min: number; max: number };
   enemyMultiHit: number;
   hitsToTake: { worst: number; best: number } | null;
+  /** 無効化に必要な DEF（物理）または MDEF（魔法） */
+  nullifyDef: number;
+  /** 現在の有効防御値（物理: DEF + MDEF/10、魔法: MDEF + DEF/10） */
+  effectiveSelfDef: number;
+  /** あといくつ必要か（0なら既に無効化） */
+  additionalDefNeeded: number;
 }
 
 export function calcDefensiveComparison(
@@ -181,6 +192,15 @@ export function calcDefensiveComparison(
         }
       : null;
 
+    // 無効化に必要な DEF/MDEF (H26: ceil(enemyStat * 1.75))
+    const nullifyDef = Math.ceil(enemyStat * 1.75);
+    // 現在の有効防御値 (物理: DEF + MDEF/10、魔法: MDEF + DEF/10)
+    const effectiveSelfDef = enemyIsPhysical
+      ? playerStats.def + playerStats.mdef / 10
+      : playerStats.mdef + playerStats.def / 10;
+    // あといくつ必要か (H34: max(nullifyDef - effectiveSelfDef, 0))
+    const additionalDefNeeded = Math.max(nullifyDef - effectiveSelfDef, 0);
+
     return {
       entry,
       scaled,
@@ -191,6 +211,9 @@ export function calcDefensiveComparison(
       currentDmg,
       enemyMultiHit,
       hitsToTake,
+      nullifyDef,
+      effectiveSelfDef,
+      additionalDefNeeded,
     };
   });
 }

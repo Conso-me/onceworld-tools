@@ -26,6 +26,11 @@ export function OffensiveComparisonTable({ rows, onSelectMonster, selectedSpellN
   if (rows.length === 0) return null;
 
   const isMagic = rows[0].mode === "魔攻";
+  const isPhysical = rows[0].mode === "物理";
+
+  const gridCols = isPhysical
+    ? "grid-cols-[minmax(0,1fr)_auto_auto_auto_auto]"
+    : "grid-cols-[minmax(0,1fr)_auto_auto_auto]";
 
   return (
     <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 overflow-hidden">
@@ -58,11 +63,12 @@ export function OffensiveComparisonTable({ rows, onSelectMonster, selectedSpellN
         </div>
       )}
       {/* ヘッダー */}
-      <div className="grid grid-cols-[minmax(0,1fr)_auto_auto_auto] gap-x-2 px-3 py-2 bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wide">
+      <div className={`grid ${gridCols} gap-x-2 px-3 py-2 bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wide`}>
         <span>{t("common:monster")}</span>
-        <span className="text-right w-32 whitespace-nowrap">{t("damage")}</span>
-        <span className="text-right w-16 whitespace-nowrap">{t("hitsToKill")}</span>
-        <span className="text-right w-10">OK</span>
+        {isPhysical && <span className="w-20 whitespace-nowrap">必要LUCK</span>}
+        <span className="w-32 whitespace-nowrap">{t("damage")}</span>
+        <span className="w-16 whitespace-nowrap">{t("hitsToKill")}</span>
+        <span className="w-10">OK</span>
       </div>
 
       {/* 行 */}
@@ -98,11 +104,13 @@ export function OffensiveComparisonTable({ rows, onSelectMonster, selectedSpellN
               ? "bg-green-50"
               : "";
 
+          const luckAchieved = row.additionalLuckNeeded === 0;
+
           return (
             <button
               key={idx}
               onClick={() => onSelectMonster(idx)}
-              className={`w-full grid grid-cols-[minmax(0,1fr)_auto_auto_auto] gap-x-2 px-3 py-2 text-left hover:bg-indigo-50 transition-colors items-center ${rowBg}`}
+              className={`w-full grid ${gridCols} gap-x-2 px-3 py-2 text-left hover:bg-indigo-50 transition-colors items-center ${rowBg}`}
             >
               {/* モンスター名 + 属性 + Lv */}
               <div className="min-w-0">
@@ -135,14 +143,37 @@ export function OffensiveComparisonTable({ rows, onSelectMonster, selectedSpellN
                 </div>
               </div>
 
+              {/* 必要LUCK（物理のみ） */}
+              {isPhysical && (
+                <div className="text-right w-20">
+                  <div className={`text-xs font-bold tabular-nums ${luckAchieved ? "text-green-600" : "text-gray-800"}`}>
+                    {(row.requiredHitLuck ?? 0).toLocaleString()}
+                  </div>
+                  {!luckAchieved && row.additionalLuckNeeded !== undefined && row.additionalLuckNeeded > 0 && (
+                    <div className="text-[10px] text-orange-500 tabular-nums whitespace-nowrap">
+                      あと{row.additionalLuckNeeded.toLocaleString()}
+                    </div>
+                  )}
+                  {luckAchieved && (
+                    <div className="text-[10px] text-green-600">達成</div>
+                  )}
+                </div>
+              )}
+
               {/* ダメージ */}
-              <div className="text-right w-32">
+              <div className="w-32">
                 {isNullified ? (
-                  <span className="text-xs text-gray-400">{t("cannotPenetrate")}</span>
+                  <div className="text-right">
+                    <span className="text-xs text-gray-400">{t("cannotPenetrate")}</span>
+                  </div>
                 ) : (
-                  <div>
-                    <span className="text-sm font-semibold text-gray-700 tabular-nums">
-                      {formatHitCount(dmgMin, lang)}〜{formatHitCount(dmgMax, lang)}
+                  <div className="grid grid-cols-[1fr_auto_1fr] items-center">
+                    <span className="tabular-nums text-sm font-semibold text-gray-700 text-right whitespace-nowrap">
+                      {formatHitCount(dmgMin, lang)}
+                    </span>
+                    <span className="text-sm font-semibold text-gray-700 px-0.5">〜</span>
+                    <span className="tabular-nums text-sm font-semibold text-gray-700 text-right whitespace-nowrap">
+                      {formatHitCount(dmgMax, lang)}
                     </span>
                   </div>
                 )}
