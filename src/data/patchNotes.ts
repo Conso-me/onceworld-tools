@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-04-05",
+    changes: [
+    { type: "feature", text: "feat: 装備に表示順フィールド(order)を追加し、オーディンアックスを追加" },
+    ],
+  },
+
+  {
     date: "2026-04-04",
     changes: [
     { type: "improve", text: "fix: 比較テーブルのヘッダーラベルを全て左揃えに統一" },
