@@ -2,7 +2,7 @@
  * OnceWorld ダメージ計算ユーティリティ
  *
  * 物理/魔弾: (ATK or INT) × 1.75 - effectiveDef) × 4 × 属性 × 乱数(0.9-1.1) × クリ(2.5) × 多段
- * 主人公魔法: ((INT + 解析書) × 1.25 × 魔法倍率 - effectiveDef) × 4 × 属性 × 乱数 × クリ（多段なし）
+ * 主人公魔法: ((INT + 解析書) × 1.25 × 魔法倍率 - effectiveDef) × 4 × 属性 × 乱数（クリなし・多段なし）
  * 最小ダメ: baseDamage <= 0 → 1〜9
  * 多段: SPD 3000→2, 10000→3, 30000→4, 100000→5
  */
@@ -15,6 +15,8 @@ export interface DamageRange {
   critMax: number;
   critAvg: number;
   isNullified: boolean;
+  /** クリティカル判定があるか（魔法はfalse） */
+  hasCrit: boolean;
 }
 
 /**
@@ -68,7 +70,7 @@ export function calcPlayerMagicDamage(
     4 *
     elementAffinity *
     finalMult;
-  return makeDamageRange(base);
+  return makeDamageRange(base, false);
 }
 
 /**
@@ -90,16 +92,17 @@ export function calcPetMagicDamage(
   return makeDamageRange(base);
 }
 
-function makeDamageRange(base: number): DamageRange {
+function makeDamageRange(base: number, hasCrit = true): DamageRange {
   if (base <= 0) {
     return {
       min: 1,
       max: 9,
       avg: 5,
-      critMin: 1,
-      critMax: 9,
-      critAvg: 5,
+      critMin: 0,
+      critMax: 0,
+      critAvg: 0,
       isNullified: true,
+      hasCrit,
     };
   }
   const min = Math.floor(base * 0.9);
@@ -109,10 +112,11 @@ function makeDamageRange(base: number): DamageRange {
     min,
     max,
     avg,
-    critMin: Math.floor(min * 2.5),
-    critMax: Math.floor(max * 2.5),
-    critAvg: Math.floor(avg * 2.5),
+    critMin: hasCrit ? Math.floor(min * 2.5) : 0,
+    critMax: hasCrit ? Math.floor(max * 2.5) : 0,
+    critAvg: hasCrit ? Math.floor(avg * 2.5) : 0,
     isNullified: false,
+    hasCrit,
   };
 }
 

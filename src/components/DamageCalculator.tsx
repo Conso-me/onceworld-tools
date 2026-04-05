@@ -367,8 +367,6 @@ export function DamageCalculator() {
         const hitsToKill = calcHitsToKill(scaled.hp, dmg.isNullified ? 1 : dmg.min, spell.hits);
         const totalMin = dmg.isNullified ? spell.hits : dmg.min * spell.hits;
         const totalMax = dmg.isNullified ? 9 * spell.hits : dmg.max * spell.hits;
-        const totalCritMin = dmg.isNullified ? spell.hits : dmg.critMin * spell.hits;
-        const totalCritMax = dmg.isNullified ? 9 * spell.hits : dmg.critMax * spell.hits;
         const minStat = calcMinIntToHit(
           scaled.scaledDef,
           scaled.scaledMdef,
@@ -401,7 +399,7 @@ export function DamageCalculator() {
           spell.hits,
           crystalCubeFinalMult
         );
-        return { spell, dmg, totalMin, totalMax, totalCritMin, totalCritMax, hitsToKill, minStat, targetStats, overkillGuaranteed, overkillPossible, overkillStatNeeded };
+        return { spell, dmg, totalMin, totalMax, hitsToKill, minStat, targetStats, overkillGuaranteed, overkillPossible, overkillStatNeeded };
       });
       return { mode: "魔攻" as const, spellResults };
     }
@@ -1120,10 +1118,10 @@ export function DamageCalculator() {
                   </span>
                 </div>
                 {hasMyOffenseStats ? (
-                  <div className="grid grid-cols-[1fr_auto_auto_auto_auto_auto_auto] gap-y-1.5 gap-x-1">
-                    {offensiveResult.spellResults.map(({ spell, dmg, totalMin, totalMax, totalCritMin, totalCritMax, hitsToKill, overkillGuaranteed, overkillPossible, overkillStatNeeded }) => (
-                      <div key={spell.name} className="col-span-7 grid grid-cols-subgrid bg-white/60 rounded-lg py-1.5">
-                        <div className="col-span-7 flex items-center gap-1 mb-1 px-2">
+                  <div className="grid grid-cols-[1fr_auto_auto_auto] gap-y-1.5 gap-x-1">
+                    {offensiveResult.spellResults.map(({ spell, dmg, totalMin, totalMax, hitsToKill, overkillGuaranteed, overkillPossible, overkillStatNeeded }) => (
+                      <div key={spell.name} className="col-span-4 grid grid-cols-subgrid bg-white/60 rounded-lg py-1.5">
+                        <div className="col-span-4 flex items-center gap-1 mb-1 px-2">
                           <span className={`text-xs px-1 py-0.5 rounded border font-medium ${elementColors[spell.element]}`}>{t(`game:element.${spell.element}`)}</span>
                           <span className="text-sm font-medium text-gray-700">{spell.name}</span>
                           <span className="text-xs text-gray-400">
@@ -1147,20 +1145,16 @@ export function DamageCalculator() {
                           )}
                         </div>
                         {dmg.isNullified ? (
-                          <span className="col-span-7 text-xs text-gray-400 px-2">{t("cannotPenetrate")}</span>
+                          <span className="col-span-4 text-xs text-gray-400 px-2">{t("cannotPenetrate")}</span>
                         ) : (
                           <>
                             <span className="pl-2 text-sm font-bold text-green-600 tabular-nums text-right self-center">{totalMin.toLocaleString()}</span>
                             <span className="text-sm text-green-600 text-center self-center">〜</span>
-                            <span className="text-sm font-bold text-green-600 tabular-nums text-right self-center">{totalMax.toLocaleString()}</span>
-                            <span className="px-1 text-xs text-yellow-600 text-center self-center">{t("critShort")}</span>
-                            <span className="text-xs text-yellow-600 tabular-nums text-right self-center">{totalCritMin.toLocaleString()}</span>
-                            <span className="text-xs text-yellow-600 text-center self-center">〜</span>
-                            <span className="pr-2 text-xs text-yellow-600 tabular-nums text-right self-center">{totalCritMax.toLocaleString()}</span>
+                            <span className="pr-2 text-sm font-bold text-green-600 tabular-nums text-right self-center">{totalMax.toLocaleString()}</span>
                           </>
                         )}
                         {!dmg.isNullified && (
-                          <div className="col-span-7 flex items-center justify-end gap-1 px-2 pt-0.5">
+                          <div className="col-span-4 flex items-center justify-end gap-1 px-2 pt-0.5">
                             {overkillGuaranteed ? (
                               <span className="text-xs text-orange-500 font-semibold">
                                 INT {overkillStatNeeded.toLocaleString()} で達成（+{Math.max(0, effInt - overkillStatNeeded).toLocaleString()} 超過）
@@ -1208,7 +1202,7 @@ export function DamageCalculator() {
                           </span>
                         )}
                       </div>
-                      {!offensiveResult.dmg.isNullified && (
+                      {!offensiveResult.dmg.isNullified && offensiveResult.dmg.hasCrit && (
                         <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
                           <span className="text-sm text-gray-500">
                             {t("critical")}
