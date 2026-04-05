@@ -48,6 +48,7 @@ export interface EquipmentItem {
   def: number;
   mdef: number;
   luck: number;
+  order?: number;
 }
 
 export type AccessoryEffectType =
