@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-04-05",
     changes: [
+    { type: "improve", text: "fix: 魔法攻撃にクリティカル判定が存在しないため計算と表示から除外" },
     { type: "feature", text: "feat: 装備に表示順フィールド(order)を追加し、オーディンアックスを追加" },
     ],
   },
