@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-04-07",
+    changes: [
+    { type: "improve", text: "fix: 転生の極致ボーナスをテーブルから式 5000*(天命輪廻-9)^1.25 に置き換え (#60)" },
+    ],
+  },
+
+  {
     date: "2026-04-05",
     changes: [
     { type: "improve", text: "fix: 魔法攻撃にクリティカル判定が存在しないため計算と表示から除外" },
