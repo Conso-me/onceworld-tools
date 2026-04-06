@@ -18,7 +18,7 @@ export function getAvailablePoints(cfg: SimConfig): number {
   const rebirthBonus = cfg.reinCount < 10 ? cfg.tenseisCount * 30 : 0;
   const multiplied = (base + rebirthBonus) * (1 + cfg.reinCount);
   const pinnacleBonus =
-    statPointsData.extremeReincarnation.find((e) => e.count === cfg.reinCount)?.bonus ?? 0;
+    cfg.reinCount >= 10 ? Math.floor(5000 * Math.pow(cfg.reinCount - 9, 1.25)) : 0;
   const cosmoCubeBonus = cfg.hasCosmoCube ? cfg.reinCount * 10000 : 0;
   const subtotal = multiplied + pinnacleBonus + cosmoCubeBonus;
   return Math.floor(subtotal * (1 + cfg.johaneCount / 100));

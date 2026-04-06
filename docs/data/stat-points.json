@@ -200,10 +200,5 @@
     { "level": 198, "points": 4728 },
     { "level": 199, "points": 4752 },
     { "level": 200, "points": 4975 }
-  ],
-  "extremeReincarnation": [
-    { "count": 10, "bonus": 5000 },
-    { "count": 11, "bonus": 11892 },
-    { "count": 12, "bonus": 19741 }
   ]
 }
