@@ -24,12 +24,9 @@ export function getAvailablePoints(cfg: SimConfig): number {
   return Math.floor(subtotal * (1 + (cfg.johaneCount / 100) * (1 + cfg.johanneAltarCount * 0.002)));
 }
 
-/** 1ステータスへの割り振り上限（基底10,000） */
+/** 1ステータスへの割り振り上限（天命輪廻ベース） */
 export function getPerStatLimit(cfg: SimConfig): number {
-  return 10000
-    + cfg.kinikiBookCount * 80
-    + cfg.sageItemCount * 10
-    + (cfg.hasChoyoContract ? 900000 : 0);
+  return Math.max(1, cfg.reinCount - 9) * 1_000_000;
 }
 
 export function calcAllocatedPoints(cfg: SimConfig): number {
