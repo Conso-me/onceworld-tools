@@ -11,6 +11,7 @@ export const DEFAULT_SIM_CONFIG: SimConfig = {
   charElement: "火",
   hasCosmoCube: false,
   johaneCount: 0,
+  johanneAltarCount: 0,
   kinikiBookCount: 1000,
   sageItemCount: 1000,
   hasChoyoContract: true,
