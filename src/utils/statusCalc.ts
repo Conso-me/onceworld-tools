@@ -21,7 +21,7 @@ export function getAvailablePoints(cfg: SimConfig): number {
     cfg.reinCount >= 10 ? Math.floor(5000 * Math.pow(cfg.reinCount - 9, 1.25)) : 0;
   const cosmoCubeBonus = cfg.hasCosmoCube ? cfg.reinCount * 10000 : 0;
   const subtotal = multiplied + pinnacleBonus + cosmoCubeBonus;
-  return Math.floor(subtotal * (1 + cfg.johaneCount / 100));
+  return Math.floor(subtotal * (1 + (cfg.johaneCount / 100) * (1 + cfg.johanneAltarCount * 0.002)));
 }
 
 /** 1ステータスへの割り振り上限（基底10,000） */

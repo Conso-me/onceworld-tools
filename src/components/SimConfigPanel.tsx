@@ -1016,31 +1016,6 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
             </div>
           </section>
 
-          {/* 振り分けポイント・上限 */}
-          <section className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
-            <SectionHeader title={t("allocationSection")} onAllMax={maxAllPoints} />
-            <NumInput label={t("johannePen")} value={cfg.johaneCount} max={1000}
-              onChange={(v) => setField("johaneCount", v)} />
-            <div className="grid grid-cols-2 gap-2">
-              <NumInput label={t("kinikiBook")} value={cfg.kinikiBookCount} max={1000}
-                onChange={(v) => setField("kinikiBookCount", v)} />
-              <NumInput label={t("sageItem")} value={cfg.sageItemCount} max={1000}
-                onChange={(v) => setField("sageItemCount", v)} />
-            </div>
-            <label className="flex items-center gap-2 text-sm cursor-pointer">
-              <input
-                type="checkbox" checked={cfg.hasChoyoContract}
-                onChange={(e) => setField("hasChoyoContract", e.target.checked)}
-                className="accent-blue-500 w-4 h-4"
-              />
-              <span className="text-xs">{t("transcendenceContract")}</span>
-            </label>
-            <div className="grid grid-cols-2 gap-2 text-xs bg-gray-50 rounded-lg px-3 py-1.5">
-              <div>{t("availablePoints")}<br /><span className="font-mono font-semibold text-gray-700">{available.toLocaleString()}</span></div>
-              <div>{t("perStatLimit")}<br /><span className="font-mono font-semibold text-gray-700">{perStatLimit.toLocaleString()}</span></div>
-            </div>
-          </section>
-
           {/* ステータス割り振り */}
           <section className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
             <div className="flex items-center justify-between">
@@ -1086,6 +1061,35 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
                 {t("overCap", { stats: cappedStats.map((s) => s.label).join("、"), limit: perStatLimit.toLocaleString() })}
               </p>
             )}
+          </section>
+
+          {/* 振り分けポイント・上限 */}
+          <section className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
+            <SectionHeader title={t("allocationSection")} onAllMax={maxAllPoints} />
+            <div className="grid grid-cols-2 gap-2">
+              <NumInput label={t("johannePen")} value={cfg.johaneCount} max={1000}
+                onChange={(v) => setField("johaneCount", v)} />
+              <NumInput label={t("johanneAltar")} value={cfg.johanneAltarCount} max={999}
+                onChange={(v) => setField("johanneAltarCount", v)} />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <NumInput label={t("kinikiBook")} value={cfg.kinikiBookCount} max={1000}
+                onChange={(v) => setField("kinikiBookCount", v)} />
+              <NumInput label={t("sageItem")} value={cfg.sageItemCount} max={1000}
+                onChange={(v) => setField("sageItemCount", v)} />
+            </div>
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
+              <input
+                type="checkbox" checked={cfg.hasChoyoContract}
+                onChange={(e) => setField("hasChoyoContract", e.target.checked)}
+                className="accent-blue-500 w-4 h-4"
+              />
+              <span className="text-xs">{t("transcendenceContract")}</span>
+            </label>
+            <div className="grid grid-cols-2 gap-2 text-xs bg-gray-50 rounded-lg px-3 py-1.5">
+              <div>{t("availablePoints")}<br /><span className="font-mono font-semibold text-gray-700">{available.toLocaleString()}</span></div>
+              <div>{t("perStatLimit")}<br /><span className="font-mono font-semibold text-gray-700">{perStatLimit.toLocaleString()}</span></div>
+            </div>
           </section>
         </div>
       )}

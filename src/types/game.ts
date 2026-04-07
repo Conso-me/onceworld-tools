@@ -123,6 +123,7 @@ export interface SimConfig extends Record<string, unknown> {
   // 振り分けポイント（使える総量）
   hasCosmoCube: boolean;
   johaneCount: number;
+  johanneAltarCount: number;
   // 振り分け上限（各ステータスへの上限、基底10,000）
   kinikiBookCount: number;
   sageItemCount: number;

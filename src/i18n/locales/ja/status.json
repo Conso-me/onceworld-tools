@@ -16,6 +16,7 @@
   "cosmoCubeBonus": "(+{{points}}pt)",
   "allocationSection": "振り分けポイント・上限",
   "johannePen": "ヨハネの羽ペン (利用可能ポイント×1%/個)",
+  "johanneAltar": "ヨハネの祭壇 (羽ペン効果+0.2%/個)",
   "kinikiBook": "禁域の書物 (+80/個)",
   "sageItem": "賢者の落とし物 (+10/個)",
   "transcendenceContract": "超越の契約書所持 (+900,000)",
