@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-04-07",
     changes: [
+    { type: "fix", text: "fix: 暴君盾のステータス修正・強化対応化" },
     { type: "feature", text: "feat: ver2.0新モンスター7体・循環宇宙3〜5プリセット追加" },
     { type: "improve", text: "fix: 転生の極致ボーナスをテーブルから式 5000*(天命輪廻-9)^1.25 に置き換え (#60)" },
     ],
