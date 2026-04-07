@@ -166,6 +166,45 @@ export const enemyPresetGroups: EnemyPresetGroup[] = [
       { monsterName: "グラビティスライム", level: 118000, location: "循環宇宙２" },
     ],
   },
+  {
+    mapLabel: "循環宇宙",
+    label: "循環宇宙３",
+    presets: [
+      { monsterName: "グラビティスライム",     level: 75000,  location: "循環宇宙３" },
+      { monsterName: "朽ちざる竜骸イゾ",       level: 75000,  location: "循環宇宙３" },
+      { monsterName: "グラビティスライム",     level: 95000,  location: "循環宇宙３" },
+      { monsterName: "朽ちざる竜骸イゾ",       level: 95000,  location: "循環宇宙３" },
+      { monsterName: "ドラゴンヘッド",         level: 95000,  location: "循環宇宙３" },
+      { monsterName: "残燃モエコ",             level: 95000,  location: "循環宇宙３" },
+      { monsterName: "ラッキーヒトデ",         level: 98000,  location: "循環宇宙３" },
+      { monsterName: "動く石碑",               level: 98000,  location: "循環宇宙３" },
+      { monsterName: "デーモンブレイド",       level: 245000, location: "循環宇宙３" },
+      { monsterName: "マルコゲトカゲ",         level: 245000, location: "循環宇宙３" },
+      { monsterName: "黎明神トモダチ",         level: 144444, location: "循環宇宙３" },
+      { monsterName: "捧げし者",               level: 144444, location: "循環宇宙３" },
+      { monsterName: "ダークフェニックス",     level: 390000, location: "循環宇宙３" },
+    ],
+  },
+  {
+    mapLabel: "循環宇宙",
+    label: "循環宇宙４",
+    presets: [
+      { monsterName: "ペリカンEXP",     level: 140000, location: "循環宇宙４" },
+      { monsterName: "グラビティスライム", level: 140000, location: "循環宇宙４" },
+      { monsterName: "雷大王イカ",      level: 140000, location: "循環宇宙４" },
+      { monsterName: "虹ペリカンEXP",   level: 140000, location: "循環宇宙４" },
+      { monsterName: "黙示木",          level: 180000, location: "循環宇宙４" },
+      { monsterName: "オコシイタケ",    level: 180000, location: "循環宇宙４" },
+      { monsterName: "オコスター",      level: 280000, location: "循環宇宙４" },
+    ],
+  },
+  {
+    mapLabel: "循環宇宙",
+    label: "循環宇宙５",
+    presets: [
+      { monsterName: "雷大王イカ", level: 310000, location: "循環宇宙５" },
+    ],
+  },
 ];
 
 export function formatPresetLabel(preset: EnemyPreset): string {
