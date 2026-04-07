@@ -45,6 +45,7 @@
   "registered": "Saved ({{count}})",
   "overwritePresetConfirm": "Overwrite preset \"{{name}}\"?",
   "overwriteBuildPresetConfirm": "Overwrite build preset \"{{name}}\"?",
+  "overwriteSave": "Overwrite",
   "table": {
     "stat": "Stat",
     "alloc": "Alloc",

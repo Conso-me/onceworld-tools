@@ -46,6 +46,7 @@
   "registered": "登録済み ({{count}}件)",
   "overwritePresetConfirm": "プリセット「{{name}}」を上書きしますか？",
   "overwriteBuildPresetConfirm": "ビルドプリセット「{{name}}」を上書きしますか？",
+  "overwriteSave": "上書き保存",
   "table": {
     "stat": "ステータス",
     "alloc": "割り振り",
