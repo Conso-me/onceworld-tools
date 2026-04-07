@@ -124,10 +124,6 @@ export interface SimConfig extends Record<string, unknown> {
   hasCosmoCube: boolean;
   johaneCount: number;
   johanneAltarCount: number;
-  // 振り分け上限（各ステータスへの上限、基底10,000）
-  kinikiBookCount: number;
-  sageItemCount: number;
-  hasChoyoContract: boolean;
   // ステータス割り振り
   allocVit: number;
   allocSpd: number;

@@ -195,6 +195,7 @@ export const enemyPresetGroups: EnemyPresetGroup[] = [
       { monsterName: "虹ペリカンEXP",   level: 140000, location: "循環宇宙４" },
       { monsterName: "黙示木",          level: 180000, location: "循環宇宙４" },
       { monsterName: "オコシイタケ",    level: 180000, location: "循環宇宙４" },
+      { monsterName: "オコスター",      level: 180000, location: "循環宇宙４" },
       { monsterName: "オコスター",      level: 280000, location: "循環宇宙４" },
     ],
   },

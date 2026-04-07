@@ -905,9 +905,6 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
 
   function maxAllPoints() {
     setField("johaneCount", 1000);
-    setField("kinikiBookCount", 1000);
-    setField("sageItemCount", 1000);
-    setField("hasChoyoContract", true);
   }
 
   function maxAllEquip() {
@@ -1063,29 +1060,15 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
             )}
           </section>
 
-          {/* 振り分けポイント・上限 */}
+          {/* 振り分けポイント */}
           <section className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
             <SectionHeader title={t("allocationSection")} onAllMax={maxAllPoints} />
             <div className="grid grid-cols-2 gap-2">
               <NumInput label={t("johannePen")} value={cfg.johaneCount} max={1000}
                 onChange={(v) => setField("johaneCount", v)} />
-              <NumInput label={t("johanneAltar")} value={cfg.johanneAltarCount} max={999}
+              <NumInput label={t("johanneAltar")} value={cfg.johanneAltarCount} max={1000}
                 onChange={(v) => setField("johanneAltarCount", v)} />
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              <NumInput label={t("kinikiBook")} value={cfg.kinikiBookCount} max={1000}
-                onChange={(v) => setField("kinikiBookCount", v)} />
-              <NumInput label={t("sageItem")} value={cfg.sageItemCount} max={1000}
-                onChange={(v) => setField("sageItemCount", v)} />
-            </div>
-            <label className="flex items-center gap-2 text-sm cursor-pointer">
-              <input
-                type="checkbox" checked={cfg.hasChoyoContract}
-                onChange={(e) => setField("hasChoyoContract", e.target.checked)}
-                className="accent-blue-500 w-4 h-4"
-              />
-              <span className="text-xs">{t("transcendenceContract")}</span>
-            </label>
             <div className="grid grid-cols-2 gap-2 text-xs bg-gray-50 rounded-lg px-3 py-1.5">
               <div>{t("availablePoints")}<br /><span className="font-mono font-semibold text-gray-700">{available.toLocaleString()}</span></div>
               <div>{t("perStatLimit")}<br /><span className="font-mono font-semibold text-gray-700">{perStatLimit.toLocaleString()}</span></div>
