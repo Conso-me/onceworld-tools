@@ -1212,6 +1212,8 @@ export function SimConfigPanel({ cfg, setField, reset, replaceAll }: SimConfigPa
   const [simPresetName, setSimPresetName] = useState("");
   const [selectedSimPresetId, setSelectedSimPresetId] = useState("");
 
+  const [overwriteSaved, setOverwriteSaved] = useState(false);
+
   function handleSaveSimPreset() {
     const trimmed = simPresetName.trim();
     if (!trimmed) return;
@@ -1225,11 +1227,21 @@ export function SimConfigPanel({ cfg, setField, reset, replaceAll }: SimConfigPa
     const preset = loadPreset(selectedSimPresetId);
     if (!preset) return;
     replaceAll(preset.config);
+    setOverwriteSaved(false);
+  }
+
+  function handleOverwriteSimPreset() {
+    const preset = simPresets.find((p) => p.id === selectedSimPresetId);
+    if (!preset) return;
+    savePreset(preset.name, cfg);
+    setOverwriteSaved(true);
+    setTimeout(() => setOverwriteSaved(false), 1500);
   }
 
   function handleDeleteSimPreset() {
     deletePreset(selectedSimPresetId);
     setSelectedSimPresetId("");
+    setOverwriteSaved(false);
   }
 
   return (
@@ -1240,7 +1252,7 @@ export function SimConfigPanel({ cfg, setField, reset, replaceAll }: SimConfigPa
         <div className="flex gap-1.5 items-center">
           <select
             value={selectedSimPresetId}
-            onChange={(e) => setSelectedSimPresetId(e.target.value)}
+            onChange={(e) => { setSelectedSimPresetId(e.target.value); setOverwriteSaved(false); }}
             className={`${inputCls} flex-1 min-w-0`}
           >
             <option value="">{t("selectBuildPreset")}</option>
@@ -1259,6 +1271,21 @@ export function SimConfigPanel({ cfg, setField, reset, replaceAll }: SimConfigPa
             className="shrink-0 text-xs px-2.5 py-1.5 rounded-lg bg-red-100 text-red-600 font-medium disabled:opacity-30 disabled:cursor-not-allowed hover:bg-red-200 transition-colors"
           >{t("common:delete")}</button>
         </div>
+        {selectedSimPresetId && (
+          <button
+            onClick={handleOverwriteSimPreset}
+            className={`w-full text-xs py-1.5 rounded-lg font-medium transition-colors ${
+              overwriteSaved
+                ? "bg-green-100 text-green-700 border border-green-200"
+                : "bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100"
+            }`}
+          >
+            {overwriteSaved
+              ? `✓ ${t("common:saved")}`
+              : `${t("overwriteSave")} — ${simPresets.find((p) => p.id === selectedSimPresetId)?.name}`
+            }
+          </button>
+        )}
         <div className="flex gap-1.5 items-center">
           <input
             type="text"
