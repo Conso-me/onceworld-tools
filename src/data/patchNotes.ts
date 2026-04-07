@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-04-08",
+    changes: [
+    { type: "fix", text: "fix: ヨハネの祭壇・羽ペンの振り分けポイント乗算順序を修正" },
+    ],
+  },
+
+  {
     date: "2026-04-07",
     changes: [
     { type: "feature", text: "fix: 振り分け上限を天命輪廻ベースに変更・オコスターLv18万プリセット追加" },
