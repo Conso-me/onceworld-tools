@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-04-07",
     changes: [
+    { type: "feature", text: "fix: 振り分け上限を天命輪廻ベースに変更・オコスターLv18万プリセット追加" },
     { type: "fix", text: "fix: ver2.0新モンスターの攻撃タイプ修正" },
     { type: "feature", text: "feat: ヨハネの祭壇を追加・ステータス割り振りを上部に移動" },
     { type: "fix", text: "fix: 暴君盾のステータス修正・強化対応化" },
