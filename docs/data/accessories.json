@@ -29,5 +29,8 @@
   { "name": "収索機",           "maxLevel": 9999, "effects": [{ "type": "ドロップ率","value": 50,"scalePercent": 1 }] },
   { "name": "陽魂環",           "maxLevel": 1000, "effects": [{ "type": "VIT%",  "value": 30, "scalePercent": 1 }] },
   { "name": "武器照合",         "maxLevel": 1000, "effects": [{ "type": "ATK%",  "value": 30, "scalePercent": 1 }] },
-  { "name": "マナランタン",     "maxLevel": 1000, "effects": [{ "type": "INT%",  "value": 30, "scalePercent": 1 }] }
+  { "name": "マナランタン",     "maxLevel": 1000, "effects": [{ "type": "INT%",  "value": 30, "scalePercent": 1 }] },
+  { "name": "アークゲート",     "maxLevel": 10,   "effects": [{ "type": "経験値",    "value": 500, "scalePercent": 1 }, { "type": "ドロップ率", "value": 500, "scalePercent": 1 }] },
+  { "name": "ドミナススローン", "maxLevel": 10,   "effects": [{ "type": "経験値",    "value": 500, "scalePercent": 1 }, { "type": "捕獲率",    "value": 500, "scalePercent": 1 }] },
+  { "name": "フォーチュンポット","maxLevel": 10,   "effects": [{ "type": "ドロップ率","value": 1000, "scalePercent": 1 }] }
 ]
