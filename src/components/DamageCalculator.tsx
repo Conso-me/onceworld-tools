@@ -1026,7 +1026,7 @@ export function DamageCalculator() {
             {comparisonTab === "与ダメ" ? (
               <div className="space-y-2">
                 {myAttackMode === "物理" && (
-                  <DefenseMaxSummary rows={defensiveComparison} />
+                  <DefenseMaxSummary rows={defensiveComparison} offensiveRows={offensiveComparison} />
                 )}
                 <OffensiveComparisonTable
                   rows={offensiveComparison}
