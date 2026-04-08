@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-04-08",
     changes: [
+    { type: "fix", text: "fix: ダークフェニックス・トリカゴドリ・オメガ・スペクトラムの攻撃タイプを魔攻に修正" },
     { type: "improve", text: "fix: 比較テーブルのmin-widthを600pxに拡大して読みやすく" },
     { type: "fix", text: "fix: ダメージ計算ページのスマホ表示でテキスト重なり・はみ出しを修正" },
     { type: "feature", text: "feat: 悪魔シリーズを装備選択UIに表示、持つ書物を追加" },
