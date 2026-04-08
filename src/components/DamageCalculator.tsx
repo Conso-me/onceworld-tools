@@ -40,7 +40,7 @@ import {
 import type { MultiMonsterEntry } from "../utils/multiDamageCalc";
 import { OffensiveComparisonTable } from "./damage/OffensiveComparisonTable";
 import { DefensiveComparisonTable } from "./damage/DefensiveComparisonTable";
-import { DefenseMaxSummary } from "./damage/DefenseMaxSummary";
+import { PhysicalOffensiveSummary } from "./damage/PhysicalOffensiveSummary";
 import { InputField } from "./ui/InputField";
 import { StatCard } from "./ui/StatCard";
 import { ResultRow } from "./ui/ResultRow";
@@ -1026,7 +1026,11 @@ export function DamageCalculator() {
             {comparisonTab === "与ダメ" ? (
               <div className="space-y-2">
                 {myAttackMode === "物理" && (
-                  <DefenseMaxSummary rows={defensiveComparison} offensiveRows={offensiveComparison} />
+                  <PhysicalOffensiveSummary
+                    rows={offensiveComparison}
+                    playerAtk={effAtk}
+                    playerLuck={effLuck}
+                  />
                 )}
                 <OffensiveComparisonTable
                   rows={offensiveComparison}
