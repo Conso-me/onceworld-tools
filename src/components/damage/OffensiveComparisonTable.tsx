@@ -98,7 +98,7 @@ export function OffensiveComparisonTable({ rows, onSelectMonster, selectedSpellN
             ? activeSpell?.totalMax ?? 0
             : (row.dmg?.isNullified ? 9 : row.dmg?.max ?? 0);
 
-          const overkill = isMagic ? false : row.overkillGuaranteed;
+          const overkill = isMagic ? (activeSpell?.overkillGuaranteed ?? false) : row.overkillGuaranteed;
 
           const rowBg = isNullified
             ? "bg-gray-50"
