@@ -15,6 +15,8 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-04-08",
     changes: [
+    { type: "feature", text: "feat: オメガ・スペクトラムのデータを追加" },
+    { type: "feature", text: "feat: バージョン2.0の装備・アクセ・モンスターデータを追加" },
     { type: "feature", text: "feat: 命中率表示に必要LUK・不足LUKのヒントを追加" },
     { type: "feature", text: "feat: ビルドプリセット読み込み後に上書き保存ボタンを追加" },
     { type: "fix", text: "fix: ヨハネの祭壇・羽ペンの振り分けポイント乗算順序を修正" },
