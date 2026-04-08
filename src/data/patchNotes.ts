@@ -15,6 +15,8 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-04-08",
     changes: [
+    { type: "improve", text: "fix: 比較テーブルのmin-widthを600pxに拡大して読みやすく" },
+    { type: "fix", text: "fix: ダメージ計算ページのスマホ表示でテキスト重なり・はみ出しを修正" },
     { type: "feature", text: "feat: 悪魔シリーズを装備選択UIに表示、持つ書物を追加" },
     { type: "improve", text: "feat: 与ダメ物理サマリーを与ダメ専用情報に作り直す" },
     { type: "feature", text: "feat: 与ダメ物理サマリーに命中LUCK最大の敵への与ダメ・必要LUCKを追加" },
