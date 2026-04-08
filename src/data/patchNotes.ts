@@ -13,6 +13,17 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-04-09",
+    changes: [
+    { type: "feature", text: "feat: 魔攻単体表示にOverKill用魔晶立方体数を追加、キューブ→魔晶立方体に統一" },
+    { type: "feature", text: "feat: 魔攻比較リストにOverKillサマリーを追加" },
+    { type: "improve", text: "fix: 比較リストのヘッダー・セルをモンスター名以外中央揃えに変更" },
+    { type: "improve", text: "fix: 比較リストのオーバーキル表示を「OK」から「OverKill」に変更" },
+    { type: "fix", text: "fix: 比較リストの魔攻でオーバーキル判定が表示されない問題を修正" },
+    ],
+  },
+
+  {
     date: "2026-04-08",
     changes: [
     { type: "fix", text: "fix: ダークフェニックス・トリカゴドリ・オメガ・スペクトラムの攻撃タイプを魔攻に修正" },
