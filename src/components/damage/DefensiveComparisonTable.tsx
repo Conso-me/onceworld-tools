@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import type { Element } from "../../types/game";
 import type { DefensiveComparisonRow } from "../../utils/multiDamageCalc";
 import { formatHitCount } from "../../utils/formatNumber";
+import { DefenseMaxSummary } from "./DefenseMaxSummary";
 
 const elementColors: Record<Element, string> = {
   火: "bg-red-100 text-red-600",
@@ -23,6 +24,8 @@ export function DefensiveComparisonTable({ rows, onSelectMonster }: Props) {
   if (rows.length === 0) return null;
 
   return (
+    <div className="space-y-2">
+    <DefenseMaxSummary rows={rows} />
     <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 overflow-hidden">
       {/* ヘッダー */}
       <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-x-2 px-3 py-2 bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wide">
@@ -151,6 +154,7 @@ export function DefensiveComparisonTable({ rows, onSelectMonster }: Props) {
           );
         })}
       </div>
+    </div>
     </div>
   );
 }
