@@ -62,8 +62,10 @@ export function OffensiveComparisonTable({ rows, onSelectMonster, selectedSpellN
           ))}
         </div>
       )}
+      {/* 横スクロールラッパー */}
+      <div className="overflow-x-auto">
       {/* ヘッダー */}
-      <div className={`grid ${gridCols} gap-x-2 px-3 py-2 bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wide`}>
+      <div className={`grid ${gridCols} gap-x-2 px-3 py-2 bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wide min-w-[480px]`}>
         <span>{t("common:monster")}</span>
         {isPhysical && <span className="w-20 whitespace-nowrap">必要LUCK</span>}
         <span className="w-32 whitespace-nowrap">{t("damage")}</span>
@@ -110,7 +112,7 @@ export function OffensiveComparisonTable({ rows, onSelectMonster, selectedSpellN
             <button
               key={idx}
               onClick={() => onSelectMonster(idx)}
-              className={`w-full grid ${gridCols} gap-x-2 px-3 py-2 text-left hover:bg-indigo-50 transition-colors items-center ${rowBg}`}
+              className={`w-full grid ${gridCols} gap-x-2 px-3 py-2 text-left hover:bg-indigo-50 transition-colors items-center min-w-[480px] ${rowBg}`}
             >
               {/* モンスター名 + 属性 + Lv */}
               <div className="min-w-0">
@@ -204,6 +206,7 @@ export function OffensiveComparisonTable({ rows, onSelectMonster, selectedSpellN
           );
         })}
       </div>
+      </div>{/* /横スクロールラッパー */}
     </div>
   );
 }
