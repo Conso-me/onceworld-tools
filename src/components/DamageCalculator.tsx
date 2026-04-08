@@ -485,7 +485,10 @@ export function DamageCalculator() {
       overkillStatNeeded = Math.max(Math.ceil((requiredBase / crystalCubeFinalMult + effectiveDef) / (1.75 * crystalCubePreMult)), 0);
     }
 
-    return { mode: myAttackMode as "物理" | "魔弾", dmg, multiHit, hitsToKill, minStat, targetStats, hitRate, overkillGuaranteed, overkillPossible, overkillStatNeeded };
+    const requiredLuck = myAttackMode === "物理" ? scaled.scaledLuck : null;
+    const luckShortfall = myAttackMode === "物理" ? Math.max(scaled.scaledLuck - effLuck, 0) : null;
+
+    return { mode: myAttackMode as "物理" | "魔弾", dmg, multiHit, hitsToKill, minStat, targetStats, hitRate, overkillGuaranteed, overkillPossible, overkillStatNeeded, requiredLuck, luckShortfall };
   }, [
     scaled,
     effAtk,
@@ -1277,11 +1280,25 @@ export function DamageCalculator() {
                         );
                       })()}
                       {offensiveResult.hitRate !== null && (
-                        <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
-                          <span className="text-sm text-gray-500">{t("hitRate")}</span>
-                          <span className={`font-bold ${offensiveResult.hitRate >= 80 ? "text-green-600" : offensiveResult.hitRate < 20 ? "text-red-500" : "text-yellow-600"}`}>
-                            {offensiveResult.hitRate}%
-                          </span>
+                        <div className="py-2 px-3 bg-white/60 rounded-lg">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-500">{t("hitRate")}</span>
+                            <span className={`font-bold ${offensiveResult.hitRate >= 80 ? "text-green-600" : offensiveResult.hitRate < 20 ? "text-red-500" : "text-yellow-600"}`}>
+                              {offensiveResult.hitRate}%
+                            </span>
+                          </div>
+                          <div className="mt-0.5">
+                            {offensiveResult.hitRate >= 100 ? (
+                              <span className="text-xs text-green-500 font-semibold">
+                                LUK {offensiveResult.requiredLuck!.toLocaleString()} で達成（+{(effLuck - offensiveResult.requiredLuck!).toLocaleString()} 超過）
+                              </span>
+                            ) : (
+                              <span className="text-xs text-gray-400">
+                                LUK {offensiveResult.requiredLuck!.toLocaleString()} 必要
+                                <span className="text-orange-500 font-semibold ml-1">(あと +{offensiveResult.luckShortfall!.toLocaleString()})</span>
+                              </span>
+                            )}
+                          </div>
                         </div>
                       )}
                     </>
