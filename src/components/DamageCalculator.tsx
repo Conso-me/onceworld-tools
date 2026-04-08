@@ -41,6 +41,7 @@ import type { MultiMonsterEntry } from "../utils/multiDamageCalc";
 import { OffensiveComparisonTable } from "./damage/OffensiveComparisonTable";
 import { DefensiveComparisonTable } from "./damage/DefensiveComparisonTable";
 import { PhysicalOffensiveSummary } from "./damage/PhysicalOffensiveSummary";
+import { MagicOffensiveSummary } from "./damage/MagicOffensiveSummary";
 import { InputField } from "./ui/InputField";
 import { StatCard } from "./ui/StatCard";
 import { ResultRow } from "./ui/ResultRow";
@@ -1030,6 +1031,16 @@ export function DamageCalculator() {
                     rows={offensiveComparison}
                     playerAtk={effAtk}
                     playerLuck={effLuck}
+                  />
+                )}
+                {myAttackMode === "魔攻" && (
+                  <MagicOffensiveSummary
+                    rows={offensiveComparison}
+                    selectedSpellName={comparisonSpell}
+                    currentInt={effInt}
+                    currentCubeCount={crystalCubeNum}
+                    magicBaseInt={magicBaseInt}
+                    crystalCubeFinalMult={crystalCubeFinalMult}
                   />
                 )}
                 <OffensiveComparisonTable
