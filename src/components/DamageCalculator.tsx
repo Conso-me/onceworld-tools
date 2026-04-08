@@ -41,6 +41,7 @@ import type { MultiMonsterEntry } from "../utils/multiDamageCalc";
 import { OffensiveComparisonTable } from "./damage/OffensiveComparisonTable";
 import { DefensiveComparisonTable } from "./damage/DefensiveComparisonTable";
 import { PhysicalOffensiveSummary } from "./damage/PhysicalOffensiveSummary";
+import { MagicOffensiveSummary } from "./damage/MagicOffensiveSummary";
 import { InputField } from "./ui/InputField";
 import { StatCard } from "./ui/StatCard";
 import { ResultRow } from "./ui/ResultRow";
@@ -400,7 +401,24 @@ export function DamageCalculator() {
           spell.hits,
           crystalCubeFinalMult
         );
-        return { spell, dmg, totalMin, totalMax, hitsToKill, minStat, targetStats, overkillGuaranteed, overkillPossible, overkillStatNeeded };
+        // 現在のINTでOverKillするのに必要な魔晶立方体の最小数（0〜1000）
+        let overkillCubesNeeded: number | null = null;
+        if (!overkillGuaranteed && effInt > 0) {
+          for (let c = 0; c <= 1000; c++) {
+            const needed = calcIntForKill(
+              scaled.hp * 10,
+              scaled.scaledDef,
+              scaled.scaledMdef,
+              selfToEnemyAffinity,
+              spell.multiplier * (1 + c * 0.01),
+              magicBaseInt,
+              spell.hits,
+              crystalCubeFinalMult
+            );
+            if (needed <= effInt) { overkillCubesNeeded = c; break; }
+          }
+        }
+        return { spell, dmg, totalMin, totalMax, hitsToKill, minStat, targetStats, overkillGuaranteed, overkillPossible, overkillStatNeeded, overkillCubesNeeded };
       });
       return { mode: "魔攻" as const, spellResults };
     }
@@ -1032,6 +1050,16 @@ export function DamageCalculator() {
                     playerLuck={effLuck}
                   />
                 )}
+                {myAttackMode === "魔攻" && (
+                  <MagicOffensiveSummary
+                    rows={offensiveComparison}
+                    selectedSpellName={comparisonSpell}
+                    currentInt={effInt}
+                    currentCubeCount={crystalCubeNum}
+                    magicBaseInt={magicBaseInt}
+                    crystalCubeFinalMult={crystalCubeFinalMult}
+                  />
+                )}
                 <OffensiveComparisonTable
                   rows={offensiveComparison}
                   onSelectMonster={handleComparisonSelectMonster}
@@ -1132,7 +1160,7 @@ export function DamageCalculator() {
                 </div>
                 {hasMyOffenseStats ? (
                   <div className="grid grid-cols-[1fr_auto_auto_auto] gap-y-1.5 gap-x-1">
-                    {offensiveResult.spellResults.map(({ spell, dmg, totalMin, totalMax, hitsToKill, overkillGuaranteed, overkillPossible, overkillStatNeeded }) => (
+                    {offensiveResult.spellResults.map(({ spell, dmg, totalMin, totalMax, hitsToKill, overkillGuaranteed, overkillPossible, overkillStatNeeded, overkillCubesNeeded }) => (
                       <div key={spell.name} className="col-span-4 grid grid-cols-subgrid bg-white/60 rounded-lg py-1.5">
                         <div className="col-span-4 flex items-center gap-1 mb-1 px-2">
                           <span className={`text-xs px-1 py-0.5 rounded border font-medium ${elementColors[spell.element]}`}>{t(`game:element.${spell.element}`)}</span>
@@ -1167,20 +1195,33 @@ export function DamageCalculator() {
                           </>
                         )}
                         {!dmg.isNullified && (
-                          <div className="col-span-4 flex items-center justify-end gap-1 px-2 pt-0.5">
-                            {overkillGuaranteed ? (
-                              <span className="text-xs text-orange-500 font-semibold">
-                                INT {overkillStatNeeded.toLocaleString()} で達成（+{Math.max(0, effInt - overkillStatNeeded).toLocaleString()} 超過）
-                              </span>
-                            ) : (
-                              <>
-                                <span className="text-xs text-gray-400">
-                                  Overkill: INT {overkillStatNeeded.toLocaleString()} 必要
-                                </span>
+                          <div className="col-span-4 flex flex-col items-end gap-0.5 px-2 pt-0.5">
+                            <div className="flex items-center gap-1">
+                              {overkillGuaranteed ? (
                                 <span className="text-xs text-orange-500 font-semibold">
-                                  (あと +{Math.max(0, overkillStatNeeded - effInt).toLocaleString()})
+                                  INT {overkillStatNeeded.toLocaleString()} で達成（+{Math.max(0, effInt - overkillStatNeeded).toLocaleString()} 超過）
                                 </span>
-                              </>
+                              ) : (
+                                <>
+                                  <span className="text-xs text-gray-400">
+                                    Overkill: INT {overkillStatNeeded.toLocaleString()} 必要
+                                  </span>
+                                  <span className="text-xs text-orange-500 font-semibold">
+                                    (あと +{Math.max(0, overkillStatNeeded - effInt).toLocaleString()})
+                                  </span>
+                                </>
+                              )}
+                            </div>
+                            {!overkillGuaranteed && effInt > 0 && (
+                              <div className="flex items-center gap-1">
+                                {overkillCubesNeeded === null ? (
+                                  <span className="text-xs text-gray-400">魔晶立方体1000個でも不足</span>
+                                ) : (
+                                  <span className="text-xs text-purple-500 font-semibold">
+                                    魔晶立方体 あと{Math.max(0, overkillCubesNeeded - crystalCubeNum).toLocaleString()}個でOverKill可能
+                                  </span>
+                                )}
+                              </div>
                             )}
                           </div>
                         )}

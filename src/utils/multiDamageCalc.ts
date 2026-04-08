@@ -9,6 +9,7 @@ import {
   calcMultiHitCount,
   calcHitsToKill,
   calcHitRate,
+  calcIntForKill,
 } from "./damageCalc";
 import {
   calcDamage as calcDefDamage,
@@ -33,6 +34,8 @@ export interface OffensiveSpellResult {
   totalMin: number;
   totalMax: number;
   hitsToKill: number;
+  overkillGuaranteed: boolean;
+  overkillStatNeeded: number;
 }
 
 export interface OffensiveComparisonRow {
@@ -90,7 +93,18 @@ export function calcOffensiveComparison(
         const totalMin = dmg.isNullified ? spell.hits : dmg.min * spell.hits;
         const totalMax = dmg.isNullified ? 9 * spell.hits : dmg.max * spell.hits;
         const hitsToKill = calcHitsToKill(scaled.hp, dmg.isNullified ? 1 : dmg.min, spell.hits);
-        return { spell, dmg, totalMin, totalMax, hitsToKill };
+        const overkillGuaranteed = !dmg.isNullified && totalMin >= scaled.hp * 10;
+        const overkillStatNeeded = calcIntForKill(
+          scaled.hp * 10,
+          scaled.scaledDef,
+          scaled.scaledMdef,
+          affinity,
+          effectiveMult,
+          magicParams.magicBaseInt,
+          spell.hits,
+          magicParams.crystalCubeFinalMult
+        );
+        return { spell, dmg, totalMin, totalMax, hitsToKill, overkillGuaranteed, overkillStatNeeded };
       });
 
       // 最良の魔法 = 無効化されていない中で最も少ない確殺回数（同じなら最大ダメージ）

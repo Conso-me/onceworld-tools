@@ -67,10 +67,10 @@ export function OffensiveComparisonTable({ rows, onSelectMonster, selectedSpellN
       {/* ヘッダー */}
       <div className={`grid ${gridCols} gap-x-2 px-3 py-2 bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wide min-w-[600px]`}>
         <span>{t("common:monster")}</span>
-        {isPhysical && <span className="w-20 whitespace-nowrap">必要LUCK</span>}
-        <span className="w-32 whitespace-nowrap">{t("damage")}</span>
-        <span className="w-16 whitespace-nowrap">{t("hitsToKill")}</span>
-        <span className="w-10">OK</span>
+        {isPhysical && <span className="w-20 whitespace-nowrap text-center">必要LUCK</span>}
+        <span className="w-32 whitespace-nowrap text-center">{t("damage")}</span>
+        <span className="w-16 whitespace-nowrap text-center">{t("hitsToKill")}</span>
+        <span className="w-16 text-center">OverKill</span>
       </div>
 
       {/* 行 */}
@@ -98,7 +98,7 @@ export function OffensiveComparisonTable({ rows, onSelectMonster, selectedSpellN
             ? activeSpell?.totalMax ?? 0
             : (row.dmg?.isNullified ? 9 : row.dmg?.max ?? 0);
 
-          const overkill = isMagic ? false : row.overkillGuaranteed;
+          const overkill = isMagic ? (activeSpell?.overkillGuaranteed ?? false) : row.overkillGuaranteed;
 
           const rowBg = isNullified
             ? "bg-gray-50"
@@ -147,7 +147,7 @@ export function OffensiveComparisonTable({ rows, onSelectMonster, selectedSpellN
 
               {/* 必要LUCK（物理のみ） */}
               {isPhysical && (
-                <div className="text-right w-20">
+                <div className="text-center w-20">
                   <div className={`text-xs font-bold tabular-nums ${luckAchieved ? "text-green-600" : "text-gray-800"}`}>
                     {(row.requiredHitLuck ?? 0).toLocaleString()}
                   </div>
@@ -165,7 +165,7 @@ export function OffensiveComparisonTable({ rows, onSelectMonster, selectedSpellN
               {/* ダメージ */}
               <div className="w-32">
                 {isNullified ? (
-                  <div className="text-right">
+                  <div className="text-center">
                     <span className="text-xs text-gray-400">{t("cannotPenetrate")}</span>
                   </div>
                 ) : (
@@ -182,7 +182,7 @@ export function OffensiveComparisonTable({ rows, onSelectMonster, selectedSpellN
               </div>
 
               {/* 確殺 */}
-              <div className="text-right w-16">
+              <div className="text-center w-16">
                 {isNullified ? (
                   <span className="text-xs text-gray-300">—</span>
                 ) : (
@@ -194,11 +194,11 @@ export function OffensiveComparisonTable({ rows, onSelectMonster, selectedSpellN
                 )}
               </div>
 
-              {/* OK */}
-              <div className="text-right w-10">
+              {/* OverKill */}
+              <div className="text-center w-16">
                 {overkill && (
                   <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-600 font-bold">
-                    OK
+                    OverKill
                   </span>
                 )}
               </div>
