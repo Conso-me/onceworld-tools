@@ -40,6 +40,7 @@ import {
 import type { MultiMonsterEntry } from "../utils/multiDamageCalc";
 import { OffensiveComparisonTable } from "./damage/OffensiveComparisonTable";
 import { DefensiveComparisonTable } from "./damage/DefensiveComparisonTable";
+import { DefenseMaxSummary } from "./damage/DefenseMaxSummary";
 import { InputField } from "./ui/InputField";
 import { StatCard } from "./ui/StatCard";
 import { ResultRow } from "./ui/ResultRow";
@@ -1023,12 +1024,17 @@ export function DamageCalculator() {
           {/* テーブル */}
           <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
             {comparisonTab === "与ダメ" ? (
-              <OffensiveComparisonTable
-                rows={offensiveComparison}
-                onSelectMonster={handleComparisonSelectMonster}
-                selectedSpellName={comparisonSpell}
-                onSpellSelect={setComparisonSpell}
-              />
+              <div className="space-y-2">
+                {myAttackMode === "物理" && (
+                  <DefenseMaxSummary rows={defensiveComparison} />
+                )}
+                <OffensiveComparisonTable
+                  rows={offensiveComparison}
+                  onSelectMonster={handleComparisonSelectMonster}
+                  selectedSpellName={comparisonSpell}
+                  onSpellSelect={setComparisonSpell}
+                />
+              </div>
             ) : (
               <DefensiveComparisonTable
                 rows={defensiveComparison}
