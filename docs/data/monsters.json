@@ -2072,5 +2072,22 @@
     "captureRate": 0.01,
     "exp": 570000,
     "gold": 30000
+  },
+  {
+    "name": "オメガ・スペクトラム",
+    "level": 0,
+    "element": "闇",
+    "attackType": "魔法",
+    "vit": 2180,
+    "spd": 450,
+    "atk": 420,
+    "int": 580,
+    "def": 920,
+    "mdef": 1000,
+    "luck": 620,
+    "mov": 29,
+    "captureRate": 0.01,
+    "exp": 3085000,
+    "gold": 200000
   }
 ]
