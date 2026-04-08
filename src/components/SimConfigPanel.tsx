@@ -69,7 +69,7 @@ const petStatGroups = getPetsByPrimaryStat();
 
 // ── Equipment grouping ────────────────────────────────────────────────────────
 
-const EQUIP_SERIES_ORDER = ["皮", "鉄", "プラチナ", "魔導士", "獄炎", "ドラゴン", "暴君", "その他"] as const;
+const EQUIP_SERIES_ORDER = ["皮", "鉄", "プラチナ", "魔導士", "獄炎", "ドラゴン", "暴君", "悪魔", "その他"] as const;
 type EquipSeries = typeof EQUIP_SERIES_ORDER[number];
 
 // Computed once — slot → series → items (items named "なし" are excluded)
