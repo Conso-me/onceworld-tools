@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-04-08",
     changes: [
+    { type: "feature", text: "feat: 悪魔シリーズを装備選択UIに表示、持つ書物を追加" },
     { type: "improve", text: "feat: 与ダメ物理サマリーを与ダメ専用情報に作り直す" },
     { type: "feature", text: "feat: 与ダメ物理サマリーに命中LUCK最大の敵への与ダメ・必要LUCKを追加" },
     { type: "improve", text: "feat: 与ダメ比較（物理時）にも最大DEF/MDEFサマリーを表示" },
