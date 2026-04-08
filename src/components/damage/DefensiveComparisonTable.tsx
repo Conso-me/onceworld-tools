@@ -48,7 +48,7 @@ export function DefensiveComparisonTable({ rows, onSelectMonster }: Props) {
                 <div className="text-lg font-bold text-orange-600 tabular-nums">{maxPhysReq.toLocaleString()}</div>
                 {remaining !== null && (
                   <div className={`text-xs tabular-nums font-medium ${achieved ? "text-green-600" : "text-orange-500"}`}>
-                    {achieved ? "達成済み" : `あと${remaining.toLocaleString()}`}
+                    {achieved ? "達成済み ✓" : `あと${remaining.toLocaleString()}`}
                   </div>
                 )}
               </div>
@@ -63,7 +63,7 @@ export function DefensiveComparisonTable({ rows, onSelectMonster }: Props) {
                 <div className="text-lg font-bold text-purple-600 tabular-nums">{maxMagicReq.toLocaleString()}</div>
                 {remaining !== null && (
                   <div className={`text-xs tabular-nums font-medium ${achieved ? "text-green-600" : "text-purple-500"}`}>
-                    {achieved ? "達成済み" : `あと${remaining.toLocaleString()}`}
+                    {achieved ? "達成済み ✓" : `あと${remaining.toLocaleString()}`}
                   </div>
                 )}
               </div>
