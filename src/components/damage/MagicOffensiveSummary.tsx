@@ -45,7 +45,7 @@ export function MagicOffensiveSummary({
   const intShortfall = Math.max(0, maxOverkillInt - currentInt);
   const intAchieved = currentInt > 0 && intShortfall <= 0;
 
-  // OverKill必要キューブ: 現在のINTで各モンスターをOKするための最小キューブ数
+  // OverKill必要魔晶立方体: 現在のINTで各モンスターをOKするための最小魔晶立方体数
   let maxCubesNeeded = 0;
   let hardestByCubeName = rowsWithSpell[0].row.scaled.name;
   let isUnachievable = false;
@@ -109,7 +109,7 @@ export function MagicOffensiveSummary({
           </div>
         </div>
 
-        {/* OverKill: INT + キューブ */}
+        {/* OverKill: INT + 魔晶立方体 */}
         <div className="bg-white rounded-xl px-3 py-2 space-y-2">
           {/* INT */}
           <div>
@@ -131,13 +131,13 @@ export function MagicOffensiveSummary({
 
           <div className="border-t border-gray-100" />
 
-          {/* キューブ */}
+          {/* 魔晶立方体 */}
           <div>
             <div
               className="text-[10px] text-gray-400 font-medium truncate"
-              title={`OverKillキューブ数（${hardestByCubeName}）`}
+              title={`OverKill魔晶立方体数（${hardestByCubeName}）`}
             >
-              OverKillキューブ数（{hardestByCubeName}）
+              OverKill魔晶立方体数（{hardestByCubeName}）
             </div>
             {currentInt === 0 ? (
               <div className="text-[10px] text-gray-400 mt-0.5">INTを設定すると表示</div>
