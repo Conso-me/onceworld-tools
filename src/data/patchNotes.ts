@@ -15,6 +15,11 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-04-08",
     changes: [
+    { type: "improve", text: "feat: 与ダメ物理サマリーを与ダメ専用情報に作り直す" },
+    { type: "feature", text: "feat: 与ダメ物理サマリーに命中LUCK最大の敵への与ダメ・必要LUCKを追加" },
+    { type: "improve", text: "feat: 与ダメ比較（物理時）にも最大DEF/MDEFサマリーを表示" },
+    { type: "improve", text: "fix: 達成済み時も必要DEF/MDEF値を常に表示" },
+    { type: "feature", text: "feat: 被ダメ比較テーブルに全モンスター無効化に必要な最大DEF/MDEF表示を追加" },
     { type: "feature", text: "feat: オメガ・スペクトラムのデータを追加" },
     { type: "feature", text: "feat: バージョン2.0の装備・アクセ・モンスターデータを追加" },
     { type: "feature", text: "feat: 命中率表示に必要LUK・不足LUKのヒントを追加" },
