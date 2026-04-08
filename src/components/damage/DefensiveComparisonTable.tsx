@@ -27,8 +27,10 @@ export function DefensiveComparisonTable({ rows, onSelectMonster }: Props) {
     <div className="space-y-2">
     <DefenseMaxSummary rows={rows} />
     <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 overflow-hidden">
+      {/* 横スクロールラッパー */}
+      <div className="overflow-x-auto">
       {/* ヘッダー */}
-      <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-x-2 px-3 py-2 bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wide">
+      <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-x-2 px-3 py-2 bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wide min-w-[600px]">
         <span>{t("common:monster")}</span>
         <span className="w-20 whitespace-nowrap">無効化</span>
         <span className="w-28">{t("defensePanel.currentDamage")}</span>
@@ -52,7 +54,7 @@ export function DefensiveComparisonTable({ rows, onSelectMonster }: Props) {
             <button
               key={idx}
               onClick={() => onSelectMonster(idx)}
-              className={`w-full grid grid-cols-[1fr_auto_auto_auto_auto] gap-x-2 px-3 py-2 text-left hover:bg-indigo-50 transition-colors items-center ${rowBg}`}
+              className={`w-full grid grid-cols-[1fr_auto_auto_auto_auto] gap-x-2 px-3 py-2 text-left hover:bg-indigo-50 transition-colors items-center min-w-[600px] ${rowBg}`}
             >
               {/* モンスター名 + 属性 + Lv + 攻撃種 */}
               <div className="min-w-0">
@@ -154,6 +156,7 @@ export function DefensiveComparisonTable({ rows, onSelectMonster }: Props) {
           );
         })}
       </div>
+      </div>{/* /横スクロールラッパー */}
     </div>
     </div>
   );

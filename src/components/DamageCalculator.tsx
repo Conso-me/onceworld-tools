@@ -743,16 +743,16 @@ export function DamageCalculator() {
               {comparisonMonsters.map((entry, idx) => (
                 <span
                   key={idx}
-                  className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-100 text-xs text-gray-700"
+                  className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-100 text-xs text-gray-700 max-w-full"
                 >
-                  <span className={`w-1.5 h-1.5 rounded-full ${
+                  <span className={`flex-shrink-0 w-1.5 h-1.5 rounded-full ${
                     { 火: "bg-red-400", 水: "bg-blue-400", 木: "bg-green-400", 光: "bg-yellow-400", 闇: "bg-purple-400" }[entry.monster.element]
                   }`} />
-                  {entry.monster.name}
-                  <span className="text-gray-400">Lv{entry.level.toLocaleString()}</span>
+                  <span className="truncate">{entry.monster.name}</span>
+                  <span className="flex-shrink-0 text-gray-400">Lv{entry.level.toLocaleString()}</span>
                   <button
                     onClick={() => handleRemoveFromComparison(idx)}
-                    className="text-gray-300 hover:text-gray-500 ml-0.5"
+                    className="flex-shrink-0 text-gray-300 hover:text-gray-500 ml-0.5"
                   >
                     ×
                   </button>

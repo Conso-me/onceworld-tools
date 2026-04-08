@@ -37,7 +37,8 @@ export function PhysicalOffensiveSummary({ rows, playerAtk, playerLuck }: Props)
 
         {/* 一番硬い敵への与ダメ */}
         <div className="bg-white rounded-xl px-3 py-2 col-span-1">
-          <div className="text-[10px] text-gray-400 font-medium mb-0.5">
+          <div className="text-[10px] text-gray-400 font-medium mb-0.5 truncate"
+               title={`最硬（${hardestRow.scaled.name}）への与ダメ`}>
             最硬（{hardestRow.scaled.name}）への与ダメ
           </div>
           {hardestRow.dmg?.isNullified ? (
@@ -62,7 +63,8 @@ export function PhysicalOffensiveSummary({ rows, playerAtk, playerLuck }: Props)
 
         {/* 一番LUKが高い敵への命中 */}
         <div className="bg-white rounded-xl px-3 py-2 col-span-1">
-          <div className="text-[10px] text-gray-400 font-medium mb-0.5">
+          <div className="text-[10px] text-gray-400 font-medium mb-0.5 truncate"
+               title={`最高LUCK（${hardestLuckRow.scaled.name}）への命中`}>
             最高LUCK（{hardestLuckRow.scaled.name}）への命中
           </div>
           {hitRate !== null && hitRate !== undefined ? (
