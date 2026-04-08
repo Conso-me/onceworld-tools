@@ -1166,5 +1166,21 @@
     "mov": 0,
     "special": null,
     "order": 720
+  },
+  {
+    "name": "持つ書物",
+    "slot": "武器",
+    "series": null,
+    "material": "強化できない",
+    "vit": 0,
+    "spd": 0,
+    "atk": 0,
+    "int": 999999,
+    "def": 0,
+    "mdef": 999999,
+    "luck": 0,
+    "mov": 0,
+    "special": null,
+    "order": 730
   }
 ]
