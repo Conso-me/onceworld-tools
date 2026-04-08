@@ -70,7 +70,7 @@ export function OffensiveComparisonTable({ rows, onSelectMonster, selectedSpellN
         {isPhysical && <span className="w-20 whitespace-nowrap">必要LUCK</span>}
         <span className="w-32 whitespace-nowrap">{t("damage")}</span>
         <span className="w-16 whitespace-nowrap">{t("hitsToKill")}</span>
-        <span className="w-10">OK</span>
+        <span className="w-16">OverKill</span>
       </div>
 
       {/* 行 */}
@@ -194,11 +194,11 @@ export function OffensiveComparisonTable({ rows, onSelectMonster, selectedSpellN
                 )}
               </div>
 
-              {/* OK */}
-              <div className="text-right w-10">
+              {/* OverKill */}
+              <div className="text-right w-16">
                 {overkill && (
                   <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-600 font-bold">
-                    OK
+                    OverKill
                   </span>
                 )}
               </div>
