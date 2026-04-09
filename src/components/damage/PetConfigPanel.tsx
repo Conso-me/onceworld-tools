@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import type { PetDamageConfig, PetStatResult, Element } from "../../types/game";
 import { useAllMonsters } from "../../hooks/useAllMonsters";
 import { MonsterSelectorModal } from "../ui/MonsterSelectorModal";
-import { calcPetMaxLevel } from "../../utils/petStatCalc";
 import { usePetPresets } from "../../hooks/usePetPresets";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -125,15 +124,6 @@ function CompactInput({
             : "border-gray-200 bg-white"
         }`}
       />
-      {max !== undefined && (
-        <button
-          type="button"
-          onClick={() => onChange(max)}
-          className="text-center text-[9px] leading-none text-indigo-400 hover:text-indigo-600 transition-colors"
-        >
-          MAX
-        </button>
-      )}
     </div>
   );
 }
@@ -155,7 +145,6 @@ export function PetConfigPanel({ config, setField, reset, petResult, replaceConf
     [config.petMonsterName, allMonsters],
   );
 
-  const maxLevel = calcPetMaxLevel(config.hadesHelmetCount);
   const petElement: Element | null = selectedMonster?.element ?? null;
   const activeMushroomKey: MushroomKey | null = petElement ? MUSHROOM_BY_ELEMENT[petElement] : null;
 
@@ -229,8 +218,8 @@ export function PetConfigPanel({ config, setField, reset, petResult, replaceConf
         />
       </div>
 
-      {/* ── ペットレベル + 同族殲儀 + 上限Lv ────────────── */}
-      <div className="grid grid-cols-3 gap-2">
+      {/* ── ペットレベル + 同族殲儀 ────────────── */}
+      <div className="grid grid-cols-2 gap-2">
         {/* ペットレベル */}
         <div className="space-y-1">
           <label className="block text-[10px] lg:text-[9px] font-medium text-gray-500 truncate">
@@ -241,12 +230,12 @@ export function PetConfigPanel({ config, setField, reset, petResult, replaceConf
               type="text"
               inputMode="numeric"
               value={config.petLevel}
-              onChange={(e) => handleNumField("petLevel", e.target.value, maxLevel)}
+              onChange={(e) => handleNumField("petLevel", e.target.value, 1200)}
               className="w-full px-2 py-1.5 lg:py-1 bg-white border border-gray-200 rounded-lg text-center text-sm lg:text-xs font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
             />
             <button
               type="button"
-              onClick={() => setField("petLevel", maxLevel)}
+              onClick={() => setField("petLevel", 1200)}
               className="flex-shrink-0 px-1.5 py-1.5 lg:py-1 bg-indigo-50 border border-indigo-200 rounded-lg text-[10px] font-semibold text-indigo-600 hover:bg-indigo-100 transition-colors leading-none"
             >
               MAX
@@ -259,55 +248,39 @@ export function PetConfigPanel({ config, setField, reset, petResult, replaceConf
           <label className="block text-[10px] lg:text-[9px] font-medium text-gray-500 truncate">
             {t("petSengiCount")}
           </label>
-          <div className="flex gap-1">
-            <input
-              type="text"
-              inputMode="numeric"
-              value={config.sengiCount}
-              onChange={(e) => handleNumField("sengiCount", e.target.value, 30)}
-              className="w-full px-2 py-1.5 lg:py-1 bg-white border border-gray-200 rounded-lg text-center text-sm lg:text-xs font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
-            />
-            <button
-              type="button"
-              onClick={() => setField("sengiCount", 30)}
-              className="flex-shrink-0 px-1.5 py-1.5 lg:py-1 bg-indigo-50 border border-indigo-200 rounded-lg text-[10px] font-semibold text-indigo-600 hover:bg-indigo-100 transition-colors leading-none"
-            >
-              MAX
-            </button>
-          </div>
-        </div>
-
-        {/* 上限Lv（ハデスの兜数から算出） */}
-        <div className="space-y-1">
-          <label className="block text-[10px] lg:text-[9px] font-medium text-gray-500 truncate">
-            {t("petMaxLevel")}
-          </label>
-          <div className="flex gap-1">
-            <input
-              type="text"
-              inputMode="numeric"
-              value={200 + config.hadesHelmetCount}
-              onChange={(e) => {
-                const raw = parseInt(e.target.value.replace(/[^0-9]/g, ""), 10);
-                const lv = isNaN(raw) ? 200 : Math.min(Math.max(raw, 200), 1200);
-                setField("hadesHelmetCount", lv - 200);
-                if (config.petLevel > lv) setField("petLevel", lv);
-              }}
-              className="w-full px-2 py-1.5 lg:py-1 bg-white border border-gray-200 rounded-lg text-center text-sm lg:text-xs font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
-            />
-            <button
-              type="button"
-              onClick={() => {
-                setField("hadesHelmetCount", 1000);
-                if (config.petLevel > 1200) setField("petLevel", 1200);
-              }}
-              className="flex-shrink-0 px-1.5 py-1.5 lg:py-1 bg-indigo-50 border border-indigo-200 rounded-lg text-[10px] font-semibold text-indigo-600 hover:bg-indigo-100 transition-colors leading-none"
-            >
-              MAX
-            </button>
-          </div>
+          <input
+            type="text"
+            inputMode="numeric"
+            value={config.sengiCount}
+            onChange={(e) => handleNumField("sengiCount", e.target.value, 30)}
+            className="w-full px-2 py-1.5 lg:py-1 bg-white border border-gray-200 rounded-lg text-center text-sm lg:text-xs font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
+          />
+          <p className="text-[10px] text-gray-400 text-center leading-none">0〜30</p>
         </div>
       </div>
+
+      {/* ── 一括MAX ───────────────────────────────────────── */}
+      <button
+        type="button"
+        onClick={() => {
+          setField("sengiCount", 30);
+          setField("mushroomFire", 1000);
+          setField("mushroomWater", 1000);
+          setField("mushroomWood", 1000);
+          setField("mushroomLight", 1000);
+          setField("mushroomDark", 1000);
+          setField("powderVit", 100);
+          setField("powderSpd", 100);
+          setField("powderAtk", 100);
+          setField("powderInt", 100);
+          setField("powderDef", 100);
+          setField("powderMdef", 100);
+          setField("powderLuck", 100);
+        }}
+        className="w-full py-1.5 lg:py-1 bg-indigo-50 border border-indigo-200 rounded-lg text-xs font-semibold text-indigo-600 hover:bg-indigo-100 transition-colors"
+      >
+        {t("petAllMax")}
+      </button>
 
       {/* ── 属性キノコ ──────────────────────────────────────── */}
       <div className="space-y-1">

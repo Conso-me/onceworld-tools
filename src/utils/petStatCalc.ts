@@ -79,7 +79,7 @@ function findHighestStatKey(
 }
 
 export function calcPetStats(config: PetDamageConfig, monsterBase: MonsterBase): PetStatResult {
-  const maxLevel = calcPetMaxLevel(config.hadesHelmetCount);
+  const maxLevel = 1200;
   const level = Math.min(config.petLevel, maxLevel);
 
   const bases: Record<StatKey, number> = {
