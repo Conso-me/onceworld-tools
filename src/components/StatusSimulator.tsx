@@ -141,6 +141,9 @@ export function StatusSimulator() {
   const { presets, savePreset } = useStatPresets();
   const [presetName, setPresetName] = useState("");
   const [attackModeForExport, setAttackModeForExport] = useState<"物理" | "魔攻">("物理");
+  const [analysisBookForExport, setAnalysisBookForExport] = useState("");
+  const [analysisAnalysisBookForExport, setAnalysisAnalysisBookForExport] = useState("");
+  const [crystalCubeForExport, setCrystalCubeForExport] = useState("");
 
   const resultA = useMemo(() => calcStatus(cfgA), [cfgA]);
   const resultB = useMemo(() => calcStatus(cfgB), [cfgB]);
@@ -166,9 +169,9 @@ export function StatusSimulator() {
       luck: String(activeResult.final.luck),
       element:    activeCfg.charElement,
       attackMode: attackModeForExport,
-      analysisBook: "0",
-      analysisAnalysisBook: "0",
-      crystalCube: "0",
+      analysisBook: analysisBookForExport || "0",
+      analysisAnalysisBook: analysisAnalysisBookForExport || "0",
+      crystalCube: crystalCubeForExport || "0",
     });
     setPresetName("");
   }
@@ -262,6 +265,44 @@ export function StatusSimulator() {
               ))}
             </div>
           </div>
+          {attackModeForExport === "魔攻" && (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500 shrink-0">{t("analysisBook")}</span>
+                <input
+                  type="number"
+                  min={0}
+                  placeholder="0"
+                  value={analysisBookForExport}
+                  onChange={(e) => setAnalysisBookForExport(e.target.value)}
+                  className={`${inputCls} w-20`}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500 shrink-0">{t("analysisAnalysisBook")}</span>
+                <input
+                  type="number"
+                  min={0}
+                  placeholder="0"
+                  value={analysisAnalysisBookForExport}
+                  onChange={(e) => setAnalysisAnalysisBookForExport(e.target.value)}
+                  className={`${inputCls} w-20`}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500 shrink-0">{t("crystalCube")}</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={1000}
+                  placeholder="0"
+                  value={crystalCubeForExport}
+                  onChange={(e) => setCrystalCubeForExport(e.target.value)}
+                  className={`${inputCls} w-20`}
+                />
+              </div>
+            </div>
+          )}
           <div className="flex gap-2">
             <input
               type="text"
