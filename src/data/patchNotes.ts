@@ -15,6 +15,8 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-04-09",
     changes: [
+    { type: "fix", text: "fix: パターン1ペット5体追加・超越者リガミア名前修正 (ref #90)" },
+    { type: "feature", text: "feat: パターン2ペット（Lv200-1200）のスキルデータを追加 (close #90)" },
     { type: "improve", text: "feat: プリセット保存欄にペット名をデフォルト表示" },
     { type: "improve", text: "fix: 全部MAXから同族殲儀を除外（現ゲームでは30到達不可のため）" },
     { type: "improve", text: "refactor: 上限Lv入力を廃止・全部MAXボタンを1つに集約" },
