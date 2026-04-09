@@ -3,10 +3,17 @@ import type { SimConfig } from "../types/game";
 
 const STORAGE_KEY = "owt:sim-presets";
 
+export type SimPresetExtra = {
+  crystalCube: string;
+  analysisBook: string;
+  analysisAnalysisBook: string;
+};
+
 export type SimPreset = {
   id: string;
   name: string;
   config: SimConfig;
+  extra?: SimPresetExtra;
 };
 
 function loadFromStorage(): SimPreset[] {
@@ -24,14 +31,14 @@ function persist(presets: SimPreset[]) {
 export function useSimPresets() {
   const [presets, setPresets] = useState<SimPreset[]>(loadFromStorage);
 
-  const savePreset = useCallback((name: string, config: SimConfig) => {
+  const savePreset = useCallback((name: string, config: SimConfig, extra?: SimPresetExtra) => {
     setPresets((prev) => {
       const existingIdx = prev.findIndex((p) => p.name === name);
       let next: SimPreset[];
       if (existingIdx >= 0) {
-        next = prev.map((p, i) => i === existingIdx ? { ...p, config, name } : p);
+        next = prev.map((p, i) => i === existingIdx ? { ...p, config, name, extra } : p);
       } else {
-        next = [...prev, { id: crypto.randomUUID(), name, config }];
+        next = [...prev, { id: crypto.randomUUID(), name, config, extra }];
       }
       persist(next);
       return next;

@@ -917,6 +917,12 @@ export function DamageCalculator() {
               setField={setSimField}
               reset={resetSim}
               replaceAll={replaceAllSim}
+              extraFields={{ crystalCube, analysisBook, analysisAnalysisBook }}
+              onLoadExtraFields={(extra) => {
+                setCrystalCube(extra.crystalCube);
+                setAnalysisBook(extra.analysisBook);
+                setAnalysisAnalysisBook(extra.analysisAnalysisBook);
+              }}
             />
           )}
 
