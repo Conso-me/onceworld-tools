@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-04-09",
     changes: [
+    { type: "fix", text: "fix: ビルドプリセットに魔晶立方体・魔法解析書を記録するよう修正" },
     { type: "feature", text: "fix: ステータスシミュレータのダメ計プリセット保存に魔法解析書・解析書の解析書・魔晶立方体を追加" },
     { type: "feature", text: "feat: 魔攻単体表示にOverKill用魔晶立方体数を追加、キューブ→魔晶立方体に統一" },
     { type: "feature", text: "feat: 魔攻比較リストにOverKillサマリーを追加" },
