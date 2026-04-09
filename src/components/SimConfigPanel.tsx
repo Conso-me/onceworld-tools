@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useSimPresets } from "../hooks/useSimPresets";
+import { useSimPresets, type SimPresetExtra } from "../hooks/useSimPresets";
 import { calcAllocatedPoints, getAvailablePoints, getPerStatLimit } from "../utils/statusCalc";
 import {
   getEquipmentByName, equipment,
@@ -1204,9 +1204,11 @@ export interface SimConfigPanelProps {
   setField: SimSetField;
   reset: () => void;
   replaceAll: (cfg: SimConfig) => void;
+  extraFields?: SimPresetExtra;
+  onLoadExtraFields?: (extra: SimPresetExtra) => void;
 }
 
-export function SimConfigPanel({ cfg, setField, reset, replaceAll }: SimConfigPanelProps) {
+export function SimConfigPanel({ cfg, setField, reset, replaceAll, extraFields, onLoadExtraFields }: SimConfigPanelProps) {
   const { t } = useTranslation("status");
   const { presets: simPresets, savePreset, loadPreset, deletePreset } = useSimPresets();
   const [simPresetName, setSimPresetName] = useState("");
@@ -1219,7 +1221,7 @@ export function SimConfigPanel({ cfg, setField, reset, replaceAll }: SimConfigPa
     if (!trimmed) return;
     const existing = simPresets.find((p) => p.name === trimmed);
     if (existing && !window.confirm(t("overwriteBuildPresetConfirm", { name: trimmed }))) return;
-    savePreset(trimmed, cfg);
+    savePreset(trimmed, cfg, extraFields);
     setSimPresetName("");
   }
 
@@ -1227,13 +1229,14 @@ export function SimConfigPanel({ cfg, setField, reset, replaceAll }: SimConfigPa
     const preset = loadPreset(selectedSimPresetId);
     if (!preset) return;
     replaceAll(preset.config);
+    if (preset.extra && onLoadExtraFields) onLoadExtraFields(preset.extra);
     setOverwriteSaved(false);
   }
 
   function handleOverwriteSimPreset() {
     const preset = simPresets.find((p) => p.id === selectedSimPresetId);
     if (!preset) return;
-    savePreset(preset.name, cfg);
+    savePreset(preset.name, cfg, extraFields);
     setOverwriteSaved(true);
     setTimeout(() => setOverwriteSaved(false), 1500);
   }
