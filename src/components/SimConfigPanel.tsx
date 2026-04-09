@@ -156,9 +156,9 @@ function effectiveAccMax(maxLevel: number): number {
   return Math.min(maxLevel, 1000);
 }
 
-/** アクセサリー選択時のデフォルトレベル（上限不明=9999は100、それ以外は上限値） */
+/** アクセサリー選択時のデフォルトレベル（最大レベルをそのままセット） */
 function defaultAccLevel(maxLevel: number): number {
-  return maxLevel >= 9999 ? 100 : Math.min(maxLevel, 1000);
+  return maxLevel;
 }
 
 // ── UI Helpers ────────────────────────────────────────────────────────────────
