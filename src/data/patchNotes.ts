@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-04-10",
+    changes: [
+    { type: "feature", text: "feat: オコォーンを太古の中庭エネミープリセットに追加" },
+    ],
+  },
+
+  {
     date: "2026-04-09",
     changes: [
     { type: "fix", text: "fix: パターン1ペット5体追加・超越者リガミア名前修正 (ref #90)" },
