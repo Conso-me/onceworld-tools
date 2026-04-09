@@ -19,6 +19,7 @@ export interface MonsterBase {
   captureRate: number;
   exp: number;
   gold: number;
+  magicImmune?: boolean;
 }
 
 export interface ScaledMonster extends MonsterBase {
