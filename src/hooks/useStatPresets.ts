@@ -5,7 +5,7 @@ const SYNC_EVENT = "owt:stat-presets-updated";
 
 const STORAGE_KEY = "owt:stat-presets";
 
-type PlayerAttackMode = "物理" | "魔弾" | "魔攻";
+type PlayerAttackMode = "物理" | "魔弾" | "魔攻" | "魔法";
 
 export type StatPreset = {
   id: string;

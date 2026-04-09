@@ -30,7 +30,7 @@ describe("Monster data integrity", () => {
   });
 
   it("all attackTypes should be valid", () => {
-    const validAttackTypes = new Set(["物理", "魔弾", "魔攻"]);
+    const validAttackTypes = new Set(["物理", "魔法", "魔弾"]);
     for (const monster of monsters) {
       expect(
         validAttackTypes.has(monster.attackType),

@@ -1,5 +1,6 @@
-import type { SimConfig } from "../types/game";
+import type { SimConfig, PetDamageConfig } from "../types/game";
 import { DEFAULT_SIM_CONFIG } from "../hooks/useSharedSimConfig";
+import { DEFAULT_PET_DAMAGE_CONFIG } from "./petStatCalc";
 import equipmentData from "../../docs/data/equipment.json";
 import accessoriesData from "../../docs/data/accessories.json";
 import petSkillsData from "../../docs/data/pet-skills.json";
@@ -70,6 +71,16 @@ function namesToIds(state: DamageShareState): unknown {
     }
     result.sim = sim;
   }
+
+  if (result.pet && typeof result.pet === "object") {
+    const pet: SimRecord = { ...result.pet as SimRecord };
+    if (typeof pet.petMonsterName === "string" && pet.petMonsterName) {
+      const id = monsterLookup.nameToId.get(pet.petMonsterName as string);
+      if (id !== undefined) pet.petMonsterName = id;
+    }
+    result.pet = pet;
+  }
+
   return result;
 }
 
@@ -102,6 +113,15 @@ function idsToNames(data: SimRecord): DamageShareState {
     }
     result.sim = sim;
   }
+
+  if (result.pet && typeof result.pet === "object") {
+    const pet: SimRecord = { ...result.pet as SimRecord };
+    if (typeof pet.petMonsterName === "number") {
+      pet.petMonsterName = monsterLookup.idToName[pet.petMonsterName as number] ?? "";
+    }
+    result.pet = pet;
+  }
+
   return result as unknown as DamageShareState;
 }
 
@@ -123,10 +143,27 @@ export function expandSimConfig(partial: Partial<SimConfig>): SimConfig {
   return { ...DEFAULT_SIM_CONFIG, ...partial };
 }
 
+/** PetDamageConfig: デフォルト値と同じフィールドを除いてサイズを削減 */
+export function compactPetConfig(cfg: PetDamageConfig): Partial<PetDamageConfig> {
+  const compact: Partial<PetDamageConfig> = {};
+  for (const key of Object.keys(DEFAULT_PET_DAMAGE_CONFIG) as (keyof PetDamageConfig)[]) {
+    if (cfg[key] !== DEFAULT_PET_DAMAGE_CONFIG[key]) {
+      (compact as Record<string, unknown>)[key] = cfg[key];
+    }
+  }
+  return compact;
+}
+
+/** PetDamageConfig: デフォルト値を補完してフルに戻す */
+export function expandPetConfig(partial: Partial<PetDamageConfig>): PetDamageConfig {
+  return { ...DEFAULT_PET_DAMAGE_CONFIG, ...partial };
+}
+
 // ── 共有状態の型 ──────────────────────────────────────────────────────────
 
 export interface DamageShareState {
   v: 1;
+  calcTarget?: "player" | "pet";
   monsterName?: string;
   monsterLevel?: number;
   statMode: "manual" | "sim";
@@ -143,6 +180,7 @@ export interface DamageShareState {
   analysisAnalysisBook?: string;
   crystalCube?: string;
   sim?: Partial<SimConfig>;
+  pet?: Partial<PetDamageConfig>;
   comparisonMonsters?: { name: string; level: number; location: string }[];
   comparisonActive?: boolean;
   comparisonTab?: "与ダメ" | "被ダメ";
