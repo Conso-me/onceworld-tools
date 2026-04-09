@@ -2106,7 +2106,7 @@
     "pattern": 1
   },
   {
-    "name": "超越者リガミア",
+    "name": "超越者　リガミア",
     "skills": [
       {
         "level": 31,
@@ -3064,6 +3064,136 @@
         "level": 1200,
         "type": "？",
         "value": null
+      }
+    ]
+  },
+  {
+    "name": "禁域のワイバーン",
+    "pattern": 1,
+    "skills": [
+      {
+        "level": 31,
+        "type": "DEF",
+        "value": 100000
+      },
+      {
+        "level": 71,
+        "type": "M-DEF",
+        "value": 100000
+      },
+      {
+        "level": 121,
+        "type": "ATK",
+        "value": 100000
+      },
+      {
+        "level": 181,
+        "type": "INT",
+        "value": 100000
+      }
+    ]
+  },
+  {
+    "name": "オコシイタケ",
+    "pattern": 1,
+    "skills": [
+      {
+        "level": 31,
+        "type": "捕獲率",
+        "value": 300
+      },
+      {
+        "level": 71,
+        "type": "捕獲率",
+        "value": 300
+      },
+      {
+        "level": 121,
+        "type": "捕獲率",
+        "value": 500
+      },
+      {
+        "level": 181,
+        "type": "捕獲率",
+        "value": 1000
+      }
+    ]
+  },
+  {
+    "name": "オコスター",
+    "pattern": 1,
+    "skills": [
+      {
+        "level": 31,
+        "type": "ドロップ率",
+        "value": 300
+      },
+      {
+        "level": 71,
+        "type": "ドロップ率",
+        "value": 300
+      },
+      {
+        "level": 121,
+        "type": "ドロップ率",
+        "value": 500
+      },
+      {
+        "level": 181,
+        "type": "ドロップ率",
+        "value": 1000
+      }
+    ]
+  },
+  {
+    "name": "ダークウィッチ",
+    "pattern": 1,
+    "skills": [
+      {
+        "level": 31,
+        "type": "M-DEF%",
+        "value": 25
+      },
+      {
+        "level": 71,
+        "type": "M-DEF%",
+        "value": 25
+      },
+      {
+        "level": 121,
+        "type": "M-DEF%",
+        "value": 25
+      },
+      {
+        "level": 181,
+        "type": "M-DEF%",
+        "value": 50
+      }
+    ]
+  },
+  {
+    "name": "冥炎のハデス",
+    "pattern": 1,
+    "skills": [
+      {
+        "level": 31,
+        "type": "ATK%",
+        "value": 20
+      },
+      {
+        "level": 71,
+        "type": "ATK%",
+        "value": 20
+      },
+      {
+        "level": 121,
+        "type": "ATK%",
+        "value": 30
+      },
+      {
+        "level": 181,
+        "type": "ATK%",
+        "value": 50
       }
     ]
   }
