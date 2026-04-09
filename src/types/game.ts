@@ -160,3 +160,33 @@ export interface SimConfig extends Record<string, unknown> {
   // HP補正
   kinikiLiquidCount: number;
 }
+
+/** ペットダメージ計算用設定 */
+export interface PetDamageConfig {
+  petMonsterName: string;
+  petLevel: number;
+  sengiCount: number;           // 同族殲儀回数 (0-30)
+  hadesHelmetCount: number;     // ハデスの兜所持数 (0-1000)
+  mushroomFire: number;         // 火キノコ (0-1000)
+  mushroomWater: number;        // 水キノコ (0-1000)
+  mushroomWood: number;         // 木キノコ (0-1000)
+  mushroomLight: number;        // 光キノコ (0-1000)
+  mushroomDark: number;         // 闇キノコ (0-1000)
+  hasMushroomHouse: boolean;    // キノコハウス所持
+  powderVit: number;            // 粉 (各0-100)
+  powderSpd: number;
+  powderAtk: number;
+  powderInt: number;
+  powderDef: number;
+  powderMdef: number;
+  powderLuck: number;
+}
+
+/** ペットステータス計算結果 */
+export interface PetStatResult {
+  final: CoreStats;
+  hp: number;
+  element: Element;
+  attackMode: "物理" | "魔弾";
+  maxLevel: number;
+}

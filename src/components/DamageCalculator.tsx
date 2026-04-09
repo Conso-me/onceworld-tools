@@ -1,8 +1,11 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import type { MonsterBase, Element } from "../types/game";
-import { usePersistedState } from "../hooks/usePersistedState";
+import { usePersistedState, usePersistedGroup } from "../hooks/usePersistedState";
 import { useSharedSimConfig } from "../hooks/useSharedSimConfig";
+import { PetConfigPanel } from "./damage/PetConfigPanel";
+import { calcPetStats, DEFAULT_PET_DAMAGE_CONFIG } from "../utils/petStatCalc";
+import type { PetDamageConfig } from "../types/game";
 import { useStatPresets } from "../hooks/useStatPresets";
 import { calcStatus } from "../utils/statusCalc";
 import { SimConfigPanel } from "./SimConfigPanel";
@@ -55,6 +58,8 @@ import {
   clearShareParam,
   compactSimConfig,
   expandSimConfig,
+  compactPetConfig,
+  expandPetConfig,
   type DamageShareState,
 } from "../utils/shareState";
 
@@ -103,6 +108,10 @@ export function DamageCalculator() {
   // 物理オーバーキル計算に多段攻撃を含めるか（現状ゲーム内では多段でOKが発生しないためデフォルトOFF）
   const [physOverkillMultiHit, setPhysOverkillMultiHit] = usePersistedState("dmg:physOverkillMultiHit", false);
 
+  // ペット計算モード
+  const [calcTarget, setCalcTarget] = usePersistedState<"player" | "pet">("dmg:calcTarget", "player");
+  const [petCfg, setPetField, resetPet, replacePet] = usePersistedGroup<PetDamageConfig & Record<string, unknown>>("dmg:pet", DEFAULT_PET_DAMAGE_CONFIG as PetDamageConfig & Record<string, unknown>) as unknown as [PetDamageConfig, <K extends keyof PetDamageConfig>(field: K, value: PetDamageConfig[K]) => void, () => void, (s: PetDamageConfig) => void];
+
   const myAtkNum = parseInt(myAtk) || 0;
   const myIntNum = parseInt(myInt) || 0;
   const myDefNum = parseInt(myDef) || 0;
@@ -126,15 +135,27 @@ export function DamageCalculator() {
   const [simCfg, setSimField, resetSim, replaceAllSim] = useSharedSimConfig();
   const simResult = useMemo(() => calcStatus(simCfg), [simCfg]);
 
+  // ペットステータス計算
+  const petMonster = useMemo(() => petCfg.petMonsterName ? getMonsterByName(petCfg.petMonsterName) ?? null : null, [petCfg.petMonsterName]);
+  const petResult = useMemo(() => petMonster ? calcPetStats(petCfg, petMonster) : null, [petCfg, petMonster]);
+
   // 実効ステータス（モードによって切り替え）
-  const effAtk     = statMode === "sim" ? simResult.final.atk  : myAtkNum;
-  const effInt     = statMode === "sim" ? simResult.final.int  : myIntNum;
-  const effDef     = statMode === "sim" ? simResult.final.def  : myDefNum;
-  const effMdef    = statMode === "sim" ? simResult.final.mdef : myMdefNum;
-  const effSpd     = statMode === "sim" ? simResult.final.spd  : mySpdNum;
-  const effLuck    = statMode === "sim" ? simResult.final.luck : myLuckNum;
-  const effElement: Element = statMode === "sim" ? simCfg.charElement : myElement;
-  const effPlayerHp = statMode === "sim" ? simResult.hp : playerHp;
+  const effAtk     = calcTarget === "pet" ? (petResult?.final.atk ?? 0)  : statMode === "sim" ? simResult.final.atk  : myAtkNum;
+  const effInt     = calcTarget === "pet" ? (petResult?.final.int ?? 0)  : statMode === "sim" ? simResult.final.int  : myIntNum;
+  const effDef     = calcTarget === "pet" ? (petResult?.final.def ?? 0)  : statMode === "sim" ? simResult.final.def  : myDefNum;
+  const effMdef    = calcTarget === "pet" ? (petResult?.final.mdef ?? 0) : statMode === "sim" ? simResult.final.mdef : myMdefNum;
+  const effSpd     = calcTarget === "pet" ? (petResult?.final.spd ?? 0)  : statMode === "sim" ? simResult.final.spd  : mySpdNum;
+  const effLuck    = calcTarget === "pet" ? (petResult?.final.luck ?? 0) : statMode === "sim" ? simResult.final.luck : myLuckNum;
+  const effElement: Element = calcTarget === "pet" ? (petResult?.element ?? "火") : statMode === "sim" ? simCfg.charElement : myElement;
+  const effPlayerHp = calcTarget === "pet" ? (petResult?.hp ?? 0) : statMode === "sim" ? simResult.hp : playerHp;
+
+  // ペットモード時の攻撃タイプは自動判定、魔法装備は無効
+  const activeAttackMode: PlayerAttackMode = calcTarget === "pet"
+    ? (petResult?.attackMode ?? "物理")
+    : myAttackMode;
+  const activeCrystalCubePreMult = calcTarget === "pet" ? 1 : crystalCubePreMult;
+  const activeCrystalCubeFinalMult = calcTarget === "pet" ? 1 : crystalCubeFinalMult;
+  const activeMagicBaseInt = calcTarget === "pet" ? 0 : magicBaseInt;
 
   // プリセット
   const [presetName, setPresetName] = useState("");
@@ -227,23 +248,29 @@ export function DamageCalculator() {
       }
     }
 
-    setStatMode(state.statMode);
+    if (state.calcTarget === "pet") {
+      setCalcTarget("pet");
+      if (state.pet) replacePet(expandPetConfig(state.pet));
+    } else {
+      setCalcTarget("player");
+      setStatMode(state.statMode);
 
-    if (state.statMode === "manual") {
-      if (state.atk !== undefined) setMyAtk(state.atk);
-      if (state.int !== undefined) setMyInt(state.int);
-      if (state.def !== undefined) setMyDef(state.def);
-      if (state.mdef !== undefined) setMyMdef(state.mdef);
-      if (state.spd !== undefined) setMySpd(state.spd);
-      if (state.vit !== undefined) setMyVit(state.vit);
-      if (state.luck !== undefined) setMyLuck(state.luck);
-      if (state.element) setMyElement(state.element as Element);
-      if (state.attackMode) setMyAttackMode(state.attackMode as PlayerAttackMode);
-      if (state.analysisBook !== undefined) setAnalysisBook(state.analysisBook);
-      if (state.analysisAnalysisBook !== undefined) setAnalysisAnalysisBook(state.analysisAnalysisBook);
-      if (state.crystalCube !== undefined) setCrystalCube(state.crystalCube);
-    } else if (state.statMode === "sim" && state.sim) {
-      replaceAllSim(expandSimConfig(state.sim));
+      if (state.statMode === "manual") {
+        if (state.atk !== undefined) setMyAtk(state.atk);
+        if (state.int !== undefined) setMyInt(state.int);
+        if (state.def !== undefined) setMyDef(state.def);
+        if (state.mdef !== undefined) setMyMdef(state.mdef);
+        if (state.spd !== undefined) setMySpd(state.spd);
+        if (state.vit !== undefined) setMyVit(state.vit);
+        if (state.luck !== undefined) setMyLuck(state.luck);
+        if (state.element) setMyElement(state.element as Element);
+        if (state.attackMode) setMyAttackMode(state.attackMode as PlayerAttackMode);
+        if (state.analysisBook !== undefined) setAnalysisBook(state.analysisBook);
+        if (state.analysisAnalysisBook !== undefined) setAnalysisAnalysisBook(state.analysisAnalysisBook);
+        if (state.crystalCube !== undefined) setCrystalCube(state.crystalCube);
+      } else if (state.statMode === "sim" && state.sim) {
+        replaceAllSim(expandSimConfig(state.sim));
+      }
     }
 
     if (state.comparisonMonsters && state.comparisonMonsters.length >= 2) {
@@ -351,20 +378,20 @@ export function DamageCalculator() {
   const offensiveResult = useMemo(() => {
     if (!scaled) return null;
 
-    const multiHit = calcMultiHitCount(effSpd, myAttackMode === "魔攻");
+    const multiHit = calcMultiHitCount(effSpd, activeAttackMode === "魔攻");
 
-    if (myAttackMode === "魔攻") {
+    if (activeAttackMode === "魔攻") {
       // 全魔法の結果を計算
       const spellResults = MAGIC_SPELLS.map((spell) => {
-        const effectiveMult = spell.multiplier * crystalCubePreMult;
+        const effectiveMult = spell.multiplier * activeCrystalCubePreMult;
         const dmg = calcPlayerMagicDamage(
           effInt,
-          magicBaseInt,
+          activeMagicBaseInt,
           effectiveMult,
           scaled.scaledDef,
           scaled.scaledMdef,
           selfToEnemyAffinity,
-          crystalCubeFinalMult
+          activeCrystalCubeFinalMult
         );
         const hitsToKill = calcHitsToKill(scaled.hp, dmg.isNullified ? 1 : dmg.min, spell.hits);
         const totalMin = dmg.isNullified ? spell.hits : dmg.min * spell.hits;
@@ -373,7 +400,7 @@ export function DamageCalculator() {
           scaled.scaledDef,
           scaled.scaledMdef,
           effectiveMult,
-          magicBaseInt
+          activeMagicBaseInt
         );
         // N回確殺: hits>1の魔法はN回の使用でN*hits回ヒット
         const targetStats = [1, 2, 3].map((n) =>
@@ -383,9 +410,9 @@ export function DamageCalculator() {
             scaled.scaledMdef,
             selfToEnemyAffinity,
             effectiveMult,
-            magicBaseInt,
+            activeMagicBaseInt,
             n * spell.hits,
-            crystalCubeFinalMult
+            activeCrystalCubeFinalMult
           )
         );
         const overkillThreshold = scaled.hp * 10;
@@ -397,9 +424,9 @@ export function DamageCalculator() {
           scaled.scaledMdef,
           selfToEnemyAffinity,
           effectiveMult,
-          magicBaseInt,
+          activeMagicBaseInt,
           spell.hits,
-          crystalCubeFinalMult
+          activeCrystalCubeFinalMult
         );
         // 現在のINTでOverKillするのに必要な魔晶立方体の最小数（0〜1000）
         let overkillCubesNeeded: number | null = null;
@@ -411,9 +438,9 @@ export function DamageCalculator() {
               scaled.scaledMdef,
               selfToEnemyAffinity,
               spell.multiplier * (1 + c * 0.01),
-              magicBaseInt,
+              activeMagicBaseInt,
               spell.hits,
-              crystalCubeFinalMult
+              activeCrystalCubeFinalMult
             );
             if (needed <= effInt) { overkillCubesNeeded = c; break; }
           }
@@ -424,7 +451,7 @@ export function DamageCalculator() {
     }
 
     let dmg;
-    if (myAttackMode === "物理") {
+    if (activeAttackMode === "物理") {
       dmg = calcPhysicalDamage(
         effAtk,
         scaled.scaledDef,
@@ -438,8 +465,8 @@ export function DamageCalculator() {
         scaled.scaledDef,
         scaled.scaledMdef,
         selfToEnemyAffinity,
-        crystalCubeFinalMult,
-        crystalCubePreMult
+        activeCrystalCubeFinalMult,
+        activeCrystalCubePreMult
       );
     }
 
@@ -447,15 +474,15 @@ export function DamageCalculator() {
 
     // 最低必要ステータス
     let minStat: number;
-    if (myAttackMode === "物理") {
+    if (activeAttackMode === "物理") {
       minStat = calcMinAtkToHit(scaled.scaledDef, scaled.scaledMdef);
     } else {
-      minStat = calcMinIntToHitMadan(scaled.scaledDef, scaled.scaledMdef, crystalCubePreMult);
+      minStat = calcMinIntToHitMadan(scaled.scaledDef, scaled.scaledMdef, activeCrystalCubePreMult);
     }
 
     // N回確殺用ステータス（1〜3回分）
     const targetStats = [1, 2, 3].map((n) => {
-      if (myAttackMode === "物理") {
+      if (activeAttackMode === "物理") {
         return calcAtkForKill(
           scaled.hp,
           scaled.scaledDef,
@@ -476,11 +503,11 @@ export function DamageCalculator() {
           requiredDmgPerTurn / 4 / selfToEnemyAffinity / 0.9 / multiHit;
         // (INT×1.75×preMult - def)×4×aff×0.9×multi×finalMult >= hp/n
         // INT >= (requiredBase/finalMult + def) / (1.75×preMult)
-        return Math.max(Math.ceil((requiredBase / crystalCubeFinalMult + effectiveDef) / (1.75 * crystalCubePreMult)), 0);
+        return Math.max(Math.ceil((requiredBase / activeCrystalCubeFinalMult + effectiveDef) / (1.75 * activeCrystalCubePreMult)), 0);
       }
     });
 
-    const hitRate = myAttackMode === "物理"
+    const hitRate = activeAttackMode === "物理"
       ? calcHitRate(effLuck, scaled.scaledLuck)
       : null;
 
@@ -488,36 +515,37 @@ export function DamageCalculator() {
     // 物理は多段OKフラグで切り替え、魔弾は常に多段適用
     // 物理：トグルで切り替え（デフォルト単発のみ）
     // 魔弾：各着弾は個別の単発扱いのため常に1
-    const overkillHitCount = myAttackMode === "物理" ? (physOverkillMultiHit ? multiHit : 1) : 1;
+    const overkillHitCount = activeAttackMode === "物理" ? (physOverkillMultiHit ? multiHit : 1) : 1;
     const totalMinDmg = dmg.isNullified ? 0 : dmg.min * overkillHitCount;
     const totalMaxDmg = dmg.isNullified ? 0 : dmg.max * overkillHitCount;
     const overkillGuaranteed = !dmg.isNullified && totalMinDmg >= overkillThreshold;
     const overkillPossible = !dmg.isNullified && totalMaxDmg >= overkillThreshold;
 
     let overkillStatNeeded: number;
-    if (myAttackMode === "物理") {
+    if (activeAttackMode === "物理") {
       overkillStatNeeded = calcAtkForKill(scaled.hp * 10, scaled.scaledDef, scaled.scaledMdef, selfToEnemyAffinity, overkillHitCount, 1);
     } else {
       // 魔弾: (int * 1.75 * preMult - effectiveDef) * 4 * affinity * 0.9 * multiHit * finalMult >= hp * 10
       const effectiveDef = calcEffectiveDef(scaled.scaledDef, scaled.scaledMdef, false);
       const requiredBase = (scaled.hp * 10) / 4 / selfToEnemyAffinity / 0.9 / overkillHitCount;
-      overkillStatNeeded = Math.max(Math.ceil((requiredBase / crystalCubeFinalMult + effectiveDef) / (1.75 * crystalCubePreMult)), 0);
+      overkillStatNeeded = Math.max(Math.ceil((requiredBase / activeCrystalCubeFinalMult + effectiveDef) / (1.75 * activeCrystalCubePreMult)), 0);
     }
 
-    const requiredLuck = myAttackMode === "物理" ? scaled.scaledLuck : null;
-    const luckShortfall = myAttackMode === "物理" ? Math.max(scaled.scaledLuck - effLuck, 0) : null;
+    const requiredLuck = activeAttackMode === "物理" ? scaled.scaledLuck : null;
+    const luckShortfall = activeAttackMode === "物理" ? Math.max(scaled.scaledLuck - effLuck, 0) : null;
 
-    return { mode: myAttackMode as "物理" | "魔弾", dmg, multiHit, hitsToKill, minStat, targetStats, hitRate, overkillGuaranteed, overkillPossible, overkillStatNeeded, requiredLuck, luckShortfall };
+    return { mode: activeAttackMode as "物理" | "魔弾", dmg, multiHit, hitsToKill, minStat, targetStats, hitRate, overkillGuaranteed, overkillPossible, overkillStatNeeded, requiredLuck, luckShortfall };
   }, [
     scaled,
     effAtk,
     effInt,
     effSpd,
     effLuck,
-    myAttackMode,
+    activeAttackMode,
     selfToEnemyAffinity,
-    magicBaseInt,
-    crystalCubeMult,
+    activeMagicBaseInt,
+    activeCrystalCubePreMult,
+    activeCrystalCubeFinalMult,
     physOverkillMultiHit,
   ]);
 
@@ -582,10 +610,10 @@ export function DamageCalculator() {
     return calcOffensiveComparison(
       comparisonMonsters,
       { atk: effAtk, int: effInt, spd: effSpd, luck: effLuck, element: effElement },
-      myAttackMode,
-      { magicBaseInt, crystalCubePreMult, crystalCubeFinalMult }
+      activeAttackMode,
+      { magicBaseInt: activeMagicBaseInt, crystalCubePreMult: activeCrystalCubePreMult, crystalCubeFinalMult: activeCrystalCubeFinalMult }
     );
-  }, [comparisonActive, comparisonMonsters, effAtk, effInt, effSpd, effLuck, effElement, myAttackMode, magicBaseInt, crystalCubePreMult, crystalCubeFinalMult]);
+  }, [comparisonActive, comparisonMonsters, effAtk, effInt, effSpd, effLuck, effElement, activeAttackMode, activeMagicBaseInt, activeCrystalCubePreMult, activeCrystalCubeFinalMult]);
 
   const defensiveComparison = useMemo(() => {
     if (!comparisonActive || comparisonMonsters.length === 0) return null;
@@ -608,18 +636,21 @@ export function DamageCalculator() {
 
   const hasMonster = !!scaled;
   const hasMyOffenseStats =
-    (myAttackMode === "物理" ? effAtk > 0 : effInt > 0) && hasMonster;
+    (activeAttackMode === "物理" ? effAtk > 0 : effInt > 0) && hasMonster;
   const hasMyDefenseStats = (effDef > 0 || effMdef > 0) && hasMonster;
 
   const handleCopyShareUrl = useCallback(async () => {
     const state: DamageShareState = {
       v: 1,
+      calcTarget: calcTarget !== "player" ? calcTarget : undefined,
       monsterName: selectedMonster?.name,
       monsterLevel: monsterLevel !== 1 ? monsterLevel : undefined,
       statMode,
     };
 
-    if (statMode === "manual") {
+    if (calcTarget === "pet") {
+      state.pet = compactPetConfig(petCfg);
+    } else if (statMode === "manual") {
       state.atk = myAtk;
       state.int = myInt;
       state.def = myDef;
@@ -660,7 +691,7 @@ export function DamageCalculator() {
     }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  }, [selectedMonster, monsterLevel, statMode, myAtk, myInt, myDef, myMdef, mySpd, myVit, myLuck, myElement, myAttackMode, analysisBook, analysisAnalysisBook, crystalCube, simCfg, comparisonMonsters, comparisonActive, comparisonTab, comparisonSpell]);
+  }, [selectedMonster, monsterLevel, statMode, calcTarget, petCfg, myAtk, myInt, myDef, myMdef, mySpd, myVit, myLuck, myElement, myAttackMode, analysisBook, analysisAnalysisBook, crystalCube, simCfg, comparisonMonsters, comparisonActive, comparisonTab, comparisonSpell]);
 
   const elements: Element[] = ["火", "水", "木", "光", "闇"];
   const attackModes: { value: PlayerAttackMode; label: string }[] = [
@@ -847,6 +878,25 @@ export function DamageCalculator() {
           {/* 折り畳みコンテンツ（モバイルのみ）*/}
           <div className={myStatusOpen ? "" : "hidden lg:block"}>
 
+          {/* 主人公 / ペット 切り替えタブ */}
+          <div className="flex rounded-lg overflow-hidden border border-gray-200 text-xs mb-3 lg:mb-2">
+            {(["player", "pet"] as const).map((target) => (
+              <button
+                key={target}
+                onClick={() => setCalcTarget(target)}
+                className={`flex-1 py-2 lg:py-1.5 font-medium transition-colors ${
+                  calcTarget === target
+                    ? "bg-blue-500 text-white"
+                    : "bg-white text-gray-500 hover:bg-gray-50"
+                }`}
+              >
+                {target === "player" ? t("playerTab") : t("petTab")}
+              </button>
+            ))}
+          </div>
+
+          {calcTarget === "player" ? (
+            <>
           {/* 手動入力 / 装備設定 トグル */}
           <div className="flex rounded-lg overflow-hidden border border-gray-200 text-xs">
             {(["manual", "sim"] as const).map((mode) => (
@@ -976,6 +1026,15 @@ export function DamageCalculator() {
               </div>
             </div>
           )}
+            </>
+          ) : (
+            <PetConfigPanel
+              config={petCfg}
+              setField={setPetField}
+              reset={resetPet}
+              petResult={petResult}
+            />
+          )}
 
           </div>{/* /折り畳みコンテンツ */}
         </div>
@@ -1049,14 +1108,14 @@ export function DamageCalculator() {
           <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
             {comparisonTab === "与ダメ" ? (
               <div className="space-y-2">
-                {myAttackMode === "物理" && (
+                {activeAttackMode === "物理" && (
                   <PhysicalOffensiveSummary
                     rows={offensiveComparison}
                     playerAtk={effAtk}
                     playerLuck={effLuck}
                   />
                 )}
-                {myAttackMode === "魔攻" && (
+                {activeAttackMode === "魔攻" && (
                   <MagicOffensiveSummary
                     rows={offensiveComparison}
                     selectedSpellName={comparisonSpell}
@@ -1395,7 +1454,7 @@ export function DamageCalculator() {
       {/* 被ダメージ / 最低必要INT（魔攻時切り替え） */}
       <div className="space-y-2">
         <div className="flex items-center gap-2 px-1">
-          {myAttackMode === "魔攻" ? (
+          {activeAttackMode === "魔攻" ? (
             <div className="flex bg-gray-100 rounded-lg p-0.5 gap-0.5">
               {(["被ダメ", "最低INT"] as const).map((tab) => (
                 <button
@@ -1417,7 +1476,7 @@ export function DamageCalculator() {
         </div>
 
         {/* 最低必要INT パネル（魔攻 + 最低INTタブ時） */}
-        {myAttackMode === "魔攻" && defPanelTab === "最低INT" && hasMonster && offensiveResult && offensiveResult.mode === "魔攻" && (
+        {activeAttackMode === "魔攻" && defPanelTab === "最低INT" && hasMonster && offensiveResult && offensiveResult.mode === "魔攻" && (
           <StatCard title={t("minINTBySpell")} accent="purple">
             <div className="space-y-1.5">
               {offensiveResult.spellResults.map(({ spell, minStat, targetStats }) => (
@@ -1443,7 +1502,7 @@ export function DamageCalculator() {
         )}
 
         {/* 被ダメパネル（非魔攻 or 被ダメタブ時） */}
-        {(myAttackMode !== "魔攻" || defPanelTab === "被ダメ") && hasMonster && defensiveResult ? (<>
+        {(activeAttackMode !== "魔攻" || defPanelTab === "被ダメ") && hasMonster && defensiveResult ? (<>
           <StatCard
             title={t("defensePanel.title", { type: defensiveResult.enemyIsPhysical ? t("game:attackLabel.physical") : t("game:attackLabel.magic"), attackType: t(`game:attackType.${scaled!.attackType}`), stat: defensiveResult.enemyIsPhysical ? "ATK" : "INT", value: defensiveResult.enemyStat.toLocaleString() })}
             accent="orange"
@@ -1595,7 +1654,7 @@ export function DamageCalculator() {
             </div>
           )}
         </>) : (
-          (myAttackMode !== "魔攻" || defPanelTab === "被ダメ") && (
+          (activeAttackMode !== "魔攻" || defPanelTab === "被ダメ") && (
             <div className="bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 p-8 text-center">
               <p className="text-sm text-gray-400">{t("selectMonsterDefense")}</p>
             </div>
