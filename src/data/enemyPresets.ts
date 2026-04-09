@@ -117,6 +117,7 @@ export const enemyPresetGroups: EnemyPresetGroup[] = [
     label: "太古の中庭",
     presets: [
       { monsterName: "オコスター",       level: 350000,   location: "太古の中庭" },
+      { monsterName: "オコォーン",       level: 350000,   location: "太古の中庭・レア出現" },
       { monsterName: "黙示木",           level: 810000,   location: "太古の中庭" },
       { monsterName: "根界獣ドルグラント", level: 1280000, location: "太古の中庭・ボス" },
     ],
