@@ -63,7 +63,7 @@ import {
   type DamageShareState,
 } from "../utils/shareState";
 
-type PlayerAttackMode = "物理" | "魔弾" | "魔攻";
+type PlayerAttackMode = "物理" | "魔弾" | "魔攻" | "魔法";
 
 export function DamageCalculator() {
   const { t } = useTranslation("damage");
@@ -458,8 +458,19 @@ export function DamageCalculator() {
         scaled.scaledMdef,
         selfToEnemyAffinity
       );
+    } else if (activeAttackMode === "魔法") {
+      // ペット魔法攻撃（INT×1.25、クリなし・多段なし）
+      dmg = calcPlayerMagicDamage(
+        effInt,
+        0,
+        1.0,
+        scaled.scaledDef,
+        scaled.scaledMdef,
+        selfToEnemyAffinity,
+        1.0
+      );
     } else {
-      // 魔弾
+      // 魔弾（INT×1.75、クリあり・多段あり）
       dmg = calcPetMagicDamage(
         effInt,
         scaled.scaledDef,
@@ -470,12 +481,17 @@ export function DamageCalculator() {
       );
     }
 
-    const hitsToKill = calcHitsToKill(scaled.hp, dmg.min, multiHit);
+    // 魔法はクリなし・多段なし
+    const isMagicSpell = activeAttackMode === "魔法";
+    const effectiveMultiHit = isMagicSpell ? 1 : multiHit;
+    const hitsToKill = calcHitsToKill(scaled.hp, dmg.min, effectiveMultiHit);
 
     // 最低必要ステータス
     let minStat: number;
     if (activeAttackMode === "物理") {
       minStat = calcMinAtkToHit(scaled.scaledDef, scaled.scaledMdef);
+    } else if (activeAttackMode === "魔法") {
+      minStat = calcMinIntToHit(scaled.scaledDef, scaled.scaledMdef, 1.0, 0);
     } else {
       minStat = calcMinIntToHitMadan(scaled.scaledDef, scaled.scaledMdef, activeCrystalCubePreMult);
     }
@@ -490,6 +506,18 @@ export function DamageCalculator() {
           selfToEnemyAffinity,
           multiHit,
           n
+        );
+      } else if (activeAttackMode === "魔法") {
+        // ペット魔法: INT×1.25、多段なし
+        return calcIntForKill(
+          scaled.hp,
+          scaled.scaledDef,
+          scaled.scaledMdef,
+          selfToEnemyAffinity,
+          1.0,
+          0,
+          n,
+          1.0
         );
       } else {
         // 魔弾
@@ -524,8 +552,11 @@ export function DamageCalculator() {
     let overkillStatNeeded: number;
     if (activeAttackMode === "物理") {
       overkillStatNeeded = calcAtkForKill(scaled.hp * 10, scaled.scaledDef, scaled.scaledMdef, selfToEnemyAffinity, overkillHitCount, 1);
+    } else if (activeAttackMode === "魔法") {
+      // ペット魔法: INT×1.25、多段なし
+      overkillStatNeeded = calcIntForKill(scaled.hp * 10, scaled.scaledDef, scaled.scaledMdef, selfToEnemyAffinity, 1.0, 0, 1, 1.0);
     } else {
-      // 魔弾: (int * 1.75 * preMult - effectiveDef) * 4 * affinity * 0.9 * multiHit * finalMult >= hp * 10
+      // 魔弾: INT×1.75
       const effectiveDef = calcEffectiveDef(scaled.scaledDef, scaled.scaledMdef, false);
       const requiredBase = (scaled.hp * 10) / 4 / selfToEnemyAffinity / 0.9 / overkillHitCount;
       overkillStatNeeded = Math.max(Math.ceil((requiredBase / activeCrystalCubeFinalMult + effectiveDef) / (1.75 * activeCrystalCubePreMult)), 0);
@@ -534,7 +565,7 @@ export function DamageCalculator() {
     const requiredLuck = activeAttackMode === "物理" ? scaled.scaledLuck : null;
     const luckShortfall = activeAttackMode === "物理" ? Math.max(scaled.scaledLuck - effLuck, 0) : null;
 
-    return { mode: activeAttackMode as "物理" | "魔弾", dmg, multiHit, hitsToKill, minStat, targetStats, hitRate, overkillGuaranteed, overkillPossible, overkillStatNeeded, requiredLuck, luckShortfall };
+    return { mode: activeAttackMode as "物理" | "魔法" | "魔弾", dmg, multiHit: effectiveMultiHit, hitsToKill, minStat, targetStats, hitRate, overkillGuaranteed, overkillPossible, overkillStatNeeded, requiredLuck, luckShortfall };
   }, [
     scaled,
     effAtk,
@@ -580,7 +611,7 @@ export function DamageCalculator() {
 
     const enemyMultiHit = calcMultiHitCount(
       scaled.scaledSpd,
-      scaled.attackType === "魔攻"
+      scaled.attackType === "魔法"
     );
 
     const hitsToTake = effPlayerHp > 0
@@ -1033,6 +1064,7 @@ export function DamageCalculator() {
               setField={setPetField}
               reset={resetPet}
               petResult={petResult}
+              replaceConfig={replacePet}
             />
           )}
 
@@ -1302,7 +1334,7 @@ export function DamageCalculator() {
             /* ===== 物理 / 魔弾モード ===== */
             <>
               <StatCard
-                title={`${offensiveResult.mode === "物理" ? t("physicalAttack") : t("magicBulletAttack")} → ${scaled!.name} Lv${monsterLevel}`}
+                title={`${offensiveResult.mode === "物理" ? t("physicalAttack") : offensiveResult.mode === "魔法" ? t("magicAttack") : t("magicBulletAttack")} → ${scaled!.name} Lv${monsterLevel}`}
                 accent="green"
               >
                 <div className="space-y-2">

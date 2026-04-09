@@ -141,8 +141,8 @@ describe("getPetAttackMode", () => {
     expect(getPetAttackMode("魔弾")).toBe("魔弾");
   });
 
-  it('"魔攻" → "魔弾" (non-物理 maps to 魔弾)', () => {
-    expect(getPetAttackMode("魔攻")).toBe("魔弾");
+  it('"魔法" → "魔法"', () => {
+    expect(getPetAttackMode("魔法")).toBe("魔法");
   });
 });
 
@@ -253,9 +253,15 @@ describe("calcPetStats", () => {
     expect(result.final.vit).toBe(468);
   });
 
-  it("magic attackType maps to 魔弾 attackMode", () => {
-    const magicMonster = { ...mockMonster, attackType: "魔攻" as const };
+  it("魔法 attackType maps to 魔法 attackMode", () => {
+    const magicMonster = { ...mockMonster, attackType: "魔法" as const };
     const result = calcPetStats(makeConfig(), magicMonster);
+    expect(result.attackMode).toBe("魔法");
+  });
+
+  it("魔弾 attackType maps to 魔弾 attackMode", () => {
+    const madanMonster = { ...mockMonster, attackType: "魔弾" as const };
+    const result = calcPetStats(makeConfig(), madanMonster);
     expect(result.attackMode).toBe("魔弾");
   });
 });

@@ -24,7 +24,7 @@ export interface MultiMonsterEntry {
   location: string;
 }
 
-type PlayerAttackMode = "物理" | "魔弾" | "魔攻";
+type PlayerAttackMode = "物理" | "魔弾" | "魔攻" | "魔法";
 
 // ─── Offensive ────────────────────────────────────────────────────────────────
 
@@ -196,7 +196,7 @@ export function calcDefensiveComparison(
 
     const enemyMultiHit = calcMultiHitCount(
       scaled.scaledSpd,
-      scaled.attackType === "魔攻"
+      scaled.attackType === "魔法"
     );
 
     const hitsToTake = playerStats.hp > 0

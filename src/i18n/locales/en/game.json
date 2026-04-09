@@ -11,8 +11,8 @@
   },
   "attackType": {
     "物理": "Physical",
-    "魔弾": "Magic Bullet",
-    "魔攻": "Magic"
+    "魔法": "Magic",
+    "魔弾": "Magic Bullet"
   },
   "attackLabel": {
     "physical": "Physical",

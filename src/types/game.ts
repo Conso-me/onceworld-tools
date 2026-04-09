@@ -1,7 +1,7 @@
 export type Element = "火" | "水" | "木" | "光" | "闇";
 
-// 魔弾 = ペット/敵の魔法攻撃（×1.75）、魔攻 = プレイヤー魔法（×1.25×魔法倍率）
-export type AttackType = "物理" | "魔弾" | "魔攻";
+// 魔弾 = ペット/敵の魔法弾攻撃（INT×1.75）、魔法 = ペットの魔法攻撃（INT×1.25）
+export type AttackType = "物理" | "魔法" | "魔弾";
 
 export interface MonsterBase {
   name: string;
@@ -187,6 +187,6 @@ export interface PetStatResult {
   final: CoreStats;
   hp: number;
   element: Element;
-  attackMode: "物理" | "魔弾";
+  attackMode: "物理" | "魔法" | "魔弾";
   maxLevel: number;
 }

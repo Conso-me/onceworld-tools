@@ -4,7 +4,7 @@ import type { MonsterBase, Element, AttackType } from "../types/game";
 import { getCustomMonsters, setCustomMonsters, getAllMonsters } from "../data/monsters";
 
 const ELEMENTS: Element[] = ["火", "水", "木", "光", "闇"];
-const ATTACK_TYPES: AttackType[] = ["物理", "魔弾", "魔攻"];
+const ATTACK_TYPES: AttackType[] = ["物理", "魔法", "魔弾"];
 
 const elementColors: Record<Element, string> = {
   火: "bg-red-100 text-red-700 border-red-300",

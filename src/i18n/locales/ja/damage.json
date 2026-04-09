@@ -81,5 +81,9 @@
   "petAttackType": "攻撃方法",
   "petNoPetSelected": "ペットが未選択です",
   "petPhysical": "物理",
-  "petMagic": "魔弾"
+  "petMagic": "魔弾",
+  "petPresetNamePlaceholder": "プリセット名",
+  "petPresetSave": "保存",
+  "petPresetSelect": "プリセットを選択",
+  "petPresetLoad": "読込"
 }

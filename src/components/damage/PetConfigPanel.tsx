@@ -4,6 +4,7 @@ import type { PetDamageConfig, PetStatResult, Element } from "../../types/game";
 import { useAllMonsters } from "../../hooks/useAllMonsters";
 import { MonsterSelectorModal } from "../ui/MonsterSelectorModal";
 import { calcPetMaxLevel } from "../../utils/petStatCalc";
+import { usePetPresets } from "../../hooks/usePetPresets";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -12,6 +13,7 @@ export interface PetConfigPanelProps {
   setField: <K extends keyof PetDamageConfig>(field: K, value: PetDamageConfig[K]) => void;
   reset: () => void;
   petResult: PetStatResult | null;
+  replaceConfig?: (cfg: PetDamageConfig) => void;
 }
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -129,12 +131,15 @@ function CompactInput({
 
 // ── Main Component ────────────────────────────────────────────────────────────
 
-export function PetConfigPanel({ config, setField, reset, petResult }: PetConfigPanelProps) {
+export function PetConfigPanel({ config, setField, reset, petResult, replaceConfig }: PetConfigPanelProps) {
   const { t } = useTranslation("damage");
   const { t: tGame } = useTranslation("game");
   const { t: tCommon } = useTranslation("common");
   const allMonsters = useAllMonsters();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { presets, savePreset, loadPreset, deletePreset } = usePetPresets();
+  const [presetName, setPresetName] = useState("");
+  const [selectedPresetId, setSelectedPresetId] = useState("");
 
   const selectedMonster = useMemo(
     () => (config.petMonsterName ? allMonsters.find((m) => m.name === config.petMonsterName) ?? null : null),
@@ -156,6 +161,26 @@ export function PetConfigPanel({ config, setField, reset, petResult }: PetConfig
     if (isNaN(num)) num = 0;
     if (maxVal !== undefined) num = Math.min(num, maxVal);
     setField(field, num as PetDamageConfig[K]);
+  };
+
+  const handleSavePreset = () => {
+    const trimmed = presetName.trim();
+    if (!trimmed) return;
+    const existing = presets.find((p) => p.name === trimmed);
+    if (existing && !window.confirm(tCommon("overwriteConfirm", { name: trimmed }))) return;
+    savePreset(trimmed, config);
+    setPresetName("");
+  };
+
+  const handleLoadPreset = () => {
+    const preset = loadPreset(selectedPresetId);
+    if (!preset || !replaceConfig) return;
+    replaceConfig(preset.config);
+  };
+
+  const handleDeletePreset = () => {
+    deletePreset(selectedPresetId);
+    setSelectedPresetId("");
   };
 
   return (
@@ -195,14 +220,14 @@ export function PetConfigPanel({ config, setField, reset, petResult }: PetConfig
         />
       </div>
 
-      {/* ── ペットレベル + 同族殲儀 + ハデスの兜 ────────────── */}
+      {/* ── ペットレベル + 同族殲儀 + 上限Lv ────────────── */}
       <div className="grid grid-cols-3 gap-2">
         {/* ペットレベル */}
         <div className="space-y-1">
           <label className="block text-[10px] lg:text-[9px] font-medium text-gray-500 truncate">
             {t("petLevel")}
           </label>
-          <div className="relative">
+          <div className="flex gap-1">
             <input
               type="text"
               inputMode="numeric"
@@ -210,10 +235,14 @@ export function PetConfigPanel({ config, setField, reset, petResult }: PetConfig
               onChange={(e) => handleNumField("petLevel", e.target.value, maxLevel)}
               className="w-full px-2 py-1.5 lg:py-1 bg-white border border-gray-200 rounded-lg text-center text-sm lg:text-xs font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
             />
+            <button
+              type="button"
+              onClick={() => setField("petLevel", maxLevel)}
+              className="flex-shrink-0 px-1.5 py-1.5 lg:py-1 bg-indigo-50 border border-indigo-200 rounded-lg text-[10px] font-semibold text-indigo-600 hover:bg-indigo-100 transition-colors leading-none"
+            >
+              MAX
+            </button>
           </div>
-          <p className="text-[10px] text-gray-400 text-center leading-none">
-            {t("petMaxLevel")} {maxLevel}
-          </p>
         </div>
 
         {/* 同族殲儀回数 */}
@@ -231,19 +260,24 @@ export function PetConfigPanel({ config, setField, reset, petResult }: PetConfig
           <p className="text-[10px] text-gray-400 text-center leading-none">0〜30</p>
         </div>
 
-        {/* ハデスの兜 */}
+        {/* 上限Lv（ハデスの兜数から算出） */}
         <div className="space-y-1">
           <label className="block text-[10px] lg:text-[9px] font-medium text-gray-500 truncate">
-            {t("petHadesHelmetCount")}
+            {t("petMaxLevel")}
           </label>
           <input
             type="text"
             inputMode="numeric"
-            value={config.hadesHelmetCount}
-            onChange={(e) => handleNumField("hadesHelmetCount", e.target.value, 1000)}
+            value={200 + config.hadesHelmetCount}
+            onChange={(e) => {
+              const raw = parseInt(e.target.value.replace(/[^0-9]/g, ""), 10);
+              const lv = isNaN(raw) ? 200 : Math.min(Math.max(raw, 200), 1200);
+              setField("hadesHelmetCount", lv - 200);
+              if (config.petLevel > lv) setField("petLevel", lv);
+            }}
             className="w-full px-2 py-1.5 lg:py-1 bg-white border border-gray-200 rounded-lg text-center text-sm lg:text-xs font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
           />
-          <p className="text-[10px] text-gray-400 text-center leading-none">0〜1000</p>
+          <p className="text-[10px] text-gray-400 text-center leading-none">200〜1200</p>
         </div>
       </div>
 
@@ -315,7 +349,7 @@ export function PetConfigPanel({ config, setField, reset, petResult }: PetConfig
               {tGame(`element.${petResult.element}`)}
             </span>
             <span className="text-[10px] text-gray-500">
-              {petResult.attackMode === "物理" ? t("petPhysical") : t("petMagic")}
+              {tGame(`attackType.${petResult.attackMode}`)}
             </span>
           </div>
           <div className="bg-gray-50 rounded-xl p-2 lg:p-1.5 space-y-1">
@@ -342,6 +376,60 @@ export function PetConfigPanel({ config, setField, reset, petResult }: PetConfig
       ) : (
         <p className="text-xs text-gray-400 text-center py-1">{t("petNoPetSelected")}</p>
       )}
+
+      {/* ── プリセット ────────────────────────────────────── */}
+      <div className="space-y-1 pt-1 border-t border-gray-100">
+        {/* 保存 */}
+        <div className="flex gap-1">
+          <input
+            type="text"
+            placeholder={t("petPresetNamePlaceholder")}
+            value={presetName}
+            onChange={(e) => setPresetName(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") handleSavePreset(); }}
+            className="flex-1 min-w-0 px-2 py-1 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+          <button
+            type="button"
+            onClick={handleSavePreset}
+            disabled={!presetName.trim()}
+            className="flex-shrink-0 px-2 py-1 text-xs bg-indigo-50 border border-indigo-200 text-indigo-600 rounded-lg hover:bg-indigo-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            {t("petPresetSave")}
+          </button>
+        </div>
+        {/* 読み込み */}
+        {presets.length > 0 && (
+          <div className="flex gap-1">
+            <select
+              value={selectedPresetId}
+              onChange={(e) => setSelectedPresetId(e.target.value)}
+              className="flex-1 min-w-0 px-2 py-1 text-xs border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="">{t("petPresetSelect")}</option>
+              {presets.map((p) => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={handleLoadPreset}
+              disabled={!selectedPresetId || !replaceConfig}
+              className="flex-shrink-0 px-2 py-1 text-xs bg-gray-50 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              {t("petPresetLoad")}
+            </button>
+            <button
+              type="button"
+              onClick={handleDeletePreset}
+              disabled={!selectedPresetId}
+              className="flex-shrink-0 px-2 py-1 text-xs bg-red-50 border border-red-200 text-red-500 rounded-lg hover:bg-red-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              {tCommon("delete")}
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* ── リセットボタン ─────────────────────────────────── */}
       <div className="flex justify-end">

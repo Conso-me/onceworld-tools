@@ -81,5 +81,9 @@
   "petAttackType": "Attack Type",
   "petNoPetSelected": "No pet selected",
   "petPhysical": "Physical",
-  "petMagic": "Magic Bullet"
+  "petMagic": "Magic Bullet",
+  "petPresetNamePlaceholder": "Preset name",
+  "petPresetSave": "Save",
+  "petPresetSelect": "Select preset",
+  "petPresetLoad": "Load"
 }

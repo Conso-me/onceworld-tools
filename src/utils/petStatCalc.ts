@@ -46,8 +46,8 @@ export function calcPetStat(
   return floor((baseValue + powder) * (1 + (sengiCount + 1) * (sengiCount * 3 + levelBonus)));
 }
 
-export function getPetAttackMode(attackType: AttackType): "物理" | "魔弾" {
-  return attackType === "物理" ? "物理" : "魔弾";
+export function getPetAttackMode(attackType: AttackType): "物理" | "魔法" | "魔弾" {
+  return attackType;
 }
 
 function getMushroomBonus(element: Element, config: PetDamageConfig): number {
