@@ -15,6 +15,12 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-04-09",
     changes: [
+    { type: "improve", text: "feat: プリセット保存欄にペット名をデフォルト表示" },
+    { type: "improve", text: "fix: 全部MAXから同族殲儀を除外（現ゲームでは30到達不可のため）" },
+    { type: "improve", text: "refactor: 上限Lv入力を廃止・全部MAXボタンを1つに集約" },
+    { type: "feature", text: "feat: 全数値入力にMAXボタンを追加" },
+    { type: "fix", text: "fix: Issue #88 フィードバック対応（攻撃タイプ修正・MAXボタン・上限Lv・プリセット保存）" },
+    { type: "feature", text: "feat: ペットのステータスでダメージ計算する機能を追加" },
     { type: "fix", text: "fix: アクセサリーの最大レベルをwiki準拠に修正し、選択時に自動セット" },
     { type: "fix", text: "fix: ビルドプリセットに魔晶立方体・魔法解析書を記録するよう修正" },
     { type: "feature", text: "fix: ステータスシミュレータのダメ計プリセット保存に魔法解析書・解析書の解析書・魔晶立方体を追加" },
