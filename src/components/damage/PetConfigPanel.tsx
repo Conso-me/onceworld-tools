@@ -263,7 +263,6 @@ export function PetConfigPanel({ config, setField, reset, petResult, replaceConf
       <button
         type="button"
         onClick={() => {
-          setField("sengiCount", 30);
           setField("mushroomFire", 1000);
           setField("mushroomWater", 1000);
           setField("mushroomWood", 1000);
