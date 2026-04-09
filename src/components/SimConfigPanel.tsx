@@ -6,6 +6,7 @@ import {
   getEquipmentByName, equipment,
   getAccessoryByName, accessories,
   getPetsByPrimaryStat, getPetSkillSummaryForCategory,
+  getPatternLevels, getPetMaxLevel,
 } from "../data";
 import type { PetStatCategory, PetCategoryGroup } from "../data";
 import type { SimConfig, CoreStats, EquipmentSlot, Element, AccessoryItem, EquipmentItem } from "../types/game";
@@ -55,7 +56,7 @@ const PET_SLOTS: {
   { nameKey: "pet3Name", levelKey: "pet3Level" },
 ];
 
-const PET_LEVELS = [0, 31, 71, 121, 181] as const;
+// パターン別レベルは getPatternLevels() で取得するため定数は不要
 
 const ELEMENTS: Element[] = ["火", "水", "木", "光", "闇"];
 
@@ -648,13 +649,15 @@ function PetSubGroup({
       )}
       {pets.map((pet) => {
         const selected = petName === pet.name;
+        const petLevels = getPatternLevels(pet.pattern);
+        const maxLv = petLevels[petLevels.length - 1];
         return (
           <div key={pet.name}>
             <button
               type="button"
               onClick={() => {
                 onPetChange(pet.name);
-                if (!selected) onLevelChange(181);
+                if (!selected) onLevelChange(maxLv);
               }}
               className={`w-full flex items-center gap-2 px-4 py-2 text-sm transition-colors border-l-2 ${
                 selected
@@ -664,11 +667,14 @@ function PetSubGroup({
             >
               <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${selected ? "bg-blue-400" : "bg-gray-300"}`} />
               <span className="flex-1 text-left text-xs truncate">{pet.name}</span>
+              {pet.pattern === 2 && (
+                <span className="text-xs text-purple-500 font-bold shrink-0 mr-1">P2</span>
+              )}
               <span className="text-xs text-gray-400 shrink-0">{getPetSkillSummaryForCategory(pet, cat, subgroupKey)}</span>
             </button>
             {selected && (
               <div className="flex flex-wrap gap-x-4 gap-y-1 px-6 py-2 bg-blue-50 border-t border-blue-100 border-l-2 border-l-blue-400">
-                {PET_LEVELS.map((lv) => (
+                {petLevels.map((lv) => (
                   <label key={lv} className="flex items-center gap-1 text-xs cursor-pointer">
                     <input
                       type="radio"
@@ -924,9 +930,9 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
   }
 
   function maxAllPet() {
-    setField("petLevel",  181);
-    setField("pet2Level", 181);
-    setField("pet3Level", 181);
+    setField("petLevel",  getPetMaxLevel(cfg.petName) as SimConfig["petLevel"]);
+    setField("pet2Level", getPetMaxLevel(cfg.pet2Name) as SimConfig["pet2Level"]);
+    setField("pet3Level", getPetMaxLevel(cfg.pet3Name) as SimConfig["pet3Level"]);
   }
 
   function maxAllProtein() {

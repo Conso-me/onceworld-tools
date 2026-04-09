@@ -8,11 +8,12 @@ function normalizeSkillType(type: string): string {
   return type;
 }
 
-export const pets: PetEntry[] = (rawData as Array<{ name: string; skills: Array<{ level: number; type: string; value: number }> }>).map(
+export const pets: PetEntry[] = (rawData as Array<{ name: string; pattern?: number; skills: Array<{ level: number; type: string; value: number | null }> }>).map(
   (p) => ({
     name: p.name,
+    pattern: (p.pattern ?? 1) as 1 | 2,
     skills: p.skills.map((s) => ({
-      level: s.level as 31 | 71 | 121 | 181,
+      level: s.level as PetSkill["level"],
       type: normalizeSkillType(s.type) as PetSkill["type"],
       value: s.value,
     })),
@@ -99,7 +100,9 @@ function getCategorySkillTypes(cat: PetStatCategory): { flat: string[]; pct: str
 
 function sumSkillTypes(pet: PetEntry, types: string[]): number {
   if (types.length === 0) return 0;
-  return pet.skills.filter((s) => types.includes(s.type)).reduce((sum, s) => sum + s.value, 0);
+  return pet.skills
+    .filter((s) => types.includes(s.type) && s.value !== null)
+    .reduce((sum, s) => sum + (s.value as number), 0);
 }
 
 /** 実数 / 加算% / 乗算（最終%）の3グループに分けたカテゴリグループ */
@@ -151,16 +154,18 @@ export function getPetsByPrimaryStat(): Map<PetStatCategory, PetCategoryGroup> {
   return result;
 }
 
-/** 全レベルスキルの累積合計を返す（例: "VIT +420・最終VIT% +35"） */
+/** 全レベルスキルの累積合計を返す（例: "VIT +420・最終VIT% +35"）。未判明スキルは "？" で示す */
 export function getPetMaxSkillSummary(pet: PetEntry): string {
   if (!pet.skills.length) return "";
   const totals = new Map<string, number>();
+  let hasUnknown = false;
   for (const s of pet.skills) {
+    if (s.type === "？" || s.value === null) { hasUnknown = true; continue; }
     totals.set(s.type, (totals.get(s.type) ?? 0) + s.value);
   }
-  return [...totals.entries()]
-    .map(([type, total]) => `${type} +${total}`)
-    .join("・");
+  const parts = [...totals.entries()].map(([type, total]) => `${type} +${total}`);
+  if (hasUnknown) parts.push("？");
+  return parts.join("・");
 }
 
 /**
@@ -174,7 +179,9 @@ export function getPetSkillSummaryForCategory(
   subgroup: keyof PetCategoryGroup
 ): string {
   const totals = new Map<string, number>();
+  let hasUnknown = false;
   for (const s of pet.skills) {
+    if (s.value === null || s.type === "？") { hasUnknown = true; continue; }
     totals.set(s.type, (totals.get(s.type) ?? 0) + s.value);
   }
 
@@ -194,5 +201,17 @@ export function getPetSkillSummaryForCategory(
 
   const hasOthers = [...totals.keys()].some((t) => !relevantTypes.includes(t));
   const summary = relevantParts.join("・");
-  return hasOthers && summary ? `${summary}・その他` : summary;
+  const suffix = (hasOthers || hasUnknown) && summary ? "・その他" : (hasUnknown && !summary ? "？" : "");
+  return summary + suffix;
+}
+
+/** パターンに応じたスキル解放レベル一覧（0 = 未装備）を返す */
+export function getPatternLevels(pattern: 1 | 2): readonly (0 | 31 | 71 | 121 | 181 | 200 | 500 | 800 | 1200)[] {
+  return pattern === 2 ? [0, 200, 500, 800, 1200] : [0, 31, 71, 121, 181];
+}
+
+/** ペットの最大スキル解放レベルを返す（名前未登録は181） */
+export function getPetMaxLevel(petName: string): 181 | 1200 {
+  const pet = getPetByName(petName);
+  return pet?.pattern === 2 ? 1200 : 181;
 }

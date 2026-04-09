@@ -22,7 +22,8 @@
         "type": "最終VIT%",
         "value": 35
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "レッドゴブリン",
@@ -47,7 +48,8 @@
         "type": "ATK%",
         "value": 25
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ゴブリンメイジ",
@@ -72,7 +74,8 @@
         "type": "M-DEF%",
         "value": 25
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "クリーチャーローズ",
@@ -97,7 +100,8 @@
         "type": "経験値",
         "value": 100
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "キメラタートル",
@@ -122,7 +126,8 @@
         "type": "VIT",
         "value": 1250
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "鉄罠花",
@@ -147,7 +152,8 @@
         "type": "M-DEF%",
         "value": 20
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ペンギンソルジャー",
@@ -172,7 +178,8 @@
         "type": "SPD%",
         "value": 25
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ハネスライム",
@@ -197,7 +204,8 @@
         "type": "SPD",
         "value": 1920
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ボスゴブリン",
@@ -222,7 +230,8 @@
         "type": "LUCK",
         "value": 980
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ギガントオーク",
@@ -247,7 +256,8 @@
         "type": "防御%",
         "value": 30
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "古代魚　ザコーン",
@@ -272,7 +282,8 @@
         "type": "最終VIT%",
         "value": 20
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "禁域のラミア",
@@ -297,7 +308,8 @@
         "type": "経験値",
         "value": 110
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "マッドガエル",
@@ -322,7 +334,8 @@
         "type": "捕獲率",
         "value": 65
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ダークメイジ",
@@ -347,7 +360,8 @@
         "type": "INT%",
         "value": 30
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "アリクイロード",
@@ -372,7 +386,8 @@
         "type": "M-DEF%",
         "value": 20
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "原始蝶",
@@ -397,7 +412,8 @@
         "type": "HP回復",
         "value": 2000
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "動く墓",
@@ -422,7 +438,8 @@
         "type": "VIT",
         "value": 1450
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "オルトロス",
@@ -447,7 +464,8 @@
         "type": "VIT%",
         "value": 25
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "雪だるまん",
@@ -472,7 +490,8 @@
         "type": "SPD",
         "value": 1500
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "シカファイター",
@@ -497,7 +516,8 @@
         "type": "INT",
         "value": 900
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ペンギンロード",
@@ -522,7 +542,8 @@
         "type": "ATK%",
         "value": 10
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "パンダ",
@@ -547,7 +568,8 @@
         "type": "DEF",
         "value": 1920
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ファントムツリー",
@@ -572,7 +594,8 @@
         "type": "M-DEF%",
         "value": 15
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "スノーモケラ",
@@ -597,7 +620,8 @@
         "type": "M-DEF%",
         "value": 20
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "零の者",
@@ -622,7 +646,8 @@
         "type": "最終INT%",
         "value": 25
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "禁域の巨木",
@@ -647,7 +672,8 @@
         "type": "VIT%",
         "value": 40
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ゴブリン特攻隊",
@@ -672,7 +698,8 @@
         "type": "VIT",
         "value": 960
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ゴブリンクルー",
@@ -697,7 +724,8 @@
         "type": "VIT%",
         "value": 35
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "紅サソリ",
@@ -722,7 +750,8 @@
         "type": "最終LUCK%",
         "value": 9
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "死戦士マミー",
@@ -747,7 +776,8 @@
         "type": "M-DEF",
         "value": 1000
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "アヌビス",
@@ -772,7 +802,8 @@
         "type": "HP回復",
         "value": 1000
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ファイヤーメイジ",
@@ -797,7 +828,8 @@
         "type": "SPD",
         "value": 550
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "エジプトアシュラ",
@@ -822,7 +854,8 @@
         "type": "DEF",
         "value": 760
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "デザートイッヌ",
@@ -847,7 +880,8 @@
         "type": "SPD",
         "value": 2000
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "不思議なツボ",
@@ -872,7 +906,8 @@
         "type": "ドロップ率",
         "value": 70
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "天狗",
@@ -897,7 +932,8 @@
         "type": "最終LUCK%",
         "value": 17
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ランプの精霊",
@@ -922,7 +958,8 @@
         "type": "捕獲率",
         "value": 60
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "邪黒竜",
@@ -947,7 +984,8 @@
         "type": "ATK",
         "value": 1025
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "捧げし者",
@@ -972,7 +1010,8 @@
         "type": "LUCK%",
         "value": 77
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "黎明神トモダチ",
@@ -997,7 +1036,8 @@
         "type": "最終LUCK%",
         "value": 20
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "禁域のアヌビシュ",
@@ -1022,7 +1062,8 @@
         "type": "捕獲率",
         "value": 100
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "居住者A",
@@ -1047,7 +1088,8 @@
         "type": "SPD%",
         "value": 35
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "居住者B",
@@ -1072,7 +1114,8 @@
         "type": "SPD%",
         "value": 35
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ホネ",
@@ -1097,7 +1140,8 @@
         "type": "ATK",
         "value": 1500
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ボーンバトラー",
@@ -1122,7 +1166,8 @@
         "type": "M-DEF",
         "value": 1880
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ダイコンに見えるダイコン",
@@ -1147,7 +1192,8 @@
         "type": "最終LUCK%",
         "value": 5
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "クリーチャーアイ",
@@ -1172,7 +1218,8 @@
         "type": "DEF",
         "value": 1450
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "悪夢の石像",
@@ -1197,7 +1244,8 @@
         "type": "VIT%",
         "value": 15
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "スカルウィスプ",
@@ -1222,7 +1270,8 @@
         "type": "SPD%",
         "value": 20
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "フレイムフロッグ",
@@ -1247,7 +1296,8 @@
         "type": "HP回復",
         "value": 1000
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "キメラキング",
@@ -1272,7 +1322,8 @@
         "type": "経験値",
         "value": 150
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ネクロプリンセス",
@@ -1297,7 +1348,8 @@
         "type": "捕獲率",
         "value": 35
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "朽ちざる竜骸イゾ",
@@ -1322,7 +1374,8 @@
         "type": "最終ATK%",
         "value": 57
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "禁域のクマヌイ",
@@ -1347,7 +1400,8 @@
         "type": "M-DEF",
         "value": 2000
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "烈火鼠",
@@ -1372,7 +1426,8 @@
         "type": "SPD%",
         "value": 35
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "燃えてる何か",
@@ -1397,7 +1452,8 @@
         "type": "DEF%",
         "value": 30
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "焼トリ",
@@ -1422,7 +1478,8 @@
         "type": "経験値",
         "value": 150
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ウォーデン",
@@ -1447,7 +1504,8 @@
         "type": "DEF%",
         "value": 25
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "バーニングロック",
@@ -1472,7 +1530,8 @@
         "type": "M-DEF%",
         "value": 25
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ケルベロス",
@@ -1497,7 +1556,8 @@
         "type": "VIT%",
         "value": 30
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ガチキメラ",
@@ -1522,7 +1582,8 @@
         "type": "M-DEF",
         "value": 1500
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "フレイムボーン",
@@ -1547,7 +1608,8 @@
         "type": "SPD%",
         "value": 15
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "炎鬼",
@@ -1572,7 +1634,8 @@
         "type": "VIT",
         "value": 1325
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ブタ天使",
@@ -1597,7 +1660,8 @@
         "type": "経験値",
         "value": 297
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "エレファントパラディン",
@@ -1622,7 +1686,8 @@
         "type": "VIT%",
         "value": 45
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "赫竜王",
@@ -1647,7 +1712,8 @@
         "type": "DEF%",
         "value": 45
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "残燃モエコ",
@@ -1672,7 +1738,8 @@
         "type": "最終SPD%",
         "value": 15
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "禁域のヴァルネシア",
@@ -1697,7 +1764,8 @@
         "type": "ATK%",
         "value": 50
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "カニクラブ",
@@ -1722,7 +1790,8 @@
         "type": "DEF",
         "value": 30000
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ワニゲーター",
@@ -1747,7 +1816,8 @@
         "type": "ATK",
         "value": 30000
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "翡翠竜",
@@ -1772,7 +1842,8 @@
         "type": "INT",
         "value": 100700
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "マッドシャーク",
@@ -1797,7 +1868,8 @@
         "type": "SPD%",
         "value": 35
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "浮遊イカ",
@@ -1822,7 +1894,8 @@
         "type": "VIT%",
         "value": 25
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "氷結晶",
@@ -1847,7 +1920,8 @@
         "type": "HP回復",
         "value": 99999
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "命を刈り取る者",
@@ -1872,7 +1946,8 @@
         "type": "捕獲率",
         "value": 75
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ヤマタノオロチ",
@@ -1897,7 +1972,8 @@
         "type": "ATK",
         "value": 10000
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "元ギルド長ノック",
@@ -1922,7 +1998,8 @@
         "type": "INT%",
         "value": 30
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ラッキーヒトデ",
@@ -1947,7 +2024,8 @@
         "type": "LUCK%",
         "value": 30
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "アビスマーダー",
@@ -1972,7 +2050,8 @@
         "type": "ドロップ率",
         "value": 200
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "氷女王アナトユ",
@@ -1997,7 +2076,8 @@
         "type": "M-DEF%",
         "value": 25
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "封印されし神鯨",
@@ -2022,10 +2102,11 @@
         "type": "最終VIT%",
         "value": 25
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
-    "name": "超越者リガミア",
+    "name": "超越者　リガミア",
     "skills": [
       {
         "level": 31,
@@ -2047,7 +2128,8 @@
         "type": "SPD%",
         "value": 30
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "海賊船",
@@ -2072,7 +2154,8 @@
         "type": "ドロップ率",
         "value": 700
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ホムラウマ",
@@ -2097,7 +2180,8 @@
         "type": "SPD",
         "value": 1000
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "深淵灯魚",
@@ -2122,7 +2206,8 @@
         "type": "LUCK%",
         "value": 20
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "うねうね",
@@ -2147,7 +2232,8 @@
         "type": "VIT%",
         "value": 15
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "イージスリエル",
@@ -2172,7 +2258,8 @@
         "type": "INT%",
         "value": 15
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "デーモンブレイド",
@@ -2197,7 +2284,8 @@
         "type": "ATK%",
         "value": 15
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "時空竜クロノゼリウス",
@@ -2222,7 +2310,8 @@
         "type": "最終M-DEF%",
         "value": 25
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "マルコゲトカゲ",
@@ -2247,7 +2336,8 @@
         "type": "捕獲率",
         "value": 300
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "白竜",
@@ -2272,7 +2362,8 @@
         "type": "LUCK%",
         "value": 80
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "イグニス・シスター",
@@ -2297,7 +2388,8 @@
         "type": "M-DEF",
         "value": 2800
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "オルド・クラウセス",
@@ -2322,7 +2414,8 @@
         "type": "SPD",
         "value": 2800
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "BOX",
@@ -2347,7 +2440,8 @@
         "type": "DEF",
         "value": 10000
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "冥王ノクタール",
@@ -2372,7 +2466,8 @@
         "type": "INT%",
         "value": 97
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "罪環の監視者モルモ",
@@ -2397,7 +2492,8 @@
         "type": "捕獲率",
         "value": 400
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "イグニシア",
@@ -2422,7 +2518,8 @@
         "type": "経験値",
         "value": 100
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ヌー",
@@ -2447,7 +2544,8 @@
         "type": "経験値",
         "value": 100
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ミニハム",
@@ -2472,7 +2570,8 @@
         "type": "経験値",
         "value": 100
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "シーサー",
@@ -2497,7 +2596,8 @@
         "type": "経験値",
         "value": 100
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "グルームエッグ",
@@ -2522,7 +2622,8 @@
         "type": "経験値",
         "value": 100
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "スライムガール(物理)",
@@ -2547,7 +2648,8 @@
         "type": "経験値",
         "value": 100
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "スライムガール(魔法)",
@@ -2572,7 +2674,8 @@
         "type": "経験値",
         "value": 100
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "ペリカンEXP",
@@ -2597,7 +2700,8 @@
         "type": "経験値",
         "value": 50
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "支配のトリ",
@@ -2622,7 +2726,8 @@
         "type": "捕獲率",
         "value": 80
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "キングニワトリ",
@@ -2647,7 +2752,8 @@
         "type": "経験値",
         "value": 200
       }
-    ]
+    ],
+    "pattern": 1
   },
   {
     "name": "虹ペリカンEXP",
@@ -2671,6 +2777,423 @@
         "level": 181,
         "type": "経験値",
         "value": 250
+      }
+    ],
+    "pattern": 1
+  },
+  {
+    "name": "ドラゴンヘッド",
+    "pattern": 2,
+    "skills": [
+      {
+        "level": 200,
+        "type": "ATK%",
+        "value": 30
+      },
+      {
+        "level": 500,
+        "type": "ATK%",
+        "value": 30
+      },
+      {
+        "level": 800,
+        "type": "ATK%",
+        "value": 60
+      },
+      {
+        "level": 1200,
+        "type": "ATK%",
+        "value": 160
+      }
+    ]
+  },
+  {
+    "name": "トリカゴドリ",
+    "pattern": 2,
+    "skills": [
+      {
+        "level": 200,
+        "type": "捕獲率",
+        "value": 500
+      },
+      {
+        "level": 500,
+        "type": "捕獲率",
+        "value": 500
+      },
+      {
+        "level": 800,
+        "type": "捕獲率",
+        "value": 500
+      },
+      {
+        "level": 1200,
+        "type": "捕獲率",
+        "value": 1000
+      }
+    ]
+  },
+  {
+    "name": "黙示木",
+    "pattern": 2,
+    "skills": [
+      {
+        "level": 200,
+        "type": "経験値",
+        "value": 500
+      },
+      {
+        "level": 500,
+        "type": "経験値",
+        "value": 500
+      },
+      {
+        "level": 800,
+        "type": "経験値",
+        "value": 500
+      },
+      {
+        "level": 1200,
+        "type": "経験値",
+        "value": 1000
+      }
+    ]
+  },
+  {
+    "name": "雷大王イカ",
+    "pattern": 2,
+    "skills": [
+      {
+        "level": 200,
+        "type": "SPD%",
+        "value": 100
+      },
+      {
+        "level": 500,
+        "type": "SPD%",
+        "value": 100
+      },
+      {
+        "level": 800,
+        "type": "SPD%",
+        "value": 100
+      },
+      {
+        "level": 1200,
+        "type": "SPD%",
+        "value": 200
+      }
+    ]
+  },
+  {
+    "name": "グラビティスライム",
+    "pattern": 2,
+    "skills": [
+      {
+        "level": 200,
+        "type": "VIT%",
+        "value": 70
+      },
+      {
+        "level": 500,
+        "type": "VIT%",
+        "value": 70
+      },
+      {
+        "level": 800,
+        "type": "VIT%",
+        "value": 70
+      },
+      {
+        "level": 1200,
+        "type": "VIT%",
+        "value": 290
+      }
+    ]
+  },
+  {
+    "name": "動く石碑",
+    "pattern": 2,
+    "skills": [
+      {
+        "level": 200,
+        "type": "M-DEF%",
+        "value": 70
+      },
+      {
+        "level": 500,
+        "type": "M-DEF%",
+        "value": 70
+      },
+      {
+        "level": 800,
+        "type": "M-DEF%",
+        "value": 70
+      },
+      {
+        "level": 1200,
+        "type": "？",
+        "value": null
+      }
+    ]
+  },
+  {
+    "name": "ダークフェニックス",
+    "pattern": 2,
+    "skills": [
+      {
+        "level": 200,
+        "type": "ドロップ率",
+        "value": 1000
+      },
+      {
+        "level": 500,
+        "type": "経験値",
+        "value": 1000
+      },
+      {
+        "level": 800,
+        "type": "ドロップ率",
+        "value": 1000
+      },
+      {
+        "level": 1200,
+        "type": "経験値",
+        "value": 1000
+      }
+    ]
+  },
+  {
+    "name": "鉄壁要塞パルテノン",
+    "pattern": 2,
+    "skills": [
+      {
+        "level": 200,
+        "type": "DEF%",
+        "value": 100
+      },
+      {
+        "level": 500,
+        "type": "DEF%",
+        "value": 150
+      },
+      {
+        "level": 800,
+        "type": "DEF%",
+        "value": null
+      },
+      {
+        "level": 1200,
+        "type": "DEF%",
+        "value": null
+      }
+    ]
+  },
+  {
+    "name": "オメガ・スペクトラム",
+    "pattern": 2,
+    "skills": [
+      {
+        "level": 200,
+        "type": "LUCK%",
+        "value": 250
+      },
+      {
+        "level": 500,
+        "type": "ATK%",
+        "value": 250
+      },
+      {
+        "level": 800,
+        "type": "INT%",
+        "value": 250
+      },
+      {
+        "level": 1200,
+        "type": "？",
+        "value": null
+      }
+    ]
+  },
+  {
+    "name": "根界獣ドルグラント",
+    "pattern": 2,
+    "skills": [
+      {
+        "level": 200,
+        "type": "最終ATK%",
+        "value": 1
+      },
+      {
+        "level": 500,
+        "type": "最終ATK%",
+        "value": 1
+      },
+      {
+        "level": 800,
+        "type": "最終ATK%",
+        "value": 1
+      },
+      {
+        "level": 1200,
+        "type": "最終ATK%",
+        "value": 97
+      }
+    ]
+  },
+  {
+    "name": "オコォーン",
+    "pattern": 2,
+    "skills": [
+      {
+        "level": 200,
+        "type": "MOV",
+        "value": 1
+      },
+      {
+        "level": 500,
+        "type": "MOV",
+        "value": 1
+      },
+      {
+        "level": 800,
+        "type": "MOV",
+        "value": 2
+      },
+      {
+        "level": 1200,
+        "type": "？",
+        "value": null
+      }
+    ]
+  },
+  {
+    "name": "禁域のワイバーン",
+    "pattern": 1,
+    "skills": [
+      {
+        "level": 31,
+        "type": "DEF",
+        "value": 100000
+      },
+      {
+        "level": 71,
+        "type": "M-DEF",
+        "value": 100000
+      },
+      {
+        "level": 121,
+        "type": "ATK",
+        "value": 100000
+      },
+      {
+        "level": 181,
+        "type": "INT",
+        "value": 100000
+      }
+    ]
+  },
+  {
+    "name": "オコシイタケ",
+    "pattern": 1,
+    "skills": [
+      {
+        "level": 31,
+        "type": "捕獲率",
+        "value": 300
+      },
+      {
+        "level": 71,
+        "type": "捕獲率",
+        "value": 300
+      },
+      {
+        "level": 121,
+        "type": "捕獲率",
+        "value": 500
+      },
+      {
+        "level": 181,
+        "type": "捕獲率",
+        "value": 1000
+      }
+    ]
+  },
+  {
+    "name": "オコスター",
+    "pattern": 1,
+    "skills": [
+      {
+        "level": 31,
+        "type": "ドロップ率",
+        "value": 300
+      },
+      {
+        "level": 71,
+        "type": "ドロップ率",
+        "value": 300
+      },
+      {
+        "level": 121,
+        "type": "ドロップ率",
+        "value": 500
+      },
+      {
+        "level": 181,
+        "type": "ドロップ率",
+        "value": 1000
+      }
+    ]
+  },
+  {
+    "name": "ダークウィッチ",
+    "pattern": 1,
+    "skills": [
+      {
+        "level": 31,
+        "type": "M-DEF%",
+        "value": 25
+      },
+      {
+        "level": 71,
+        "type": "M-DEF%",
+        "value": 25
+      },
+      {
+        "level": 121,
+        "type": "M-DEF%",
+        "value": 25
+      },
+      {
+        "level": 181,
+        "type": "M-DEF%",
+        "value": 50
+      }
+    ]
+  },
+  {
+    "name": "冥炎のハデス",
+    "pattern": 1,
+    "skills": [
+      {
+        "level": 31,
+        "type": "ATK%",
+        "value": 20
+      },
+      {
+        "level": 71,
+        "type": "ATK%",
+        "value": 20
+      },
+      {
+        "level": 121,
+        "type": "ATK%",
+        "value": 30
+      },
+      {
+        "level": 181,
+        "type": "ATK%",
+        "value": 50
       }
     ]
   }

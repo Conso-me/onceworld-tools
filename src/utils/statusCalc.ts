@@ -152,6 +152,7 @@ function petFlatFor(petName: string, petLevel: number): CoreStats {
   const pet = getPetByName(petName);
   if (!pet) return result;
   for (const skill of getActiveSkills(pet, petLevel)) {
+    if (skill.value === null) continue;
     const key = FLAT_MAP[skill.type];
     if (key) result[key] += skill.value;
   }
@@ -164,6 +165,7 @@ function petPctFor(petName: string, petLevel: number): CoreStats {
   const pet = getPetByName(petName);
   if (!pet) return result;
   for (const skill of getActiveSkills(pet, petLevel)) {
+    if (skill.value === null) continue;
     const key = PCT_MAP[skill.type];
     if (key) result[key] += skill.value;
   }
@@ -176,6 +178,7 @@ function petFinalPctFor(petName: string, petLevel: number): CoreStats {
   const pet = getPetByName(petName);
   if (!pet) return result;
   for (const skill of getActiveSkills(pet, petLevel)) {
+    if (skill.value === null) continue;
     const key = FINAL_PCT_MAP[skill.type];
     if (key) result[key] += skill.value;
   }
