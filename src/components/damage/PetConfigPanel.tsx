@@ -162,7 +162,7 @@ export function PetConfigPanel({ config, setField, reset, petResult, replaceConf
   };
 
   const handleSavePreset = () => {
-    const trimmed = presetName.trim();
+    const trimmed = presetName.trim() || (selectedMonster?.name ?? "");
     if (!trimmed) return;
     const existing = presets.find((p) => p.name === trimmed);
     if (existing && !window.confirm(tCommon("overwriteConfirm", { name: trimmed }))) return;
@@ -383,7 +383,7 @@ export function PetConfigPanel({ config, setField, reset, petResult, replaceConf
         <div className="flex gap-1">
           <input
             type="text"
-            placeholder={t("petPresetNamePlaceholder")}
+            placeholder={selectedMonster?.name ?? t("petPresetNamePlaceholder")}
             value={presetName}
             onChange={(e) => setPresetName(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") handleSavePreset(); }}
@@ -392,7 +392,7 @@ export function PetConfigPanel({ config, setField, reset, petResult, replaceConf
           <button
             type="button"
             onClick={handleSavePreset}
-            disabled={!presetName.trim()}
+            disabled={!presetName.trim() && !selectedMonster}
             className="flex-shrink-0 px-2 py-1 text-xs bg-indigo-50 border border-indigo-200 text-indigo-600 rounded-lg hover:bg-indigo-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             {t("petPresetSave")}
