@@ -76,16 +76,18 @@ export type PetSkillType =
   | "DEF" | "DEF%" | "最終DEF%"
   | "M-DEF" | "M-DEF%" | "最終M-DEF%"
   | "LUCK" | "LUCK%" | "最終LUCK%"
-  | "MOV" | "HP回復" | "経験値" | "捕獲率" | "ドロップ率";
+  | "MOV" | "HP回復" | "経験値" | "捕獲率" | "ドロップ率"
+  | "？";
 
 export interface PetSkill {
-  level: 31 | 71 | 121 | 181;
+  level: 31 | 71 | 121 | 181 | 200 | 500 | 800 | 1200;
   type: PetSkillType;
-  value: number;
+  value: number | null;  // null = 未判明
 }
 
 export interface PetEntry {
   name: string;
+  pattern: 1 | 2;
   skills: PetSkill[];
 }
 
@@ -145,9 +147,9 @@ export interface SimConfig extends Record<string, unknown> {
   acc3: string; acc3Level: number;
   acc4: string; acc4Level: number;
   // ペット（3枠）
-  petName: string;  petLevel: 0 | 31 | 71 | 121 | 181;
-  pet2Name: string; pet2Level: 0 | 31 | 71 | 121 | 181;
-  pet3Name: string; pet3Level: 0 | 31 | 71 | 121 | 181;
+  petName: string;  petLevel: 0 | 31 | 71 | 121 | 181 | 200 | 500 | 800 | 1200;
+  pet2Name: string; pet2Level: 0 | 31 | 71 | 121 | 181 | 200 | 500 | 800 | 1200;
+  pet3Name: string; pet3Level: 0 | 31 | 71 | 121 | 181 | 200 | 500 | 800 | 1200;
   // プロテイン
   proteinVit: number;
   proteinSpd: number;
