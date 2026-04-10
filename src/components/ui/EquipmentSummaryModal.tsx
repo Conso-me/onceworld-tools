@@ -191,7 +191,7 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
           {/* 装備 */}
           <div>
             <SectionHeader>装備</SectionHeader>
-            <div className="space-y-1">
+            <div className="space-y-1 max-w-[60%]">
               <ItemRow label="武器" name={cfg.equipWeapon} enh={cfg.enhWeapon} canEnhance={weaponCanEnh} />
               {armorSlots.map(({ label, name, enh, item }) => (
                 <ItemRow
@@ -213,7 +213,7 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
           {/* アクセサリー */}
           <div>
             <SectionHeader>アクセサリー</SectionHeader>
-            <div className="space-y-1">
+            <div className="space-y-1 max-w-[60%]">
               {accSlots.map((s, i) => (
                 <div key={i} className="flex items-baseline gap-2 text-xs">
                   <span className="text-gray-400 w-8 shrink-0">{i + 1}</span>
@@ -232,7 +232,7 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
           {/* ペット */}
           <div>
             <SectionHeader>ペット</SectionHeader>
-            <div className="space-y-1">
+            <div className="space-y-1 max-w-[60%]">
               {petSlots.map((s, i) => (
                 <div key={i} className="flex items-baseline gap-2 text-xs">
                   <span className="text-gray-400 w-8 shrink-0">{i + 1}</span>
