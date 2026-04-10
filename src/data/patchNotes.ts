@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-04-10",
     changes: [
+    { type: "improve", text: "feat: 魔法無効エネミーの表示対応 (close #93)" },
     { type: "feature", text: "feat: オコォーンを太古の中庭エネミープリセットに追加" },
     ],
   },
