@@ -8,6 +8,7 @@ import { MonsterEditor } from "./components/MonsterEditor";
 import { PetSimulator } from "./components/PetSimulator";
 import { TabNav, type Tab } from "./components/ui/TabNav";
 import { PatchNotesModal } from "./components/PatchNotesModal";
+import { EquipmentSummaryModal } from "./components/ui/EquipmentSummaryModal";
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -29,6 +30,7 @@ function App() {
     return tabs.find((t) => t.id === hash && !t.disabled)?.id ?? "damage";
   });
   const [showPatchNotes, setShowPatchNotes] = useState(false);
+  const [showEquipSummary, setShowEquipSummary] = useState(false);
 
   const handleTabChange = useCallback((tabId: string) => {
     setActiveTab(tabId);
@@ -74,6 +76,12 @@ function App() {
               >
                 {t("patchNotes")}
               </button>
+              <button
+                onClick={() => setShowEquipSummary(true)}
+                className="hidden sm:inline-flex text-xs px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors font-medium"
+              >
+                装備確認
+              </button>
 
               {/* Mobile: ⋯ ドロップダウンメニュー */}
               <div ref={mobileMenuRef} className="relative sm:hidden">
@@ -99,6 +107,12 @@ function App() {
                       className="w-full text-left px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50"
                     >
                       {t("patchNotes")}
+                    </button>
+                    <button
+                      onClick={() => { setShowEquipSummary(true); setMobileMenuOpen(false); }}
+                      className="w-full text-left px-4 py-2.5 text-sm text-indigo-600 hover:bg-gray-50"
+                    >
+                      装備確認
                     </button>
                   </div>
                 )}
@@ -153,6 +167,7 @@ function App() {
       </footer>
 
       {showPatchNotes && <PatchNotesModal onClose={() => setShowPatchNotes(false)} />}
+      {showEquipSummary && <EquipmentSummaryModal onClose={() => setShowEquipSummary(false)} />}
     </div>
   );
 }
