@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-04-10",
     changes: [
+    { type: "fix", text: "fix: 多段魔法（火魔法等）のオーバーキル判定を1発基準に修正" },
     { type: "improve", text: "refactor: ヘッダータブを5個に整理、周回計算・モンスター登録を⋯ドロップダウンへ" },
     { type: "feature", text: "feat: ペットシミュレータタブを追加" },
     { type: "improve", text: "feat: 魔法無効エネミーの表示対応 (close #93)" },
