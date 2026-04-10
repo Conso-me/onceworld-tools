@@ -113,27 +113,38 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
     }
     if (petSlots.every((s) => !s.name)) lines.push("  なし");
 
+    const alignStats = (entries: [string, number][]) => {
+      const maxLabel = Math.max(...entries.map(([l]) => l.length));
+      const vals = entries.map(([, v]) => fmt(v));
+      const maxVal = Math.max(...vals.map((v) => v.length));
+      return entries.map(([l], i) => `  ${l.padStart(maxLabel)}: ${vals[i].padStart(maxVal)}`);
+    };
+
     lines.push("");
     lines.push("【ステータス割り振り】");
-    lines.push(`  VIT:   ${fmt(cfg.allocVit)}`);
-    lines.push(`  SPD:   ${fmt(cfg.allocSpd)}`);
-    lines.push(`  ATK:   ${fmt(cfg.allocAtk)}`);
-    lines.push(`  INT:   ${fmt(cfg.allocInt)}`);
-    lines.push(`  DEF:   ${fmt(cfg.allocDef)}`);
-    lines.push(`  M-DEF: ${fmt(cfg.allocMdef)}`);
-    lines.push(`  LUCK:  ${fmt(cfg.allocLuck)}`);
-    lines.push(`  合計:  ${fmt(allocTotal)}`);
+    for (const l of alignStats([
+      ["VIT",   cfg.allocVit],
+      ["SPD",   cfg.allocSpd],
+      ["ATK",   cfg.allocAtk],
+      ["INT",   cfg.allocInt],
+      ["DEF",   cfg.allocDef],
+      ["M-DEF", cfg.allocMdef],
+      ["LUCK",  cfg.allocLuck],
+      ["合計",  allocTotal],
+    ])) lines.push(l);
 
     lines.push("");
     lines.push("【最終ステータス】");
-    lines.push(`  VIT:   ${fmt(final.vit)}`);
-    lines.push(`  SPD:   ${fmt(final.spd)}`);
-    lines.push(`  ATK:   ${fmt(final.atk)}`);
-    lines.push(`  INT:   ${fmt(final.int)}`);
-    lines.push(`  DEF:   ${fmt(final.def)}`);
-    lines.push(`  M-DEF: ${fmt(final.mdef)}`);
-    lines.push(`  LUCK:  ${fmt(final.luck)}`);
-    lines.push(`  HP:    ${fmt(hp)}`);
+    for (const l of alignStats([
+      ["VIT",   final.vit],
+      ["SPD",   final.spd],
+      ["ATK",   final.atk],
+      ["INT",   final.int],
+      ["DEF",   final.def],
+      ["M-DEF", final.mdef],
+      ["LUCK",  final.luck],
+      ["HP",    hp],
+    ])) lines.push(l);
 
     return lines.join("\n");
   }, [cfg, weaponCanEnh, armorSlots, accSlots, petSlots, setBonus, setBonusSeries, allocTotal, final, hp]);
