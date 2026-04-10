@@ -26,7 +26,7 @@ function ItemRow({ label, name, enh, canEnhance }: {
         ? <>
             <span className="text-gray-800 font-medium flex-1 min-w-0 truncate">{name}</span>
             {enh !== undefined && (canEnhance ?? true) && (
-              <span className="text-gray-400 shrink-0">+{enh}</span>
+              <span className="text-gray-400 shrink-0 mr-2">+{enh}</span>
             )}
           </>
         : <span className="text-gray-300 flex-1">-</span>
@@ -220,7 +220,7 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
                   {s.name
                     ? <>
                         <span className="text-gray-800 font-medium flex-1 min-w-0 truncate">{s.name}</span>
-                        <span className="text-gray-400 shrink-0">Lv.{s.level}</span>
+                        <span className="text-gray-400 shrink-0 mr-2">Lv.{s.level}</span>
                       </>
                     : <span className="text-gray-300 flex-1">-</span>
                   }
@@ -239,7 +239,7 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
                   {s.name
                     ? <>
                         <span className="text-gray-800 font-medium flex-1 min-w-0 truncate">{s.name}</span>
-                        <span className="text-gray-400 shrink-0">Lv.{s.level}</span>
+                        <span className="text-gray-400 shrink-0 mr-2">Lv.{s.level}</span>
                       </>
                     : <span className="text-gray-300 flex-1">-</span>
                   }
