@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-04-11",
     changes: [
+    { type: "feature", text: "feat: 装備・ステータス一括確認モーダルを追加" },
     { type: "feature", text: "feat: 木魔法・闇魔法のデバフ効果をダメージ計算に反映するトグルを追加" },
     ],
   },
