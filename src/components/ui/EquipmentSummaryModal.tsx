@@ -113,18 +113,38 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
     }
     if (petSlots.every((s) => !s.name)) lines.push("  なし");
 
+    const alignStats = (entries: [string, number][]) => {
+      const maxLabel = Math.max(...entries.map(([l]) => l.length));
+      const vals = entries.map(([, v]) => fmt(v));
+      const maxVal = Math.max(...vals.map((v) => v.length));
+      return entries.map(([l], i) => `  ${l.padStart(maxLabel)}: ${vals[i].padStart(maxVal)}`);
+    };
+
     lines.push("");
     lines.push("【ステータス割り振り】");
-    lines.push(
-      `  VIT:${fmt(cfg.allocVit)} SPD:${fmt(cfg.allocSpd)} ATK:${fmt(cfg.allocAtk)} INT:${fmt(cfg.allocInt)} DEF:${fmt(cfg.allocDef)} M-DEF:${fmt(cfg.allocMdef)} LUCK:${fmt(cfg.allocLuck)}`
-    );
-    lines.push(`  合計: ${fmt(allocTotal)}`);
+    for (const l of alignStats([
+      ["VIT",   cfg.allocVit],
+      ["SPD",   cfg.allocSpd],
+      ["ATK",   cfg.allocAtk],
+      ["INT",   cfg.allocInt],
+      ["DEF",   cfg.allocDef],
+      ["M-DEF", cfg.allocMdef],
+      ["LUCK",  cfg.allocLuck],
+      ["合計",  allocTotal],
+    ])) lines.push(l);
 
     lines.push("");
     lines.push("【最終ステータス】");
-    lines.push(
-      `  VIT:${fmt(final.vit)} SPD:${fmt(final.spd)} ATK:${fmt(final.atk)} INT:${fmt(final.int)} DEF:${fmt(final.def)} M-DEF:${fmt(final.mdef)} LUCK:${fmt(final.luck)} HP:${fmt(hp)}`
-    );
+    for (const l of alignStats([
+      ["VIT",   final.vit],
+      ["SPD",   final.spd],
+      ["ATK",   final.atk],
+      ["INT",   final.int],
+      ["DEF",   final.def],
+      ["M-DEF", final.mdef],
+      ["LUCK",  final.luck],
+      ["HP",    hp],
+    ])) lines.push(l);
 
     return lines.join("\n");
   }, [cfg, weaponCanEnh, armorSlots, accSlots, petSlots, setBonus, setBonusSeries, allocTotal, final, hp]);
