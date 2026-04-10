@@ -115,16 +115,25 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
 
     lines.push("");
     lines.push("【ステータス割り振り】");
-    lines.push(
-      `  VIT:${fmt(cfg.allocVit)} SPD:${fmt(cfg.allocSpd)} ATK:${fmt(cfg.allocAtk)} INT:${fmt(cfg.allocInt)} DEF:${fmt(cfg.allocDef)} M-DEF:${fmt(cfg.allocMdef)} LUCK:${fmt(cfg.allocLuck)}`
-    );
-    lines.push(`  合計: ${fmt(allocTotal)}`);
+    lines.push(`  VIT:   ${fmt(cfg.allocVit)}`);
+    lines.push(`  SPD:   ${fmt(cfg.allocSpd)}`);
+    lines.push(`  ATK:   ${fmt(cfg.allocAtk)}`);
+    lines.push(`  INT:   ${fmt(cfg.allocInt)}`);
+    lines.push(`  DEF:   ${fmt(cfg.allocDef)}`);
+    lines.push(`  M-DEF: ${fmt(cfg.allocMdef)}`);
+    lines.push(`  LUCK:  ${fmt(cfg.allocLuck)}`);
+    lines.push(`  合計:  ${fmt(allocTotal)}`);
 
     lines.push("");
     lines.push("【最終ステータス】");
-    lines.push(
-      `  VIT:${fmt(final.vit)} SPD:${fmt(final.spd)} ATK:${fmt(final.atk)} INT:${fmt(final.int)} DEF:${fmt(final.def)} M-DEF:${fmt(final.mdef)} LUCK:${fmt(final.luck)} HP:${fmt(hp)}`
-    );
+    lines.push(`  VIT:   ${fmt(final.vit)}`);
+    lines.push(`  SPD:   ${fmt(final.spd)}`);
+    lines.push(`  ATK:   ${fmt(final.atk)}`);
+    lines.push(`  INT:   ${fmt(final.int)}`);
+    lines.push(`  DEF:   ${fmt(final.def)}`);
+    lines.push(`  M-DEF: ${fmt(final.mdef)}`);
+    lines.push(`  LUCK:  ${fmt(final.luck)}`);
+    lines.push(`  HP:    ${fmt(hp)}`);
 
     return lines.join("\n");
   }, [cfg, weaponCanEnh, armorSlots, accSlots, petSlots, setBonus, setBonusSeries, allocTotal, final, hp]);
