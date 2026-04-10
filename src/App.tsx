@@ -17,8 +17,8 @@ function App() {
     { id: "arena", label: t("tabs.arena"), icon: "🏟" },
     { id: "status", label: t("tabs.status"), shortLabel: t("tabs.statusShort"), icon: "✦" },
     { id: "pet", label: t("tabs.pet"), shortLabel: t("tabs.petShort"), icon: "🐾" },
-    { id: "farm", label: t("tabs.farm"), shortLabel: t("tabs.farmShort"), icon: "♻" },
-    { id: "monsters", label: t("tabs.monsters"), shortLabel: t("tabs.monstersShort"), icon: "📋" },
+    { id: "farm", label: t("tabs.farm"), shortLabel: t("tabs.farmShort"), icon: "♻", overflow: true },
+    { id: "monsters", label: t("tabs.monsters"), shortLabel: t("tabs.monstersShort"), icon: "📋", overflow: true },
   ];
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
