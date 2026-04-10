@@ -70,7 +70,7 @@ export function EnemyPresetModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
       <div className="absolute inset-0 bg-black/50" onClick={handleClose} />
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl flex flex-col" style={{ height: "min(640px, 85vh)" }}>
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col" style={{ height: "min(640px, 85vh)" }}>
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 flex-shrink-0">
