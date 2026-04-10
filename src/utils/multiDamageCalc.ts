@@ -71,10 +71,13 @@ export function calcOffensiveComparison(
     magicBaseInt: number;
     crystalCubePreMult: number;
     crystalCubeFinalMult: number;
-  }
+  },
+  enemyDebuffs?: { woodMagicEffect?: boolean; darkMagicEffect?: boolean }
 ): OffensiveComparisonRow[] {
   return entries.map((entry) => {
     const scaled = scaleMonster(entry.monster, entry.level);
+    const effScaledDef = enemyDebuffs?.woodMagicEffect ? Math.floor(scaled.scaledDef / 2) : scaled.scaledDef;
+    const effScaledLuck = enemyDebuffs?.darkMagicEffect ? Math.floor(scaled.scaledLuck / 2) : scaled.scaledLuck;
     const affinity = getElementAffinity(playerStats.element, entry.monster.element);
     const multiHit = calcMultiHitCount(playerStats.spd, attackMode === "魔攻");
 
@@ -85,7 +88,7 @@ export function calcOffensiveComparison(
           playerStats.int,
           magicParams.magicBaseInt,
           effectiveMult,
-          scaled.scaledDef,
+          effScaledDef,
           scaled.scaledMdef,
           affinity,
           magicParams.crystalCubeFinalMult
@@ -97,7 +100,7 @@ export function calcOffensiveComparison(
         const overkillGuaranteed = !dmg.isNullified && dmg.min >= scaled.hp * 10;
         const overkillStatNeeded = calcIntForKill(
           scaled.hp * 10,
-          scaled.scaledDef,
+          effScaledDef,
           scaled.scaledMdef,
           affinity,
           effectiveMult,
@@ -124,10 +127,10 @@ export function calcOffensiveComparison(
 
     // 物理/魔弾
     const dmg = attackMode === "物理"
-      ? calcPhysicalDamage(playerStats.atk, scaled.scaledDef, scaled.scaledMdef, affinity)
+      ? calcPhysicalDamage(playerStats.atk, effScaledDef, scaled.scaledMdef, affinity)
       : calcPetMagicDamage(
           playerStats.int,
-          scaled.scaledDef,
+          effScaledDef,
           scaled.scaledMdef,
           affinity,
           magicParams.crystalCubeFinalMult,
@@ -135,11 +138,11 @@ export function calcOffensiveComparison(
         );
 
     const hitsToKill = calcHitsToKill(scaled.hp, dmg.min, multiHit);
-    const hitRate = attackMode === "物理" ? calcHitRate(playerStats.luck, scaled.scaledLuck) : null;
+    const hitRate = attackMode === "物理" ? calcHitRate(playerStats.luck, effScaledLuck) : null;
     const overkillThreshold = scaled.hp * 10;
     const overkillGuaranteed = !dmg.isNullified && dmg.min >= overkillThreshold;
-    const requiredHitLuck = attackMode === "物理" ? scaled.scaledLuck : undefined;
-    const additionalLuckNeeded = attackMode === "物理" ? Math.max(scaled.scaledLuck - playerStats.luck, 0) : undefined;
+    const requiredHitLuck = attackMode === "物理" ? effScaledLuck : undefined;
+    const additionalLuckNeeded = attackMode === "物理" ? Math.max(effScaledLuck - playerStats.luck, 0) : undefined;
 
     return { entry, scaled, affinity, mode: attackMode, dmg, multiHit, hitsToKill, hitRate, overkillGuaranteed, requiredHitLuck, additionalLuckNeeded };
   });

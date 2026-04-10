@@ -107,6 +107,9 @@ export function DamageCalculator() {
   const [crystalCube, setCrystalCube] = usePersistedState("dmg:crystalCube", "");
   // 物理オーバーキル計算に多段攻撃を含めるか（現状ゲーム内では多段でOKが発生しないためデフォルトOFF）
   const [physOverkillMultiHit, setPhysOverkillMultiHit] = usePersistedState("dmg:physOverkillMultiHit", false);
+  // 魔法デバフ: 木魔法→DEF半減、闇魔法→LUK半減
+  const [woodMagicEffect, setWoodMagicEffect] = usePersistedState("dmg:woodMagicEffect", false);
+  const [darkMagicEffect, setDarkMagicEffect] = usePersistedState("dmg:darkMagicEffect", false);
 
   // ペット計算モード
   const [calcTarget, setCalcTarget] = usePersistedState<"player" | "pet">("dmg:calcTarget", "player");
@@ -378,6 +381,10 @@ export function DamageCalculator() {
   const offensiveResult = useMemo(() => {
     if (!scaled) return null;
 
+    // 魔法デバフ適用後の敵ステータス
+    const effEnemyDef = woodMagicEffect ? Math.floor(scaled.scaledDef / 2) : scaled.scaledDef;
+    const effEnemyLuck = darkMagicEffect ? Math.floor(scaled.scaledLuck / 2) : scaled.scaledLuck;
+
     const multiHit = calcMultiHitCount(effSpd, activeAttackMode === "魔攻");
 
     if (activeAttackMode === "魔攻") {
@@ -388,7 +395,7 @@ export function DamageCalculator() {
           effInt,
           activeMagicBaseInt,
           effectiveMult,
-          scaled.scaledDef,
+          effEnemyDef,
           scaled.scaledMdef,
           selfToEnemyAffinity,
           activeCrystalCubeFinalMult
@@ -397,7 +404,7 @@ export function DamageCalculator() {
         const totalMin = dmg.isNullified ? spell.hits : dmg.min * spell.hits;
         const totalMax = dmg.isNullified ? 9 * spell.hits : dmg.max * spell.hits;
         const minStat = calcMinIntToHit(
-          scaled.scaledDef,
+          effEnemyDef,
           scaled.scaledMdef,
           effectiveMult,
           activeMagicBaseInt
@@ -406,7 +413,7 @@ export function DamageCalculator() {
         const targetStats = [1, 2, 3].map((n) =>
           calcIntForKill(
             scaled.hp,
-            scaled.scaledDef,
+            effEnemyDef,
             scaled.scaledMdef,
             selfToEnemyAffinity,
             effectiveMult,
@@ -421,7 +428,7 @@ export function DamageCalculator() {
         const overkillPossible = !dmg.isNullified && dmg.max >= overkillThreshold;
         const overkillStatNeeded = calcIntForKill(
           scaled.hp * 10,
-          scaled.scaledDef,
+          effEnemyDef,
           scaled.scaledMdef,
           selfToEnemyAffinity,
           effectiveMult,
@@ -435,7 +442,7 @@ export function DamageCalculator() {
           for (let c = 0; c <= 1000; c++) {
             const needed = calcIntForKill(
               scaled.hp * 10,
-              scaled.scaledDef,
+              effEnemyDef,
               scaled.scaledMdef,
               selfToEnemyAffinity,
               spell.multiplier * (1 + c * 0.01),
@@ -455,7 +462,7 @@ export function DamageCalculator() {
     if (activeAttackMode === "物理") {
       dmg = calcPhysicalDamage(
         effAtk,
-        scaled.scaledDef,
+        effEnemyDef,
         scaled.scaledMdef,
         selfToEnemyAffinity
       );
@@ -465,7 +472,7 @@ export function DamageCalculator() {
         effInt,
         0,
         1.0,
-        scaled.scaledDef,
+        effEnemyDef,
         scaled.scaledMdef,
         selfToEnemyAffinity,
         1.0
@@ -474,7 +481,7 @@ export function DamageCalculator() {
       // 魔弾（INT×1.75、クリあり・多段あり）
       dmg = calcPetMagicDamage(
         effInt,
-        scaled.scaledDef,
+        effEnemyDef,
         scaled.scaledMdef,
         selfToEnemyAffinity,
         activeCrystalCubeFinalMult,
@@ -490,11 +497,11 @@ export function DamageCalculator() {
     // 最低必要ステータス
     let minStat: number;
     if (activeAttackMode === "物理") {
-      minStat = calcMinAtkToHit(scaled.scaledDef, scaled.scaledMdef);
+      minStat = calcMinAtkToHit(effEnemyDef, scaled.scaledMdef);
     } else if (activeAttackMode === "魔法") {
-      minStat = calcMinIntToHit(scaled.scaledDef, scaled.scaledMdef, 1.0, 0);
+      minStat = calcMinIntToHit(effEnemyDef, scaled.scaledMdef, 1.0, 0);
     } else {
-      minStat = calcMinIntToHitMadan(scaled.scaledDef, scaled.scaledMdef, activeCrystalCubePreMult);
+      minStat = calcMinIntToHitMadan(effEnemyDef, scaled.scaledMdef, activeCrystalCubePreMult);
     }
 
     // N回確殺用ステータス（1〜3回分）
@@ -502,7 +509,7 @@ export function DamageCalculator() {
       if (activeAttackMode === "物理") {
         return calcAtkForKill(
           scaled.hp,
-          scaled.scaledDef,
+          effEnemyDef,
           scaled.scaledMdef,
           selfToEnemyAffinity,
           multiHit,
@@ -512,7 +519,7 @@ export function DamageCalculator() {
         // ペット魔法: INT×1.25、多段なし
         return calcIntForKill(
           scaled.hp,
-          scaled.scaledDef,
+          effEnemyDef,
           scaled.scaledMdef,
           selfToEnemyAffinity,
           1.0,
@@ -523,7 +530,7 @@ export function DamageCalculator() {
       } else {
         // 魔弾
         const effectiveDef = calcEffectiveDef(
-          scaled.scaledDef,
+          effEnemyDef,
           scaled.scaledMdef,
           false
         );
@@ -537,7 +544,7 @@ export function DamageCalculator() {
     });
 
     const hitRate = activeAttackMode === "物理"
-      ? calcHitRate(effLuck, scaled.scaledLuck)
+      ? calcHitRate(effLuck, effEnemyLuck)
       : null;
 
     const overkillThreshold = scaled.hp * 10;
@@ -552,19 +559,19 @@ export function DamageCalculator() {
 
     let overkillStatNeeded: number;
     if (activeAttackMode === "物理") {
-      overkillStatNeeded = calcAtkForKill(scaled.hp * 10, scaled.scaledDef, scaled.scaledMdef, selfToEnemyAffinity, overkillHitCount, 1);
+      overkillStatNeeded = calcAtkForKill(scaled.hp * 10, effEnemyDef, scaled.scaledMdef, selfToEnemyAffinity, overkillHitCount, 1);
     } else if (activeAttackMode === "魔法") {
       // ペット魔法: INT×1.25、多段なし
-      overkillStatNeeded = calcIntForKill(scaled.hp * 10, scaled.scaledDef, scaled.scaledMdef, selfToEnemyAffinity, 1.0, 0, 1, 1.0);
+      overkillStatNeeded = calcIntForKill(scaled.hp * 10, effEnemyDef, scaled.scaledMdef, selfToEnemyAffinity, 1.0, 0, 1, 1.0);
     } else {
       // 魔弾: INT×1.75
-      const effectiveDef = calcEffectiveDef(scaled.scaledDef, scaled.scaledMdef, false);
+      const effectiveDef = calcEffectiveDef(effEnemyDef, scaled.scaledMdef, false);
       const requiredBase = (scaled.hp * 10) / 4 / selfToEnemyAffinity / 0.9 / overkillHitCount;
       overkillStatNeeded = Math.max(Math.ceil((requiredBase / activeCrystalCubeFinalMult + effectiveDef) / (1.75 * activeCrystalCubePreMult)), 0);
     }
 
-    const requiredLuck = activeAttackMode === "物理" ? scaled.scaledLuck : null;
-    const luckShortfall = activeAttackMode === "物理" ? Math.max(scaled.scaledLuck - effLuck, 0) : null;
+    const requiredLuck = activeAttackMode === "物理" ? effEnemyLuck : null;
+    const luckShortfall = activeAttackMode === "物理" ? Math.max(effEnemyLuck - effLuck, 0) : null;
 
     return { mode: activeAttackMode as "物理" | "魔法" | "魔弾", dmg, multiHit: effectiveMultiHit, hitsToKill, minStat, targetStats, hitRate, overkillGuaranteed, overkillPossible, overkillStatNeeded, requiredLuck, luckShortfall };
   }, [
@@ -579,6 +586,8 @@ export function DamageCalculator() {
     activeCrystalCubePreMult,
     activeCrystalCubeFinalMult,
     physOverkillMultiHit,
+    woodMagicEffect,
+    darkMagicEffect,
   ]);
 
   // ===== 被ダメージ計算 =====
@@ -643,9 +652,10 @@ export function DamageCalculator() {
       comparisonMonsters,
       { atk: effAtk, int: effInt, spd: effSpd, luck: effLuck, element: effElement },
       activeAttackMode,
-      { magicBaseInt: activeMagicBaseInt, crystalCubePreMult: activeCrystalCubePreMult, crystalCubeFinalMult: activeCrystalCubeFinalMult }
+      { magicBaseInt: activeMagicBaseInt, crystalCubePreMult: activeCrystalCubePreMult, crystalCubeFinalMult: activeCrystalCubeFinalMult },
+      { woodMagicEffect, darkMagicEffect }
     );
-  }, [comparisonActive, comparisonMonsters, effAtk, effInt, effSpd, effLuck, effElement, activeAttackMode, activeMagicBaseInt, activeCrystalCubePreMult, activeCrystalCubeFinalMult]);
+  }, [comparisonActive, comparisonMonsters, effAtk, effInt, effSpd, effLuck, effElement, activeAttackMode, activeMagicBaseInt, activeCrystalCubePreMult, activeCrystalCubeFinalMult, woodMagicEffect, darkMagicEffect]);
 
   const defensiveComparison = useMemo(() => {
     if (!comparisonActive || comparisonMonsters.length === 0) return null;
@@ -1204,7 +1214,14 @@ export function DamageCalculator() {
             </div>
             <div className="flex flex-col">
               <span className="text-xs text-gray-400">DEF</span>
-              <span className="text-sm font-semibold text-gray-700">{scaled.scaledDef.toLocaleString()}</span>
+              {woodMagicEffect ? (
+                <span className="text-sm font-semibold text-green-600">
+                  {Math.floor(scaled.scaledDef / 2).toLocaleString()}
+                  <span className="text-xs font-normal ml-1 line-through text-gray-400">{scaled.scaledDef.toLocaleString()}</span>
+                </span>
+              ) : (
+                <span className="text-sm font-semibold text-gray-700">{scaled.scaledDef.toLocaleString()}</span>
+              )}
               <span className="text-xs text-gray-400">({scaled.def})</span>
             </div>
             <div className="flex flex-col">
@@ -1219,7 +1236,14 @@ export function DamageCalculator() {
             </div>
             <div className="flex flex-col">
               <span className="text-xs text-gray-400">LUCK</span>
-              <span className="text-sm font-semibold text-gray-700">{scaled.scaledLuck.toLocaleString()}</span>
+              {darkMagicEffect ? (
+                <span className="text-sm font-semibold text-purple-600">
+                  {Math.floor(scaled.scaledLuck / 2).toLocaleString()}
+                  <span className="text-xs font-normal ml-1 line-through text-gray-400">{scaled.scaledLuck.toLocaleString()}</span>
+                </span>
+              ) : (
+                <span className="text-sm font-semibold text-gray-700">{scaled.scaledLuck.toLocaleString()}</span>
+              )}
               <span className="text-xs text-gray-400">({scaled.luck})</span>
             </div>
             <div className="flex flex-col">
@@ -1228,6 +1252,31 @@ export function DamageCalculator() {
                 {(Math.max(Math.floor(Math.pow(monsterLevel, 1.1) * 0.2), 1) * scaled.exp).toLocaleString()}
               </span>
             </div>
+          </div>
+          {/* 魔法デバフトグル */}
+          <div className="flex gap-2 mt-3 pt-3 border-t border-gray-100">
+            <button
+              onClick={() => setWoodMagicEffect(!woodMagicEffect)}
+              className={`text-xs px-2 py-1 rounded border transition-colors ${
+                woodMagicEffect
+                  ? "bg-green-100 border-green-300 text-green-700 font-medium"
+                  : "bg-gray-50 border-gray-200 text-gray-400"
+              }`}
+              title="木魔法デバフ：敵のDEFが半減"
+            >
+              木魔法 DEF×½
+            </button>
+            <button
+              onClick={() => setDarkMagicEffect(!darkMagicEffect)}
+              className={`text-xs px-2 py-1 rounded border transition-colors ${
+                darkMagicEffect
+                  ? "bg-purple-100 border-purple-300 text-purple-700 font-medium"
+                  : "bg-gray-50 border-gray-200 text-gray-400"
+              }`}
+              title="闇魔法デバフ：敵のLUKが半減"
+            >
+              闇魔法 LUK×½
+            </button>
           </div>
         </div>
       )}
