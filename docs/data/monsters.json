@@ -2003,7 +2003,8 @@
     "mov": 22,
     "captureRate": 0.1,
     "exp": 36,
-    "gold": 20000
+    "gold": 20000,
+    "magicImmune": true
   },
   {
     "name": "トリカゴドリ",
@@ -2054,7 +2055,8 @@
     "mov": 0,
     "captureRate": 0.1,
     "exp": 621200,
-    "gold": 220000
+    "gold": 220000,
+    "magicImmune": true
   },
   {
     "name": "オコォーン",

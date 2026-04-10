@@ -1182,6 +1182,9 @@ export function DamageCalculator() {
             <span className="text-sm bg-gray-100 text-gray-600 px-2 py-0.5 rounded-lg font-medium">Lv{monsterLevel.toLocaleString()}</span>
             <span className={`text-sm px-2 py-0.5 rounded-lg border font-medium ${elementColors[scaled.element]}`}>{t(`game:element.${scaled.element}`)}</span>
             <span className="text-sm bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-lg font-medium">{t(`game:attackType.${scaled.attackType}`)}</span>
+            {scaled.magicImmune && (
+              <span className="text-sm px-2 py-0.5 rounded-lg font-bold bg-purple-100 text-purple-600 border border-purple-200">魔法無効</span>
+            )}
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-2">
             <div className="flex flex-col">
@@ -1255,9 +1258,17 @@ export function DamageCalculator() {
                     {selfToEnemyAffinity > 1 ? `${t("weakness")} ×1.2` : selfToEnemyAffinity < 1 ? `${t("resistance")} ×0.8` : `${t("normal")} ×1.0`}
                   </span>
                 </div>
+                {scaled!.magicImmune && (
+                  <div className="flex items-center gap-2 px-3 py-2 mb-2 rounded-xl bg-purple-50 border border-purple-200">
+                    <span className="text-purple-500 text-base">🚫</span>
+                    <span className="text-sm font-bold text-purple-700">この敵は魔法が無効です（ダメージ 0）</span>
+                  </div>
+                )}
                 {hasMyOffenseStats ? (
                   <div className="grid grid-cols-[1fr_auto_auto_auto] gap-y-1.5 gap-x-1">
-                    {offensiveResult.spellResults.map(({ spell, dmg, totalMin, totalMax, hitsToKill, overkillGuaranteed, overkillPossible, overkillStatNeeded, overkillCubesNeeded }) => (
+                    {offensiveResult.spellResults.map(({ spell, dmg, totalMin, totalMax, hitsToKill, overkillGuaranteed, overkillPossible, overkillStatNeeded, overkillCubesNeeded }) => {
+                      const effectivelyNullified = dmg.isNullified || !!scaled!.magicImmune;
+                      return (
                       <div key={spell.name} className="col-span-4 grid grid-cols-subgrid bg-white/60 rounded-lg py-1.5">
                         <div className="col-span-4 flex items-center gap-1 mb-1 px-2">
                           <span className={`text-xs px-1 py-0.5 rounded border font-medium ${elementColors[spell.element]}`}>{t(`game:element.${spell.element}`)}</span>
@@ -1265,14 +1276,14 @@ export function DamageCalculator() {
                           <span className="text-xs text-gray-400">
                             ×{spell.multiplier}{spell.hits > 1 ? ` / ${spell.hits}${t("hits")}` : ""}
                           </span>
-                          {!dmg.isNullified && (overkillGuaranteed || overkillPossible) && (
+                          {!effectivelyNullified && (overkillGuaranteed || overkillPossible) && (
                             <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold tracking-wide ${
                               overkillGuaranteed ? "bg-orange-500 text-white" : "bg-orange-100 text-orange-600"
                             }`}>
                               {overkillGuaranteed ? "OVERKILL!" : "OVERKILL?"}
                             </span>
                           )}
-                          {!dmg.isNullified && (
+                          {!effectivelyNullified && (
                             <span className={`ml-auto text-sm font-bold px-2 py-0.5 rounded-full ${
                               hitsToKill === 1 ? "bg-green-100 text-green-700" :
                               hitsToKill <= 3 ? "bg-yellow-100 text-yellow-700" :
@@ -1282,8 +1293,10 @@ export function DamageCalculator() {
                             </span>
                           )}
                         </div>
-                        {dmg.isNullified ? (
-                          <span className="col-span-4 text-xs text-gray-400 px-2">{t("cannotPenetrate")}</span>
+                        {effectivelyNullified ? (
+                          <span className="col-span-4 text-xs text-purple-500 font-semibold px-2">
+                            {scaled!.magicImmune ? "魔法無効（ダメージ 0）" : t("cannotPenetrate")}
+                          </span>
                         ) : (
                           <>
                             <span className="pl-2 text-sm font-bold text-green-600 tabular-nums text-right self-center">{totalMin.toLocaleString()}</span>
@@ -1291,7 +1304,7 @@ export function DamageCalculator() {
                             <span className="pr-2 text-sm font-bold text-green-600 tabular-nums text-right self-center">{totalMax.toLocaleString()}</span>
                           </>
                         )}
-                        {!dmg.isNullified && (
+                        {!effectivelyNullified && (
                           <div className="col-span-4 flex flex-col items-end gap-0.5 px-2 pt-0.5">
                             <div className="flex items-center gap-1">
                               {overkillGuaranteed ? (
@@ -1323,7 +1336,7 @@ export function DamageCalculator() {
                           </div>
                         )}
                       </div>
-                    ))}
+                    ); })}
                   </div>
                 ) : (
                   <p className="text-xs text-gray-400">{t("enterIntForDamage")}</p>

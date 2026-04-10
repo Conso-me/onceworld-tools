@@ -175,7 +175,12 @@ export function EnemyPresetModal({
                         )}
                       </span>
                     )}
-                    <span className="flex-1 font-semibold text-gray-900 text-sm group-hover:text-indigo-700">{preset.monsterName ?? t("game:unknownName")}</span>
+                    <span className="flex-1 font-semibold text-gray-900 text-sm group-hover:text-indigo-700 flex items-center gap-1.5">
+                      {preset.monsterName ?? t("game:unknownName")}
+                      {preset.magicImmune && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-600 font-bold flex-shrink-0">魔法無効</span>
+                      )}
+                    </span>
                     <span className="w-28 text-right text-sm font-mono font-semibold text-indigo-600">{preset.level.toLocaleString()}</span>
                     <span className="w-44 text-right text-sm text-gray-700">{preset.location}</span>
                   </div>
@@ -194,7 +199,12 @@ export function EnemyPresetModal({
                       </span>
                     )}
                     <div className="min-w-0 flex-1">
-                      <div className="font-semibold text-gray-900 text-sm group-hover:text-indigo-700">{preset.monsterName ?? t("game:unknownName")}</div>
+                      <div className="font-semibold text-gray-900 text-sm group-hover:text-indigo-700 flex items-center gap-1.5">
+                        {preset.monsterName ?? t("game:unknownName")}
+                        {preset.magicImmune && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-600 font-bold flex-shrink-0">魔法無効</span>
+                        )}
+                      </div>
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="text-xs font-mono font-semibold text-indigo-600">Lv {preset.level.toLocaleString()}</span>
                         <span className="text-xs text-gray-500">{preset.location}</span>

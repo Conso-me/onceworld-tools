@@ -2,6 +2,7 @@ export interface EnemyPreset {
   monsterName: string | null; // null = 名称不明
   level: number;
   location: string;
+  magicImmune?: boolean;
 }
 
 export interface EnemyPresetGroup {
@@ -44,7 +45,7 @@ export const enemyPresetGroups: EnemyPresetGroup[] = [
       { monsterName: "残燃モエコ",         level: 95000,  location: "循環宇宙３・右" },
       { monsterName: "ドラゴンヘッド",     level: 95000,  location: "循環宇宙３・右" },
       { monsterName: "ラッキーヒトデ",     level: 98000,  location: "循環宇宙３・下" },
-      { monsterName: "動く石碑",           level: 98000,  location: "循環宇宙３・下・レア出現" },
+      { monsterName: "動く石碑",           level: 98000,  location: "循環宇宙３・下・レア出現", magicImmune: true },
       { monsterName: "捧げし者",           level: 144444, location: "循環宇宙３・右下" },
       { monsterName: "黎明神トモダチ",     level: 144444, location: "循環宇宙３・右下" },
     ],
@@ -72,9 +73,9 @@ export const enemyPresetGroups: EnemyPresetGroup[] = [
       { monsterName: "黙示木",             level: 390000, location: "循環宇宙最深部・左右の小部屋" },
       { monsterName: "雷大王イカ",         level: 390000, location: "循環宇宙最深部・左右の小部屋" },
       { monsterName: "グラビティスライム", level: 390000, location: "循環宇宙最深部・左右の小部屋" },
-      { monsterName: "動く石碑",           level: 310000, location: "循環宇宙最深部・レア出現" },
-      { monsterName: "動く石碑",           level: 365000, location: "循環宇宙最深部・レア出現" },
-      { monsterName: "動く石碑",           level: 390000, location: "循環宇宙最深部・レア出現" },
+      { monsterName: "動く石碑",           level: 310000, location: "循環宇宙最深部・レア出現", magicImmune: true },
+      { monsterName: "動く石碑",           level: 365000, location: "循環宇宙最深部・レア出現", magicImmune: true },
+      { monsterName: "動く石碑",           level: 390000, location: "循環宇宙最深部・レア出現", magicImmune: true },
       { monsterName: "ドラゴンヘッド",     level: 580000, location: "循環宇宙最深部・ボス部屋" },
       { monsterName: "黙示木",             level: 650000, location: "循環宇宙最深部・ボス部屋" },
       { monsterName: "鉄壁要塞パルテノン", level: 680000, location: "循環宇宙最深部・ボス" },
@@ -119,7 +120,7 @@ export const enemyPresetGroups: EnemyPresetGroup[] = [
       { monsterName: "オコスター",       level: 350000,   location: "太古の中庭" },
       { monsterName: "オコォーン",       level: 350000,   location: "太古の中庭・レア出現" },
       { monsterName: "黙示木",           level: 810000,   location: "太古の中庭" },
-      { monsterName: "根界獣ドルグラント", level: 1280000, location: "太古の中庭・ボス" },
+      { monsterName: "根界獣ドルグラント", level: 1280000, location: "太古の中庭・ボス", magicImmune: true },
     ],
   },
   // ---- 深淵回廊 ----
