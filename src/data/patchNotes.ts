@@ -15,6 +15,8 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-04-11",
     changes: [
+    { type: "improve", text: "fix: テキストコピーのステータスをラベル・数値ともに右揃えに変更" },
+    { type: "improve", text: "fix: テキストコピーのステータスを縦並びに変更" },
     { type: "feature", text: "feat: 装備・ステータス一括確認モーダルを追加" },
     { type: "feature", text: "feat: 木魔法・闇魔法のデバフ効果をダメージ計算に反映するトグルを追加" },
     ],
