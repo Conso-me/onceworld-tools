@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-04-11",
+    changes: [
+    { type: "feature", text: "feat: 木魔法・闇魔法のデバフ効果をダメージ計算に反映するトグルを追加" },
+    ],
+  },
+
+  {
     date: "2026-04-10",
     changes: [
     { type: "improve", text: "fix: 敵プリセットモーダルのPC表示幅を拡張してモンスター名を広げる" },
