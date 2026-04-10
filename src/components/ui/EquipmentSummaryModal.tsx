@@ -13,13 +13,6 @@ function fmt(n: number) {
   return n.toLocaleString("ja-JP");
 }
 
-function EnhBadge({ enh, canEnhance }: { enh: number; canEnhance: boolean }) {
-  if (!canEnhance) return null;
-  return (
-    <span className="text-gray-400 text-xs ml-1">+{enh}</span>
-  );
-}
-
 function ItemRow({ label, name, enh, canEnhance }: {
   label: string;
   name: string;
@@ -27,14 +20,16 @@ function ItemRow({ label, name, enh, canEnhance }: {
   canEnhance?: boolean;
 }) {
   return (
-    <div className="flex items-baseline gap-1.5 text-xs">
+    <div className="flex items-baseline text-xs gap-2">
       <span className="text-gray-400 w-8 shrink-0">{label}</span>
       {name
         ? <>
-            <span className="text-gray-800 font-medium">{name}</span>
-            {enh !== undefined && <EnhBadge enh={enh} canEnhance={canEnhance ?? true} />}
+            <span className="text-gray-800 font-medium flex-1 min-w-0 truncate">{name}</span>
+            {enh !== undefined && (canEnhance ?? true) && (
+              <span className="text-gray-400 shrink-0">+{enh}</span>
+            )}
           </>
-        : <span className="text-gray-300">-</span>
+        : <span className="text-gray-300 flex-1">-</span>
       }
     </div>
   );
@@ -220,14 +215,14 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
             <SectionHeader>アクセサリー</SectionHeader>
             <div className="space-y-1">
               {accSlots.map((s, i) => (
-                <div key={i} className="flex items-baseline gap-1.5 text-xs">
+                <div key={i} className="flex items-baseline gap-2 text-xs">
                   <span className="text-gray-400 w-8 shrink-0">{i + 1}</span>
                   {s.name
                     ? <>
-                        <span className="text-gray-800 font-medium">{s.name}</span>
-                        <span className="text-gray-400 ml-1">Lv.{s.level}</span>
+                        <span className="text-gray-800 font-medium flex-1 min-w-0 truncate">{s.name}</span>
+                        <span className="text-gray-400 shrink-0">Lv.{s.level}</span>
                       </>
-                    : <span className="text-gray-300">-</span>
+                    : <span className="text-gray-300 flex-1">-</span>
                   }
                 </div>
               ))}
@@ -239,14 +234,14 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
             <SectionHeader>ペット</SectionHeader>
             <div className="space-y-1">
               {petSlots.map((s, i) => (
-                <div key={i} className="flex items-baseline gap-1.5 text-xs">
+                <div key={i} className="flex items-baseline gap-2 text-xs">
                   <span className="text-gray-400 w-8 shrink-0">{i + 1}</span>
                   {s.name
                     ? <>
-                        <span className="text-gray-800 font-medium">{s.name}</span>
-                        <span className="text-gray-400 ml-1">Lv.{s.level}</span>
+                        <span className="text-gray-800 font-medium flex-1 min-w-0 truncate">{s.name}</span>
+                        <span className="text-gray-400 shrink-0">Lv.{s.level}</span>
                       </>
-                    : <span className="text-gray-300">-</span>
+                    : <span className="text-gray-300 flex-1">-</span>
                   }
                 </div>
               ))}
