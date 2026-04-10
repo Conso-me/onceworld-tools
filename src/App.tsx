@@ -5,6 +5,7 @@ import { FarmCalculator } from "./components/FarmCalculator";
 import { StatusSimulator } from "./components/StatusSimulator";
 import { ArenaCalculator } from "./components/ArenaCalculator";
 import { MonsterEditor } from "./components/MonsterEditor";
+import { PetSimulator } from "./components/PetSimulator";
 import { TabNav, type Tab } from "./components/ui/TabNav";
 import { PatchNotesModal } from "./components/PatchNotesModal";
 
@@ -15,6 +16,7 @@ function App() {
     { id: "damage", label: t("tabs.damage"), shortLabel: t("tabs.damageShort"), icon: "⚔" },
     { id: "arena", label: t("tabs.arena"), icon: "🏟" },
     { id: "status", label: t("tabs.status"), shortLabel: t("tabs.statusShort"), icon: "✦" },
+    { id: "pet", label: t("tabs.pet"), shortLabel: t("tabs.petShort"), icon: "🐾" },
     { id: "farm", label: t("tabs.farm"), shortLabel: t("tabs.farmShort"), icon: "♻" },
     { id: "monsters", label: t("tabs.monsters"), shortLabel: t("tabs.monstersShort"), icon: "📋" },
   ];
@@ -136,6 +138,9 @@ function App() {
         </div>
         <div className={activeTab === "arena" ? "" : "hidden"}>
           <ArenaCalculator />
+        </div>
+        <div className={activeTab === "pet" ? "" : "hidden"}>
+          <PetSimulator />
         </div>
         <div className={activeTab === "monsters" ? "" : "hidden"}>
           <MonsterEditor />
