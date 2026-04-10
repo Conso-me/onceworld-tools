@@ -416,8 +416,9 @@ export function DamageCalculator() {
           )
         );
         const overkillThreshold = scaled.hp * 10;
-        const overkillGuaranteed = !dmg.isNullified && totalMin >= overkillThreshold;
-        const overkillPossible = !dmg.isNullified && totalMax >= overkillThreshold;
+        // オーバーキルは1発でHP×10以上が必要。多段魔法（火魔法等）でも合計ではなく1発で判定
+        const overkillGuaranteed = !dmg.isNullified && dmg.min >= overkillThreshold;
+        const overkillPossible = !dmg.isNullified && dmg.max >= overkillThreshold;
         const overkillStatNeeded = calcIntForKill(
           scaled.hp * 10,
           scaled.scaledDef,
@@ -425,7 +426,7 @@ export function DamageCalculator() {
           selfToEnemyAffinity,
           effectiveMult,
           activeMagicBaseInt,
-          spell.hits,
+          1,
           activeCrystalCubeFinalMult
         );
         // 現在のINTでOverKillするのに必要な魔晶立方体の最小数（0〜1000）
