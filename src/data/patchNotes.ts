@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-04-11",
     changes: [
+    { type: "improve", text: "fix: 装備サマリーのコンテンツ幅を60%に制限" },
     { type: "improve", text: "fix: 装備サマリーの名前を左揃え・強化値/レベルを右揃えに変更" },
     { type: "improve", text: "fix: テキストコピーのステータスをラベル・数値ともに右揃えに変更" },
     { type: "improve", text: "fix: テキストコピーのステータスを縦並びに変更" },
