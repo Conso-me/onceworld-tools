@@ -93,7 +93,8 @@ export function calcOffensiveComparison(
         const totalMin = dmg.isNullified ? spell.hits : dmg.min * spell.hits;
         const totalMax = dmg.isNullified ? 9 * spell.hits : dmg.max * spell.hits;
         const hitsToKill = calcHitsToKill(scaled.hp, dmg.isNullified ? 1 : dmg.min, spell.hits);
-        const overkillGuaranteed = !dmg.isNullified && totalMin >= scaled.hp * 10;
+        // オーバーキルは1発でHP×10以上が必要。多段魔法（火魔法等）でも合計ではなく1発で判定
+        const overkillGuaranteed = !dmg.isNullified && dmg.min >= scaled.hp * 10;
         const overkillStatNeeded = calcIntForKill(
           scaled.hp * 10,
           scaled.scaledDef,
@@ -101,7 +102,7 @@ export function calcOffensiveComparison(
           affinity,
           effectiveMult,
           magicParams.magicBaseInt,
-          spell.hits,
+          1,
           magicParams.crystalCubeFinalMult
         );
         return { spell, dmg, totalMin, totalMax, hitsToKill, overkillGuaranteed, overkillStatNeeded };
