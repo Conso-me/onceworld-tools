@@ -78,6 +78,39 @@ function findHighestStatKey(
   return bestKey;
 }
 
+/**
+ * For each stat, find the minimum level for petB config to reach or exceed resultA's stat value.
+ * Returns null for a stat if even level 1200 cannot reach the target.
+ */
+export function findEquivalentLevels(
+  resultA: PetStatResult,
+  cfgB: PetDamageConfig,
+  monsterB: MonsterBase,
+): Record<StatKey, number | null> {
+  const result = {} as Record<StatKey, number | null>;
+  const maxResult = calcPetStats({ ...cfgB, petLevel: 1200 }, monsterB);
+
+  for (const key of STAT_KEYS) {
+    const targetStat = resultA.final[key];
+    if (maxResult.final[key] < targetStat) {
+      result[key] = null;
+      continue;
+    }
+    let lo = 1, hi = 1200;
+    while (lo < hi) {
+      const mid = Math.floor((lo + hi) / 2);
+      const midResult = calcPetStats({ ...cfgB, petLevel: mid }, monsterB);
+      if (midResult.final[key] >= targetStat) {
+        hi = mid;
+      } else {
+        lo = mid + 1;
+      }
+    }
+    result[key] = lo;
+  }
+  return result;
+}
+
 export function calcPetStats(config: PetDamageConfig, monsterBase: MonsterBase): PetStatResult {
   const maxLevel = 1200;
   const level = Math.min(config.petLevel, maxLevel);

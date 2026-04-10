@@ -11,7 +11,9 @@
     "farm": "周回計算",
     "farmShort": "周回計",
     "monsters": "モンスター登録",
-    "monstersShort": "図鑑"
+    "monstersShort": "図鑑",
+    "pet": "ペットシミュ",
+    "petShort": "ペット"
   },
   "preparing": "準備中",
   "add": "追加",

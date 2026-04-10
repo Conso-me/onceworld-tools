@@ -11,7 +11,9 @@
     "farm": "Farming",
     "farmShort": "Farm",
     "monsters": "Monster Editor",
-    "monstersShort": "MON"
+    "monstersShort": "MON",
+    "pet": "Pet Sim",
+    "petShort": "Pet"
   },
   "preparing": "Coming Soon",
   "add": "Add",
