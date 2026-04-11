@@ -142,7 +142,7 @@ export function EnemyPresetModal({
               {multiSelect && <span className="w-6" />}
               <span className="flex-1 text-xs font-bold text-gray-600 uppercase tracking-wide">{t("game:name")}</span>
               <span className="w-28 text-right text-xs font-bold text-gray-600 uppercase tracking-wide">{t("game:level")}</span>
-              <span className="w-44 text-right text-xs font-bold text-gray-600 uppercase tracking-wide">{t("game:location")}</span>
+              <span className="w-56 text-right text-xs font-bold text-gray-600 uppercase tracking-wide">{t("game:location")}</span>
             </div>
             {group?.presets.map((preset, pi) => {
               const isChecked = multiSelect && comparisonKeys?.has(presetKey(preset));
@@ -182,7 +182,7 @@ export function EnemyPresetModal({
                       )}
                     </span>
                     <span className="w-28 text-right text-sm font-mono font-semibold text-indigo-600">{preset.level.toLocaleString()}</span>
-                    <span className="w-44 text-right text-sm text-gray-700">{preset.location}</span>
+                    <span className="w-56 text-right text-sm text-gray-700">{preset.location}</span>
                   </div>
                   <div className="sm:hidden flex items-center gap-2">
                     {multiSelect && (
