@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-04-12",
+    changes: [
+    { type: "fix", text: "fix: 裏路地シミュの「ダメ計と同期」が最新値を反映しないバグを修正" },
+    ],
+  },
+
+  {
     date: "2026-04-11",
     changes: [
     { type: "improve", text: "fix: 敵プリセットモーダルの出現場所列幅を拡張（w-44→w-56）" },
