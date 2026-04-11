@@ -266,6 +266,13 @@ export function ArenaCalculator() {
   const [mySpd, setMySpd] = usePersistedState("arena:spd", "");
   const [syncWithDmg, setSyncWithDmg] = usePersistedState("arena:sync", false);
   const [syncMode, setSyncMode] = usePersistedState<"manual" | "sim">("arena:syncMode", "manual");
+  // ダメ計タブの手動入力値をリアクティブに読み取る（同期ON時に使用）
+  const [dmgDef] = usePersistedState("dmg:def", "");
+  const [dmgMdef] = usePersistedState("dmg:mdef", "");
+  const [dmgVit] = usePersistedState("dmg:vit", "");
+  const [dmgLuck] = usePersistedState("dmg:luck", "");
+  const [dmgAtk] = usePersistedState("dmg:atk", "");
+  const [dmgSpd] = usePersistedState("dmg:spd", "");
   const [simCfg] = useSharedSimConfig();
   const simResult = useMemo(() => calcStatus(simCfg), [simCfg]);
   const [arenaLevel, setArenaLevel] = usePersistedState(
@@ -279,32 +286,32 @@ export function ArenaCalculator() {
   const effectiveDef = syncWithDmg
     ? syncMode === "sim"
       ? simResult.final.def
-      : parseInt(JSON.parse(localStorage.getItem("owt:dmg:def") ?? '""') || "0") || 0
+      : parseInt(dmgDef) || 0
     : parseInt(myDef) || 0;
   const effectiveMdef = syncWithDmg
     ? syncMode === "sim"
       ? simResult.final.mdef
-      : parseInt(JSON.parse(localStorage.getItem("owt:dmg:mdef") ?? '""') || "0") || 0
+      : parseInt(dmgMdef) || 0
     : parseInt(myMdef) || 0;
   const effectiveVit = syncWithDmg
     ? syncMode === "sim"
       ? simResult.final.vit
-      : parseInt(JSON.parse(localStorage.getItem("owt:dmg:vit") ?? '""') || "0") || 0
+      : parseInt(dmgVit) || 0
     : parseInt(myVit) || 0;
   const effectiveLuk = syncWithDmg
     ? syncMode === "sim"
       ? simResult.final.luck
-      : parseInt(JSON.parse(localStorage.getItem("owt:dmg:luck") ?? '""') || "0") || 0
+      : parseInt(dmgLuck) || 0
     : parseInt(myLuk) || 0;
   const effectiveAtk = syncWithDmg
     ? syncMode === "sim"
       ? simResult.final.atk
-      : parseInt(JSON.parse(localStorage.getItem("owt:dmg:atk") ?? '""') || "0") || 0
+      : parseInt(dmgAtk) || 0
     : parseInt(myAtk) || 0;
   const effectiveSpd = syncWithDmg
     ? syncMode === "sim"
       ? simResult.final.spd
-      : parseInt(JSON.parse(localStorage.getItem("owt:dmg:spd") ?? '""') || "0") || 0
+      : parseInt(dmgSpd) || 0
     : parseInt(mySpd) || 0;
 
   const playerHp = effectiveVit > 0 ? effectiveVit * 18 + 100 : 0;
