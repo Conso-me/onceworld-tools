@@ -13,6 +13,15 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-04-13",
+    changes: [
+    { type: "improve", text: "fix: ペットスキルの？を正しいタイプに更新" },
+    { type: "fix", text: "fix: accCategory/petCategoryの翻訳キー不足を修正" },
+    { type: "feature", text: "feat: アクセ・ペットの分類に経験値/捕獲率/ドロップ率/MOV/HP回復を追加" },
+    ],
+  },
+
+  {
     date: "2026-04-12",
     changes: [
     { type: "feature", text: "feat: 装備サマリーにキャラクター情報セクションを追加" },
