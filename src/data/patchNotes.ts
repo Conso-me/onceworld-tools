@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-04-12",
     changes: [
+    { type: "feature", text: "feat: 装備サマリーにキャラクター情報セクションを追加" },
     { type: "feature", text: "feat: PWAオフライン対応を追加" },
     { type: "fix", text: "fix: 裏路地シミュの「ダメ計と同期」が最新値を反映しないバグを修正" },
     ],
