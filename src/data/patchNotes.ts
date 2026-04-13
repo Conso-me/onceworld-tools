@@ -15,6 +15,9 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-04-13",
     changes: [
+    { type: "improve", text: "fix: OKライン数値を削除、オレンジ背景+グレー文字に変更" },
+    { type: "improve", text: "fix: オーバーキル表示のコントラスト改善" },
+    { type: "improve", text: "fix: オーバーキルラインの視認性を改善" },
     { type: "improve", text: "fix: ペットスキルの？を正しいタイプに更新" },
     { type: "fix", text: "fix: accCategory/petCategoryの翻訳キー不足を修正" },
     { type: "feature", text: "feat: アクセ・ペットの分類に経験値/捕獲率/ドロップ率/MOV/HP回復を追加" },
