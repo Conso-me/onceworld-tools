@@ -110,7 +110,8 @@ export function DamageCalculator() {
   const [physOverkillMultiHit, setPhysOverkillMultiHit] = usePersistedState("dmg:physOverkillMultiHit", false);
   // オーバーキルスプラッシュ
   const [showOverkillSplash, setShowOverkillSplash] = useState(false);
-  const [splashStatText, setSplashStatText] = useState("");
+  const [splashStatLabel, setSplashStatLabel] = useState("");
+  const [splashStatValue, setSplashStatValue] = useState(0);
   const prevOverkillRef = useRef(false);
   // 魔法デバフ: 木魔法→DEF半減、闇魔法→LUK半減
   const [woodMagicEffect, setWoodMagicEffect] = usePersistedState("dmg:woodMagicEffect", false);
@@ -602,9 +603,8 @@ export function DamageCalculator() {
       ? offensiveResult.spellResults.some(r => r.overkillGuaranteed)
       : offensiveResult.overkillGuaranteed;
     if (isOk && !prevOverkillRef.current) {
-      const statLabel = offensiveResult.mode === "物理" ? "ATK" : "INT";
-      const statVal = offensiveResult.mode === "物理" ? effAtk : effInt;
-      setSplashStatText(`${statLabel}  ${statVal.toLocaleString()}`);
+      setSplashStatLabel(offensiveResult.mode === "物理" ? "ATK" : "INT");
+      setSplashStatValue(offensiveResult.mode === "物理" ? effAtk : effInt);
       setShowOverkillSplash(true);
     }
     prevOverkillRef.current = isOk;
@@ -1861,7 +1861,8 @@ export function DamageCalculator() {
       )}
       <OverkillSplash
         show={showOverkillSplash}
-        statText={splashStatText}
+        statLabel={splashStatLabel}
+        statValue={splashStatValue}
         onDismiss={() => setShowOverkillSplash(false)}
       />
     </div>
