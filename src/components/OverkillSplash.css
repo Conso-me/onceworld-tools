@@ -1,0 +1,119 @@
+@keyframes ok-zoom {
+  0%   { transform: scale(0.05) rotate(-4deg); opacity: 0; }
+  55%  { transform: scale(1.18) rotate(1.5deg); opacity: 1; }
+  72%  { transform: scale(0.94) rotate(-0.5deg); }
+  85%  { transform: scale(1.04) rotate(0deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+@keyframes ok-overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes ok-overlay-out {
+  from { opacity: 1; }
+  to   { opacity: 0; pointer-events: none; }
+}
+
+@keyframes ok-glow {
+  0%, 100% {
+    text-shadow:
+      0 0 18px #f97316,
+      0 0 40px #f97316,
+      0 0 80px #ea580c,
+      0 0 140px #dc2626;
+  }
+  50% {
+    text-shadow:
+      0 0 28px #fb923c,
+      0 0 60px #f97316,
+      0 0 110px #dc2626,
+      0 0 200px #b91c1c;
+  }
+}
+
+@keyframes ok-stat-in {
+  0%   { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes ok-sub-blink {
+  0%, 100% { opacity: 0.25; }
+  50%      { opacity: 0.55; }
+}
+
+.ok-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, rgba(30,8,0,0.93) 0%, rgba(0,0,0,0.97) 100%);
+  cursor: pointer;
+  user-select: none;
+}
+
+.ok-overlay.entering {
+  animation: ok-overlay-in 0.12s ease-out forwards;
+}
+
+.ok-overlay.exiting {
+  animation: ok-overlay-out 0.4s ease-in forwards;
+}
+
+/* scanlines */
+.ok-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0,0,0,0.18) 3px,
+    rgba(0,0,0,0.18) 4px
+  );
+  pointer-events: none;
+}
+
+.ok-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  animation: ok-zoom 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.ok-title {
+  font-family: 'Bebas Neue', 'Impact', sans-serif;
+  font-size: clamp(5rem, 20vw, 16rem);
+  line-height: 0.88;
+  color: #fb923c;
+  letter-spacing: 0.03em;
+  -webkit-text-stroke: 2px #fde8d0;
+  animation: ok-glow 1.1s ease-in-out infinite 0.55s;
+  text-shadow:
+    0 0 18px #f97316,
+    0 0 40px #ea580c,
+    0 0 90px #dc2626;
+}
+
+.ok-stat {
+  font-family: 'Bebas Neue', 'Impact', sans-serif;
+  font-size: clamp(1.6rem, 5.5vw, 4.5rem);
+  color: #fed7aa;
+  letter-spacing: 0.18em;
+  opacity: 0;
+  animation: ok-stat-in 0.35s ease-out 0.35s forwards;
+}
+
+.ok-sub {
+  font-family: 'Bebas Neue', 'Impact', sans-serif;
+  font-size: clamp(0.7rem, 1.8vw, 1.1rem);
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 0.35em;
+  margin-top: 2rem;
+  animation: ok-sub-blink 1.4s ease-in-out infinite 1s;
+}

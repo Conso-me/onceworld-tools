@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import type { MonsterBase, Element } from "../types/game";
 import { usePersistedState, usePersistedGroup } from "../hooks/usePersistedState";
@@ -50,6 +50,7 @@ import { StatCard } from "./ui/StatCard";
 import { ResultRow } from "./ui/ResultRow";
 import { ProgressBar } from "./ui/ProgressBar";
 import { MonsterSelector } from "./ui/MonsterSelector";
+import { OverkillSplash } from "./OverkillSplash";
 import { EnemyPresetModal, presetKey } from "./ui/EnemyPresetModal";
 import {
   buildShareUrl,
@@ -107,6 +108,10 @@ export function DamageCalculator() {
   const [crystalCube, setCrystalCube] = usePersistedState("dmg:crystalCube", "");
   // 物理オーバーキル計算に多段攻撃を含めるか（現状ゲーム内では多段でOKが発生しないためデフォルトOFF）
   const [physOverkillMultiHit, setPhysOverkillMultiHit] = usePersistedState("dmg:physOverkillMultiHit", false);
+  // オーバーキルスプラッシュ
+  const [showOverkillSplash, setShowOverkillSplash] = useState(false);
+  const [splashStatText, setSplashStatText] = useState("");
+  const prevOverkillRef = useRef(false);
   // 魔法デバフ: 木魔法→DEF半減、闇魔法→LUK半減
   const [woodMagicEffect, setWoodMagicEffect] = usePersistedState("dmg:woodMagicEffect", false);
   const [darkMagicEffect, setDarkMagicEffect] = usePersistedState("dmg:darkMagicEffect", false);
@@ -589,6 +594,21 @@ export function DamageCalculator() {
     woodMagicEffect,
     darkMagicEffect,
   ]);
+
+  // ===== オーバーキルスプラッシュ =====
+  useEffect(() => {
+    if (!offensiveResult) { prevOverkillRef.current = false; return; }
+    const isOk = offensiveResult.mode === "魔攻"
+      ? offensiveResult.spellResults.some(r => r.overkillGuaranteed)
+      : offensiveResult.overkillGuaranteed;
+    if (isOk && !prevOverkillRef.current) {
+      const statLabel = offensiveResult.mode === "物理" ? "ATK" : "INT";
+      const statVal = offensiveResult.mode === "物理" ? effAtk : effInt;
+      setSplashStatText(`${statLabel}  ${statVal.toLocaleString()}`);
+      setShowOverkillSplash(true);
+    }
+    prevOverkillRef.current = isOk;
+  }, [offensiveResult, effAtk, effInt]);
 
   // ===== 被ダメージ計算 =====
   const defensiveResult = useMemo(() => {
@@ -1839,6 +1859,11 @@ export function DamageCalculator() {
           </div>
         </div>
       )}
+      <OverkillSplash
+        show={showOverkillSplash}
+        statText={splashStatText}
+        onDismiss={() => setShowOverkillSplash(false)}
+      />
     </div>
   );
 }
