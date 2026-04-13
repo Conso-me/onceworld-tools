@@ -85,6 +85,11 @@
     "魔法防御力": "M-DEF",
     "幸運": "LUCK",
     "攻撃速度": "SPD",
+    "経験値": "EXP",
+    "捕獲率": "Capture Rate",
+    "ドロップ率": "Drop Rate",
+    "MOV": "MOV",
+    "HP回復": "HP Regen",
     "その他": "Other"
   },
   "petCategory": {
@@ -98,6 +103,8 @@
     "経験値": "EXP",
     "捕獲率": "Capture Rate",
     "ドロップ率": "Drop Rate",
+    "MOV": "MOV",
+    "HP回復": "HP Regen",
     "その他": "Other"
   },
   "bodyCount": "{{count}}",
