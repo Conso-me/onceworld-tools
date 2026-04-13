@@ -2932,8 +2932,8 @@
       },
       {
         "level": 1200,
-        "type": "？",
-        "value": null
+        "type": "M-DEF%",
+        "value": 290
       }
     ]
   },
@@ -3010,8 +3010,8 @@
       },
       {
         "level": 1200,
-        "type": "？",
-        "value": null
+        "type": "LUCK%",
+        "value": 250
       }
     ]
   },
@@ -3062,8 +3062,8 @@
       },
       {
         "level": 1200,
-        "type": "？",
-        "value": null
+        "type": "MOV",
+        "value": 2
       }
     ]
   },
