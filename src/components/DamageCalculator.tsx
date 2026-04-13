@@ -1355,25 +1355,28 @@ export function DamageCalculator() {
                           </>
                         )}
                         {!effectivelyNullified && (
-                          <div className="col-span-4 flex flex-col items-end gap-0.5 px-2 pt-0.5">
-                            <div className="flex items-center gap-1">
+                          <div className="col-span-4 px-2 pt-0.5 pb-0.5">
+                            <div className={`flex items-center gap-2 text-xs rounded px-1.5 py-1 border-l-2 ${
+                              overkillGuaranteed
+                                ? "border-orange-400 bg-orange-50"
+                                : "border-orange-200 bg-orange-50/50"
+                            }`}>
+                              <span className="font-medium text-orange-600 shrink-0">OKライン</span>
+                              <span className="text-gray-500 tabular-nums shrink-0">{(scaled!.hp * 10).toLocaleString()}</span>
+                              <span className="text-gray-300">|</span>
                               {overkillGuaranteed ? (
-                                <span className="text-xs text-orange-500 font-semibold">
-                                  INT {overkillStatNeeded.toLocaleString()} で達成（+{Math.max(0, effInt - overkillStatNeeded).toLocaleString()} 超過）
+                                <span className="text-orange-500 font-semibold">
+                                  INT {overkillStatNeeded.toLocaleString()} 達成（+{Math.max(0, effInt - overkillStatNeeded).toLocaleString()} 超過）
                                 </span>
                               ) : (
-                                <>
-                                  <span className="text-xs text-gray-400">
-                                    Overkill: INT {overkillStatNeeded.toLocaleString()} 必要
-                                  </span>
-                                  <span className="text-xs text-orange-500 font-semibold">
-                                    (あと +{Math.max(0, overkillStatNeeded - effInt).toLocaleString()})
-                                  </span>
-                                </>
+                                <span className="text-gray-400">
+                                  INT <span className="font-semibold text-gray-600">{overkillStatNeeded.toLocaleString()}</span> 必要
+                                  <span className="text-orange-500 font-semibold ml-1">（あと +{Math.max(0, overkillStatNeeded - effInt).toLocaleString()}）</span>
+                                </span>
                               )}
                             </div>
                             {!overkillGuaranteed && effInt > 0 && (
-                              <div className="flex items-center gap-1">
+                              <div className="flex items-center justify-end gap-1 mt-0.5">
                                 {overkillCubesNeeded === null ? (
                                   <span className="text-xs text-gray-400">魔晶立方体1000個でも不足</span>
                                 ) : (
@@ -1449,9 +1452,9 @@ export function DamageCalculator() {
                         const needed = offensiveResult.overkillStatNeeded;
                         const shortfall = Math.max(0, needed - currentStat);
                         return (
-                          <div className={`flex items-start justify-between py-2 px-3 rounded-lg gap-2 ${offensiveResult.overkillGuaranteed ? "bg-orange-50" : "bg-gray-50"}`}>
+                          <div className="flex items-start justify-between py-2 px-3 rounded-lg gap-2 bg-orange-50 border border-orange-200">
                             <div className="flex flex-col gap-0.5">
-                              <span className={`text-sm font-medium ${offensiveResult.overkillGuaranteed ? "text-orange-700" : "text-gray-500"}`}>Overkill</span>
+                              <span className="text-sm font-medium text-orange-700">Overkill</span>
                               {offensiveResult.mode === "物理" && (
                                 <button
                                   onClick={() => setPhysOverkillMultiHit(!physOverkillMultiHit)}
@@ -1475,6 +1478,9 @@ export function DamageCalculator() {
                                   : "bg-gray-100 text-gray-500"
                               }`}>
                                 {offensiveResult.overkillGuaranteed ? "確定" : offensiveResult.overkillPossible ? "可能性あり" : "不可"}
+                              </span>
+                              <span className="text-xs text-orange-400">
+                                OKライン: {(scaled!.hp * 10).toLocaleString()}
                               </span>
                               {offensiveResult.overkillGuaranteed ? (
                                 <span className="text-xs text-orange-500 font-semibold">
