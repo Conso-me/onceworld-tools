@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSharedSimConfig } from "../../hooks/useSharedSimConfig";
+import { usePersistedState } from "../../hooks/usePersistedState";
 import { calcStatus } from "../../utils/statusCalc";
 import { getEquipmentByName } from "../../data/equipment";
 
@@ -46,6 +47,8 @@ function SectionHeader({ children }: { children: React.ReactNode }) {
 export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
   const [cfg] = useSharedSimConfig();
   const [copied, setCopied] = useState(false);
+  const [crystalCubeRaw] = usePersistedState("dmg:crystalCube", "");
+  const crystalCubeNum = Math.min(parseInt(crystalCubeRaw) || 0, 1000);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -86,7 +89,15 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
     + cfg.allocDef + cfg.allocMdef + cfg.allocLuck;
 
   const buildCopyText = useCallback(() => {
-    const lines: string[] = ["【装備】"];
+    const lines: string[] = [
+      "【キャラクター情報】",
+      `  レベル: ${cfg.charLevel}`,
+      `  天命: ${cfg.reinCount}`,
+      `  属性: ${cfg.charElement}`,
+      `  魔晶立方体: ${crystalCubeNum.toLocaleString("ja-JP")}個`,
+      "",
+      "【装備】",
+    ];
     lines.push(`  武器: ${cfg.equipWeapon || "なし"}${cfg.equipWeapon && weaponCanEnh ? ` +${cfg.enhWeapon}` : ""}`);
     for (const { label, name, enh, item } of armorSlots) {
       const canEnh = item ? item.material !== "強化できない" : true;
@@ -142,7 +153,7 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
     ])) lines.push(l);
 
     return lines.join("\n");
-  }, [cfg, weaponCanEnh, armorSlots, accSlots, petSlots, setBonus, setBonusSeries, allocTotal, final, hp]);
+  }, [cfg, crystalCubeNum, weaponCanEnh, armorSlots, accSlots, petSlots, setBonus, setBonusSeries, allocTotal, final, hp]);
 
   const handleCopy = useCallback(async () => {
     try {
@@ -188,6 +199,29 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
 
         {/* 本体 */}
         <div className="overflow-y-auto flex-1 px-4 py-3 space-y-3">
+          {/* キャラクター情報 */}
+          <div>
+            <SectionHeader>キャラクター情報</SectionHeader>
+            <div className="grid grid-cols-4 gap-x-2 gap-y-1">
+              <div className="flex flex-col items-center bg-gray-50 rounded-lg px-2 py-1">
+                <span className="text-xs text-gray-400">レベル</span>
+                <span className="text-xs font-semibold text-gray-700">{fmt(cfg.charLevel)}</span>
+              </div>
+              <div className="flex flex-col items-center bg-gray-50 rounded-lg px-2 py-1">
+                <span className="text-xs text-gray-400">天命</span>
+                <span className="text-xs font-semibold text-gray-700">{cfg.reinCount}</span>
+              </div>
+              <div className="flex flex-col items-center bg-gray-50 rounded-lg px-2 py-1">
+                <span className="text-xs text-gray-400">属性</span>
+                <span className="text-xs font-semibold text-gray-700">{cfg.charElement}</span>
+              </div>
+              <div className="flex flex-col items-center bg-gray-50 rounded-lg px-2 py-1">
+                <span className="text-xs text-gray-400">魔晶立方体</span>
+                <span className="text-xs font-semibold text-gray-700">{fmt(crystalCubeNum)}個</span>
+              </div>
+            </div>
+          </div>
+
           {/* 装備 */}
           <div>
             <SectionHeader>装備</SectionHeader>
