@@ -62,7 +62,7 @@ const ELEMENTS: Element[] = ["火", "水", "木", "光", "闇"];
 
 const PET_STAT_CATEGORY_ORDER: PetStatCategory[] = [
   "体力", "攻撃力", "魔力", "防御力", "魔法防御力", "幸運", "攻撃速度",
-  "経験値", "捕獲率", "ドロップ率", "その他",
+  "経験値", "捕獲率", "ドロップ率", "MOV", "HP回復", "その他",
 ];
 
 // Computed once — pet data is static
@@ -99,17 +99,22 @@ function getEquipStatSummary(item: EquipmentItem): string {
 
 // ── Accessory grouping ────────────────────────────────────────────────────────
 
-const ACC_CATEGORY_ORDER = ["体力", "攻撃力", "魔力", "防御力", "魔法防御力", "幸運", "攻撃速度", "その他"] as const;
+const ACC_CATEGORY_ORDER = ["体力", "攻撃力", "魔力", "防御力", "魔法防御力", "幸運", "攻撃速度", "経験値", "捕獲率", "ドロップ率", "MOV", "HP回復", "その他"] as const;
 type AccCategory = typeof ACC_CATEGORY_ORDER[number];
 
 function accEffectCat(type: string): AccCategory {
-  if (type.startsWith("VIT"))   return "体力";
-  if (type.startsWith("ATK"))   return "攻撃力";
-  if (type.startsWith("INT"))   return "魔力";
-  if (type.startsWith("M-DEF")) return "魔法防御力";
-  if (type.startsWith("DEF"))   return "防御力";
-  if (type.startsWith("LUCK"))  return "幸運";
-  if (type.startsWith("SPD"))   return "攻撃速度";
+  if (type.startsWith("VIT"))    return "体力";
+  if (type.startsWith("ATK"))    return "攻撃力";
+  if (type.startsWith("INT"))    return "魔力";
+  if (type.startsWith("M-DEF"))  return "魔法防御力";
+  if (type.startsWith("DEF"))    return "防御力";
+  if (type.startsWith("LUCK"))   return "幸運";
+  if (type.startsWith("SPD"))    return "攻撃速度";
+  if (type === "経験値")         return "経験値";
+  if (type === "捕獲率")         return "捕獲率";
+  if (type === "ドロップ率")     return "ドロップ率";
+  if (type === "MOV")            return "MOV";
+  if (type === "HP回復")         return "HP回復";
   return "その他";
 }
 
