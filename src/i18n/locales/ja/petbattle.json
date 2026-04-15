@@ -1,0 +1,58 @@
+{
+  "title": "ペットバトル 1対1",
+  "subtitle": "ペット同士のダメージ・耐久シミュレータ",
+  "configA": "ペット A",
+  "configB": "ペット B",
+  "selectBoth": "両方のペットを選択してください",
+  "summary": {
+    "title": "ステータス要約",
+    "hp": "HP",
+    "spd": "SPD",
+    "atk": "ATK",
+    "int": "INT",
+    "def": "DEF",
+    "mdef": "M-DEF",
+    "luck": "LUCK"
+  },
+  "damage": {
+    "aToB": "A → B",
+    "bToA": "B → A",
+    "perHit": "1ヒット",
+    "perTurn": "1ターン総ダメ",
+    "multiHit": "多段 × {{n}}",
+    "hitRate": "命中率 {{rate}}%",
+    "crit": "クリ {{avg}}",
+    "effectiveDef": "有効防御 {{value}}",
+    "affinity": {
+      "weakness": "弱点",
+      "neutral": "通常",
+      "resistance": "耐性"
+    },
+    "nullified": "ダメージ通らず (1〜9)"
+  },
+  "durability": {
+    "title": "耐久 & 勝敗",
+    "direction": "攻撃方向",
+    "worst": "最遅",
+    "best": "最速",
+    "expectedWithMiss": "命中込み目安",
+    "turns": "{{n}} ターン",
+    "infinity": "∞"
+  },
+  "initiative": {
+    "label": "先攻",
+    "tied": "同速",
+    "detail": "SPD {{spdA}} vs {{spdB}}"
+  },
+  "prediction": {
+    "label": "勝敗予測",
+    "winA": "A 勝利",
+    "winB": "B 勝利",
+    "draw": "引き分け",
+    "turnsToWin": "{{n}} ターンで決着",
+    "note": {
+      "simultaneous": "同ターン相打ち",
+      "stalemate": "両者ダメージ通らず膠着"
+    }
+  }
+}

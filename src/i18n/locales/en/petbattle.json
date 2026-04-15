@@ -1,0 +1,58 @@
+{
+  "title": "Pet Battle 1v1",
+  "subtitle": "Pet vs pet damage & durability simulator",
+  "configA": "Pet A",
+  "configB": "Pet B",
+  "selectBoth": "Select both pets",
+  "summary": {
+    "title": "Stat Summary",
+    "hp": "HP",
+    "spd": "SPD",
+    "atk": "ATK",
+    "int": "INT",
+    "def": "DEF",
+    "mdef": "M-DEF",
+    "luck": "LUCK"
+  },
+  "damage": {
+    "aToB": "A → B",
+    "bToA": "B → A",
+    "perHit": "Per Hit",
+    "perTurn": "Per Turn",
+    "multiHit": "Multi × {{n}}",
+    "hitRate": "Hit {{rate}}%",
+    "crit": "Crit {{avg}}",
+    "effectiveDef": "Eff.Def {{value}}",
+    "affinity": {
+      "weakness": "Weak",
+      "neutral": "Normal",
+      "resistance": "Resist"
+    },
+    "nullified": "Blocked (1-9)"
+  },
+  "durability": {
+    "title": "Durability & Outcome",
+    "direction": "Direction",
+    "worst": "Slowest",
+    "best": "Fastest",
+    "expectedWithMiss": "Hit-rate adjusted",
+    "turns": "{{n}} turns",
+    "infinity": "∞"
+  },
+  "initiative": {
+    "label": "First",
+    "tied": "Tied",
+    "detail": "SPD {{spdA}} vs {{spdB}}"
+  },
+  "prediction": {
+    "label": "Prediction",
+    "winA": "A wins",
+    "winB": "B wins",
+    "draw": "Draw",
+    "turnsToWin": "Decided in {{n}} turns",
+    "note": {
+      "simultaneous": "Mutual KO on same turn",
+      "stalemate": "Neither side deals damage"
+    }
+  }
+}

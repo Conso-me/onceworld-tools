@@ -9,6 +9,7 @@ import jaStatus from "./locales/ja/status.json";
 import jaFarm from "./locales/ja/farm.json";
 import jaArena from "./locales/ja/arena.json";
 import jaMonsters from "./locales/ja/monsters.json";
+import jaPetBattle from "./locales/ja/petbattle.json";
 
 import enCommon from "./locales/en/common.json";
 import enGame from "./locales/en/game.json";
@@ -17,6 +18,7 @@ import enStatus from "./locales/en/status.json";
 import enFarm from "./locales/en/farm.json";
 import enArena from "./locales/en/arena.json";
 import enMonsters from "./locales/en/monsters.json";
+import enPetBattle from "./locales/en/petbattle.json";
 
 i18n
   .use(LanguageDetector)
@@ -31,6 +33,7 @@ i18n
         farm: jaFarm,
         arena: jaArena,
         monsters: jaMonsters,
+        petbattle: jaPetBattle,
       },
       en: {
         common: enCommon,
@@ -40,6 +43,7 @@ i18n
         farm: enFarm,
         arena: enArena,
         monsters: enMonsters,
+        petbattle: enPetBattle,
       },
     },
     fallbackLng: "ja",
