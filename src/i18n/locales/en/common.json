@@ -13,7 +13,9 @@
     "monsters": "Monster Editor",
     "monstersShort": "MON",
     "pet": "Pet Sim",
-    "petShort": "Pet"
+    "petShort": "Pet",
+    "petbattle": "Pet Battle",
+    "petbattleShort": "Battle"
   },
   "preparing": "Coming Soon",
   "add": "Add",

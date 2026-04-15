@@ -13,7 +13,9 @@
     "monsters": "モンスター登録",
     "monstersShort": "図鑑",
     "pet": "ペットシミュ",
-    "petShort": "ペット"
+    "petShort": "ペット",
+    "petbattle": "ペットバトル",
+    "petbattleShort": "対戦"
   },
   "preparing": "準備中",
   "add": "追加",
