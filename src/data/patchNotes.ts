@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-04-16",
+    changes: [
+    { type: "improve", text: "feat(data): add 七理の宝環 accessory" },
+    ],
+  },
+
+  {
     date: "2026-04-15",
     changes: [
     { type: "improve", text: "feat: ペットバトルをメインタブに昇格、ペットシミュをoverflowへ移動" },
