@@ -13,6 +13,14 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-04-15",
+    changes: [
+    { type: "improve", text: "feat: ペットバトルをメインタブに昇格、ペットシミュをoverflowへ移動" },
+    { type: "feature", text: "feat: ペット1対1バトルシミュレータを追加 (Issue #113)" },
+    ],
+  },
+
+  {
     date: "2026-04-13",
     changes: [
     { type: "improve", text: "fix: OKライン数値を削除、オレンジ背景+グレー文字に変更" },
