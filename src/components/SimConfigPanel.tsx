@@ -119,18 +119,30 @@ function accEffectCat(type: string): AccCategory {
 }
 
 // Computed once — accessory data is static
+// Multi-effect accessories appear in all matching categories
 const accGroups = (() => {
   const map = new Map<AccCategory, AccessoryItem[]>();
   for (const acc of accessories) {
-    const cat = acc.effects.length > 0 ? accEffectCat(acc.effects[0].type) : "その他";
-    if (!map.has(cat)) map.set(cat, []);
-    map.get(cat)!.push(acc);
+    const cats = new Set<AccCategory>(
+      acc.effects.length > 0
+        ? acc.effects.map(e => accEffectCat(e.type))
+        : ["その他"]
+    );
+    for (const cat of cats) {
+      if (!map.has(cat)) map.set(cat, []);
+      map.get(cat)!.push(acc);
+    }
   }
   return map;
 })();
 
 function getAccSummary(acc: AccessoryItem): string {
-  return acc.effects.map((e) => `${e.type} +${e.value}`).join("・");
+  const effects = acc.effects;
+  // 全effectが同じ%値 → "ALL+X%" で圧縮
+  if (effects.length >= 3 && effects.every(e => e.type.endsWith("%") && e.value === effects[0].value)) {
+    return `ALL+${effects[0].value}%`;
+  }
+  return effects.map((e) => `${e.type} +${e.value}`).join("・");
 }
 
 function getAccMaxLvLabel(maxLevel: number, tFn: (key: string) => string): string {
