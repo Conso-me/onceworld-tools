@@ -87,7 +87,13 @@ export function PetBattleSimulator() {
 
       {/* 右パネル（結果） */}
       <div className="mt-4 lg:mt-0">
-        <BattleResultPanel resultA={resultA} resultB={resultB} battle={battle} />
+        <BattleResultPanel
+          resultA={resultA}
+          resultB={resultB}
+          battle={battle}
+          petInfoA={{ monsterName: cfgA.petMonsterName, level: cfgA.petLevel, sengiCount: cfgA.sengiCount }}
+          petInfoB={{ monsterName: cfgB.petMonsterName, level: cfgB.petLevel, sengiCount: cfgB.sengiCount }}
+        />
       </div>
     </div>
   );

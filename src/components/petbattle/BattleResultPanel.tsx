@@ -4,10 +4,18 @@ import type { PetBattleResult } from "../../utils/petBattleCalc";
 import { BattleDamageCard } from "./BattleDamageCard";
 import { BattleDurabilityCard } from "./BattleDurabilityCard";
 
+export interface PetInfo {
+  monsterName: string;
+  level: number;
+  sengiCount: number;
+}
+
 export interface BattleResultPanelProps {
   resultA: PetStatResult | null;
   resultB: PetStatResult | null;
   battle: PetBattleResult | null;
+  petInfoA?: PetInfo;
+  petInfoB?: PetInfo;
 }
 
 const elementBadgeColors: Record<Element, string> = {
@@ -33,10 +41,12 @@ function StatRow({
   pet,
   label,
   accentClass,
+  petInfo,
 }: {
   pet: PetStatResult;
   label: string;
   accentClass: string;
+  petInfo?: PetInfo;
 }) {
   const { t } = useTranslation("petbattle");
   const { t: tGame } = useTranslation("game");
@@ -44,8 +54,23 @@ function StatRow({
 
   return (
     <div className={`rounded-lg border p-2 ${accentClass}`}>
-      <div className="flex items-center gap-1.5 mb-1.5">
+      <div className="flex items-center gap-1.5 mb-1">
         <span className="text-xs font-bold">{label}</span>
+        {petInfo?.monsterName && (
+          <span className="text-xs font-semibold text-gray-700 truncate">{petInfo.monsterName}</span>
+        )}
+      </div>
+      <div className="flex items-center gap-1.5 mb-1.5">
+        {petInfo?.monsterName && (
+          <>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/80 border border-gray-200 text-gray-600">
+              Lv.{petInfo.level}
+            </span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/80 border border-gray-200 text-gray-600">
+              殲儀 {petInfo.sengiCount}回
+            </span>
+          </>
+        )}
         <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${elementBadgeColors[pet.element]}`}>
           {tGame(`element.${pet.element}`)}
         </span>
@@ -73,7 +98,7 @@ function StatRow({
   );
 }
 
-export function BattleResultPanel({ resultA, resultB, battle }: BattleResultPanelProps) {
+export function BattleResultPanel({ resultA, resultB, battle, petInfoA, petInfoB }: BattleResultPanelProps) {
   const { t } = useTranslation("petbattle");
 
   if (!resultA || !resultB || !battle) {
@@ -88,8 +113,8 @@ export function BattleResultPanel({ resultA, resultB, battle }: BattleResultPane
     <div className="space-y-3">
       {/* ステータス要約 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-        <StatRow pet={resultA} label={t("configA")} accentClass="bg-blue-50 border-blue-100" />
-        <StatRow pet={resultB} label={t("configB")} accentClass="bg-orange-50 border-orange-100" />
+        <StatRow pet={resultA} label={t("configA")} accentClass="bg-blue-50 border-blue-100" petInfo={petInfoA} />
+        <StatRow pet={resultB} label={t("configB")} accentClass="bg-orange-50 border-orange-100" petInfo={petInfoB} />
       </div>
 
       {/* ダメージカード */}
