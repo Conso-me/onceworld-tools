@@ -14,5 +14,6 @@ export const MAGIC_SPELLS: MagicSpell[] = [
   { name: "大地葬送", element: "木", multiplier: 1.3, hits: 1, spCost: 9 },
   { name: "雷鳴一閃", element: "光", multiplier: 2.0, hits: 1, spCost: 7 },
   { name: "冥刃降臨", element: "闇", multiplier: 1.4, hits: 1, spCost: 11 },
-  { name: "時流停滞", element: "光", multiplier: 1.015, hits: 1, spCost: 7 },
+  { name: "時流停滞", element: "光", multiplier: 1.0,   hits: 1, spCost: 7 },
+  { name: "心眼威圧", element: "火", multiplier: 0.1,   hits: 1, spCost: 25 },
 ];
