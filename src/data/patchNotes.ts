@@ -15,6 +15,8 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-04-16",
     changes: [
+    { type: "fix", text: "fix(data): 七理の宝環の最大レベルを100に修正" },
+    { type: "improve", text: "fix(ui): 全ステ効果アクセをALL+X%表示・全カテゴリに表示" },
     { type: "improve", text: "feat(data): add 七理の宝環 accessory" },
     ],
   },
