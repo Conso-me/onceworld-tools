@@ -113,8 +113,9 @@ export function predictWinner(
   bToA: AttackOutcome,
   initiative: InitiativeWinner,
 ): BattlePrediction {
-  const aKillsIn = aToB.hitsToKill.worst;
-  const bKillsIn = bToA.hitsToKill.worst;
+  // ミス率を加味した期待ターン数で勝敗判定
+  const aKillsIn = aToB.expectedTurnsWithMiss;
+  const bKillsIn = bToA.expectedTurnsWithMiss;
 
   if (!Number.isFinite(aKillsIn) && !Number.isFinite(bKillsIn)) {
     return { winner: "draw", turnsToWin: Infinity, note: "stalemate" };
