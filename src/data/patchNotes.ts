@@ -13,8 +13,20 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-04-17",
+    changes: [
+    { type: "improve", text: "revert(ci): PATCH_NOTES_PATに戻す" },
+    { type: "fix", text: "fix(ci): PATCH_NOTES_PATをGITHUB_TOKENに変更してcheckout認証エラーを修正" },
+    { type: "fix", text: "fix(ci): GH_TOKENをGITHUB_TOKENに変更してfeedback sync認証エラーを修正" },
+    ],
+  },
+
+  {
     date: "2026-04-16",
     changes: [
+    { type: "fix", text: "feat(magic): 心眼威圧を追加・時流停滞の魔法倍率を修正" },
+    { type: "improve", text: "feat(petbattle): 幸運によるHIT率を勝敗予測に反映" },
+    { type: "improve", text: "feat(petbattle): バトル結果にモンスター名・レベル・殲儀数を表示" },
     { type: "fix", text: "fix(data): 七理の宝環の最大レベルを100に修正" },
     { type: "improve", text: "fix(ui): 全ステ効果アクセをALL+X%表示・全カテゴリに表示" },
     { type: "improve", text: "feat(data): add 七理の宝環 accessory" },
