@@ -41,7 +41,12 @@ export function BattleDurabilityCard({ result, spdA, spdB }: BattleDurabilityCar
       {/* 勝敗予測バッジ */}
       <div className={`rounded-lg border px-3 py-2 ${predictionBadge}`}>
         <div className="flex items-baseline justify-between gap-2">
-          <span className="text-[11px] font-medium opacity-80">{t("prediction.label")}</span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[11px] font-medium opacity-80">{t("prediction.label")}</span>
+            <span className="text-[9px] px-1 py-0.5 rounded bg-yellow-100 text-yellow-700 border border-yellow-200 font-medium leading-none">
+              {t("prediction.experimental")}
+            </span>
+          </div>
           <span className="text-base font-bold">
             {predictionLabel}
             {Number.isFinite(prediction.turnsToWin) && (

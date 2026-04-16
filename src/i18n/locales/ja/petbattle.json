@@ -46,6 +46,7 @@
   },
   "prediction": {
     "label": "勝敗予測",
+    "experimental": "幸運込み・検証中",
     "winA": "A 勝利",
     "winB": "B 勝利",
     "draw": "引き分け",
