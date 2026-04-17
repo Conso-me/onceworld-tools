@@ -400,38 +400,25 @@ describe("calcHitRate", () => {
     expect(calcHitRate(50, -10)).toBe(100);
   });
 
-  it("ratio < 0.5 → 1%", () => {
-    // playerLuck=10, enemyLuck=100 → ratio=0.1 < 0.5
-    expect(calcHitRate(10, 100)).toBe(1);
+  it("very low ratio → 1% (min clamp)", () => {
     expect(calcHitRate(0, 100)).toBe(1);
-    expect(calcHitRate(49, 100)).toBe(1);
+    expect(calcHitRate(10, 100)).toBe(1);
   });
 
-  it("ratio = 0.5 → boundary (should be > 1)", () => {
-    // ratio=0.5 → 1 + ((0.5-0.5)/0.5)*99 = 1
-    expect(calcHitRate(50, 100)).toBe(1);
+  it("ratio = 0.5 → ~43% (Hill function, K=0.529)", () => {
+    expect(calcHitRate(50, 100)).toBe(43);
   });
 
-  it("ratio >= 1.0 → 100%", () => {
-    expect(calcHitRate(100, 100)).toBe(100);
+  it("ratio = K (0.529) → 50% (inflection point)", () => {
+    expect(calcHitRate(529, 1000)).toBe(50);
+  });
+
+  it("ratio = 1.0 → ~96%", () => {
+    expect(calcHitRate(100, 100)).toBe(96);
+  });
+
+  it("ratio >= 2.0 → 100% (max clamp)", () => {
     expect(calcHitRate(200, 100)).toBe(100);
-  });
-
-  it("linear interpolation between 0.5 and 1.0", () => {
-    // ratio=0.75 → 1 + ((0.75-0.5)/0.5)*99 = 1 + 0.5*99 = 1 + 49.5 = 50.5 → round → 51
-    expect(calcHitRate(75, 100)).toBe(Math.round(1 + ((0.75 - 0.5) / 0.5) * 99));
-  });
-
-  it("ratio just above 0.5", () => {
-    // playerLuck=51, enemyLuck=100 → ratio=0.51
-    // 1 + ((0.51-0.5)/0.5)*99 = 1 + (0.01/0.5)*99 = 1 + 1.98 = 2.98 → round → 3
-    expect(calcHitRate(51, 100)).toBe(Math.round(1 + ((0.51 - 0.5) / 0.5) * 99));
-  });
-
-  it("ratio just below 1.0", () => {
-    // playerLuck=99, enemyLuck=100 → ratio=0.99
-    // 1 + ((0.99-0.5)/0.5)*99 = 1 + 0.98*99 = 1 + 97.02 = 98.02 → round → 98
-    expect(calcHitRate(99, 100)).toBe(Math.round(1 + ((0.99 - 0.5) / 0.5) * 99));
   });
 });
 

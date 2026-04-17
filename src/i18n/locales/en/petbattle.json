@@ -46,7 +46,6 @@
   },
   "prediction": {
     "label": "Prediction",
-    "experimental": "Luck-based (experimental)",
     "winA": "A wins",
     "winB": "B wins",
     "draw": "Draw",
