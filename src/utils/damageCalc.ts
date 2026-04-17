@@ -207,16 +207,15 @@ export function calcAtkForKill(
 
 /**
  * 命中率を計算（物理攻撃のみ）
- * playerLuck < enemyLuck × 0.5 → 1%
- * playerLuck ≥ enemyLuck → 100%
- * その間: 線形補間
+ * ヒル関数: ratio^5 / (ratio^5 + K^5), K=0.529
+ * 実測フィット: ratio=0.5→~43%, ratio=1.0→~96%
  */
 export function calcHitRate(playerLuck: number, enemyLuck: number): number {
   if (enemyLuck <= 0) return 100;
   const ratio = playerLuck / enemyLuck;
-  if (ratio < 0.5) return 1;
-  if (ratio >= 1.0) return 100;
-  return Math.round(1 + ((ratio - 0.5) / 0.5) * 99);
+  const r5 = Math.pow(ratio, 5);
+  const K5 = Math.pow(0.529, 5);
+  return Math.max(1, Math.min(100, Math.round((r5 / (r5 + K5)) * 100)));
 }
 
 /**
