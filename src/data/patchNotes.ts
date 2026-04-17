@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-04-17",
     changes: [
+    { type: "improve", text: "fix(petbattle): LUK命中率計算式をヒル関数に更新（Issue #120）" },
     { type: "fix", text: "ペットバトル：幸運によるHIT率計算式をヒル関数に更新（実測データでフィット・検証中バッジを削除）" },
     { type: "improve", text: "revert(ci): PATCH_NOTES_PATに戻す" },
     { type: "fix", text: "fix(ci): PATCH_NOTES_PATをGITHUB_TOKENに変更してcheckout認証エラーを修正" },
