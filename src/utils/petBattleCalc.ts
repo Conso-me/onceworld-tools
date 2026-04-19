@@ -28,7 +28,7 @@ export type InitiativeWinner = "A" | "B" | "tie";
 export interface BattlePrediction {
   winner: "A" | "B" | "draw";
   turnsToWin: number;
-  note: "simultaneous" | "stalemate" | null;
+  note: "simultaneous" | "stalemate" | "preContactKO" | null;
 }
 
 export interface RangePhaseResult {
@@ -246,10 +246,61 @@ export function calcRangePhase(
   };
 }
 
+const STARTING_DIST = 50;
+
+function calcAdjustedPrediction(
+  rangePhase: RangePhaseResult,
+  aToB: AttackOutcome,
+  bToA: AttackOutcome,
+  initiative: InitiativeWinner,
+  aHP: number,
+  bHP: number,
+): BattlePrediction {
+  if (rangePhase.advantageSide === "none" || rangePhase.preContactAttacks === 0) {
+    return predictWinner(aToB, bToA, initiative);
+  }
+
+  const isAAdvantaged = rangePhase.advantageSide === "A";
+  const defenderHP = isAAdvantaged ? bHP : aHP;
+  const rangedOutcome = isAAdvantaged ? aToB : bToA;
+  const meleeOutcome = isAAdvantaged ? bToA : aToB;
+
+  const remainingHP = defenderHP - rangePhase.preContactDamageAvg;
+
+  if (remainingHP <= 0) {
+    return { winner: rangePhase.advantageSide, turnsToWin: rangePhase.preContactAttacks, note: "preContactKO" };
+  }
+
+  // 接敵後：近接も同時に攻撃開始。魔弾側の残HPを調整して計算
+  const adjWorst = rangedOutcome.perTurn.min > 0 ? Math.ceil(remainingHP / rangedOutcome.perTurn.min) : Infinity;
+  const adjExpected = rangedOutcome.hitRate > 0 && Number.isFinite(adjWorst)
+    ? Math.ceil(adjWorst * (100 / rangedOutcome.hitRate))
+    : Infinity;
+  const meleeExpected = meleeOutcome.expectedTurnsWithMiss;
+  const rangedTotal = Number.isFinite(adjExpected) ? rangePhase.preContactAttacks + adjExpected : Infinity;
+
+  if (!Number.isFinite(rangedTotal) && !Number.isFinite(meleeExpected)) {
+    return { winner: "draw", turnsToWin: Infinity, note: "stalemate" };
+  }
+  if (adjExpected < meleeExpected) {
+    return { winner: rangePhase.advantageSide, turnsToWin: rangedTotal, note: null };
+  }
+  if (meleeExpected < adjExpected) {
+    return { winner: isAAdvantaged ? "B" : "A", turnsToWin: meleeExpected, note: null };
+  }
+  // 同ターン: 先攻判定
+  if (initiative === rangePhase.advantageSide) {
+    return { winner: rangePhase.advantageSide, turnsToWin: rangedTotal, note: null };
+  }
+  if (initiative !== "tie") {
+    return { winner: initiative, turnsToWin: meleeExpected, note: null };
+  }
+  return { winner: "draw", turnsToWin: adjExpected, note: "simultaneous" };
+}
+
 export function calcPetBattleResult(
   a: PetStatResult,
   b: PetStatResult,
-  startingDist = 100,
 ): PetBattleResult {
   const aToB = calcAttackOutcome(a, b);
   const bToA = calcAttackOutcome(b, a);
@@ -259,7 +310,7 @@ export function calcPetBattleResult(
     b.final.spd,
     b.final.luck,
   );
-  const prediction = predictWinner(aToB, bToA, initiative);
-  const rangePhase = calcRangePhase(a, b, aToB, bToA, startingDist);
+  const rangePhase = calcRangePhase(a, b, aToB, bToA, STARTING_DIST);
+  const prediction = calcAdjustedPrediction(rangePhase, aToB, bToA, initiative, a.hp, b.hp);
   return { aToB, bToA, initiative, prediction, rangePhase };
 }

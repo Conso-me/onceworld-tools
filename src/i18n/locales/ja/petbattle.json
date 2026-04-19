@@ -70,7 +70,8 @@
     "turnsToWin": "{{n}} ターンで決着",
     "note": {
       "simultaneous": "同ターン相打ち",
-      "stalemate": "両者ダメージ通らず膠着"
+      "stalemate": "両者ダメージ通らず膠着",
+      "preContactKO": "接敵前に倒しきる"
     }
   }
 }

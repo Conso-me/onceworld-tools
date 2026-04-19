@@ -17,8 +17,6 @@ export interface BattleResultPanelProps {
   battle: PetBattleResult | null;
   petInfoA?: PetInfo;
   petInfoB?: PetInfo;
-  startingDist: number;
-  onStartingDistChange: (v: number) => void;
 }
 
 const elementBadgeColors: Record<Element, string> = {
@@ -101,7 +99,7 @@ function StatRow({
   );
 }
 
-export function BattleResultPanel({ resultA, resultB, battle, petInfoA, petInfoB, startingDist, onStartingDistChange }: BattleResultPanelProps) {
+export function BattleResultPanel({ resultA, resultB, battle, petInfoA, petInfoB }: BattleResultPanelProps) {
   const { t } = useTranslation("petbattle");
 
   if (!resultA || !resultB || !battle) {
@@ -127,11 +125,7 @@ export function BattleResultPanel({ resultA, resultB, battle, petInfoA, petInfoB
       </div>
 
       {/* レンジ・移動フェーズ */}
-      <BattleRangeCard
-        rangePhase={battle.rangePhase}
-        startingDist={startingDist}
-        onStartingDistChange={onStartingDistChange}
-      />
+      <BattleRangeCard rangePhase={battle.rangePhase} />
 
       {/* 耐久+先攻+勝敗 */}
       <BattleDurabilityCard

@@ -27,7 +27,6 @@ export function PetBattleSimulator() {
     DEFAULT_PET_DAMAGE_CONFIG as PetDamageConfig & Record<string, unknown>,
   ) as unknown as PetCfgTuple;
   const [activeConfig, setActiveConfig] = usePersistedState<"A" | "B">("petbattle:active", "A");
-  const [startingDist, setStartingDist] = usePersistedState<number>("petbattle:startingDist", 100);
 
   const allMonsters = useAllMonsters();
 
@@ -44,8 +43,8 @@ export function PetBattleSimulator() {
   const resultB = useMemo(() => (monsterB ? calcPetStats(cfgB, monsterB) : null), [cfgB, monsterB]);
 
   const battle = useMemo(
-    () => (resultA && resultB ? calcPetBattleResult(resultA, resultB, startingDist) : null),
-    [resultA, resultB, startingDist],
+    () => (resultA && resultB ? calcPetBattleResult(resultA, resultB) : null),
+    [resultA, resultB],
   );
 
   const activeCfg = activeConfig === "A" ? cfgA : cfgB;
@@ -95,8 +94,6 @@ export function PetBattleSimulator() {
           battle={battle}
           petInfoA={{ monsterName: cfgA.petMonsterName, level: cfgA.petLevel, sengiCount: cfgA.sengiCount }}
           petInfoB={{ monsterName: cfgB.petMonsterName, level: cfgB.petLevel, sengiCount: cfgB.sengiCount }}
-          startingDist={startingDist}
-          onStartingDistChange={setStartingDist}
         />
       </div>
     </div>

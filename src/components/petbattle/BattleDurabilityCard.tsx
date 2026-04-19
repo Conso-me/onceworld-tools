@@ -54,7 +54,7 @@ export function BattleDurabilityCard({ result, spdA, spdB }: BattleDurabilityCar
           </span>
         </div>
         {prediction.note && (
-          <div className="text-[11px] mt-1 opacity-80">
+          <div className={`text-[11px] mt-1 opacity-80 ${prediction.note === "preContactKO" ? "font-semibold" : ""}`}>
             {t(`prediction.note.${prediction.note}`)}
           </div>
         )}

@@ -70,7 +70,8 @@
     "turnsToWin": "Decided in {{n}} turns",
     "note": {
       "simultaneous": "Mutual KO on same turn",
-      "stalemate": "Neither side deals damage"
+      "stalemate": "Neither side deals damage",
+      "preContactKO": "KO'd before melee contact"
     }
   }
 }

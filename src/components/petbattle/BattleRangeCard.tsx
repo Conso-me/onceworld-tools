@@ -3,11 +3,9 @@ import type { RangePhaseResult } from "../../utils/petBattleCalc";
 
 interface BattleRangeCardProps {
   rangePhase: RangePhaseResult;
-  startingDist: number;
-  onStartingDistChange: (v: number) => void;
 }
 
-export function BattleRangeCard({ rangePhase, startingDist, onStartingDistChange }: BattleRangeCardProps) {
+export function BattleRangeCard({ rangePhase }: BattleRangeCardProps) {
   const { t } = useTranslation("petbattle");
   const { advantageSide, preContactTime, preContactAttacks, preContactDamageAvg,
     preContactDamageMin, preContactDamageMax, hpPctDealtAvg, rangeA, rangeB, moveSpeedA, moveSpeedB } = rangePhase;
@@ -30,27 +28,6 @@ export function BattleRangeCard({ rangePhase, startingDist, onStartingDistChange
         <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${badgeColor}`}>
           {advantageLabel}
         </span>
-      </div>
-
-      {/* 開始距離スライダー */}
-      <div className="space-y-1">
-        <div className="flex items-center justify-between text-[11px] text-gray-500">
-          <label>{t("range.startingDist")}</label>
-          <span className="font-semibold tabular-nums text-gray-700">{startingDist}</span>
-        </div>
-        <input
-          type="range"
-          min={30}
-          max={500}
-          step={10}
-          value={startingDist}
-          onChange={(e) => onStartingDistChange(Number(e.target.value))}
-          className="w-full accent-indigo-500"
-        />
-        <div className="flex justify-between text-[10px] text-gray-400">
-          <span>30</span>
-          <span>500</span>
-        </div>
       </div>
 
       {/* レンジ・速度情報 */}
