@@ -82,6 +82,7 @@ export function PetBattleSimulator() {
           reset={activeReset}
           petResult={activeResult}
           replaceConfig={activeReplaceAll}
+          showPetStats
         />
       </div>
 

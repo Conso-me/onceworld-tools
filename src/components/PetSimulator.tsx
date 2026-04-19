@@ -235,6 +235,7 @@ export function PetSimulator() {
           reset={activeReset}
           petResult={activeResult}
           replaceConfig={activeReplaceAll}
+          showPetStats
         />
       </div>
 
