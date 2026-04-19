@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-04-19",
+    changes: [
+    { type: "improve", text: "fix(damage): SPD多段HIT計算式を正式仕様に更新・上限撤廃" },
+    ],
+  },
+
+  {
     date: "2026-04-17",
     changes: [
     { type: "improve", text: "fix(petbattle): LUK命中率計算式をヒル関数に更新（Issue #120）" },
