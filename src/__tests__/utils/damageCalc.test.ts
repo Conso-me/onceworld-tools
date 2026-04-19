@@ -205,35 +205,59 @@ describe("calcMultiHitCount", () => {
     expect(calcMultiHitCount(3000, false)).toBe(2);
   });
 
-  it("SPD 3001-9999 → 2 hits", () => {
+  it("SPD 3001-8999 → 2 hits", () => {
     expect(calcMultiHitCount(5000, false)).toBe(2);
-    expect(calcMultiHitCount(9999, false)).toBe(2);
+    expect(calcMultiHitCount(8999, false)).toBe(2);
   });
 
-  it("SPD = 10000 → 3 hits (boundary)", () => {
-    expect(calcMultiHitCount(10000, false)).toBe(3);
+  it("SPD = 9000 → 3 hits (boundary)", () => {
+    expect(calcMultiHitCount(9000, false)).toBe(3);
   });
 
-  it("SPD 10001-29999 → 3 hits", () => {
-    expect(calcMultiHitCount(20000, false)).toBe(3);
-    expect(calcMultiHitCount(29999, false)).toBe(3);
+  it("SPD 9001-26999 → 3 hits", () => {
+    expect(calcMultiHitCount(9001, false)).toBe(3);
+    expect(calcMultiHitCount(26999, false)).toBe(3);
   });
 
-  it("SPD = 30000 → 4 hits (boundary)", () => {
-    expect(calcMultiHitCount(30000, false)).toBe(4);
+  it("SPD = 27000 → 4 hits (boundary)", () => {
+    expect(calcMultiHitCount(27000, false)).toBe(4);
   });
 
-  it("SPD 30001-99999 → 4 hits", () => {
-    expect(calcMultiHitCount(50000, false)).toBe(4);
-    expect(calcMultiHitCount(99999, false)).toBe(4);
+  it("SPD = 81000 → 5 hits (boundary)", () => {
+    expect(calcMultiHitCount(81000, false)).toBe(5);
   });
 
-  it("SPD = 100000 → 5 hits (boundary)", () => {
-    expect(calcMultiHitCount(100000, false)).toBe(5);
+  it("SPD = 243000 → 6 hits (boundary)", () => {
+    expect(calcMultiHitCount(243000, false)).toBe(6);
   });
 
-  it("SPD > 100000 → 5 hits (cap)", () => {
-    expect(calcMultiHitCount(999999, false)).toBe(5);
+  it("SPD = 729000 → 7 hits (boundary)", () => {
+    expect(calcMultiHitCount(729000, false)).toBe(7);
+  });
+
+  it("SPD = 2187000 → 8 hits (boundary)", () => {
+    expect(calcMultiHitCount(2_187_000, false)).toBe(8);
+  });
+
+  it("SPD = 6561000 → 9 hits (boundary)", () => {
+    expect(calcMultiHitCount(6_561_000, false)).toBe(9);
+  });
+
+  it("SPD = 19683000 → 10 hits (boundary)", () => {
+    expect(calcMultiHitCount(19_683_000, false)).toBe(10);
+  });
+
+  it("SPD = 59049000 → 11 hits (boundary)", () => {
+    expect(calcMultiHitCount(59_049_000, false)).toBe(11);
+  });
+
+  it("SPD = 177147000 → 12 hits (boundary)", () => {
+    expect(calcMultiHitCount(177_147_000, false)).toBe(12);
+  });
+
+  it("SPD > 177147000 → continues beyond 12 (no cap)", () => {
+    expect(calcMultiHitCount(531_441_000, false)).toBe(13); // 3000 × 3^11
+    expect(calcMultiHitCount(1_594_323_000, false)).toBe(14); // 3000 × 3^12
   });
 });
 

@@ -98,9 +98,9 @@ function makeDamageRange(base: number, hasCrit = true): DamageRange {
       min: 1,
       max: 9,
       avg: 5,
-      critMin: 0,
-      critMax: 0,
-      critAvg: 0,
+      critMin: 1,
+      critMax: 9,
+      critAvg: 5,
       isNullified: true,
       hasCrit,
     };
@@ -122,18 +122,21 @@ function makeDamageRange(base: number, hasCrit = true): DamageRange {
 
 /**
  * 多段攻撃回数を計算
- * 主人公魔法(魔攻)は常に1回
+ * threshold(n) = 3000 × 3^(n-2)、上限なし
  */
 export function calcMultiHitCount(
   spd: number,
   isPlayerMagic: boolean
 ): number {
   if (isPlayerMagic) return 1;
-  if (spd >= 100000) return 5;
-  if (spd >= 30000) return 4;
-  if (spd >= 10000) return 3;
-  if (spd >= 3000) return 2;
-  return 1;
+  if (spd < 3000) return 1;
+  let hits = 1;
+  let threshold = 3000;
+  while (spd >= threshold) {
+    hits++;
+    threshold *= 3;
+  }
+  return hits;
 }
 
 /**
