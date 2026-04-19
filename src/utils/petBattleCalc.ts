@@ -33,8 +33,7 @@ export interface BattlePrediction {
 
 export interface RangePhaseResult {
   advantageSide: "A" | "B" | "none";
-  preContactTime: number;
-  preContactAttacks: number;
+  preContactHits: number;
   preContactDamageAvg: number;
   preContactDamageMin: number;
   preContactDamageMax: number;
@@ -187,7 +186,7 @@ export function calcRangePhase(
   b: PetStatResult,
   aToB: AttackOutcome,
   bToA: AttackOutcome,
-  startingDist: number,
+  preContactHits: number,
 ): RangePhaseResult {
   const rangeA = calcAttackRange(a.attackMode);
   const rangeB = calcAttackRange(b.attackMode);
@@ -196,45 +195,24 @@ export function calcRangePhase(
 
   if (rangeA === rangeB) {
     return {
-      advantageSide: "none", preContactTime: 0,
-      preContactAttacks: 0, preContactDamageAvg: 0,
-      preContactDamageMin: 0, preContactDamageMax: 0,
+      advantageSide: "none", preContactHits: 0,
+      preContactDamageAvg: 0, preContactDamageMin: 0, preContactDamageMax: 0,
       hpPctDealtAvg: 0, rangeA, rangeB, moveSpeedA, moveSpeedB,
     };
   }
 
   const isAAdvantaged = rangeA > rangeB;
-  const attackRange = isAAdvantaged ? rangeA : rangeB;
-  const meleeRange = isAAdvantaged ? rangeB : rangeA;
-  const speedRanged = isAAdvantaged ? moveSpeedA : moveSpeedB;
-  const speedMelee = isAAdvantaged ? moveSpeedB : moveSpeedA;
-  const rateRanged = calcAttackRatePerSec(isAAdvantaged ? a.final.spd : b.final.spd);
   const outcome = isAAdvantaged ? aToB : bToA;
   const defenderHP = isAAdvantaged ? b.hp : a.hp;
 
-  // Pre-contact time: time between ranged pet starting to attack and melee reaching melee range
-  let preContactTime: number;
-  if (startingDist <= attackRange) {
-    // Ranged attacks immediately; melee must close from startingDist to meleeRange
-    preContactTime = Math.max(0, (startingDist - meleeRange) / speedMelee);
-  } else {
-    // Both approach until dist = attackRange, then ranged stops
-    const phase1Time = (startingDist - attackRange) / (speedRanged + speedMelee);
-    // Melee continues from attackRange to meleeRange
-    const phase2Time = (attackRange - meleeRange) / speedMelee;
-    preContactTime = phase1Time + phase2Time;
-  }
-
-  const preContactAttacks = Math.floor(preContactTime * rateRanged);
-  const preContactDamageAvg = preContactAttacks * outcome.perTurn.avg;
-  const preContactDamageMin = preContactAttacks * outcome.perTurn.min;
-  const preContactDamageMax = preContactAttacks * outcome.perTurn.max;
+  const preContactDamageAvg = preContactHits * outcome.perTurn.avg;
+  const preContactDamageMin = preContactHits * outcome.perTurn.min;
+  const preContactDamageMax = preContactHits * outcome.perTurn.max;
   const hpPctDealtAvg = defenderHP > 0 ? preContactDamageAvg / defenderHP : 0;
 
   return {
     advantageSide: isAAdvantaged ? "A" : "B",
-    preContactTime,
-    preContactAttacks,
+    preContactHits,
     preContactDamageAvg,
     preContactDamageMin,
     preContactDamageMax,
@@ -246,8 +224,6 @@ export function calcRangePhase(
   };
 }
 
-const STARTING_DIST = 50;
-
 function calcAdjustedPrediction(
   rangePhase: RangePhaseResult,
   aToB: AttackOutcome,
@@ -256,7 +232,7 @@ function calcAdjustedPrediction(
   aHP: number,
   bHP: number,
 ): BattlePrediction {
-  if (rangePhase.advantageSide === "none" || rangePhase.preContactAttacks === 0) {
+  if (rangePhase.advantageSide === "none" || rangePhase.preContactHits === 0) {
     return predictWinner(aToB, bToA, initiative);
   }
 
@@ -268,7 +244,7 @@ function calcAdjustedPrediction(
   const remainingHP = defenderHP - rangePhase.preContactDamageAvg;
 
   if (remainingHP <= 0) {
-    return { winner: rangePhase.advantageSide, turnsToWin: rangePhase.preContactAttacks, note: "preContactKO" };
+    return { winner: rangePhase.advantageSide, turnsToWin: rangePhase.preContactHits, note: "preContactKO" };
   }
 
   // 接敵後：近接も同時に攻撃開始。魔弾側の残HPを調整して計算
@@ -277,7 +253,7 @@ function calcAdjustedPrediction(
     ? Math.ceil(adjWorst * (100 / rangedOutcome.hitRate))
     : Infinity;
   const meleeExpected = meleeOutcome.expectedTurnsWithMiss;
-  const rangedTotal = Number.isFinite(adjExpected) ? rangePhase.preContactAttacks + adjExpected : Infinity;
+  const rangedTotal = Number.isFinite(adjExpected) ? rangePhase.preContactHits + adjExpected : Infinity;
 
   if (!Number.isFinite(rangedTotal) && !Number.isFinite(meleeExpected)) {
     return { winner: "draw", turnsToWin: Infinity, note: "stalemate" };
@@ -293,7 +269,7 @@ function calcAdjustedPrediction(
     return { winner: rangePhase.advantageSide, turnsToWin: rangedTotal, note: null };
   }
   if (initiative !== "tie") {
-    return { winner: initiative, turnsToWin: meleeExpected, note: null };
+    return { winner: isAAdvantaged ? "B" : "A", turnsToWin: meleeExpected, note: null };
   }
   return { winner: "draw", turnsToWin: adjExpected, note: "simultaneous" };
 }
@@ -301,6 +277,7 @@ function calcAdjustedPrediction(
 export function calcPetBattleResult(
   a: PetStatResult,
   b: PetStatResult,
+  preContactHits = 0,
 ): PetBattleResult {
   const aToB = calcAttackOutcome(a, b);
   const bToA = calcAttackOutcome(b, a);
@@ -310,7 +287,7 @@ export function calcPetBattleResult(
     b.final.spd,
     b.final.luck,
   );
-  const rangePhase = calcRangePhase(a, b, aToB, bToA, STARTING_DIST);
+  const rangePhase = calcRangePhase(a, b, aToB, bToA, preContactHits);
   const prediction = calcAdjustedPrediction(rangePhase, aToB, bToA, initiative, a.hp, b.hp);
   return { aToB, bToA, initiative, prediction, rangePhase };
 }

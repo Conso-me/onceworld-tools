@@ -54,6 +54,7 @@
     "attackRange": "Atk range",
     "moveSpeed": "Move speed",
     "preContactTime": "Time to contact",
+    "preContactHitsLabel": "Pre-contact hits (adjustable)",
     "preContactAttacks": "Pre-contact hits",
     "preContactDamage": "Pre-contact damage",
     "hpPct": "HP dealt (%)",

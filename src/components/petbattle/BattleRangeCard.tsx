@@ -3,12 +3,14 @@ import type { RangePhaseResult } from "../../utils/petBattleCalc";
 
 interface BattleRangeCardProps {
   rangePhase: RangePhaseResult;
+  preContactHits: number;
+  onPreContactHitsChange: (v: number) => void;
 }
 
-export function BattleRangeCard({ rangePhase }: BattleRangeCardProps) {
+export function BattleRangeCard({ rangePhase, preContactHits, onPreContactHitsChange }: BattleRangeCardProps) {
   const { t } = useTranslation("petbattle");
-  const { advantageSide, preContactTime, preContactAttacks, preContactDamageAvg,
-    preContactDamageMin, preContactDamageMax, hpPctDealtAvg, rangeA, rangeB, moveSpeedA, moveSpeedB } = rangePhase;
+  const { advantageSide, preContactDamageAvg, preContactDamageMin, preContactDamageMax,
+    hpPctDealtAvg, rangeA, rangeB, moveSpeedA, moveSpeedB } = rangePhase;
 
   const pctDisplay = Math.round(hpPctDealtAvg * 100);
   const badgeColor =
@@ -44,31 +46,46 @@ export function BattleRangeCard({ rangePhase }: BattleRangeCardProps) {
         </div>
       </div>
 
-      {/* 先制フェーズ結果 */}
+      {/* 先制ヒット数スライダー */}
       {advantageSide !== "none" ? (
-        <div className="bg-gray-50 rounded-lg px-3 py-2 space-y-1 text-xs">
-          <div className="flex justify-between">
-            <span className="text-gray-500">{t("range.preContactTime")}</span>
-            <span className="font-semibold tabular-nums">{preContactTime.toFixed(1)} {t("range.seconds")}</span>
+        <>
+          <div className="space-y-1">
+            <div className="flex items-center justify-between text-[11px] text-gray-500">
+              <label>{t("range.preContactHitsLabel")}</label>
+              <span className="font-bold tabular-nums text-gray-800 text-sm">{preContactHits} {t("range.hits")}</span>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              step={1}
+              value={preContactHits}
+              onChange={(e) => onPreContactHitsChange(Number(e.target.value))}
+              className="w-full accent-indigo-500"
+            />
+            <div className="flex justify-between text-[10px] text-gray-400">
+              <span>0</span>
+              <span>100</span>
+            </div>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-500">{t("range.preContactAttacks")}</span>
-            <span className="font-semibold tabular-nums">{preContactAttacks} {t("range.hits")}</span>
+
+          {/* 先制フェーズ結果 */}
+          <div className="bg-gray-50 rounded-lg px-3 py-2 space-y-1 text-xs">
+            <div className="flex justify-between">
+              <span className="text-gray-500">{t("range.preContactDamage")}</span>
+              <span className="font-semibold tabular-nums text-gray-800">
+                {Math.round(preContactDamageMin).toLocaleString()} ～ {Math.round(preContactDamageMax).toLocaleString()}
+                <span className="text-gray-400 ml-1">({t("range.avg")} {Math.round(preContactDamageAvg).toLocaleString()})</span>
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-500">{t("range.hpPct")}</span>
+              <span className={`font-bold tabular-nums ${pctDisplay >= 100 ? "text-red-600" : pctDisplay >= 50 ? "text-orange-600" : "text-gray-800"}`}>
+                {pctDisplay >= 100 ? t("range.instant") : `${pctDisplay}%`}
+              </span>
+            </div>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-500">{t("range.preContactDamage")}</span>
-            <span className="font-semibold tabular-nums text-gray-800">
-              {Math.round(preContactDamageMin).toLocaleString()} ～ {Math.round(preContactDamageMax).toLocaleString()}
-              <span className="text-gray-400 ml-1">({t("range.avg")} {Math.round(preContactDamageAvg).toLocaleString()})</span>
-            </span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-500">{t("range.hpPct")}</span>
-            <span className={`font-bold tabular-nums ${pctDisplay >= 100 ? "text-red-600" : pctDisplay >= 50 ? "text-orange-600" : "text-gray-800"}`}>
-              {pctDisplay >= 100 ? t("range.instant") : `${pctDisplay}%`}
-            </span>
-          </div>
-        </div>
+        </>
       ) : (
         <div className="text-center text-xs text-gray-400 py-1">{t("range.equalRange")}</div>
       )}

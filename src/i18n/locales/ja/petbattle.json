@@ -54,6 +54,7 @@
     "attackRange": "射程",
     "moveSpeed": "移動速度",
     "preContactTime": "接敵までの時間",
+    "preContactHitsLabel": "先制ヒット数（可変）",
     "preContactAttacks": "先制攻撃数",
     "preContactDamage": "先制ダメージ",
     "hpPct": "対象HP削り率",
