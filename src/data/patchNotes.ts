@@ -13,6 +13,14 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-04-20",
+    changes: [
+    { type: "improve", text: "feat(pet-selector): ステータス別ソートに対応" },
+    { type: "feature", text: "feat(pet-selector): ペット選択時にステータス表示と強さ順ソートを追加" },
+    ],
+  },
+
+  {
     date: "2026-04-19",
     changes: [
     { type: "improve", text: "fix(damage): SPD多段HIT計算式を正式仕様に更新・上限撤廃" },
