@@ -13,6 +13,7 @@ export interface PetConfigPanelProps {
   reset: () => void;
   petResult: PetStatResult | null;
   replaceConfig?: (cfg: PetDamageConfig) => void;
+  showPetStats?: boolean;
 }
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -130,7 +131,7 @@ function CompactInput({
 
 // ── Main Component ────────────────────────────────────────────────────────────
 
-export function PetConfigPanel({ config, setField, reset, petResult, replaceConfig }: PetConfigPanelProps) {
+export function PetConfigPanel({ config, setField, reset, petResult, replaceConfig, showPetStats }: PetConfigPanelProps) {
   const { t } = useTranslation("damage");
   const { t: tGame } = useTranslation("game");
   const { t: tCommon } = useTranslation("common");
@@ -215,6 +216,7 @@ export function PetConfigPanel({ config, setField, reset, petResult, replaceConf
             setField("petMonsterName", monster.name);
             setIsModalOpen(false);
           }}
+          showPetStats={showPetStats}
         />
       </div>
 

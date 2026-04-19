@@ -3,6 +3,36 @@ import { useTranslation } from "react-i18next";
 import type { MonsterBase, Element } from "../../types/game";
 import { useAllMonsters } from "../../hooks/useAllMonsters";
 
+function calcStatTotal(m: MonsterBase): number {
+  return m.vit + m.atk + m.int + m.def + m.mdef + m.spd + m.luck;
+}
+
+function PetStatRow({ monster }: { monster: MonsterBase }) {
+  const statDefs = [
+    { label: "ATK", v: monster.atk },
+    { label: "INT", v: monster.int },
+    { label: "VIT", v: monster.vit },
+    { label: "DEF", v: monster.def },
+    { label: "M-DEF", v: monster.mdef },
+    { label: "SPD", v: monster.spd },
+    { label: "LUK", v: monster.luck },
+  ];
+  const total = statDefs.reduce((s, x) => s + x.v, 0);
+  return (
+    <div className="flex flex-wrap gap-x-2 gap-y-0 mt-0.5 text-[10px] leading-tight">
+      {statDefs.map(({ label, v }) =>
+        v > 0 ? (
+          <span key={label} className="text-gray-500">
+            <span className="text-gray-400">{label} </span>
+            <span className="text-gray-700">{v}</span>
+          </span>
+        ) : null
+      )}
+      <span className="text-gray-600 font-semibold">合計 {total}</span>
+    </div>
+  );
+}
+
 type ElementFilter = "all" | Element;
 
 const ELEMENTS: Element[] = ["火", "水", "木", "光", "闇"];
@@ -27,12 +57,14 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   onSelect: (monster: MonsterBase) => void;
+  showPetStats?: boolean;
 }
 
-export function MonsterSelectorModal({ isOpen, onClose, onSelect }: Props) {
+export function MonsterSelectorModal({ isOpen, onClose, onSelect, showPetStats }: Props) {
   const { t } = useTranslation("game");
   const [elementFilter, setElementFilter] = useState<ElementFilter>("all");
   const [query, setQuery] = useState("");
+  const [sortByStrength, setSortByStrength] = useState(false);
 
   const allMonsters = useAllMonsters();
 
@@ -45,8 +77,11 @@ export function MonsterSelectorModal({ isOpen, onClose, onSelect }: Props) {
       const lower = query.toLowerCase();
       list = list.filter((m) => m.name.toLowerCase().includes(lower));
     }
+    if (showPetStats && sortByStrength) {
+      list = [...list].sort((a, b) => calcStatTotal(b) - calcStatTotal(a));
+    }
     return list;
-  }, [allMonsters, elementFilter, query]);
+  }, [allMonsters, elementFilter, query, showPetStats, sortByStrength]);
 
   if (!isOpen) return null;
 
@@ -113,15 +148,28 @@ export function MonsterSelectorModal({ isOpen, onClose, onSelect }: Props) {
           {/* モンスター一覧 */}
           <div className="flex-1 overflow-y-auto flex flex-col">
             {/* 検索バー */}
-            <div className="px-4 py-3 border-b border-gray-200 bg-white sticky top-0">
+            <div className="px-4 py-3 border-b border-gray-200 bg-white sticky top-0 flex items-center gap-2">
               <input
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 autoFocus
                 placeholder={t("searchByName")}
-                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
               />
+              {showPetStats && (
+                <button
+                  type="button"
+                  onClick={() => setSortByStrength((v) => !v)}
+                  className={`flex-shrink-0 px-2.5 py-1.5 text-xs rounded-lg border font-medium transition-colors ${
+                    sortByStrength
+                      ? "bg-indigo-600 text-white border-indigo-600"
+                      : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
+                  }`}
+                >
+                  強さ順
+                </button>
+              )}
             </div>
 
             {/* PC: カラムヘッダー */}
@@ -148,28 +196,34 @@ export function MonsterSelectorModal({ isOpen, onClose, onSelect }: Props) {
                     className="w-full px-5 py-3 hover:bg-indigo-50 border-b border-gray-100 text-left transition-colors group"
                   >
                     {/* PC: 横並び */}
-                    <div className="hidden sm:flex items-center gap-3">
-                      <span className="flex-1 font-semibold text-gray-900 text-sm group-hover:text-indigo-700 transition-colors">
-                        {monster.name}
-                      </span>
-                      <span className={`w-14 text-center text-xs px-2 py-0.5 rounded-full font-medium ${elementColors[monster.element] ?? "bg-gray-100 text-gray-500"}`}>
-                        {t(`element.${monster.element}`)}
-                      </span>
-                      <span className="w-16 text-right text-sm text-gray-700">
-                        {t(`attackType.${monster.attackType}`)}
-                      </span>
+                    <div className="hidden sm:block">
+                      <div className="flex items-center gap-3">
+                        <span className="flex-1 font-semibold text-gray-900 text-sm group-hover:text-indigo-700 transition-colors">
+                          {monster.name}
+                        </span>
+                        <span className={`w-14 text-center text-xs px-2 py-0.5 rounded-full font-medium ${elementColors[monster.element] ?? "bg-gray-100 text-gray-500"}`}>
+                          {t(`element.${monster.element}`)}
+                        </span>
+                        <span className="w-16 text-right text-sm text-gray-700">
+                          {t(`attackType.${monster.attackType}`)}
+                        </span>
+                      </div>
+                      {showPetStats && <PetStatRow monster={monster} />}
                     </div>
                     {/* Mobile: 名前＋属性バッジ＋攻撃タイプを1行に */}
-                    <div className="sm:hidden flex items-center gap-2">
-                      <span className="flex-1 font-semibold text-gray-900 text-sm group-hover:text-indigo-700 transition-colors">
-                        {monster.name}
-                      </span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${elementColors[monster.element] ?? "bg-gray-100 text-gray-500"}`}>
-                        {t(`element.${monster.element}`)}
-                      </span>
-                      <span className="text-xs text-gray-500 flex-shrink-0">
-                        {t(`attackType.${monster.attackType}`)}
-                      </span>
+                    <div className="sm:hidden">
+                      <div className="flex items-center gap-2">
+                        <span className="flex-1 font-semibold text-gray-900 text-sm group-hover:text-indigo-700 transition-colors">
+                          {monster.name}
+                        </span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${elementColors[monster.element] ?? "bg-gray-100 text-gray-500"}`}>
+                          {t(`element.${monster.element}`)}
+                        </span>
+                        <span className="text-xs text-gray-500 flex-shrink-0">
+                          {t(`attackType.${monster.attackType}`)}
+                        </span>
+                      </div>
+                      {showPetStats && <PetStatRow monster={monster} />}
                     </div>
                   </button>
                 ))
