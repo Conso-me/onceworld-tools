@@ -31,11 +31,26 @@ export interface BattlePrediction {
   note: "simultaneous" | "stalemate" | null;
 }
 
+export interface RangePhaseResult {
+  advantageSide: "A" | "B" | "none";
+  preContactTime: number;
+  preContactAttacks: number;
+  preContactDamageAvg: number;
+  preContactDamageMin: number;
+  preContactDamageMax: number;
+  hpPctDealtAvg: number;
+  rangeA: number;
+  rangeB: number;
+  moveSpeedA: number;
+  moveSpeedB: number;
+}
+
 export interface PetBattleResult {
   aToB: AttackOutcome;
   bToA: AttackOutcome;
   initiative: InitiativeWinner;
   prediction: BattlePrediction;
+  rangePhase: RangePhaseResult;
 }
 
 export function calcAttackOutcome(
@@ -138,9 +153,103 @@ export function predictWinner(
   return { winner: "draw", turnsToWin: aKillsIn, note: "simultaneous" };
 }
 
+// ── Range Phase ──────────────────────────────────────────────────────────────
+
+export function calcAttackRange(attackMode: "物理" | "魔法" | "魔弾"): number {
+  return attackMode === "魔弾" ? 150 : 30;
+}
+
+export function calcMoveSpeed(mov: number): number {
+  if (mov === 0) return 10;
+  return 80 * (1 + mov * 0.1);
+}
+
+// SPD → attacks per second (piecewise linear, from reference sim)
+export function calcAttackRatePerSec(spd: number): number {
+  const points: [number, number][] = [
+    [0, 1.0], [100, 1.5], [200, 2.0], [300, 2.5], [400, 3.0],
+    [500, 3.5], [600, 4.0], [700, 4.5], [800, 5.0], [3000, 20.0],
+  ];
+  if (spd <= 0) return 1.0;
+  if (spd >= 3000) return 20.0;
+  for (let i = 0; i < points.length - 1; i++) {
+    const [x1, y1] = points[i];
+    const [x2, y2] = points[i + 1];
+    if (spd >= x1 && spd <= x2) {
+      return y1 + ((spd - x1) / (x2 - x1)) * (y2 - y1);
+    }
+  }
+  return 1.0;
+}
+
+export function calcRangePhase(
+  a: PetStatResult,
+  b: PetStatResult,
+  aToB: AttackOutcome,
+  bToA: AttackOutcome,
+  startingDist: number,
+): RangePhaseResult {
+  const rangeA = calcAttackRange(a.attackMode);
+  const rangeB = calcAttackRange(b.attackMode);
+  const moveSpeedA = calcMoveSpeed(a.mov);
+  const moveSpeedB = calcMoveSpeed(b.mov);
+
+  if (rangeA === rangeB) {
+    return {
+      advantageSide: "none", preContactTime: 0,
+      preContactAttacks: 0, preContactDamageAvg: 0,
+      preContactDamageMin: 0, preContactDamageMax: 0,
+      hpPctDealtAvg: 0, rangeA, rangeB, moveSpeedA, moveSpeedB,
+    };
+  }
+
+  const isAAdvantaged = rangeA > rangeB;
+  const attackRange = isAAdvantaged ? rangeA : rangeB;
+  const meleeRange = isAAdvantaged ? rangeB : rangeA;
+  const speedRanged = isAAdvantaged ? moveSpeedA : moveSpeedB;
+  const speedMelee = isAAdvantaged ? moveSpeedB : moveSpeedA;
+  const rateRanged = calcAttackRatePerSec(isAAdvantaged ? a.final.spd : b.final.spd);
+  const outcome = isAAdvantaged ? aToB : bToA;
+  const defenderHP = isAAdvantaged ? b.hp : a.hp;
+
+  // Pre-contact time: time between ranged pet starting to attack and melee reaching melee range
+  let preContactTime: number;
+  if (startingDist <= attackRange) {
+    // Ranged attacks immediately; melee must close from startingDist to meleeRange
+    preContactTime = Math.max(0, (startingDist - meleeRange) / speedMelee);
+  } else {
+    // Both approach until dist = attackRange, then ranged stops
+    const phase1Time = (startingDist - attackRange) / (speedRanged + speedMelee);
+    // Melee continues from attackRange to meleeRange
+    const phase2Time = (attackRange - meleeRange) / speedMelee;
+    preContactTime = phase1Time + phase2Time;
+  }
+
+  const preContactAttacks = Math.floor(preContactTime * rateRanged);
+  const preContactDamageAvg = preContactAttacks * outcome.perTurn.avg;
+  const preContactDamageMin = preContactAttacks * outcome.perTurn.min;
+  const preContactDamageMax = preContactAttacks * outcome.perTurn.max;
+  const hpPctDealtAvg = defenderHP > 0 ? preContactDamageAvg / defenderHP : 0;
+
+  return {
+    advantageSide: isAAdvantaged ? "A" : "B",
+    preContactTime,
+    preContactAttacks,
+    preContactDamageAvg,
+    preContactDamageMin,
+    preContactDamageMax,
+    hpPctDealtAvg,
+    rangeA,
+    rangeB,
+    moveSpeedA,
+    moveSpeedB,
+  };
+}
+
 export function calcPetBattleResult(
   a: PetStatResult,
   b: PetStatResult,
+  startingDist = 100,
 ): PetBattleResult {
   const aToB = calcAttackOutcome(a, b);
   const bToA = calcAttackOutcome(b, a);
@@ -151,5 +260,6 @@ export function calcPetBattleResult(
     b.final.luck,
   );
   const prediction = predictWinner(aToB, bToA, initiative);
-  return { aToB, bToA, initiative, prediction };
+  const rangePhase = calcRangePhase(a, b, aToB, bToA, startingDist);
+  return { aToB, bToA, initiative, prediction, rangePhase };
 }

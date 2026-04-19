@@ -44,6 +44,24 @@
     "tied": "同速",
     "detail": "SPD {{spdA}} vs {{spdB}}"
   },
+  "range": {
+    "title": "レンジ・接敵フェーズ",
+    "advantageA": "A が先制",
+    "advantageB": "B が先制",
+    "noAdvantage": "同時接敵",
+    "equalRange": "両者同射程のため先制なし",
+    "startingDist": "開始距離",
+    "attackRange": "射程",
+    "moveSpeed": "移動速度",
+    "preContactTime": "接敵までの時間",
+    "preContactAttacks": "先制攻撃数",
+    "preContactDamage": "先制ダメージ",
+    "hpPct": "対象HP削り率",
+    "instant": "即死",
+    "avg": "平均",
+    "seconds": "秒",
+    "hits": "回"
+  },
   "prediction": {
     "label": "勝敗予測",
     "winA": "A 勝利",

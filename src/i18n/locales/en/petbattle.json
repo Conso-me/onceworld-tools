@@ -44,6 +44,24 @@
     "tied": "Tied",
     "detail": "SPD {{spdA}} vs {{spdB}}"
   },
+  "range": {
+    "title": "Range & Approach Phase",
+    "advantageA": "A strikes first",
+    "advantageB": "B strikes first",
+    "noAdvantage": "Simultaneous contact",
+    "equalRange": "Equal range — no pre-contact advantage",
+    "startingDist": "Starting distance",
+    "attackRange": "Atk range",
+    "moveSpeed": "Move speed",
+    "preContactTime": "Time to contact",
+    "preContactAttacks": "Pre-contact hits",
+    "preContactDamage": "Pre-contact damage",
+    "hpPct": "HP dealt (%)",
+    "instant": "KO before contact",
+    "avg": "avg",
+    "seconds": "s",
+    "hits": "hits"
+  },
   "prediction": {
     "label": "Prediction",
     "winA": "A wins",

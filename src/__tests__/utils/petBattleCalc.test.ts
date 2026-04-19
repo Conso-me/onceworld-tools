@@ -18,6 +18,7 @@ function makePet(overrides: {
   hp?: number;
   element?: Element;
   attackMode?: "物理" | "魔法" | "魔弾";
+  mov?: number;
 } = {}): PetStatResult {
   const final = {
     vit: overrides.vit ?? 100,
@@ -34,6 +35,7 @@ function makePet(overrides: {
     element: overrides.element ?? "火",
     attackMode: overrides.attackMode ?? "物理",
     maxLevel: 1200,
+    mov: overrides.mov ?? 10,
   };
 }
 
