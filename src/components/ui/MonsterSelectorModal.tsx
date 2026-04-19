@@ -3,32 +3,58 @@ import { useTranslation } from "react-i18next";
 import type { MonsterBase, Element } from "../../types/game";
 import { useAllMonsters } from "../../hooks/useAllMonsters";
 
-function calcStatTotal(m: MonsterBase): number {
-  return m.vit + m.atk + m.int + m.def + m.mdef + m.spd + m.luck;
+type SortKey = "default" | "total" | "atk" | "int" | "vit" | "def" | "mdef" | "spd" | "luck";
+
+const SORT_OPTIONS: { key: SortKey; label: string }[] = [
+  { key: "default", label: "デフォ" },
+  { key: "total",   label: "合計" },
+  { key: "atk",     label: "ATK" },
+  { key: "int",     label: "INT" },
+  { key: "vit",     label: "VIT" },
+  { key: "def",     label: "DEF" },
+  { key: "mdef",    label: "M-DEF" },
+  { key: "spd",     label: "SPD" },
+  { key: "luck",    label: "LUK" },
+];
+
+function getSortValue(m: MonsterBase, key: SortKey): number {
+  switch (key) {
+    case "total": return m.vit + m.atk + m.int + m.def + m.mdef + m.spd + m.luck;
+    case "atk":   return m.atk;
+    case "int":   return m.int;
+    case "vit":   return m.vit;
+    case "def":   return m.def;
+    case "mdef":  return m.mdef;
+    case "spd":   return m.spd;
+    case "luck":  return m.luck;
+    default:      return 0;
+  }
 }
 
-function PetStatRow({ monster }: { monster: MonsterBase }) {
-  const statDefs = [
-    { label: "ATK", v: monster.atk },
-    { label: "INT", v: monster.int },
-    { label: "VIT", v: monster.vit },
-    { label: "DEF", v: monster.def },
-    { label: "M-DEF", v: monster.mdef },
-    { label: "SPD", v: monster.spd },
-    { label: "LUK", v: monster.luck },
+function PetStatRow({ monster, sortKey }: { monster: MonsterBase; sortKey: SortKey }) {
+  const statDefs: { label: string; key: SortKey; v: number }[] = [
+    { label: "ATK",   key: "atk",  v: monster.atk },
+    { label: "INT",   key: "int",  v: monster.int },
+    { label: "VIT",   key: "vit",  v: monster.vit },
+    { label: "DEF",   key: "def",  v: monster.def },
+    { label: "M-DEF", key: "mdef", v: monster.mdef },
+    { label: "SPD",   key: "spd",  v: monster.spd },
+    { label: "LUK",   key: "luck", v: monster.luck },
   ];
   const total = statDefs.reduce((s, x) => s + x.v, 0);
   return (
     <div className="flex flex-wrap gap-x-2 gap-y-0 mt-0.5 text-[10px] leading-tight">
-      {statDefs.map(({ label, v }) =>
+      {statDefs.map(({ label, key, v }) =>
         v > 0 ? (
-          <span key={label} className="text-gray-500">
-            <span className="text-gray-400">{label} </span>
-            <span className="text-gray-700">{v}</span>
+          <span key={key} className={sortKey === key ? "font-bold text-indigo-600" : "text-gray-500"}>
+            <span className={sortKey === key ? "text-indigo-400" : "text-gray-400"}>{label} </span>
+            <span>{v}</span>
           </span>
         ) : null
       )}
-      <span className="text-gray-600 font-semibold">合計 {total}</span>
+      <span className={`font-semibold ${sortKey === "total" ? "text-indigo-600" : "text-gray-600"}`}>
+        合計 {total}
+      </span>
     </div>
   );
 }
@@ -64,7 +90,7 @@ export function MonsterSelectorModal({ isOpen, onClose, onSelect, showPetStats }
   const { t } = useTranslation("game");
   const [elementFilter, setElementFilter] = useState<ElementFilter>("all");
   const [query, setQuery] = useState("");
-  const [sortByStrength, setSortByStrength] = useState(false);
+  const [sortKey, setSortKey] = useState<SortKey>("default");
 
   const allMonsters = useAllMonsters();
 
@@ -77,11 +103,11 @@ export function MonsterSelectorModal({ isOpen, onClose, onSelect, showPetStats }
       const lower = query.toLowerCase();
       list = list.filter((m) => m.name.toLowerCase().includes(lower));
     }
-    if (showPetStats && sortByStrength) {
-      list = [...list].sort((a, b) => calcStatTotal(b) - calcStatTotal(a));
+    if (showPetStats && sortKey !== "default") {
+      list = [...list].sort((a, b) => getSortValue(b, sortKey) - getSortValue(a, sortKey));
     }
     return list;
-  }, [allMonsters, elementFilter, query, showPetStats, sortByStrength]);
+  }, [allMonsters, elementFilter, query, showPetStats, sortKey]);
 
   if (!isOpen) return null;
 
@@ -147,33 +173,40 @@ export function MonsterSelectorModal({ isOpen, onClose, onSelect, showPetStats }
 
           {/* モンスター一覧 */}
           <div className="flex-1 overflow-y-auto flex flex-col">
-            {/* 検索バー */}
-            <div className="px-4 py-3 border-b border-gray-200 bg-white sticky top-0 flex items-center gap-2">
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                autoFocus
-                placeholder={t("searchByName")}
-                className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              />
+            {/* 検索バー + ソートバー (sticky unit) */}
+            <div className="border-b border-gray-200 bg-white sticky top-0">
+              <div className="px-4 py-3">
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  autoFocus
+                  placeholder={t("searchByName")}
+                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                />
+              </div>
               {showPetStats && (
-                <button
-                  type="button"
-                  onClick={() => setSortByStrength((v) => !v)}
-                  className={`flex-shrink-0 px-2.5 py-1.5 text-xs rounded-lg border font-medium transition-colors ${
-                    sortByStrength
-                      ? "bg-indigo-600 text-white border-indigo-600"
-                      : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
-                  }`}
-                >
-                  強さ順
-                </button>
+                <div className="flex overflow-x-auto gap-1.5 px-4 pb-2 shrink-0">
+                  {SORT_OPTIONS.map(({ key, label }) => (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => setSortKey(key)}
+                      className={`flex-shrink-0 px-2.5 py-1 text-xs rounded-full border font-medium transition-colors ${
+                        sortKey === key
+                          ? "bg-indigo-600 text-white border-indigo-600"
+                          : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
               )}
             </div>
 
             {/* PC: カラムヘッダー */}
-            <div className="hidden sm:flex items-center gap-3 px-5 py-2.5 border-b border-gray-200 bg-gray-50 sticky top-[57px]">
+            <div className="hidden sm:flex items-center gap-3 px-5 py-2.5 border-b border-gray-200 bg-gray-50">
               <span className="flex-1 text-xs font-bold text-gray-600 uppercase tracking-wide">{t("name")}</span>
               <span className="w-14 text-center text-xs font-bold text-gray-600 uppercase tracking-wide">{t("game:element.火", { defaultValue: "" }).length > 0 ? t("monsters:element", { defaultValue: t("game:elementFilter.all", { defaultValue: "" }).length > 0 ? "" : "" }) : ""}</span>
               <span className="w-16 text-right text-xs font-bold text-gray-600 uppercase tracking-wide">{t("monsters:attackType", { ns: "monsters" })}</span>
@@ -208,7 +241,7 @@ export function MonsterSelectorModal({ isOpen, onClose, onSelect, showPetStats }
                           {t(`attackType.${monster.attackType}`)}
                         </span>
                       </div>
-                      {showPetStats && <PetStatRow monster={monster} />}
+                      {showPetStats && <PetStatRow monster={monster} sortKey={sortKey} />}
                     </div>
                     {/* Mobile: 名前＋属性バッジ＋攻撃タイプを1行に */}
                     <div className="sm:hidden">
@@ -223,7 +256,7 @@ export function MonsterSelectorModal({ isOpen, onClose, onSelect, showPetStats }
                           {t(`attackType.${monster.attackType}`)}
                         </span>
                       </div>
-                      {showPetStats && <PetStatRow monster={monster} />}
+                      {showPetStats && <PetStatRow monster={monster} sortKey={sortKey} />}
                     </div>
                   </button>
                 ))
