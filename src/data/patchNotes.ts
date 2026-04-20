@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-04-20",
     changes: [
+    { type: "feature", text: "feat(data): 新武器3件追加（ネギソード・ワタッガシ・滅界双刃）" },
     { type: "improve", text: "feat(pet-battle): 先制ヒット数をスライダーで直接調整可能に" },
     { type: "improve", text: "fix(pet-battle): 開始距離50固定・先制ダメージを勝敗予測に反映" },
     { type: "feature", text: "feat(pet-battle): レンジ・接敵フェーズのシミュレーションを追加" },
