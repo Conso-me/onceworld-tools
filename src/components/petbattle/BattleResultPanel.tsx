@@ -3,6 +3,7 @@ import type { PetStatResult, Element } from "../../types/game";
 import type { PetBattleResult } from "../../utils/petBattleCalc";
 import { BattleDamageCard } from "./BattleDamageCard";
 import { BattleDurabilityCard } from "./BattleDurabilityCard";
+import { BattleRangeCard } from "./BattleRangeCard";
 
 export interface PetInfo {
   monsterName: string;
@@ -16,6 +17,8 @@ export interface BattleResultPanelProps {
   battle: PetBattleResult | null;
   petInfoA?: PetInfo;
   petInfoB?: PetInfo;
+  preContactHits: number;
+  onPreContactHitsChange: (v: number) => void;
 }
 
 const elementBadgeColors: Record<Element, string> = {
@@ -98,7 +101,7 @@ function StatRow({
   );
 }
 
-export function BattleResultPanel({ resultA, resultB, battle, petInfoA, petInfoB }: BattleResultPanelProps) {
+export function BattleResultPanel({ resultA, resultB, battle, petInfoA, petInfoB, preContactHits, onPreContactHitsChange }: BattleResultPanelProps) {
   const { t } = useTranslation("petbattle");
 
   if (!resultA || !resultB || !battle) {
@@ -122,6 +125,13 @@ export function BattleResultPanel({ resultA, resultB, battle, petInfoA, petInfoB
         <BattleDamageCard label={t("damage.aToB")} outcome={battle.aToB} color="blue" />
         <BattleDamageCard label={t("damage.bToA")} outcome={battle.bToA} color="orange" />
       </div>
+
+      {/* レンジ・移動フェーズ */}
+      <BattleRangeCard
+        rangePhase={battle.rangePhase}
+        preContactHits={preContactHits}
+        onPreContactHitsChange={onPreContactHitsChange}
+      />
 
       {/* 耐久+先攻+勝敗 */}
       <BattleDurabilityCard

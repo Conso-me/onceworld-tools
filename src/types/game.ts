@@ -192,4 +192,5 @@ export interface PetStatResult {
   element: Element;
   attackMode: "物理" | "魔法" | "魔弾";
   maxLevel: number;
+  mov: number;
 }

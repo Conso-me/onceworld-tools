@@ -149,6 +149,7 @@ export function calcPetStats(config: PetDamageConfig, monsterBase: MonsterBase):
   const hp = final.vit * 18 + 100;
   const element: Element = monsterBase.element;
   const attackMode = getPetAttackMode(monsterBase.attackType);
+  const mov = monsterBase.mov;
 
-  return { final, hp, element, attackMode, maxLevel };
+  return { final, hp, element, attackMode, maxLevel, mov };
 }

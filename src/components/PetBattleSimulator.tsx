@@ -27,6 +27,7 @@ export function PetBattleSimulator() {
     DEFAULT_PET_DAMAGE_CONFIG as PetDamageConfig & Record<string, unknown>,
   ) as unknown as PetCfgTuple;
   const [activeConfig, setActiveConfig] = usePersistedState<"A" | "B">("petbattle:active", "A");
+  const [preContactHits, setPreContactHits] = usePersistedState<number>("petbattle:preContactHits", 0);
 
   const allMonsters = useAllMonsters();
 
@@ -43,8 +44,8 @@ export function PetBattleSimulator() {
   const resultB = useMemo(() => (monsterB ? calcPetStats(cfgB, monsterB) : null), [cfgB, monsterB]);
 
   const battle = useMemo(
-    () => (resultA && resultB ? calcPetBattleResult(resultA, resultB) : null),
-    [resultA, resultB],
+    () => (resultA && resultB ? calcPetBattleResult(resultA, resultB, preContactHits) : null),
+    [resultA, resultB, preContactHits],
   );
 
   const activeCfg = activeConfig === "A" ? cfgA : cfgB;
@@ -94,6 +95,8 @@ export function PetBattleSimulator() {
           battle={battle}
           petInfoA={{ monsterName: cfgA.petMonsterName, level: cfgA.petLevel, sengiCount: cfgA.sengiCount }}
           petInfoB={{ monsterName: cfgB.petMonsterName, level: cfgB.petLevel, sengiCount: cfgB.sengiCount }}
+          preContactHits={preContactHits}
+          onPreContactHitsChange={setPreContactHits}
         />
       </div>
     </div>
