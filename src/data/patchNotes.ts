@@ -15,6 +15,9 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-04-20",
     changes: [
+    { type: "improve", text: "feat(pet-battle): 先制ヒット数をスライダーで直接調整可能に" },
+    { type: "improve", text: "fix(pet-battle): 開始距離50固定・先制ダメージを勝敗予測に反映" },
+    { type: "feature", text: "feat(pet-battle): レンジ・接敵フェーズのシミュレーションを追加" },
     { type: "improve", text: "feat(pet-selector): ステータス別ソートに対応" },
     { type: "feature", text: "feat(pet-selector): ペット選択時にステータス表示と強さ順ソートを追加" },
     ],
