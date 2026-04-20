@@ -1182,5 +1182,53 @@
     "mov": 0,
     "special": null,
     "order": 730
+  },
+  {
+    "name": "ネギソード",
+    "slot": "武器",
+    "series": null,
+    "material": "強化できない",
+    "vit": 100,
+    "spd": 0,
+    "atk": 0,
+    "int": 0,
+    "def": 0,
+    "mdef": 0,
+    "luck": 0,
+    "mov": 5,
+    "special": null,
+    "order": 740
+  },
+  {
+    "name": "ワタッガシ",
+    "slot": "武器",
+    "series": null,
+    "material": null,
+    "vit": 0,
+    "spd": 0,
+    "atk": 0,
+    "int": 0,
+    "def": 0,
+    "mdef": 0,
+    "luck": 3999,
+    "mov": 0,
+    "special": "5体攻撃\n攻撃範囲増（小）",
+    "order": 750
+  },
+  {
+    "name": "滅界双刃",
+    "slot": "武器",
+    "series": null,
+    "material": "ホワイドデブリ×1\n引きちぎられた鎖×11",
+    "vit": 0,
+    "spd": 5555,
+    "atk": 0,
+    "int": 0,
+    "def": 0,
+    "mdef": 0,
+    "luck": 0,
+    "mov": 2,
+    "special": "2体攻撃\n攻撃範囲増（中）",
+    "order": 760
   }
 ]
