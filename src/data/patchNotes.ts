@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-04-26",
+    changes: [
+    { type: "improve", text: "feat(i18n): 共通UI部品の英語化（PR1a）" },
+    ],
+  },
+
+  {
     date: "2026-04-20",
     changes: [
     { type: "feature", text: "feat(data): 新武器3件追加（ネギソード・ワタッガシ・滅界双刃）" },
