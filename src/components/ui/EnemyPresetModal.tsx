@@ -178,7 +178,7 @@ export function EnemyPresetModal({
                     <span className="flex-1 font-semibold text-gray-900 text-sm group-hover:text-indigo-700 flex items-center gap-1.5">
                       {preset.monsterName ?? t("game:unknownName")}
                       {preset.magicImmune && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-600 font-bold flex-shrink-0">魔法無効</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-600 font-bold flex-shrink-0">{t("damage:magicImmune")}</span>
                       )}
                     </span>
                     <span className="w-28 text-right text-sm font-mono font-semibold text-indigo-600">{preset.level.toLocaleString()}</span>
@@ -202,7 +202,7 @@ export function EnemyPresetModal({
                       <div className="font-semibold text-gray-900 text-sm group-hover:text-indigo-700 flex items-center gap-1.5">
                         {preset.monsterName ?? t("game:unknownName")}
                         {preset.magicImmune && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-600 font-bold flex-shrink-0">魔法無効</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-600 font-bold flex-shrink-0">{t("damage:magicImmune")}</span>
                         )}
                       </div>
                       <div className="flex items-center gap-2 mt-0.5">

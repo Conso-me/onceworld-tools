@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { OffensiveComparisonRow } from "../../utils/multiDamageCalc";
 import { calcIntForKill } from "../../utils/damageCalc";
 
@@ -18,6 +19,7 @@ export function MagicOffensiveSummary({
   magicBaseInt,
   crystalCubeFinalMult,
 }: Props) {
+  const { t } = useTranslation(["damage", "common"]);
   const magicRows = rows.filter((r) => r.mode === "魔攻" && r.spellResults !== undefined);
   if (magicRows.length === 0) return null;
 
@@ -32,12 +34,10 @@ export function MagicOffensiveSummary({
 
   if (rowsWithSpell.length === 0) return null;
 
-  // 与ダメ判定: 最も倒しにくい敵（hitsToKill 最大）
   const hardestByKill = rowsWithSpell.reduce((max, x) =>
     (x.activeSpell!.hitsToKill ?? Infinity) > (max.activeSpell?.hitsToKill ?? Infinity) ? x : max
   );
 
-  // OverKill必要INT: overkillStatNeeded が最大の敵
   const hardestByInt = rowsWithSpell.reduce((max, x) =>
     x.activeSpell!.overkillStatNeeded > max.activeSpell!.overkillStatNeeded ? x : max
   );
@@ -45,7 +45,6 @@ export function MagicOffensiveSummary({
   const intShortfall = Math.max(0, maxOverkillInt - currentInt);
   const intAchieved = currentInt > 0 && intShortfall <= 0;
 
-  // OverKill必要魔晶立方体: 現在のINTで各モンスターをOKするための最小魔晶立方体数
   let maxCubesNeeded = 0;
   let hardestByCubeName = rowsWithSpell[0].row.scaled.name;
   let isUnachievable = false;
@@ -86,73 +85,64 @@ export function MagicOffensiveSummary({
   const cubeShortfall = !isUnachievable ? Math.max(0, maxCubesNeeded - currentCubeCount) : null;
   const cubeAchieved = currentInt > 0 && !isUnachievable && cubeShortfall === 0;
 
+  const mostKillLabel = t("damage:mostHitsToKill", { name: hardestByKill.row.scaled.name });
+  const overkillIntLabel = t("damage:overkillIntFor", { name: hardestByInt.row.scaled.name });
+  const overkillCubesLabel = t("damage:overkillCubesFor", { name: hardestByCubeName });
+
   return (
     <div className="bg-indigo-50 rounded-2xl px-4 py-3 border border-indigo-100">
-      <div className="text-xs font-bold text-indigo-600 mb-2">魔法攻撃 サマリー</div>
+      <div className="text-xs font-bold text-indigo-600 mb-2">{t("damage:magicSummary")}</div>
       <div className="grid grid-cols-2 gap-3">
 
-        {/* 与ダメ判定: 最も倒しにくい敵 */}
         <div className="bg-white rounded-xl px-3 py-2">
-          <div
-            className="text-[10px] text-gray-400 font-medium mb-0.5 truncate"
-            title={`最多確殺（${hardestByKill.row.scaled.name}）`}
-          >
-            最多確殺（{hardestByKill.row.scaled.name}）
+          <div className="text-[10px] text-gray-400 font-medium mb-0.5 truncate" title={mostKillLabel}>
+            {mostKillLabel}
           </div>
           <div className="text-base font-bold text-gray-800 tabular-nums">
             {hardestByKill.activeSpell!.totalMin.toLocaleString()}〜{hardestByKill.activeSpell!.totalMax.toLocaleString()}
           </div>
           <div className="text-xs tabular-nums text-gray-500 font-medium mt-0.5">
             {hardestByKill.activeSpell!.hitsToKill === Infinity
-              ? "倒せない"
-              : `${hardestByKill.activeSpell!.hitsToKill}回確殺`}
+              ? t("damage:cannotKill")
+              : t("damage:nHitsKillSimple", { n: hardestByKill.activeSpell!.hitsToKill })}
           </div>
         </div>
 
-        {/* OverKill: INT + 魔晶立方体 */}
         <div className="bg-white rounded-xl px-3 py-2 space-y-2">
-          {/* INT */}
           <div>
-            <div
-              className="text-[10px] text-gray-400 font-medium truncate"
-              title={`OverKill必要INT（${hardestByInt.row.scaled.name}）`}
-            >
-              OverKill必要INT（{hardestByInt.row.scaled.name}）
+            <div className="text-[10px] text-gray-400 font-medium truncate" title={overkillIntLabel}>
+              {overkillIntLabel}
             </div>
             <div className="text-base font-bold text-orange-600 tabular-nums">
               {maxOverkillInt.toLocaleString()}
             </div>
             {currentInt > 0 && (
               <div className={`text-xs tabular-nums font-medium ${intAchieved ? "text-green-600" : "text-orange-500"}`}>
-                {intAchieved ? "達成済み ✓" : `あと${intShortfall.toLocaleString()}`}
+                {intAchieved ? t("common:achievedDone") : t("common:remaining", { value: intShortfall.toLocaleString() })}
               </div>
             )}
           </div>
 
           <div className="border-t border-gray-100" />
 
-          {/* 魔晶立方体 */}
           <div>
-            <div
-              className="text-[10px] text-gray-400 font-medium truncate"
-              title={`OverKill魔晶立方体数（${hardestByCubeName}）`}
-            >
-              OverKill魔晶立方体数（{hardestByCubeName}）
+            <div className="text-[10px] text-gray-400 font-medium truncate" title={overkillCubesLabel}>
+              {overkillCubesLabel}
             </div>
             {currentInt === 0 ? (
-              <div className="text-[10px] text-gray-400 mt-0.5">INTを設定すると表示</div>
+              <div className="text-[10px] text-gray-400 mt-0.5">{t("damage:setIntForDisplay")}</div>
             ) : isUnachievable ? (
               <>
-                <div className="text-sm font-bold text-red-500">不可</div>
-                <div className="text-[10px] text-gray-400">1000個でも不足</div>
+                <div className="text-sm font-bold text-red-500">{t("damage:impossible")}</div>
+                <div className="text-[10px] text-gray-400">{t("damage:cubesShortfall1k")}</div>
               </>
             ) : (
               <>
                 <div className="text-base font-bold text-purple-600 tabular-nums">
-                  {maxCubesNeeded.toLocaleString()}個
+                  {maxCubesNeeded.toLocaleString()}{t("common:units")}
                 </div>
                 <div className={`text-xs tabular-nums font-medium ${cubeAchieved ? "text-green-600" : "text-purple-500"}`}>
-                  {cubeAchieved ? "達成済み ✓" : `あと${cubeShortfall!.toLocaleString()}個`}
+                  {cubeAchieved ? t("common:achievedDone") : t("common:remaining", { value: `${cubeShortfall!.toLocaleString()}${t("common:units")}` })}
                 </div>
               </>
             )}

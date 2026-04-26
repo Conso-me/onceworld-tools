@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { useSharedSimConfig } from "../../hooks/useSharedSimConfig";
 import { usePersistedState } from "../../hooks/usePersistedState";
 import { calcStatus } from "../../utils/statusCalc";
@@ -11,7 +12,7 @@ const STAT_LABELS: Record<string, string> = {
 const STAT_KEYS = ["vit", "spd", "atk", "int", "def", "mdef", "luck"] as const;
 
 function fmt(n: number) {
-  return n.toLocaleString("ja-JP");
+  return n.toLocaleString();
 }
 
 function ItemRow({ label, name, enh, canEnhance }: {
@@ -45,6 +46,7 @@ function SectionHeader({ children }: { children: React.ReactNode }) {
 }
 
 export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
+  const { t } = useTranslation(["common", "status", "game"]);
   const [cfg] = useSharedSimConfig();
   const [copied, setCopied] = useState(false);
   const [crystalCubeRaw] = usePersistedState("dmg:crystalCube", "");
@@ -64,12 +66,15 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
   const weaponItem = cfg.equipWeapon ? getEquipmentByName(cfg.equipWeapon) : undefined;
   const weaponCanEnh = weaponItem ? weaponItem.material !== "強化できない" : true;
 
+  const slotLabel = (slot: string) => t(`game:equipSlot.${slot}`);
+  const noneText = t("common:none");
+
   const armorSlots = [
-    { label: "頭", name: cfg.equipHead,   enh: cfg.enhHead,   item: cfg.equipHead   ? getEquipmentByName(cfg.equipHead)   : undefined },
-    { label: "服", name: cfg.equipBody,   enh: cfg.enhBody,   item: cfg.equipBody   ? getEquipmentByName(cfg.equipBody)   : undefined },
-    { label: "手", name: cfg.equipHand,   enh: cfg.enhHand,   item: cfg.equipHand   ? getEquipmentByName(cfg.equipHand)   : undefined },
-    { label: "盾", name: cfg.equipShield, enh: cfg.enhShield, item: cfg.equipShield ? getEquipmentByName(cfg.equipShield) : undefined },
-    { label: "脚", name: cfg.equipFoot,   enh: cfg.enhFoot,   item: cfg.equipFoot   ? getEquipmentByName(cfg.equipFoot)   : undefined },
+    { slot: "頭", name: cfg.equipHead,   enh: cfg.enhHead,   item: cfg.equipHead   ? getEquipmentByName(cfg.equipHead)   : undefined },
+    { slot: "服", name: cfg.equipBody,   enh: cfg.enhBody,   item: cfg.equipBody   ? getEquipmentByName(cfg.equipBody)   : undefined },
+    { slot: "手", name: cfg.equipHand,   enh: cfg.enhHand,   item: cfg.equipHand   ? getEquipmentByName(cfg.equipHand)   : undefined },
+    { slot: "盾", name: cfg.equipShield, enh: cfg.enhShield, item: cfg.equipShield ? getEquipmentByName(cfg.equipShield) : undefined },
+    { slot: "脚", name: cfg.equipFoot,   enh: cfg.enhFoot,   item: cfg.equipFoot   ? getEquipmentByName(cfg.equipFoot)   : undefined },
   ] as const;
 
   const accSlots = [
@@ -90,34 +95,34 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
 
   const buildCopyText = useCallback(() => {
     const lines: string[] = [
-      "【キャラクター情報】",
-      `  レベル: ${cfg.charLevel}`,
-      `  天命: ${cfg.reinCount}`,
-      `  属性: ${cfg.charElement}`,
-      `  魔晶立方体: ${crystalCubeNum.toLocaleString("ja-JP")}個`,
+      `【${t("common:characterInfo")}】`,
+      `  ${t("status:level")}: ${cfg.charLevel}`,
+      `  ${t("common:destiny")}: ${cfg.reinCount}`,
+      `  ${t("status:element")}: ${cfg.charElement}`,
+      `  ${t("status:crystalCube")}: ${crystalCubeNum.toLocaleString()}${t("common:units")}`,
       "",
-      "【装備】",
+      `【${t("status:equipment")}】`,
     ];
-    lines.push(`  武器: ${cfg.equipWeapon || "なし"}${cfg.equipWeapon && weaponCanEnh ? ` +${cfg.enhWeapon}` : ""}`);
-    for (const { label, name, enh, item } of armorSlots) {
+    lines.push(`  ${slotLabel("武器")}: ${cfg.equipWeapon || noneText}${cfg.equipWeapon && weaponCanEnh ? ` +${cfg.enhWeapon}` : ""}`);
+    for (const { slot, name, enh, item } of armorSlots) {
       const canEnh = item ? item.material !== "強化できない" : true;
-      lines.push(`  ${label}: ${name || "なし"}${name && canEnh ? ` +${enh}` : ""}`);
+      lines.push(`  ${slotLabel(slot)}: ${name || noneText}${name && canEnh ? ` +${enh}` : ""}`);
     }
-    if (setBonus) lines.push(`  ★セット効果: ${setBonusSeries}`);
+    if (setBonus) lines.push(`  ★${t("common:setBonus")}: ${setBonusSeries}`);
 
     lines.push("");
-    lines.push("【アクセサリー】");
+    lines.push(`【${t("status:accessory")}】`);
     for (const { name, level } of accSlots) {
       if (name) lines.push(`  ${name} Lv.${level}`);
     }
-    if (accSlots.every((s) => !s.name)) lines.push("  なし");
+    if (accSlots.every((s) => !s.name)) lines.push(`  ${noneText}`);
 
     lines.push("");
-    lines.push("【ペット】");
+    lines.push(`【${t("status:pet")}】`);
     for (const { name, level } of petSlots) {
       if (name) lines.push(`  ${name} Lv.${level}`);
     }
-    if (petSlots.every((s) => !s.name)) lines.push("  なし");
+    if (petSlots.every((s) => !s.name)) lines.push(`  ${noneText}`);
 
     const alignStats = (entries: [string, number][]) => {
       const maxLabel = Math.max(...entries.map(([l]) => l.length));
@@ -127,7 +132,7 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
     };
 
     lines.push("");
-    lines.push("【ステータス割り振り】");
+    lines.push(`【${t("common:statAllocation")}】`);
     for (const l of alignStats([
       ["VIT",   cfg.allocVit],
       ["SPD",   cfg.allocSpd],
@@ -136,11 +141,11 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
       ["DEF",   cfg.allocDef],
       ["M-DEF", cfg.allocMdef],
       ["LUCK",  cfg.allocLuck],
-      ["合計",  allocTotal],
+      [t("common:total"), allocTotal],
     ])) lines.push(l);
 
     lines.push("");
-    lines.push("【最終ステータス】");
+    lines.push(`【${t("common:finalStatus")}】`);
     for (const l of alignStats([
       ["VIT",   final.vit],
       ["SPD",   final.spd],
@@ -153,7 +158,7 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
     ])) lines.push(l);
 
     return lines.join("\n");
-  }, [cfg, crystalCubeNum, weaponCanEnh, armorSlots, accSlots, petSlots, setBonus, setBonusSeries, allocTotal, final, hp]);
+  }, [t, cfg, crystalCubeNum, weaponCanEnh, armorSlots, accSlots, petSlots, setBonus, setBonusSeries, allocTotal, final, hp, noneText]);
 
   const handleCopy = useCallback(async () => {
     try {
@@ -174,9 +179,8 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
         className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[85vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* ヘッダー */}
         <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-200 shrink-0">
-          <h3 className="text-sm font-semibold text-gray-700">装備サマリー</h3>
+          <h3 className="text-sm font-semibold text-gray-700">{t("common:equipmentSummary")}</h3>
           <div className="flex items-center gap-2">
             <button
               onClick={handleCopy}
@@ -186,7 +190,7 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
-              {copied ? "コピー済み ✓" : "テキストコピー"}
+              {copied ? t("common:copied") : t("common:copyText")}
             </button>
             <button
               onClick={onClose}
@@ -197,40 +201,37 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
           </div>
         </div>
 
-        {/* 本体 */}
         <div className="overflow-y-auto flex-1 px-4 py-3 space-y-3">
-          {/* キャラクター情報 */}
           <div>
-            <SectionHeader>キャラクター情報</SectionHeader>
+            <SectionHeader>{t("common:characterInfo")}</SectionHeader>
             <div className="grid grid-cols-4 gap-x-2 gap-y-1">
               <div className="flex flex-col items-center bg-gray-50 rounded-lg px-2 py-1">
-                <span className="text-xs text-gray-400">レベル</span>
+                <span className="text-xs text-gray-400">{t("status:level")}</span>
                 <span className="text-xs font-semibold text-gray-700">{fmt(cfg.charLevel)}</span>
               </div>
               <div className="flex flex-col items-center bg-gray-50 rounded-lg px-2 py-1">
-                <span className="text-xs text-gray-400">天命</span>
+                <span className="text-xs text-gray-400">{t("common:destiny")}</span>
                 <span className="text-xs font-semibold text-gray-700">{cfg.reinCount}</span>
               </div>
               <div className="flex flex-col items-center bg-gray-50 rounded-lg px-2 py-1">
-                <span className="text-xs text-gray-400">属性</span>
-                <span className="text-xs font-semibold text-gray-700">{cfg.charElement}</span>
+                <span className="text-xs text-gray-400">{t("status:element")}</span>
+                <span className="text-xs font-semibold text-gray-700">{t(`game:element.${cfg.charElement}`)}</span>
               </div>
               <div className="flex flex-col items-center bg-gray-50 rounded-lg px-2 py-1">
-                <span className="text-xs text-gray-400">魔晶立方体</span>
-                <span className="text-xs font-semibold text-gray-700">{fmt(crystalCubeNum)}個</span>
+                <span className="text-xs text-gray-400">{t("status:crystalCube")}</span>
+                <span className="text-xs font-semibold text-gray-700">{fmt(crystalCubeNum)}{t("common:units")}</span>
               </div>
             </div>
           </div>
 
-          {/* 装備 */}
           <div>
-            <SectionHeader>装備</SectionHeader>
+            <SectionHeader>{t("status:equipment")}</SectionHeader>
             <div className="space-y-1 max-w-[60%]">
-              <ItemRow label="武器" name={cfg.equipWeapon} enh={cfg.enhWeapon} canEnhance={weaponCanEnh} />
-              {armorSlots.map(({ label, name, enh, item }) => (
+              <ItemRow label={slotLabel("武器")} name={cfg.equipWeapon} enh={cfg.enhWeapon} canEnhance={weaponCanEnh} />
+              {armorSlots.map(({ slot, name, enh, item }) => (
                 <ItemRow
-                  key={label}
-                  label={label}
+                  key={slot}
+                  label={slotLabel(slot)}
                   name={name}
                   enh={enh}
                   canEnhance={item ? item.material !== "強化できない" : true}
@@ -239,14 +240,13 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
             </div>
             {setBonus && (
               <div className="mt-1.5 text-xs text-indigo-500 font-medium">
-                ★ セット効果: {setBonusSeries}
+                ★ {t("common:setBonus")}: {setBonusSeries}
               </div>
             )}
           </div>
 
-          {/* アクセサリー */}
           <div>
-            <SectionHeader>アクセサリー</SectionHeader>
+            <SectionHeader>{t("status:accessory")}</SectionHeader>
             <div className="space-y-1 max-w-[60%]">
               {accSlots.map((s, i) => (
                 <div key={i} className="flex items-baseline gap-2 text-xs">
@@ -263,9 +263,8 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
             </div>
           </div>
 
-          {/* ペット */}
           <div>
-            <SectionHeader>ペット</SectionHeader>
+            <SectionHeader>{t("status:pet")}</SectionHeader>
             <div className="space-y-1 max-w-[60%]">
               {petSlots.map((s, i) => (
                 <div key={i} className="flex items-baseline gap-2 text-xs">
@@ -282,9 +281,8 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
             </div>
           </div>
 
-          {/* ステータス割り振り */}
           <div>
-            <SectionHeader>ステータス割り振り</SectionHeader>
+            <SectionHeader>{t("common:statAllocation")}</SectionHeader>
             <div className="grid grid-cols-4 gap-x-2 gap-y-1">
               {STAT_KEYS.map((k) => {
                 const alloc = cfg[`alloc${k.charAt(0).toUpperCase() + k.slice(1)}` as keyof typeof cfg] as number;
@@ -296,12 +294,11 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
                 );
               })}
             </div>
-            <div className="text-xs text-gray-400 mt-1 text-right">合計 {fmt(allocTotal)}</div>
+            <div className="text-xs text-gray-400 mt-1 text-right">{t("common:total")} {fmt(allocTotal)}</div>
           </div>
 
-          {/* 最終ステータス */}
           <div>
-            <SectionHeader>最終ステータス</SectionHeader>
+            <SectionHeader>{t("common:finalStatus")}</SectionHeader>
             <div className="grid grid-cols-4 gap-x-2 gap-y-1">
               {STAT_KEYS.map((k) => (
                 <div key={k} className="flex flex-col items-center bg-indigo-50 rounded-lg px-2 py-1">
@@ -317,13 +314,12 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
           </div>
         </div>
 
-        {/* フッター */}
         <div className="px-4 py-2.5 border-t border-gray-100 shrink-0">
           <button
             onClick={onClose}
             className="w-full text-xs py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors font-medium"
           >
-            閉じる
+            {t("common:close")}
           </button>
         </div>
       </div>
