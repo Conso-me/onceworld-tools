@@ -82,7 +82,7 @@ function App() {
                 onClick={() => setShowEquipSummary(true)}
                 className="hidden sm:inline-flex text-xs px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors font-medium"
               >
-                装備確認
+                {t("equipmentCheck")}
               </button>
 
               {/* Mobile: ⋯ ドロップダウンメニュー */}
@@ -114,7 +114,7 @@ function App() {
                       onClick={() => { setShowEquipSummary(true); setMobileMenuOpen(false); }}
                       className="w-full text-left px-4 py-2.5 text-sm text-indigo-600 hover:bg-gray-50"
                     >
-                      装備確認
+                      {t("equipmentCheck")}
                     </button>
                   </div>
                 )}

@@ -53,5 +53,19 @@
   "self": "自",
   "myStatus": "自分のステータス",
   "monster": "モンスター",
-  "monsterCount": "体"
+  "monsterCount": "体",
+  "achievedDone": "達成済み ✓",
+  "expand": "展開する",
+  "collapse": "折り畳む",
+  "equipmentCheck": "装備確認",
+  "copyText": "テキストコピー",
+  "copied": "コピー済み ✓",
+  "characterInfo": "キャラクター情報",
+  "equipmentSummary": "装備サマリー",
+  "statAllocation": "ステータス割り振り",
+  "finalStatus": "最終ステータス",
+  "total": "合計",
+  "setBonus": "セット効果",
+  "destiny": "天命",
+  "sortDefault": "デフォ"
 }

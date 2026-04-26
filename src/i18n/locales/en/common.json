@@ -53,5 +53,19 @@
   "self": "Me",
   "myStatus": "My Stats",
   "monster": "Monster",
-  "monsterCount": ""
+  "monsterCount": "",
+  "achievedDone": "Done ✓",
+  "expand": "Expand",
+  "collapse": "Collapse",
+  "equipmentCheck": "Equipment",
+  "copyText": "Copy Text",
+  "copied": "Copied ✓",
+  "characterInfo": "Character Info",
+  "equipmentSummary": "Equipment Summary",
+  "statAllocation": "Stat Allocation",
+  "finalStatus": "Final Stats",
+  "total": "Total",
+  "setBonus": "Set Bonus",
+  "destiny": "Rebirth",
+  "sortDefault": "Default"
 }

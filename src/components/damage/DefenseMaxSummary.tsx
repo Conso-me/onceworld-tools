@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { DefensiveComparisonRow } from "../../utils/multiDamageCalc";
 
 interface Props {
@@ -5,6 +6,7 @@ interface Props {
 }
 
 export function DefenseMaxSummary({ rows }: Props) {
+  const { t } = useTranslation(["damage", "common"]);
   if (rows.length === 0) return null;
 
   const physRows = rows.filter((r) => r.enemyIsPhysical);
@@ -19,18 +21,18 @@ export function DefenseMaxSummary({ rows }: Props) {
 
   return (
     <div className="bg-indigo-50 rounded-2xl px-4 py-3 border border-indigo-100">
-      <div className="text-xs font-bold text-indigo-600 mb-2">全モンスターを無効化するのに必要な最大値</div>
+      <div className="text-xs font-bold text-indigo-600 mb-2">{t("damage:maxNullifyAll")}</div>
       <div className="grid grid-cols-2 gap-3">
         {maxPhysReq !== null && (() => {
           const remaining = physEffective !== null ? Math.max(0, Math.ceil(maxPhysReq - physEffective)) : null;
           const achieved = remaining !== null && remaining <= 0;
           return (
             <div className="bg-white rounded-xl px-3 py-2">
-              <div className="text-[10px] text-gray-400 font-medium">対物理 DEF</div>
+              <div className="text-[10px] text-gray-400 font-medium">{t("damage:vsPhysDef")}</div>
               <div className="text-lg font-bold text-orange-600 tabular-nums">{maxPhysReq.toLocaleString()}</div>
               {remaining !== null && (
                 <div className={`text-xs tabular-nums font-medium ${achieved ? "text-green-600" : "text-orange-500"}`}>
-                  {achieved ? "達成済み ✓" : `あと${remaining.toLocaleString()}`}
+                  {achieved ? t("common:achievedDone") : t("common:remaining", { value: remaining.toLocaleString() })}
                 </div>
               )}
             </div>
@@ -41,11 +43,11 @@ export function DefenseMaxSummary({ rows }: Props) {
           const achieved = remaining !== null && remaining <= 0;
           return (
             <div className="bg-white rounded-xl px-3 py-2">
-              <div className="text-[10px] text-gray-400 font-medium">対魔法 M-DEF</div>
+              <div className="text-[10px] text-gray-400 font-medium">{t("damage:vsMagicMdef")}</div>
               <div className="text-lg font-bold text-purple-600 tabular-nums">{maxMagicReq.toLocaleString()}</div>
               {remaining !== null && (
                 <div className={`text-xs tabular-nums font-medium ${achieved ? "text-green-600" : "text-purple-500"}`}>
-                  {achieved ? "達成済み ✓" : `あと${remaining.toLocaleString()}`}
+                  {achieved ? t("common:achievedDone") : t("common:remaining", { value: remaining.toLocaleString() })}
                 </div>
               )}
             </div>
@@ -53,7 +55,7 @@ export function DefenseMaxSummary({ rows }: Props) {
         })()}
       </div>
       {!hasPlayerStats && (
-        <div className="text-[10px] text-gray-400 mt-1">プレイヤーDEF/MDEFを設定すると達成状況を表示します</div>
+        <div className="text-[10px] text-gray-400 mt-1">{t("damage:setPlayerDefForStatus")}</div>
       )}
     </div>
   );
