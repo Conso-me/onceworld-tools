@@ -32,7 +32,7 @@ export function DefensiveComparisonTable({ rows, onSelectMonster }: Props) {
       {/* ヘッダー */}
       <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-x-2 px-3 py-2 bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wide min-w-[600px]">
         <span>{t("common:monster")}</span>
-        <span className="w-20 whitespace-nowrap">無効化</span>
+        <span className="w-20 whitespace-nowrap">{t("nullifyHeader")}</span>
         <span className="w-28">{t("defensePanel.currentDamage")}</span>
         <span className="w-24 whitespace-nowrap">{t("defensePanel.survivableHits")}</span>
         <span className="w-12"></span>
@@ -91,11 +91,11 @@ export function DefensiveComparisonTable({ rows, onSelectMonster }: Props) {
                 </div>
                 {!row.nullified && row.additionalDefNeeded > 0 && (
                   <div className="text-[10px] text-orange-500 tabular-nums whitespace-nowrap">
-                    あと{Math.ceil(row.additionalDefNeeded).toLocaleString()}
+                    {t("common:remaining", { value: Math.ceil(row.additionalDefNeeded).toLocaleString() })}
                   </div>
                 )}
                 {row.nullified && (
-                  <div className="text-[10px] text-green-600">達成</div>
+                  <div className="text-[10px] text-green-600">{t("common:achieved")}</div>
                 )}
               </div>
 
