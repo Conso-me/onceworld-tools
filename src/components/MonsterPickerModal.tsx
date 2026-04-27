@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import type { MonsterBase } from "../types/game";
 import { useAllMonsters } from "../hooks/useAllMonsters";
+import { getMonsterDisplayName } from "../data/monsters";
 
 type SortKey = "exp_desc" | "exp_asc" | "gold_desc" | "gold_asc";
 
@@ -20,7 +21,8 @@ export function MonsterPickerModal({
   onPick: (monster: MonsterBase) => void;
   onClose: () => void;
 }) {
-  const { t } = useTranslation("monsters");
+  const { t, i18n } = useTranslation("monsters");
+  const lang = i18n.language;
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortKey>("exp_desc");
 
@@ -30,7 +32,11 @@ export function MonsterPickerModal({
     let list = allMonsters;
     if (query) {
       const lower = query.toLowerCase();
-      list = list.filter((m) => m.name.toLowerCase().includes(lower));
+      list = list.filter((m) => {
+        if (m.name.toLowerCase().includes(lower)) return true;
+        if (lang === "en" && m.nameEn && m.nameEn.toLowerCase().includes(lower)) return true;
+        return false;
+      });
     }
     const [key, dir] = sort.split("_") as ["exp" | "gold", "desc" | "asc"];
     return [...list].sort((a, b) => {
@@ -116,7 +122,7 @@ export function MonsterPickerModal({
             >
               <div className="flex items-center gap-2 min-w-0">
                 <span className="text-sm text-gray-800 truncate">
-                  {monster.name}
+                  {getMonsterDisplayName(monster, lang)}
                 </span>
                 <span
                   className={`text-xs px-1.5 py-0.5 rounded shrink-0 ${elementColors[monster.element] ?? "bg-gray-100 text-gray-500"}`}

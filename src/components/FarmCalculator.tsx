@@ -14,7 +14,7 @@ import {
   type MonsterGoldEntry,
 } from "../utils/goldCalc";
 import { getMonsterDropInfo } from "../data/monsterDrops";
-import { getMonsterByName } from "../data/monsters";
+import { getMonsterByName, getMonsterDisplayName } from "../data/monsters";
 import { usePersistedState } from "../hooks/usePersistedState";
 import { StatCard } from "./ui/StatCard";
 import { MonsterPickerModal } from "./MonsterPickerModal";
@@ -107,7 +107,8 @@ function fmtDrop(n: number): string {
 }
 
 export function FarmCalculator() {
-  const { t } = useTranslation("farm");
+  const { t, i18n } = useTranslation("farm");
+  const lang = i18n.language;
   const [monsterRows, setMonsterRows] = useState<MonsterRow[]>([]);
   const [secondsPerRun, setSecondsPerRun] = usePersistedState("farm:seconds", "60");
   const [expBonus, setExpBonus] = usePersistedState("farm:expBonus", "0");
@@ -346,7 +347,7 @@ export function FarmCalculator() {
                 <div key={row.id} className="py-2 px-3 bg-gray-50 rounded-lg space-y-2">
                   {/* 名前 + 削除 */}
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700 truncate">{row.monster.name}</span>
+                    <span className="text-sm font-medium text-gray-700 truncate">{getMonsterDisplayName(row.monster, lang)}</span>
                     <button onClick={() => removeMonster(row.id)} className="text-gray-400 hover:text-red-500 transition-colors shrink-0 ml-2">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -471,7 +472,7 @@ export function FarmCalculator() {
                         {preset.name}
                       </span>
                       <span className="text-[10px] text-gray-400 shrink-0">
-                        {preset.rows.length}体
+                        {t("monsterCount", { count: preset.rows.length })}
                       </span>
                       <button
                         onClick={() => loadPreset(preset)}

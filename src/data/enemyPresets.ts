@@ -7,7 +7,9 @@ export interface EnemyPreset {
 
 export interface EnemyPresetGroup {
   mapLabel: string;  // マップ名
+  mapLabelEn?: string;
   label: string;
+  labelEn?: string;
   presets: EnemyPreset[];
 }
 

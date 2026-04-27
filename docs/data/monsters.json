@@ -1,6 +1,7 @@
 [
   {
     "name": "グリーンスライム",
+    "nameEn": "Green Slime",
     "level": 0,
     "element": "木",
     "attackType": "物理",
@@ -18,6 +19,7 @@
   },
   {
     "name": "レッドゴブリン",
+    "nameEn": "Red Goblin",
     "level": 0,
     "element": "火",
     "attackType": "物理",
@@ -35,6 +37,7 @@
   },
   {
     "name": "ゴブリンメイジ",
+    "nameEn": "Goblin Mage",
     "level": 0,
     "element": "火",
     "attackType": "魔弾",
@@ -52,6 +55,7 @@
   },
   {
     "name": "クリーチャーローズ",
+    "nameEn": "Creature Rose",
     "level": 0,
     "element": "木",
     "attackType": "物理",
@@ -69,6 +73,7 @@
   },
   {
     "name": "キメラタートル",
+    "nameEn": "Chimera Turtle",
     "level": 0,
     "element": "水",
     "attackType": "物理",
@@ -86,6 +91,7 @@
   },
   {
     "name": "鉄罠花",
+    "nameEn": "Iron Trap Bloom",
     "level": 0,
     "element": "木",
     "attackType": "魔法",
@@ -103,6 +109,7 @@
   },
   {
     "name": "ペンギンソルジャー",
+    "nameEn": "Penguin Soldier",
     "level": 0,
     "element": "水",
     "attackType": "物理",
@@ -120,6 +127,7 @@
   },
   {
     "name": "ハネスライム",
+    "nameEn": "Winged Slime",
     "level": 0,
     "element": "水",
     "attackType": "物理",
@@ -137,6 +145,7 @@
   },
   {
     "name": "ボスゴブリン",
+    "nameEn": "Boss Goblin",
     "level": 0,
     "element": "木",
     "attackType": "物理",
@@ -154,6 +163,7 @@
   },
   {
     "name": "ギガントオーク",
+    "nameEn": "Gigant Oak",
     "level": 0,
     "element": "火",
     "attackType": "物理",
@@ -171,6 +181,7 @@
   },
   {
     "name": "古代魚ザコーン",
+    "nameEn": "Ancient Fish Zakorn",
     "level": 0,
     "element": "水",
     "attackType": "物理",
@@ -188,6 +199,7 @@
   },
   {
     "name": "禁域のラミア",
+    "nameEn": "Forbidden Lamia",
     "level": 0,
     "element": "水",
     "attackType": "魔法",
@@ -205,6 +217,7 @@
   },
   {
     "name": "マッドガエル",
+    "nameEn": "Mad Frog",
     "level": 0,
     "element": "木",
     "attackType": "物理",
@@ -222,6 +235,7 @@
   },
   {
     "name": "ダークメイジ",
+    "nameEn": "Dark Mage",
     "level": 0,
     "element": "闇",
     "attackType": "魔弾",
@@ -239,6 +253,7 @@
   },
   {
     "name": "アリクイロード",
+    "nameEn": "Anteater Lord",
     "level": 0,
     "element": "木",
     "attackType": "物理",
@@ -256,6 +271,7 @@
   },
   {
     "name": "原始蝶",
+    "nameEn": "Primitive Butterfly",
     "level": 0,
     "element": "木",
     "attackType": "物理",
@@ -273,6 +289,7 @@
   },
   {
     "name": "動く墓",
+    "nameEn": "Walking Grave",
     "level": 0,
     "element": "闇",
     "attackType": "物理",
@@ -290,6 +307,7 @@
   },
   {
     "name": "オルトロス",
+    "nameEn": "Orthros",
     "level": 0,
     "element": "水",
     "attackType": "物理",
@@ -307,6 +325,7 @@
   },
   {
     "name": "雪だるまん",
+    "nameEn": "Snowdarman",
     "level": 0,
     "element": "水",
     "attackType": "物理",
@@ -324,6 +343,7 @@
   },
   {
     "name": "シカファイター",
+    "nameEn": "Deer Fighter",
     "level": 0,
     "element": "水",
     "attackType": "物理",
@@ -341,6 +361,7 @@
   },
   {
     "name": "ペンギンロード",
+    "nameEn": "Penguin Lord",
     "level": 0,
     "element": "水",
     "attackType": "物理",
@@ -358,6 +379,7 @@
   },
   {
     "name": "パンダ",
+    "nameEn": "Panda",
     "level": 0,
     "element": "木",
     "attackType": "魔法",
@@ -375,6 +397,7 @@
   },
   {
     "name": "ファントムツリー",
+    "nameEn": "Phantom Tree",
     "level": 0,
     "element": "木",
     "attackType": "魔法",
@@ -392,6 +415,7 @@
   },
   {
     "name": "スノーモケラ",
+    "nameEn": "Snow Mokera",
     "level": 0,
     "element": "水",
     "attackType": "物理",
@@ -409,6 +433,7 @@
   },
   {
     "name": "零の者",
+    "nameEn": "The One of Zero",
     "level": 0,
     "element": "水",
     "attackType": "魔弾",
@@ -426,6 +451,7 @@
   },
   {
     "name": "禁域の巨木",
+    "nameEn": "Forbidden Treant",
     "level": 0,
     "element": "木",
     "attackType": "魔弾",
@@ -443,6 +469,7 @@
   },
   {
     "name": "ゴブリン特攻隊",
+    "nameEn": "Goblin Assault Unit",
     "level": 0,
     "element": "火",
     "attackType": "物理",
@@ -460,6 +487,7 @@
   },
   {
     "name": "ゴブリンクルー",
+    "nameEn": "Goblin Crew",
     "level": 0,
     "element": "火",
     "attackType": "魔弾",
@@ -477,6 +505,7 @@
   },
   {
     "name": "紅サソリ",
+    "nameEn": "Crimson Scorpion",
     "level": 0,
     "element": "火",
     "attackType": "物理",
@@ -494,6 +523,7 @@
   },
   {
     "name": "死戦士マミー",
+    "nameEn": "Death Warrior Mummy",
     "level": 0,
     "element": "闇",
     "attackType": "物理",
@@ -511,6 +541,7 @@
   },
   {
     "name": "アヌビス",
+    "nameEn": "Anubis",
     "level": 0,
     "element": "光",
     "attackType": "物理",
@@ -528,6 +559,7 @@
   },
   {
     "name": "ファイヤーメイジ",
+    "nameEn": "Fire Mage",
     "level": 0,
     "element": "火",
     "attackType": "魔弾",
@@ -545,6 +577,7 @@
   },
   {
     "name": "エジプトアシュラ",
+    "nameEn": "Egypt Ashura",
     "level": 0,
     "element": "光",
     "attackType": "物理",
@@ -562,6 +595,7 @@
   },
   {
     "name": "デザートイッヌ",
+    "nameEn": "Desert Doggo",
     "level": 0,
     "element": "光",
     "attackType": "物理",
@@ -579,6 +613,7 @@
   },
   {
     "name": "不思議なツボ",
+    "nameEn": "Mysterious Jar",
     "level": 0,
     "element": "木",
     "attackType": "物理",
@@ -596,6 +631,7 @@
   },
   {
     "name": "天狗",
+    "nameEn": "Tengu",
     "level": 0,
     "element": "闇",
     "attackType": "魔弾",
@@ -613,6 +649,7 @@
   },
   {
     "name": "ランプの精霊",
+    "nameEn": "Lamp Spirit",
     "level": 0,
     "element": "光",
     "attackType": "魔法",
@@ -630,6 +667,7 @@
   },
   {
     "name": "邪黒竜",
+    "nameEn": "Dark Dragon",
     "level": 0,
     "element": "闇",
     "attackType": "魔弾",
@@ -647,6 +685,7 @@
   },
   {
     "name": "捧げし者",
+    "nameEn": "The Devoted One",
     "level": 0,
     "element": "光",
     "attackType": "物理",
@@ -664,6 +703,7 @@
   },
   {
     "name": "黎明神トモダチ",
+    "nameEn": "Dawn God Tomodachi",
     "level": 0,
     "element": "光",
     "attackType": "魔法",
@@ -681,6 +721,7 @@
   },
   {
     "name": "禁域のアヌビシュ",
+    "nameEn": "Forbidden Anubish",
     "level": 0,
     "element": "光",
     "attackType": "魔法",
@@ -698,6 +739,7 @@
   },
   {
     "name": "居住者A",
+    "nameEn": "Resident A",
     "level": 0,
     "element": "闇",
     "attackType": "物理",
@@ -715,6 +757,7 @@
   },
   {
     "name": "居住者B",
+    "nameEn": "Resident B",
     "level": 0,
     "element": "闇",
     "attackType": "魔弾",
@@ -732,6 +775,7 @@
   },
   {
     "name": "ホネ",
+    "nameEn": "Bone",
     "level": 0,
     "element": "闇",
     "attackType": "物理",
@@ -749,6 +793,7 @@
   },
   {
     "name": "ボーンバトラー",
+    "nameEn": "Bone Battler",
     "level": 0,
     "element": "闇",
     "attackType": "物理",
@@ -766,6 +811,7 @@
   },
   {
     "name": "ダイコンに見えるダイコン",
+    "nameEn": "Radish That Looks Like a Radish",
     "level": 0,
     "element": "光",
     "attackType": "魔法",
@@ -783,6 +829,7 @@
   },
   {
     "name": "クリーチャーアイ",
+    "nameEn": "Creature Eye",
     "level": 0,
     "element": "闇",
     "attackType": "魔弾",
@@ -800,6 +847,7 @@
   },
   {
     "name": "悪夢の石像",
+    "nameEn": "Nightmare Statue",
     "level": 0,
     "element": "闇",
     "attackType": "魔弾",
@@ -817,6 +865,7 @@
   },
   {
     "name": "スカルウィスプ",
+    "nameEn": "Skull Wisp",
     "level": 0,
     "element": "闇",
     "attackType": "物理",
@@ -834,6 +883,7 @@
   },
   {
     "name": "フレイムフロッグ",
+    "nameEn": "Flame Frog",
     "level": 0,
     "element": "火",
     "attackType": "魔法",
@@ -851,6 +901,7 @@
   },
   {
     "name": "キメラキング",
+    "nameEn": "Chimera King",
     "level": 0,
     "element": "水",
     "attackType": "物理",
@@ -868,6 +919,7 @@
   },
   {
     "name": "ネクロプリンセス",
+    "nameEn": "Necro Princess",
     "level": 0,
     "element": "闇",
     "attackType": "魔法",
@@ -885,6 +937,7 @@
   },
   {
     "name": "朽ちざる竜骸イゾ",
+    "nameEn": "Undying Dragon Corpse Izo",
     "level": 0,
     "element": "闇",
     "attackType": "物理",
@@ -902,6 +955,7 @@
   },
   {
     "name": "禁域のクマヌイ",
+    "nameEn": "Forbidden Bear",
     "level": 0,
     "element": "木",
     "attackType": "物理",
@@ -919,6 +973,7 @@
   },
   {
     "name": "烈火鼠",
+    "nameEn": "Blaze Mouse",
     "level": 0,
     "element": "火",
     "attackType": "物理",
@@ -936,6 +991,7 @@
   },
   {
     "name": "燃えてる何か",
+    "nameEn": "Burning Something",
     "level": 0,
     "element": "火",
     "attackType": "魔弾",
@@ -953,6 +1009,7 @@
   },
   {
     "name": "焼トリ",
+    "nameEn": "Grilled Bird",
     "level": 0,
     "element": "火",
     "attackType": "物理",
@@ -970,6 +1027,7 @@
   },
   {
     "name": "ウォーデン",
+    "nameEn": "Warden",
     "level": 0,
     "element": "火",
     "attackType": "物理",
@@ -987,6 +1045,7 @@
   },
   {
     "name": "バーニングロック",
+    "nameEn": "Burning Rock",
     "level": 0,
     "element": "火",
     "attackType": "魔法",
@@ -1004,6 +1063,7 @@
   },
   {
     "name": "ケルベロス",
+    "nameEn": "Cerberus",
     "level": 0,
     "element": "火",
     "attackType": "物理",
@@ -1021,6 +1081,7 @@
   },
   {
     "name": "ガチキメラ",
+    "nameEn": "True Chimera",
     "level": 0,
     "element": "火",
     "attackType": "魔法",
@@ -1038,6 +1099,7 @@
   },
   {
     "name": "フレイムボーン",
+    "nameEn": "Flame Bone",
     "level": 0,
     "element": "火",
     "attackType": "魔弾",
@@ -1055,6 +1117,7 @@
   },
   {
     "name": "炎鬼",
+    "nameEn": "Flame Ogre",
     "level": 0,
     "element": "火",
     "attackType": "物理",
@@ -1072,6 +1135,7 @@
   },
   {
     "name": "ブタ天使",
+    "nameEn": "Pig Angel",
     "level": 0,
     "element": "光",
     "attackType": "物理",
@@ -1089,6 +1153,7 @@
   },
   {
     "name": "エレファントパラディン",
+    "nameEn": "Elephant Paladin",
     "level": 0,
     "element": "光",
     "attackType": "物理",
@@ -1106,6 +1171,7 @@
   },
   {
     "name": "赫竜王",
+    "nameEn": "Infernal Dragon",
     "level": 0,
     "element": "火",
     "attackType": "魔法",
@@ -1123,6 +1189,7 @@
   },
   {
     "name": "残燃モエコ",
+    "nameEn": "Smoldering Moeko",
     "level": 0,
     "element": "火",
     "attackType": "魔法",
@@ -1140,6 +1207,7 @@
   },
   {
     "name": "禁域のヴァルネシア",
+    "nameEn": "Forbidden Valnesia",
     "level": 0,
     "element": "火",
     "attackType": "物理",
@@ -1157,6 +1225,7 @@
   },
   {
     "name": "カニクラブ",
+    "nameEn": "Crab Club",
     "level": 0,
     "element": "水",
     "attackType": "物理",
@@ -1174,6 +1243,7 @@
   },
   {
     "name": "ワニゲーター",
+    "nameEn": "Gator Crocodile",
     "level": 0,
     "element": "水",
     "attackType": "物理",
@@ -1191,6 +1261,7 @@
   },
   {
     "name": "翡翠竜",
+    "nameEn": "Jade Dragon",
     "level": 0,
     "element": "水",
     "attackType": "魔法",
@@ -1208,6 +1279,7 @@
   },
   {
     "name": "マッドシャーク",
+    "nameEn": "Mad Shark",
     "level": 0,
     "element": "水",
     "attackType": "物理",
@@ -1225,6 +1297,7 @@
   },
   {
     "name": "浮遊イカ",
+    "nameEn": "Floating Squid",
     "level": 0,
     "element": "水",
     "attackType": "魔法",
@@ -1242,6 +1315,7 @@
   },
   {
     "name": "氷結晶",
+    "nameEn": "Ice Crystal",
     "level": 0,
     "element": "水",
     "attackType": "魔弾",
@@ -1259,6 +1333,7 @@
   },
   {
     "name": "命を刈り取る者",
+    "nameEn": "The Reaper of Life",
     "level": 0,
     "element": "火",
     "attackType": "物理",
@@ -1276,6 +1351,7 @@
   },
   {
     "name": "ヤマタノオロチ",
+    "nameEn": "Yamata no Orochi",
     "level": 0,
     "element": "木",
     "attackType": "物理",
@@ -1293,6 +1369,7 @@
   },
   {
     "name": "元ギルド長ノック",
+    "nameEn": "Former Guild Master",
     "level": 0,
     "element": "光",
     "attackType": "物理",
@@ -1310,6 +1387,7 @@
   },
   {
     "name": "ラッキーヒトデ",
+    "nameEn": "Lucky Starfish",
     "level": 0,
     "element": "水",
     "attackType": "物理",
@@ -1327,6 +1405,7 @@
   },
   {
     "name": "アビスマーダー",
+    "nameEn": "Abyss Murderer",
     "level": 0,
     "element": "木",
     "attackType": "魔法",
@@ -1344,6 +1423,7 @@
   },
   {
     "name": "氷女王アナトユ",
+    "nameEn": "Ice Queen Anatoyu",
     "level": 0,
     "element": "水",
     "attackType": "魔法",
@@ -1361,6 +1441,7 @@
   },
   {
     "name": "封印されし神鯨",
+    "nameEn": "Divine Whale",
     "level": 0,
     "element": "水",
     "attackType": "物理",
@@ -1378,6 +1459,7 @@
   },
   {
     "name": "超越者リガミア",
+    "nameEn": "Rigamia",
     "level": 0,
     "element": "木",
     "attackType": "魔法",
@@ -1395,6 +1477,7 @@
   },
   {
     "name": "海賊船",
+    "nameEn": "Pirate Ship",
     "level": 0,
     "element": "水",
     "attackType": "魔弾",
@@ -1412,6 +1495,7 @@
   },
   {
     "name": "ホムラウマ",
+    "nameEn": "Blaze Steed",
     "level": 0,
     "element": "火",
     "attackType": "物理",
@@ -1429,6 +1513,7 @@
   },
   {
     "name": "深淵灯魚",
+    "nameEn": "Abyss Lanternfish",
     "level": 0,
     "element": "水",
     "attackType": "魔法",
@@ -1446,6 +1531,7 @@
   },
   {
     "name": "うねうね",
+    "nameEn": "Uneune",
     "level": 0,
     "element": "木",
     "attackType": "物理",
@@ -1463,6 +1549,7 @@
   },
   {
     "name": "イージスリエル",
+    "nameEn": "Aegisriel",
     "level": 0,
     "element": "光",
     "attackType": "魔弾",
@@ -1480,6 +1567,7 @@
   },
   {
     "name": "デーモンブレイド",
+    "nameEn": "Demonblade",
     "level": 0,
     "element": "闇",
     "attackType": "物理",
@@ -1497,6 +1585,7 @@
   },
   {
     "name": "時空竜クロノゼリウス",
+    "nameEn": "ChronoZelius",
     "level": 0,
     "element": "光",
     "attackType": "魔法",
@@ -1514,6 +1603,7 @@
   },
   {
     "name": "マルコゲトカゲ",
+    "nameEn": "Charred Lizard",
     "level": 0,
     "element": "火",
     "attackType": "物理",
@@ -1531,6 +1621,7 @@
   },
   {
     "name": "白竜",
+    "nameEn": "Albion Dragon",
     "level": 0,
     "element": "光",
     "attackType": "物理",
@@ -1548,6 +1639,7 @@
   },
   {
     "name": "イグニス・シスター",
+    "nameEn": "Ignis Sister",
     "level": 0,
     "element": "火",
     "attackType": "魔弾",
@@ -1565,6 +1657,7 @@
   },
   {
     "name": "オルド・クラウセス",
+    "nameEn": "Ordo Krausus",
     "level": 0,
     "element": "光",
     "attackType": "物理",
@@ -1582,6 +1675,7 @@
   },
   {
     "name": "BOX",
+    "nameEn": "BOX",
     "level": 0,
     "element": "水",
     "attackType": "物理",
@@ -1599,6 +1693,7 @@
   },
   {
     "name": "冥王ノクタール",
+    "nameEn": "Noctar",
     "level": 0,
     "element": "闇",
     "attackType": "魔法",
@@ -1616,6 +1711,7 @@
   },
   {
     "name": "罪環の監視者モルモ",
+    "nameEn": "Warden of Sin-Cycle",
     "level": 0,
     "element": "水",
     "attackType": "物理",
@@ -1633,6 +1729,7 @@
   },
   {
     "name": "ダークウィッチ",
+    "nameEn": "Dark Witch",
     "level": 0,
     "element": "闇",
     "attackType": "魔弾",
@@ -1650,6 +1747,7 @@
   },
   {
     "name": "冥炎のハデス",
+    "nameEn": "Hades",
     "level": 0,
     "element": "火",
     "attackType": "物理",
@@ -1667,6 +1765,7 @@
   },
   {
     "name": "イグニシア",
+    "nameEn": "Ignisia",
     "level": 0,
     "element": "火",
     "attackType": "魔弾",
@@ -1684,6 +1783,7 @@
   },
   {
     "name": "ヌー",
+    "nameEn": "Nuu",
     "level": 0,
     "element": "水",
     "attackType": "物理",
@@ -1701,6 +1801,7 @@
   },
   {
     "name": "ミニハム",
+    "nameEn": "Mossyham",
     "level": 0,
     "element": "木",
     "attackType": "物理",
@@ -1718,6 +1819,7 @@
   },
   {
     "name": "シーサー",
+    "nameEn": "Shinelion",
     "level": 0,
     "element": "光",
     "attackType": "魔法",
@@ -1735,6 +1837,7 @@
   },
   {
     "name": "グルームエッグ",
+    "nameEn": "GloomEgg",
     "level": 0,
     "element": "闇",
     "attackType": "魔弾",
@@ -1752,6 +1855,7 @@
   },
   {
     "name": "スライムガール(物理)",
+    "nameEn": "Slime Girl (P)",
     "level": 0,
     "element": "木",
     "attackType": "物理",
@@ -1769,6 +1873,7 @@
   },
   {
     "name": "スライムガール(魔法)",
+    "nameEn": "Slime Girl (M)",
     "level": 0,
     "element": "木",
     "attackType": "魔法",
@@ -1786,6 +1891,7 @@
   },
   {
     "name": "ペリカンEXP",
+    "nameEn": "Pelican EXP",
     "level": 0,
     "element": "火",
     "attackType": "物理",
@@ -1803,6 +1909,7 @@
   },
   {
     "name": "支配のトリ",
+    "nameEn": "Bird of Domination",
     "level": 0,
     "element": "闇",
     "attackType": "魔法",
@@ -1820,6 +1927,7 @@
   },
   {
     "name": "キングニワトリ",
+    "nameEn": "Chicken King",
     "level": 0,
     "element": "火",
     "attackType": "物理",
@@ -1837,6 +1945,7 @@
   },
   {
     "name": "虹ペリカンEXP",
+    "nameEn": "Rainbow Pelican EXP",
     "level": 0,
     "element": "火",
     "attackType": "物理",
@@ -1854,6 +1963,7 @@
   },
   {
     "name": "禁域のワイバーン",
+    "nameEn": "Forbidden Wyvern",
     "level": 0,
     "element": "水",
     "attackType": "物理",
@@ -1871,6 +1981,7 @@
   },
   {
     "name": "グラビティスライム",
+    "nameEn": "Gravity Slime",
     "level": 0,
     "element": "闇",
     "attackType": "物理",
@@ -1888,6 +1999,7 @@
   },
   {
     "name": "ドラゴンヘッド",
+    "nameEn": "Dragon Head",
     "level": 0,
     "element": "火",
     "attackType": "物理",
@@ -1905,6 +2017,7 @@
   },
   {
     "name": "黙示木",
+    "nameEn": "Apocalypse Tree",
     "level": 0,
     "element": "木",
     "attackType": "魔弾",
@@ -1922,6 +2035,7 @@
   },
   {
     "name": "雷大王イカ",
+    "nameEn": "Thunder King Squid",
     "level": 0,
     "element": "光",
     "attackType": "物理",
@@ -1939,6 +2053,7 @@
   },
   {
     "name": "ダークフェニックス",
+    "nameEn": "Dark Phoenix",
     "level": 0,
     "element": "闇",
     "attackType": "魔法",
@@ -1956,6 +2071,7 @@
   },
   {
     "name": "オコシイタケ",
+    "nameEn": "Angry Shiitake",
     "level": 0,
     "element": "木",
     "attackType": "物理",
@@ -1973,6 +2089,7 @@
   },
   {
     "name": "オコスター",
+    "nameEn": "Angry Star",
     "level": 0,
     "element": "木",
     "attackType": "魔弾",
@@ -1990,6 +2107,7 @@
   },
   {
     "name": "動く石碑",
+    "nameEn": "Walking Stone",
     "level": 0,
     "element": "闇",
     "attackType": "物理",
@@ -2008,6 +2126,7 @@
   },
   {
     "name": "トリカゴドリ",
+    "nameEn": "Cagebird",
     "level": 0,
     "element": "水",
     "attackType": "魔法",
@@ -2025,6 +2144,7 @@
   },
   {
     "name": "鉄壁要塞パルテノン",
+    "nameEn": "Parthenon",
     "level": 0,
     "element": "光",
     "attackType": "物理",
@@ -2042,6 +2162,7 @@
   },
   {
     "name": "根界獣ドルグラント",
+    "nameEn": "Dolgrant",
     "level": 0,
     "element": "木",
     "attackType": "物理",
@@ -2060,6 +2181,7 @@
   },
   {
     "name": "オコォーン",
+    "nameEn": "Angry Corn",
     "level": 0,
     "element": "木",
     "attackType": "物理",
@@ -2077,6 +2199,7 @@
   },
   {
     "name": "オメガ・スペクトラム",
+    "nameEn": "Omega Spectrum",
     "level": 0,
     "element": "闇",
     "attackType": "魔法",

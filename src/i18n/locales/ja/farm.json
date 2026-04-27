@@ -35,5 +35,6 @@
   "loadPreset": "読み込む",
   "deletePreset": "削除",
   "presetNamePlaceholder": "プリセット名を入力",
-  "noSavedPresets": "保存済みプリセットなし"
+  "noSavedPresets": "保存済みプリセットなし",
+  "monsterCount": "{{count}}体"
 }

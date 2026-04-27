@@ -35,5 +35,6 @@
   "loadPreset": "Load",
   "deletePreset": "Delete",
   "presetNamePlaceholder": "Enter preset name",
-  "noSavedPresets": "No saved presets"
+  "noSavedPresets": "No saved presets",
+  "monsterCount": "{{count}} monsters"
 }
