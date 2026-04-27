@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-04-27",
+    changes: [
+    { type: "improve", text: "feat(i18n): DamageCalculator・SimConfigPanel等の英語化（PR1b）" },
+    ],
+  },
+
+  {
     date: "2026-04-26",
     changes: [
     { type: "improve", text: "feat(i18n): 共通UI部品の英語化（PR1a）" },
