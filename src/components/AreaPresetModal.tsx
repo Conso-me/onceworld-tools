@@ -129,7 +129,7 @@ export function AreaPresetModal({
                   {group.presets.map((preset, pi) => (
                     <div key={pi} className="flex items-center gap-2 text-xs text-gray-500">
                       <span className="truncate flex-1">
-                        {preset.monsterName ?? "(名称不明)"}
+                        {preset.monsterName ?? t("game:unknownName")}
                       </span>
                       <span className="shrink-0 text-gray-400">
                         Lv{preset.level.toLocaleString()}

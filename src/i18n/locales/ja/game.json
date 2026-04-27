@@ -50,6 +50,7 @@
   "noMatchingMonsters": "該当するモンスターがいません",
   "sortBy": "並び替え:",
   "captureRate": "捕獲率(%)",
+  "captureRateShort": "捕獲",
   "gold": "ゴールド",
   "accSlot": {
     "1": "スロット1",

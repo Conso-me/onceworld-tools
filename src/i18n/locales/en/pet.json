@@ -1,0 +1,18 @@
+{
+  "stat": "Stat",
+  "configLabel": "Config {{id}}",
+  "configA": "Config A",
+  "configB": "Config B",
+  "diff": "Diff",
+  "value": "Value",
+  "statComparison": "Stat Comparison",
+  "catchupLevel": "Catch-up Level (A→B)",
+  "catchupNote": "Min. level for Config B to reach each stat of Config A",
+  "configAValue": "Config A",
+  "catchupLvB": "B Catch-up Lv",
+  "cannotReach": "Can't reach by Lv.1200",
+  "achieved": "Achieved (Lv.{{lv}})",
+  "configDetails": "Config {{id}} Details",
+  "configStats": "Config {{id}} Stats",
+  "selectPet": "Select a pet"
+}

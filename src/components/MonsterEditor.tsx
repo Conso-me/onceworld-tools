@@ -372,7 +372,7 @@ export function MonsterEditor() {
                     </span>
                   </div>
                   <div className="text-[10px] text-gray-400 mt-0.5">
-                    EXP: {m.exp.toLocaleString()} / G: {m.gold.toLocaleString()} / 捕獲: {m.captureRate}%
+                    EXP: {m.exp.toLocaleString()} / G: {m.gold.toLocaleString()} / {t("game:captureRateShort")}: {m.captureRate}%
                   </div>
                 </div>
                 <div className="flex gap-1 shrink-0">
