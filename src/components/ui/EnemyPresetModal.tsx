@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import type { EnemyPresetGroup, EnemyPreset } from "../../data/enemyPresets";
+import { getMonsterByName, getMonsterDisplayName } from "../../data/monsters";
 
 /** 比較リスト内のエントリを一意に識別するキー */
 function presetKey(preset: EnemyPreset): string {
@@ -27,7 +28,8 @@ export function EnemyPresetModal({
   isOpen, groups, onClose, onSelect,
   comparisonKeys, onToggleComparison, onConfirmComparison, comparisonCount = 0,
 }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language;
   const maps = useMemo(() => Array.from(new Set(groups.map(g => g.mapLabel))), [groups]);
   const [selectedMap, setSelectedMap] = useState(() => maps[0] ?? "");
   const [selectedGroupIdx, setSelectedGroupIdx] = useState(0);
@@ -94,12 +96,15 @@ export function EnemyPresetModal({
 
         {/* Mobile: マップピル */}
         <div className="sm:hidden flex overflow-x-auto gap-2 px-4 py-2 border-b border-gray-200 bg-gray-50 flex-shrink-0">
-          {maps.map(map => (
-            <button key={map} onClick={() => handleMapSelect(map)}
-              className={`flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${selectedMap === map ? "bg-indigo-600 text-white" : "bg-white text-gray-700 border border-gray-200"}`}>
-              {map}
-            </button>
-          ))}
+          {maps.map(map => {
+            const mapEn = groups.find(g => g.mapLabel === map)?.mapLabelEn;
+            return (
+              <button key={map} onClick={() => handleMapSelect(map)}
+                className={`flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${selectedMap === map ? "bg-indigo-600 text-white" : "bg-white text-gray-700 border border-gray-200"}`}>
+                {lang === "en" ? (mapEn ?? map) : map}
+              </button>
+            );
+          })}
         </div>
 
         {/* Mobile: エリアピル */}
@@ -107,7 +112,7 @@ export function EnemyPresetModal({
           {mapGroups.map(g => (
             <button key={g.globalIdx} onClick={() => setSelectedGroupIdx(g.globalIdx)}
               className={`flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${selectedGroupIdx === g.globalIdx ? "bg-indigo-600 text-white" : "bg-white text-gray-700 border border-gray-200"}`}>
-              {g.label}
+              {lang === "en" ? (g.labelEn ?? g.label) : g.label}
             </button>
           ))}
         </div>
@@ -117,12 +122,15 @@ export function EnemyPresetModal({
 
           {/* PC: マップ列 */}
           <div className="hidden sm:flex flex-col w-28 flex-shrink-0 bg-gray-50 border-r border-gray-200 overflow-y-auto py-2" style={{ scrollbarGutter: "stable" }}>
-            {maps.map(map => (
-              <button key={map} onClick={() => handleMapSelect(map)}
-                className={`w-full text-left px-3 py-2.5 text-xs font-medium transition-colors ${selectedMap === map ? "bg-white text-indigo-600 border-r-2 border-indigo-500 shadow-sm" : "text-gray-700 hover:bg-gray-100"}`}>
-                {map}
-              </button>
-            ))}
+            {maps.map(map => {
+              const mapEn = groups.find(g => g.mapLabel === map)?.mapLabelEn;
+              return (
+                <button key={map} onClick={() => handleMapSelect(map)}
+                  className={`w-full text-left px-3 py-2.5 text-xs font-medium transition-colors ${selectedMap === map ? "bg-white text-indigo-600 border-r-2 border-indigo-500 shadow-sm" : "text-gray-700 hover:bg-gray-100"}`}>
+                  {lang === "en" ? (mapEn ?? map) : map}
+                </button>
+              );
+            })}
           </div>
 
           {/* PC: エリア列 */}
@@ -130,7 +138,7 @@ export function EnemyPresetModal({
             {mapGroups.map(g => (
               <button key={g.globalIdx} onClick={() => setSelectedGroupIdx(g.globalIdx)}
                 className={`w-full text-left px-3 py-2.5 text-xs font-medium transition-colors ${selectedGroupIdx === g.globalIdx ? "bg-white text-indigo-700 border-r-2 border-indigo-400" : "text-gray-700 hover:bg-gray-100"}`}>
-                {g.label}
+                {lang === "en" ? (g.labelEn ?? g.label) : g.label}
               </button>
             ))}
           </div>
@@ -176,7 +184,7 @@ export function EnemyPresetModal({
                       </span>
                     )}
                     <span className="flex-1 font-semibold text-gray-900 text-sm group-hover:text-indigo-700 flex items-center gap-1.5">
-                      {preset.monsterName ?? t("game:unknownName")}
+                      {(() => { const m = preset.monsterName ? getMonsterByName(preset.monsterName) : null; return m ? getMonsterDisplayName(m, lang) : (preset.monsterName ?? t("game:unknownName")); })()}
                       {preset.magicImmune && (
                         <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-600 font-bold flex-shrink-0">{t("damage:magicImmune")}</span>
                       )}
@@ -200,7 +208,7 @@ export function EnemyPresetModal({
                     )}
                     <div className="min-w-0 flex-1">
                       <div className="font-semibold text-gray-900 text-sm group-hover:text-indigo-700 flex items-center gap-1.5">
-                        {preset.monsterName ?? t("game:unknownName")}
+                        {(() => { const m = preset.monsterName ? getMonsterByName(preset.monsterName) : null; return m ? getMonsterDisplayName(m, lang) : (preset.monsterName ?? t("game:unknownName")); })()}
                         {preset.magicImmune && (
                           <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-600 font-bold flex-shrink-0">{t("damage:magicImmune")}</span>
                         )}
