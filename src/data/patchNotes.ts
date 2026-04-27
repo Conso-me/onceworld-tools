@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-04-27",
     changes: [
+    { type: "improve", text: "feat(i18n): PetSimulator・MonsterEditor・AreaPresetModalの英語化（PR1c-1）" },
     { type: "improve", text: "feat(i18n): DamageCalculator・SimConfigPanel等の英語化（PR1b）" },
     ],
   },
