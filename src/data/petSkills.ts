@@ -27,8 +27,19 @@ const monsterElements = new Map<string, Element>(
   )
 );
 
+// Build English name lookup from monsters data
+const monsterNamesEn = new Map<string, string>(
+  (monstersJson as Array<{ name: string; nameEn?: string }>)
+    .filter((m) => m.nameEn)
+    .map((m) => [m.name, m.nameEn!])
+);
+
 export function getPetElement(petName: string): Element | null {
   return monsterElements.get(petName) ?? null;
+}
+
+export function getPetNameEn(petName: string): string | undefined {
+  return monsterNamesEn.get(petName);
 }
 
 /** ペットを属性別にグループ化して返す */

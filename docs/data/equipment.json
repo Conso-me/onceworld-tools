@@ -13,7 +13,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 10
+    "order": 10,
+    "nameEn": "Bare Hands"
   },
   {
     "name": "銅のつるぎ",
@@ -29,7 +30,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 20
+    "order": 20,
+    "nameEn": "Copper Sword"
   },
   {
     "name": "鉄の剣",
@@ -45,7 +47,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 30
+    "order": 30,
+    "nameEn": "Iron Sword"
   },
   {
     "name": "エルフロッド",
@@ -61,7 +64,8 @@
     "luck": 12,
     "mov": 0,
     "special": null,
-    "order": 40
+    "order": 40,
+    "nameEn": "Elf Rod"
   },
   {
     "name": "ホーリースピア",
@@ -77,7 +81,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 50
+    "order": 50,
+    "nameEn": "Holy Spear"
   },
   {
     "name": "ダークスラッシャー",
@@ -93,7 +98,8 @@
     "luck": 0,
     "mov": 0,
     "special": "2体攻撃",
-    "order": 60
+    "order": 60,
+    "nameEn": "Dark Slasher"
   },
   {
     "name": "魔人の斧",
@@ -109,7 +115,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 70
+    "order": 70,
+    "nameEn": "Demon Axe"
   },
   {
     "name": "太陽の杖",
@@ -125,7 +132,8 @@
     "luck": 150,
     "mov": 0,
     "special": null,
-    "order": 80
+    "order": 80,
+    "nameEn": "Sun Staff"
   },
   {
     "name": "聖騎士ソード",
@@ -141,7 +149,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 90
+    "order": 90,
+    "nameEn": "Paladin Sword"
   },
   {
     "name": "雲神杖",
@@ -157,7 +166,8 @@
     "luck": 71,
     "mov": 1,
     "special": null,
-    "order": 100
+    "order": 100,
+    "nameEn": "Cloud God Staff"
   },
   {
     "name": "バーサクサーベル",
@@ -173,7 +183,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 110
+    "order": 110,
+    "nameEn": "Berserk Saber"
   },
   {
     "name": "星屑ブレード",
@@ -189,7 +200,8 @@
     "luck": 490,
     "mov": 0,
     "special": null,
-    "order": 120
+    "order": 120,
+    "nameEn": "Stardust Blade"
   },
   {
     "name": "悪夢の杖",
@@ -205,7 +217,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 130
+    "order": 130,
+    "nameEn": "Nightmare Staff"
   },
   {
     "name": "神速剣ギアセブン",
@@ -221,7 +234,8 @@
     "luck": 0,
     "mov": 3,
     "special": "3体攻撃",
-    "order": 140
+    "order": 140,
+    "nameEn": "Gear Seven"
   },
   {
     "name": "ちいさな剣",
@@ -237,7 +251,8 @@
     "luck": 5,
     "mov": 0,
     "special": null,
-    "order": 150
+    "order": 150,
+    "nameEn": "Small Sword"
   },
   {
     "name": "凍てついた杖",
@@ -253,7 +268,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 160
+    "order": 160,
+    "nameEn": "Frozen Staff"
   },
   {
     "name": "メタルハンマー",
@@ -269,7 +285,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 170
+    "order": 170,
+    "nameEn": "Metal Hammer"
   },
   {
     "name": "紅蓮槍",
@@ -285,7 +302,8 @@
     "luck": 110,
     "mov": 0,
     "special": null,
-    "order": 180
+    "order": 180,
+    "nameEn": "Scarlet Legion"
   },
   {
     "name": "アズールワンド",
@@ -301,7 +319,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 190
+    "order": 190,
+    "nameEn": "Azure Wand"
   },
   {
     "name": "マグマコア・ハンマー",
@@ -317,7 +336,8 @@
     "luck": 55,
     "mov": 0,
     "special": "3体攻撃",
-    "order": 200
+    "order": 200,
+    "nameEn": "Infernal Maul"
   },
   {
     "name": "如意棒",
@@ -333,7 +353,8 @@
     "luck": 219,
     "mov": 0,
     "special": null,
-    "order": 210
+    "order": 210,
+    "nameEn": "Ruyi Jingu Bang"
   },
   {
     "name": "邪悪杖マガツミ",
@@ -349,7 +370,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 220
+    "order": 220,
+    "nameEn": "Evil Staff Magatsumi"
   },
   {
     "name": "トライデント",
@@ -365,7 +387,8 @@
     "luck": 77777,
     "mov": 0,
     "special": "7体攻撃",
-    "order": 230
+    "order": 230,
+    "nameEn": "Trident"
   },
   {
     "name": "生贄100",
@@ -381,7 +404,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 240
+    "order": 240,
+    "nameEn": "Sacrifice 151"
   },
   {
     "name": "すごいおてて",
@@ -397,7 +421,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 250
+    "order": 250,
+    "nameEn": "Amazing Hands"
   },
   {
     "name": "なし",
@@ -413,7 +438,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 260
+    "order": 260,
+    "nameEn": "None"
   },
   {
     "name": "皮の帽子",
@@ -429,7 +455,8 @@
     "luck": 9,
     "mov": 0,
     "special": null,
-    "order": 270
+    "order": 270,
+    "nameEn": "Leather Cap"
   },
   {
     "name": "メタルヘルム",
@@ -445,7 +472,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 280
+    "order": 280,
+    "nameEn": "Metal Helm"
   },
   {
     "name": "白金ヘルム",
@@ -461,7 +489,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 290
+    "order": 290,
+    "nameEn": "Platinum Helm"
   },
   {
     "name": "魔導士フード",
@@ -477,7 +506,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 300
+    "order": 300,
+    "nameEn": "Mage Hood"
   },
   {
     "name": "獄炎兜",
@@ -493,7 +523,8 @@
     "luck": 100,
     "mov": 0,
     "special": null,
-    "order": 310
+    "order": 310,
+    "nameEn": "Infernal Helm"
   },
   {
     "name": "ドラゴンヘッド",
@@ -509,7 +540,8 @@
     "luck": 350,
     "mov": 0,
     "special": null,
-    "order": 320
+    "order": 320,
+    "nameEn": "Dragon Head"
   },
   {
     "name": "布の服",
@@ -525,7 +557,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 330
+    "order": 330,
+    "nameEn": "Cloth Clothes"
   },
   {
     "name": "皮の服",
@@ -541,7 +574,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 340
+    "order": 340,
+    "nameEn": "Leather Armor"
   },
   {
     "name": "鉄の鎧",
@@ -557,7 +591,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 350
+    "order": 350,
+    "nameEn": "Iron Armor"
   },
   {
     "name": "プラチナアーマー",
@@ -573,7 +608,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 360
+    "order": 360,
+    "nameEn": "Platinum Armor"
   },
   {
     "name": "魔導士のローブ",
@@ -589,7 +625,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 370
+    "order": 370,
+    "nameEn": "Mage Robe"
   },
   {
     "name": "獄炎の鎧",
@@ -605,7 +642,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 380
+    "order": 380,
+    "nameEn": "Infernal Armor"
   },
   {
     "name": "ドラゴンアーマー",
@@ -621,7 +659,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 390
+    "order": 390,
+    "nameEn": "Dragon Armor"
   },
   {
     "name": "なし",
@@ -637,7 +676,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 400
+    "order": 400,
+    "nameEn": "None"
   },
   {
     "name": "皮の盾",
@@ -653,7 +693,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 410
+    "order": 410,
+    "nameEn": "Leather Shield"
   },
   {
     "name": "鉄の盾",
@@ -669,7 +710,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 420
+    "order": 420,
+    "nameEn": "Iron Shield"
   },
   {
     "name": "プラチナの盾",
@@ -685,7 +727,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 430
+    "order": 430,
+    "nameEn": "Platinum Shield"
   },
   {
     "name": "魔導士の盾",
@@ -701,7 +744,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 440
+    "order": 440,
+    "nameEn": "Mage Shield"
   },
   {
     "name": "獄炎の盾",
@@ -717,7 +761,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 450
+    "order": 450,
+    "nameEn": "Infernal Shield"
   },
   {
     "name": "ドラゴンの盾",
@@ -733,7 +778,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 460
+    "order": 460,
+    "nameEn": "Dragon Shield"
   },
   {
     "name": "暴君盾",
@@ -749,7 +795,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 470
+    "order": 470,
+    "nameEn": "Violence Shield"
   },
   {
     "name": "なし",
@@ -765,7 +812,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 480
+    "order": 480,
+    "nameEn": "None"
   },
   {
     "name": "皮の手袋",
@@ -781,7 +829,8 @@
     "luck": 13,
     "mov": 0,
     "special": null,
-    "order": 490
+    "order": 490,
+    "nameEn": "Leather Gloves"
   },
   {
     "name": "鉄の小手",
@@ -797,7 +846,8 @@
     "luck": 23,
     "mov": 0,
     "special": null,
-    "order": 500
+    "order": 500,
+    "nameEn": "Iron Gauntlet"
   },
   {
     "name": "プラチナアーム",
@@ -813,7 +863,8 @@
     "luck": 125,
     "mov": 0,
     "special": null,
-    "order": 510
+    "order": 510,
+    "nameEn": "Platinum Arm"
   },
   {
     "name": "魔導士のガントレット",
@@ -829,7 +880,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 520
+    "order": 520,
+    "nameEn": "Mage Gauntlet"
   },
   {
     "name": "獄炎アーム",
@@ -845,7 +897,8 @@
     "luck": 130,
     "mov": 0,
     "special": null,
-    "order": 530
+    "order": 530,
+    "nameEn": "Infernal Arm"
   },
   {
     "name": "ドラゴンブレイサー",
@@ -861,7 +914,8 @@
     "luck": 350,
     "mov": 0,
     "special": null,
-    "order": 540
+    "order": 540,
+    "nameEn": "Dragon Bracer"
   },
   {
     "name": "ただのくつ",
@@ -877,7 +931,8 @@
     "luck": 0,
     "mov": 4,
     "special": null,
-    "order": 550
+    "order": 550,
+    "nameEn": "Plain Shoes"
   },
   {
     "name": "皮のシューズ",
@@ -893,7 +948,8 @@
     "luck": 0,
     "mov": 5,
     "special": null,
-    "order": 560
+    "order": 560,
+    "nameEn": "Leather Shoes"
   },
   {
     "name": "鉄のブーツ",
@@ -909,7 +965,8 @@
     "luck": 11,
     "mov": 3,
     "special": null,
-    "order": 570
+    "order": 570,
+    "nameEn": "Iron Boots"
   },
   {
     "name": "プラチナブーツ",
@@ -925,7 +982,8 @@
     "luck": 0,
     "mov": 6,
     "special": null,
-    "order": 580
+    "order": 580,
+    "nameEn": "Platinum Boots"
   },
   {
     "name": "魔導士の靴",
@@ -941,7 +999,8 @@
     "luck": 0,
     "mov": 5,
     "special": null,
-    "order": 590
+    "order": 590,
+    "nameEn": "Mage Shoes"
   },
   {
     "name": "獄炎ブーツ",
@@ -957,7 +1016,8 @@
     "luck": 0,
     "mov": 5,
     "special": null,
-    "order": 600
+    "order": 600,
+    "nameEn": "Infernal Boots"
   },
   {
     "name": "ドラゴンレッグ",
@@ -973,7 +1033,8 @@
     "luck": 0,
     "mov": 6,
     "special": null,
-    "order": 610
+    "order": 610,
+    "nameEn": "Dragon Leg"
   },
   {
     "name": "暴君ヘルム",
@@ -989,7 +1050,8 @@
     "luck": 1200,
     "mov": 0,
     "special": null,
-    "order": 620
+    "order": 620,
+    "nameEn": "Violence Helm"
   },
   {
     "name": "暴君ジャケット",
@@ -1005,7 +1067,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 630
+    "order": 630,
+    "nameEn": "Violence Jacket"
   },
   {
     "name": "暴君アーム",
@@ -1021,7 +1084,8 @@
     "luck": 400,
     "mov": 0,
     "special": null,
-    "order": 640
+    "order": 640,
+    "nameEn": "Violence Arm"
   },
   {
     "name": "暴君シューズ",
@@ -1037,7 +1101,8 @@
     "luck": 0,
     "mov": 4,
     "special": null,
-    "order": 650
+    "order": 650,
+    "nameEn": "Violence Shoes"
   },
   {
     "name": "オーディンアックス",
@@ -1053,7 +1118,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 145
+    "order": 145,
+    "nameEn": "Odin Axe"
   },
   {
     "name": "魔剣タルタロス",
@@ -1069,7 +1135,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 660
+    "order": 660,
+    "nameEn": "Demonic Sword Tartarus"
   },
   {
     "name": "絶聖剣ニケ",
@@ -1085,7 +1152,8 @@
     "luck": 0,
     "mov": 1,
     "special": null,
-    "order": 670
+    "order": 670,
+    "nameEn": "Holy Spear Nike"
   },
   {
     "name": "悪魔ヘルム",
@@ -1101,7 +1169,8 @@
     "luck": 555,
     "mov": 0,
     "special": null,
-    "order": 680
+    "order": 680,
+    "nameEn": "Demon Helm"
   },
   {
     "name": "悪魔の鎧",
@@ -1117,7 +1186,8 @@
     "luck": 955,
     "mov": 0,
     "special": null,
-    "order": 690
+    "order": 690,
+    "nameEn": "Demon Armor"
   },
   {
     "name": "悪魔の盾",
@@ -1133,7 +1203,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 700
+    "order": 700,
+    "nameEn": "Demon Shield"
   },
   {
     "name": "悪魔の小手",
@@ -1149,7 +1220,8 @@
     "luck": 4655,
     "mov": 0,
     "special": null,
-    "order": 710
+    "order": 710,
+    "nameEn": "Demon Gauntlet"
   },
   {
     "name": "悪魔の靴",
@@ -1165,7 +1237,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 720
+    "order": 720,
+    "nameEn": "Demon Shoes"
   },
   {
     "name": "持つ書物",
@@ -1181,7 +1254,8 @@
     "luck": 0,
     "mov": 0,
     "special": null,
-    "order": 730
+    "order": 730,
+    "nameEn": "Tome Weapon"
   },
   {
     "name": "ネギソード",
@@ -1197,7 +1271,8 @@
     "luck": 0,
     "mov": 5,
     "special": null,
-    "order": 740
+    "order": 740,
+    "nameEn": "Green Onion Sword"
   },
   {
     "name": "ワタッガシ",
@@ -1213,7 +1288,8 @@
     "luck": 3999,
     "mov": 0,
     "special": "5体攻撃\n攻撃範囲増（小）",
-    "order": 750
+    "order": 750,
+    "nameEn": "Cotton Candy Stick"
   },
   {
     "name": "滅界双刃",
@@ -1229,6 +1305,7 @@
     "luck": 0,
     "mov": 2,
     "special": "2体攻撃\n攻撃範囲増（中）",
-    "order": 760
+    "order": 760,
+    "nameEn": "Twin Blades of Ruin"
   }
 ]

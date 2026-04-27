@@ -4,6 +4,8 @@ import { useSharedSimConfig } from "../../hooks/useSharedSimConfig";
 import { usePersistedState } from "../../hooks/usePersistedState";
 import { calcStatus } from "../../utils/statusCalc";
 import { getEquipmentByName } from "../../data/equipment";
+import { getAccessoryByName } from "../../data/accessories";
+import { getPetNameEn } from "../../data/petSkills";
 
 const STAT_LABELS: Record<string, string> = {
   vit: "VIT", spd: "SPD", atk: "ATK", int: "INT",
@@ -46,7 +48,9 @@ function SectionHeader({ children }: { children: React.ReactNode }) {
 }
 
 export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
-  const { t } = useTranslation(["common", "status", "game"]);
+  const { t, i18n } = useTranslation(["common", "status", "game"]);
+  const isEn = i18n.language === "en";
+  const displayName = (jaName: string, nameEn?: string) => (isEn ? (nameEn ?? jaName) : jaName);
   const [cfg] = useSharedSimConfig();
   const [copied, setCopied] = useState(false);
   const [crystalCubeRaw] = usePersistedState("dmg:crystalCube", "");
@@ -227,12 +231,12 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
           <div>
             <SectionHeader>{t("status:equipment")}</SectionHeader>
             <div className="space-y-1 max-w-[60%]">
-              <ItemRow label={slotLabel("武器")} name={cfg.equipWeapon} enh={cfg.enhWeapon} canEnhance={weaponCanEnh} />
+              <ItemRow label={slotLabel("武器")} name={displayName(cfg.equipWeapon, weaponItem?.nameEn)} enh={cfg.enhWeapon} canEnhance={weaponCanEnh} />
               {armorSlots.map(({ slot, name, enh, item }) => (
                 <ItemRow
                   key={slot}
                   label={slotLabel(slot)}
-                  name={name}
+                  name={displayName(name, item?.nameEn)}
                   enh={enh}
                   canEnhance={item ? item.material !== "強化できない" : true}
                 />
@@ -253,7 +257,7 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
                   <span className="text-gray-400 w-8 shrink-0">{i + 1}</span>
                   {s.name
                     ? <>
-                        <span className="text-gray-800 font-medium flex-1 min-w-0 truncate">{s.name}</span>
+                        <span className="text-gray-800 font-medium flex-1 min-w-0 truncate">{displayName(s.name, getAccessoryByName(s.name)?.nameEn)}</span>
                         <span className="text-gray-400 shrink-0">Lv.{s.level}</span>
                       </>
                     : <span className="text-gray-300 flex-1">-</span>
@@ -271,7 +275,7 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
                   <span className="text-gray-400 w-8 shrink-0">{i + 1}</span>
                   {s.name
                     ? <>
-                        <span className="text-gray-800 font-medium flex-1 min-w-0 truncate">{s.name}</span>
+                        <span className="text-gray-800 font-medium flex-1 min-w-0 truncate">{displayName(s.name, getPetNameEn(s.name))}</span>
                         <span className="text-gray-400 shrink-0">Lv.{s.level}</span>
                       </>
                     : <span className="text-gray-300 flex-1">-</span>

@@ -6,7 +6,7 @@ import {
   getEquipmentByName, equipment,
   getAccessoryByName, accessories,
   getPetsByPrimaryStat, getPetSkillSummaryForCategory,
-  getPatternLevels, getPetMaxLevel,
+  getPatternLevels, getPetMaxLevel, getPetNameEn,
 } from "../data";
 import type { PetStatCategory, PetCategoryGroup } from "../data";
 import type { SimConfig, CoreStats, EquipmentSlot, Element, AccessoryItem, EquipmentItem } from "../types/game";
@@ -312,7 +312,8 @@ function EquipSelectorModal({
   onEquipChange: (name: string) => void;
   onClose: () => void;
 }) {
-  const { t } = useTranslation("status");
+  const { t, i18n } = useTranslation("status");
+  const isEn = i18n.language === "en";
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -379,7 +380,7 @@ function EquipSelectorModal({
                         }`}
                       >
                         <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${selected ? "bg-blue-400" : "bg-gray-300"}`} />
-                        <span className="flex-1 text-left text-xs truncate">{item.name}</span>
+                        <span className="flex-1 text-left text-xs truncate">{isEn ? (item.nameEn ?? item.name) : item.name}</span>
                         {summary && <span className="text-xs text-gray-400 shrink-0">{summary}</span>}
                       </button>
                     );
@@ -414,7 +415,8 @@ function EquipSelector({
   onEquipChange: (name: string) => void;
   onEnhChange: (v: number) => void;
 }) {
-  const { t } = useTranslation("status");
+  const { t, i18n } = useTranslation("status");
+  const isEn = i18n.language === "en";
   const [modalOpen, setModalOpen] = useState(false);
   const item = selectedName ? getEquipmentByName(selectedName) : undefined;
   const canEnhance = item ? item.material !== "強化できない" : false;
@@ -430,7 +432,7 @@ function EquipSelector({
           className="flex-1 text-left border border-gray-200 rounded-lg px-3 py-1.5 text-xs bg-white hover:bg-gray-50 transition-colors min-w-0"
         >
           {!isNone
-            ? <span className="text-gray-700 truncate block">{selectedName}</span>
+            ? <span className="text-gray-700 truncate block">{isEn ? (item?.nameEn ?? selectedName) : selectedName}</span>
             : <span className="text-gray-400">{t("common:noneTapToSelect")}</span>
           }
         </button>
@@ -467,7 +469,8 @@ function AccSelectorModal({
   onAccChange: (name: string) => void;
   onClose: () => void;
 }) {
-  const { t } = useTranslation("status");
+  const { t, i18n } = useTranslation("status");
+  const isEn = i18n.language === "en";
   const [openCategory, setOpenCategory] = useState<AccCategory | null>(null);
 
   useEffect(() => {
@@ -545,7 +548,7 @@ function AccSelectorModal({
                           }`}
                         >
                           <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${selected ? "bg-blue-400" : "bg-gray-300"}`} />
-                          <span className="flex-1 text-left text-xs truncate">{acc.name}</span>
+                          <span className="flex-1 text-left text-xs truncate">{isEn ? (acc.nameEn ?? acc.name) : acc.name}</span>
                           <span className="text-xs text-gray-400 shrink-0">{getAccSummary(acc)}</span>
                           <span className="text-xs text-gray-300 shrink-0">{getAccMaxLvLabel(acc.maxLevel, t)}</span>
                         </button>
@@ -583,7 +586,9 @@ function AccSelector({
   onAccChange: (name: string) => void;
   onLevelChange: (lv: number) => void;
 }) {
-  const { t } = useTranslation("status");
+  const { t, i18n } = useTranslation("status");
+  const isEn = i18n.language === "en";
+  const accItem = accName ? getAccessoryByName(accName) : undefined;
   const [modalOpen, setModalOpen] = useState(false);
   return (
     <div className="space-y-1.5">
@@ -595,7 +600,7 @@ function AccSelector({
           className="flex-1 text-left border border-gray-200 rounded-lg px-3 py-1.5 text-xs bg-white hover:bg-gray-50 transition-colors min-w-0"
         >
           {accName
-            ? <span className="text-gray-700 truncate block">{accName}</span>
+            ? <span className="text-gray-700 truncate block">{isEn ? (accItem?.nameEn ?? accName) : accName}</span>
             : <span className="text-gray-400">{t("common:noneTapToSelect")}</span>
           }
         </button>
@@ -652,7 +657,8 @@ function PetSubGroup({
   onPetChange: (name: string) => void;
   onLevelChange: (level: number) => void;
 }) {
-  const { t } = useTranslation("status");
+  const { t, i18n } = useTranslation("status");
+  const isEn = i18n.language === "en";
   if (pets.length === 0) return null;
   const labelCls = SUBGROUP_STYLE[label] ?? "bg-gray-50 text-gray-500 border-gray-200";
   const translatedLabel = SUBGROUP_LABEL_KEY[label] ? t(SUBGROUP_LABEL_KEY[label]) : label;
@@ -683,7 +689,7 @@ function PetSubGroup({
               }`}
             >
               <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${selected ? "bg-blue-400" : "bg-gray-300"}`} />
-              <span className="flex-1 text-left text-xs truncate">{pet.name}</span>
+              <span className="flex-1 text-left text-xs truncate">{isEn ? (getPetNameEn(pet.name) ?? pet.name) : pet.name}</span>
               {pet.pattern === 2 && (
                 <span className="text-xs text-purple-500 font-bold shrink-0 mr-1">P2</span>
               )}
@@ -846,8 +852,10 @@ function PetSelector({
   onPetChange: (name: string) => void;
   onLevelChange: (level: number) => void;
 }) {
-  const { t } = useTranslation("status");
+  const { t, i18n } = useTranslation("status");
+  const isEn = i18n.language === "en";
   const [modalOpen, setModalOpen] = useState(false);
+  const petDisplayName = petName ? (isEn ? (getPetNameEn(petName) ?? petName) : petName) : "";
 
   return (
     <div className="space-y-1">
@@ -858,7 +866,7 @@ function PetSelector({
         className="w-full text-left border border-gray-200 rounded-lg px-3 py-1.5 text-xs bg-white hover:bg-gray-50 transition-colors"
       >
         {petName
-          ? <span className="text-gray-700">{petName}（{petLevel === 0 ? "Lv—" : `Lv${petLevel}`}）</span>
+          ? <span className="text-gray-700">{petDisplayName}（{petLevel === 0 ? "Lv—" : `Lv${petLevel}`}）</span>
           : <span className="text-gray-400">{t("common:noneTapToSelect")}</span>
         }
       </button>
