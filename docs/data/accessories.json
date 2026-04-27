@@ -1,38 +1,494 @@
 [
-  { "name": "命脈の科学式",     "maxLevel": 100,  "effects": [{ "type": "VIT",   "value": 155, "scalePercent": 10 }] },
-  { "name": "鼓動核",           "maxLevel": 500,  "effects": [{ "type": "VIT%",  "value": 15,  "scalePercent": 1  }] },
-  { "name": "ウィンドクレスト", "maxLevel": 100,  "effects": [{ "type": "SPD",   "value": 135, "scalePercent": 10 }] },
-  { "name": "閃牙星",           "maxLevel": 500,  "effects": [{ "type": "SPD%",  "value": 15,  "scalePercent": 1  }] },
-  { "name": "ブラッドトニック", "maxLevel": 100,  "effects": [{ "type": "ATK",   "value": 90,  "scalePercent": 10 }, { "type": "ATK%", "value": 5, "scalePercent": 1 }] },
-  { "name": "力瓶",             "maxLevel": 500,  "effects": [{ "type": "ATK%",  "value": 20,  "scalePercent": 1  }] },
-  { "name": "アークグリモワール","maxLevel": 100,  "effects": [{ "type": "INT",   "value": 30,  "scalePercent": 10 }, { "type": "INT%", "value": 25, "scalePercent": 1 }] },
-  { "name": "創胎珠",           "maxLevel": 500,  "effects": [{ "type": "INT%",  "value": 20,  "scalePercent": 1  }] },
-  { "name": "フォースモジュール","maxLevel": 100,  "effects": [{ "type": "DEF",   "value": 80,  "scalePercent": 10 }, { "type": "M-DEF", "value": 90, "scalePercent": 10 }] },
-  { "name": "騎士の心得",       "maxLevel": 500,  "effects": [{ "type": "DEF%",  "value": 15,  "scalePercent": 1  }] },
-  { "name": "迷盾陣",           "maxLevel": 1000, "effects": [{ "type": "DEF%",  "value": 50,  "scalePercent": 1  }] },
-  { "name": "マギバインド",     "maxLevel": 100,  "effects": [{ "type": "M-DEF%","value": 25,  "scalePercent": 1  }] },
-  { "name": "結界嵐",           "maxLevel": 500,  "effects": [{ "type": "M-DEF%","value": 15,  "scalePercent": 1  }] },
-  { "name": "ヘキサスカル",     "maxLevel": 1000, "effects": [{ "type": "M-DEF%","value": 50,  "scalePercent": 1  }] },
-  { "name": "ラッキートランプ", "maxLevel": 100,  "effects": [{ "type": "LUCK",  "value": 99,  "scalePercent": 10 }, { "type": "LUCK%", "value": 15, "scalePercent": 1 }] },
-  { "name": "運命眼",           "maxLevel": 500,  "effects": [{ "type": "LUCK%", "value": 25,  "scalePercent": 1  }] },
-  { "name": "ギャロップタリスマン","maxLevel": 1, "effects": [{ "type": "MOV",   "value": 2,   "scalePercent": 0  }] },
-  { "name": "慈縛心",           "maxLevel": 1000, "effects": [{ "type": "HP回復","value": 100, "scalePercent": 20 }] },
-  { "name": "メモリアルページ", "maxLevel": 300,  "effects": [{ "type": "経験値","value": 30,  "scalePercent": 1  }] },
-  { "name": "賢者の盃",         "maxLevel": 300,  "effects": [{ "type": "経験値","value": 50,  "scalePercent": 1  }] },
-  { "name": "エクスペディアコンパス","maxLevel": 300, "effects": [{ "type": "経験値","value": 100,"scalePercent": 1 }] },
-  { "name": "知耀杯",           "maxLevel": 1000, "effects": [{ "type": "経験値","value": 180, "scalePercent": 1  }] },
-  { "name": "テイムマスク",     "maxLevel": 300,  "effects": [{ "type": "捕獲率","value": 30,  "scalePercent": 1  }] },
-  { "name": "魅誘盃",           "maxLevel": 300,  "effects": [{ "type": "捕獲率","value": 50,  "scalePercent": 1  }] },
-  { "name": "コンタクトレター", "maxLevel": 300,  "effects": [{ "type": "捕獲率","value": 80,  "scalePercent": 1  }] },
-  { "name": "拘魂鎖",           "maxLevel": 1000, "effects": [{ "type": "捕獲率","value": 100, "scalePercent": 1  }] },
-  { "name": "オービタルリング", "maxLevel": 300,  "effects": [{ "type": "ドロップ率","value": 30,"scalePercent": 1 }] },
-  { "name": "収索機",           "maxLevel": 1000, "effects": [{ "type": "ドロップ率","value": 50,"scalePercent": 1 }] },
-  { "name": "陽魂環",           "maxLevel": 1000, "effects": [{ "type": "VIT%",  "value": 30, "scalePercent": 1 }] },
-  { "name": "武器照合",         "maxLevel": 1000, "effects": [{ "type": "ATK%",  "value": 30, "scalePercent": 1 }] },
-  { "name": "マナランタン",     "maxLevel": 1000, "effects": [{ "type": "INT%",  "value": 30, "scalePercent": 1 }] },
-  { "name": "アークゲート",     "maxLevel": 10,   "effects": [{ "type": "経験値",    "value": 500, "scalePercent": 1 }, { "type": "ドロップ率", "value": 500, "scalePercent": 1 }] },
-  { "name": "ドミナススローン", "maxLevel": 10,   "effects": [{ "type": "経験値",    "value": 500, "scalePercent": 1 }, { "type": "捕獲率",    "value": 500, "scalePercent": 1 }] },
-  { "name": "フォーチュンポット","maxLevel": 10,   "effects": [{ "type": "ドロップ率","value": 1000, "scalePercent": 1 }] },
-  { "name": "ヴォルテクスコア", "maxLevel": 1,    "effects": [{ "type": "MOV",   "value": 3,   "scalePercent": 0  }] },
-  { "name": "七理の宝環",       "maxLevel": 100,  "effects": [{ "type": "VIT%",   "value": 50, "scalePercent": 1 }, { "type": "SPD%", "value": 50, "scalePercent": 1 }, { "type": "ATK%", "value": 50, "scalePercent": 1 }, { "type": "INT%", "value": 50, "scalePercent": 1 }, { "type": "DEF%", "value": 50, "scalePercent": 1 }, { "type": "M-DEF%", "value": 50, "scalePercent": 1 }, { "type": "LUCK%", "value": 50, "scalePercent": 1 }] }
+  {
+    "name": "命脈の科学式",
+    "maxLevel": 100,
+    "effects": [
+      {
+        "type": "VIT",
+        "value": 155,
+        "scalePercent": 10
+      }
+    ],
+    "nameEn": "Formula of Life Vein"
+  },
+  {
+    "name": "鼓動核",
+    "maxLevel": 500,
+    "effects": [
+      {
+        "type": "VIT%",
+        "value": 15,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Pulse Core"
+  },
+  {
+    "name": "ウィンドクレスト",
+    "maxLevel": 100,
+    "effects": [
+      {
+        "type": "SPD",
+        "value": 135,
+        "scalePercent": 10
+      }
+    ],
+    "nameEn": "Wind Crest"
+  },
+  {
+    "name": "閃牙星",
+    "maxLevel": 500,
+    "effects": [
+      {
+        "type": "SPD%",
+        "value": 15,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Fangflare"
+  },
+  {
+    "name": "ブラッドトニック",
+    "maxLevel": 100,
+    "effects": [
+      {
+        "type": "ATK",
+        "value": 90,
+        "scalePercent": 10
+      },
+      {
+        "type": "ATK%",
+        "value": 5,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Blood Tonic"
+  },
+  {
+    "name": "力瓶",
+    "maxLevel": 500,
+    "effects": [
+      {
+        "type": "ATK%",
+        "value": 20,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Power Bottle"
+  },
+  {
+    "name": "アークグリモワール",
+    "maxLevel": 100,
+    "effects": [
+      {
+        "type": "INT",
+        "value": 30,
+        "scalePercent": 10
+      },
+      {
+        "type": "INT%",
+        "value": 25,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Arc Grimoire"
+  },
+  {
+    "name": "創胎珠",
+    "maxLevel": 500,
+    "effects": [
+      {
+        "type": "INT%",
+        "value": 20,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Genesis Core"
+  },
+  {
+    "name": "フォースモジュール",
+    "maxLevel": 100,
+    "effects": [
+      {
+        "type": "DEF",
+        "value": 80,
+        "scalePercent": 10
+      },
+      {
+        "type": "M-DEF",
+        "value": 90,
+        "scalePercent": 10
+      }
+    ],
+    "nameEn": "Force Module"
+  },
+  {
+    "name": "騎士の心得",
+    "maxLevel": 500,
+    "effects": [
+      {
+        "type": "DEF%",
+        "value": 15,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Knight's Creed"
+  },
+  {
+    "name": "迷盾陣",
+    "maxLevel": 1000,
+    "effects": [
+      {
+        "type": "DEF%",
+        "value": 50,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Labyrinth Aegis"
+  },
+  {
+    "name": "マギバインド",
+    "maxLevel": 100,
+    "effects": [
+      {
+        "type": "M-DEF%",
+        "value": 25,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Magibind"
+  },
+  {
+    "name": "結界嵐",
+    "maxLevel": 500,
+    "effects": [
+      {
+        "type": "M-DEF%",
+        "value": 15,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Barrier Tempest"
+  },
+  {
+    "name": "ヘキサスカル",
+    "maxLevel": 1000,
+    "effects": [
+      {
+        "type": "M-DEF%",
+        "value": 50,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Hexa Skull"
+  },
+  {
+    "name": "ラッキートランプ",
+    "maxLevel": 100,
+    "effects": [
+      {
+        "type": "LUCK",
+        "value": 99,
+        "scalePercent": 10
+      },
+      {
+        "type": "LUCK%",
+        "value": 15,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Lucky Card"
+  },
+  {
+    "name": "運命眼",
+    "maxLevel": 500,
+    "effects": [
+      {
+        "type": "LUCK%",
+        "value": 25,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Fate Eye"
+  },
+  {
+    "name": "ギャロップタリスマン",
+    "maxLevel": 1,
+    "effects": [
+      {
+        "type": "MOV",
+        "value": 2,
+        "scalePercent": 0
+      }
+    ],
+    "nameEn": "Gallop Talisman"
+  },
+  {
+    "name": "慈縛心",
+    "maxLevel": 1000,
+    "effects": [
+      {
+        "type": "HP回復",
+        "value": 100,
+        "scalePercent": 20
+      }
+    ],
+    "nameEn": "Bound Mercy"
+  },
+  {
+    "name": "メモリアルページ",
+    "maxLevel": 300,
+    "effects": [
+      {
+        "type": "経験値",
+        "value": 30,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Memorial Page"
+  },
+  {
+    "name": "賢者の盃",
+    "maxLevel": 300,
+    "effects": [
+      {
+        "type": "経験値",
+        "value": 50,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Sage's Chalice"
+  },
+  {
+    "name": "エクスペディアコンパス",
+    "maxLevel": 300,
+    "effects": [
+      {
+        "type": "経験値",
+        "value": 100,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Expedia Compass"
+  },
+  {
+    "name": "知耀杯",
+    "maxLevel": 1000,
+    "effects": [
+      {
+        "type": "経験値",
+        "value": 180,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Cup of Enlightenment"
+  },
+  {
+    "name": "テイムマスク",
+    "maxLevel": 300,
+    "effects": [
+      {
+        "type": "捕獲率",
+        "value": 30,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Tame Mask"
+  },
+  {
+    "name": "魅誘盃",
+    "maxLevel": 300,
+    "effects": [
+      {
+        "type": "捕獲率",
+        "value": 50,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Allure Chalice"
+  },
+  {
+    "name": "コンタクトレター",
+    "maxLevel": 300,
+    "effects": [
+      {
+        "type": "捕獲率",
+        "value": 80,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Contact Letter"
+  },
+  {
+    "name": "拘魂鎖",
+    "maxLevel": 1000,
+    "effects": [
+      {
+        "type": "捕獲率",
+        "value": 100,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Soulbind Chain"
+  },
+  {
+    "name": "オービタルリング",
+    "maxLevel": 300,
+    "effects": [
+      {
+        "type": "ドロップ率",
+        "value": 30,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Orbital Ring"
+  },
+  {
+    "name": "収索機",
+    "maxLevel": 1000,
+    "effects": [
+      {
+        "type": "ドロップ率",
+        "value": 50,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Finder Array"
+  },
+  {
+    "name": "陽魂環",
+    "maxLevel": 1000,
+    "effects": [
+      {
+        "type": "VIT%",
+        "value": 30,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Solar Halo"
+  },
+  {
+    "name": "武器照合",
+    "maxLevel": 1000,
+    "effects": [
+      {
+        "type": "ATK%",
+        "value": 30,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Arsenal Sync"
+  },
+  {
+    "name": "マナランタン",
+    "maxLevel": 1000,
+    "effects": [
+      {
+        "type": "INT%",
+        "value": 30,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Mana Lantern"
+  },
+  {
+    "name": "アークゲート",
+    "maxLevel": 10,
+    "effects": [
+      {
+        "type": "経験値",
+        "value": 500,
+        "scalePercent": 1
+      },
+      {
+        "type": "ドロップ率",
+        "value": 500,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Arc Gate"
+  },
+  {
+    "name": "ドミナススローン",
+    "maxLevel": 10,
+    "effects": [
+      {
+        "type": "経験値",
+        "value": 500,
+        "scalePercent": 1
+      },
+      {
+        "type": "捕獲率",
+        "value": 500,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Dominus Throne"
+  },
+  {
+    "name": "フォーチュンポット",
+    "maxLevel": 10,
+    "effects": [
+      {
+        "type": "ドロップ率",
+        "value": 1000,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Fortune Pot"
+  },
+  {
+    "name": "ヴォルテクスコア",
+    "maxLevel": 1,
+    "effects": [
+      {
+        "type": "MOV",
+        "value": 3,
+        "scalePercent": 0
+      }
+    ],
+    "nameEn": "Vortex Core"
+  },
+  {
+    "name": "七理の宝環",
+    "maxLevel": 100,
+    "effects": [
+      {
+        "type": "VIT%",
+        "value": 50,
+        "scalePercent": 1
+      },
+      {
+        "type": "SPD%",
+        "value": 50,
+        "scalePercent": 1
+      },
+      {
+        "type": "ATK%",
+        "value": 50,
+        "scalePercent": 1
+      },
+      {
+        "type": "INT%",
+        "value": 50,
+        "scalePercent": 1
+      },
+      {
+        "type": "DEF%",
+        "value": 50,
+        "scalePercent": 1
+      },
+      {
+        "type": "M-DEF%",
+        "value": 50,
+        "scalePercent": 1
+      },
+      {
+        "type": "LUCK%",
+        "value": 50,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": "Band of Seven Principles"
+  }
 ]
