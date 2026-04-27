@@ -13,8 +13,18 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-04-28",
+    changes: [
+    { type: "improve", text: "feat(i18n): EnemyPresetModal のモンスター名・マップ名・エリア名を英語対応" },
+    ],
+  },
+
+  {
     date: "2026-04-27",
     changes: [
+    { type: "improve", text: "feat(i18n): エリアプリセット名の英語対応・体カウント翻訳" },
+    { type: "improve", text: "feat(i18n): AreaPresetModal のモンスター名を英語対応" },
+    { type: "feature", text: "feat(i18n): モンスターデータに英語名(nameEn)を追加・表示切替対応" },
     { type: "improve", text: "feat(i18n): PetSimulator・MonsterEditor・AreaPresetModalの英語化（PR1c-1）" },
     { type: "improve", text: "feat(i18n): DamageCalculator・SimConfigPanel等の英語化（PR1b）" },
     ],
