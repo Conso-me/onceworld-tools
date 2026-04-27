@@ -5,6 +5,7 @@ export type AttackType = "物理" | "魔法" | "魔弾";
 
 export interface MonsterBase {
   name: string;
+  nameEn?: string;
   level: number;
   element: Element;
   attackType: AttackType;

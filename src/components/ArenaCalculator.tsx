@@ -12,7 +12,7 @@ import {
 } from "../utils/defenseCalc";
 import { calcMultiHitCount, calcPhysicalDamage, calcHitRate } from "../utils/damageCalc";
 import { calcStatus } from "../utils/statusCalc";
-import { getMonsterByName } from "../data/monsters";
+import { getMonsterByName, getMonsterDisplayName } from "../data/monsters";
 import { InputField } from "./ui/InputField";
 import type { MonsterBase, ScaledMonster } from "../types/game";
 import type { TFunction } from "i18next";
@@ -192,7 +192,7 @@ function ArenaMonsterRow({ result, onLevelClick, t, lang }: { result: ArenaResul
   return (
     <tr className={`border-b ${rowBg} text-sm`}>
       <td className="px-2 py-1.5 font-medium text-gray-800 whitespace-nowrap">
-        {result.base.name}
+        {getMonsterDisplayName(result.base, lang)}
       </td>
       <td className="px-2 py-1.5 whitespace-nowrap">
         <span

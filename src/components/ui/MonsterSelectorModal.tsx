@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import type { MonsterBase, Element } from "../../types/game";
 import { useAllMonsters } from "../../hooks/useAllMonsters";
+import { getMonsterDisplayName } from "../../data/monsters";
 
 type SortKey = "default" | "total" | "atk" | "int" | "vit" | "def" | "mdef" | "spd" | "luck";
 
@@ -80,7 +81,8 @@ interface Props {
 }
 
 export function MonsterSelectorModal({ isOpen, onClose, onSelect, showPetStats }: Props) {
-  const { t } = useTranslation(["game", "monsters", "common"]);
+  const { t, i18n } = useTranslation(["game", "monsters", "common"]);
+  const lang = i18n.language;
   const [elementFilter, setElementFilter] = useState<ElementFilter>("all");
   const [query, setQuery] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("default");
@@ -101,7 +103,11 @@ export function MonsterSelectorModal({ isOpen, onClose, onSelect, showPetStats }
     }
     if (query.trim()) {
       const lower = query.toLowerCase();
-      list = list.filter((m) => m.name.toLowerCase().includes(lower));
+      list = list.filter((m) => {
+        if (m.name.toLowerCase().includes(lower)) return true;
+        if (lang === "en" && m.nameEn && m.nameEn.toLowerCase().includes(lower)) return true;
+        return false;
+      });
     }
     if (showPetStats && sortKey !== "default") {
       list = [...list].sort((a, b) => getSortValue(b, sortKey) - getSortValue(a, sortKey));
@@ -231,7 +237,7 @@ export function MonsterSelectorModal({ isOpen, onClose, onSelect, showPetStats }
                     <div className="hidden sm:block">
                       <div className="flex items-center gap-3">
                         <span className="flex-1 font-semibold text-gray-900 text-sm group-hover:text-indigo-700 transition-colors">
-                          {monster.name}
+                          {getMonsterDisplayName(monster, lang)}
                         </span>
                         <span className={`w-14 text-center text-xs px-2 py-0.5 rounded-full font-medium ${elementColors[monster.element] ?? "bg-gray-100 text-gray-500"}`}>
                           {t(`game:element.${monster.element}`)}
@@ -245,7 +251,7 @@ export function MonsterSelectorModal({ isOpen, onClose, onSelect, showPetStats }
                     <div className="sm:hidden">
                       <div className="flex items-center gap-2">
                         <span className="flex-1 font-semibold text-gray-900 text-sm group-hover:text-indigo-700 transition-colors">
-                          {monster.name}
+                          {getMonsterDisplayName(monster, lang)}
                         </span>
                         <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${elementColors[monster.element] ?? "bg-gray-100 text-gray-500"}`}>
                           {t(`game:element.${monster.element}`)}

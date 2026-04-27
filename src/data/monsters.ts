@@ -43,8 +43,16 @@ export function getAllMonsterNames(): string[] {
   return _all.map((m) => m.name);
 }
 
-export function searchMonsters(query: string): MonsterBase[] {
+export function searchMonsters(query: string, lang?: string): MonsterBase[] {
   if (!query) return _all;
   const lower = query.toLowerCase();
-  return _all.filter((m) => m.name.toLowerCase().includes(lower));
+  return _all.filter((m) => {
+    if (m.name.toLowerCase().includes(lower)) return true;
+    if (lang === "en" && m.nameEn && m.nameEn.toLowerCase().includes(lower)) return true;
+    return false;
+  });
+}
+
+export function getMonsterDisplayName(m: MonsterBase, lang: string): string {
+  return lang === "en" && m.nameEn ? m.nameEn : m.name;
 }
