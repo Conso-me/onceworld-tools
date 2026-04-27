@@ -40,6 +40,7 @@ export type EquipmentSlot = "武器" | "頭" | "服" | "手" | "盾" | "脚";
 
 export interface EquipmentItem {
   name: string;
+  nameEn?: string;
   slot: EquipmentSlot;
   series?: string | null;
   material?: string;
@@ -66,6 +67,7 @@ export interface AccessoryEffect {
 
 export interface AccessoryItem {
   name: string;
+  nameEn?: string;
   maxLevel: number;
   effects: AccessoryEffect[];
 }
