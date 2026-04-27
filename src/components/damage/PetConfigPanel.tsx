@@ -45,14 +45,6 @@ const MUSHROOM_BY_ELEMENT: Record<Element, MushroomKey> = {
   闇: "mushroomDark",
 };
 
-const MUSHROOM_LABELS: Record<Element, string> = {
-  火: "火",
-  水: "水",
-  木: "木",
-  光: "光",
-  闇: "闇",
-};
-
 type PowderKey = "powderVit" | "powderSpd" | "powderAtk" | "powderInt" | "powderDef" | "powderMdef" | "powderLuck";
 const POWDER_FIELDS: { key: PowderKey; label: string }[] = [
   { key: "powderVit",  label: "VIT" },
@@ -300,7 +292,7 @@ export function PetConfigPanel({ config, setField, reset, petResult, replaceConf
             return (
               <CompactInput
                 key={el}
-                label={MUSHROOM_LABELS[el]}
+                label={tGame(`element.${el}`)}
                 value={config[key]}
                 onChange={(v) => setField(key, v)}
                 max={1000}

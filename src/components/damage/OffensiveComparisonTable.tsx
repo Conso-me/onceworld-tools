@@ -45,7 +45,7 @@ export function OffensiveComparisonTable({ rows, onSelectMonster, selectedSpellN
                 : "bg-white border border-indigo-200 text-indigo-600 hover:bg-indigo-100"
             }`}
           >
-            自動
+            {t("autoSpell")}
           </button>
           {MAGIC_SPELLS.map((spell) => (
             <button
@@ -67,7 +67,7 @@ export function OffensiveComparisonTable({ rows, onSelectMonster, selectedSpellN
       {/* ヘッダー */}
       <div className={`grid ${gridCols} gap-x-2 px-3 py-2 bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wide min-w-[600px]`}>
         <span>{t("common:monster")}</span>
-        {isPhysical && <span className="w-20 whitespace-nowrap text-center">必要LUCK</span>}
+        {isPhysical && <span className="w-20 whitespace-nowrap text-center">{t("requiredLuck")}</span>}
         <span className="w-32 whitespace-nowrap text-center">{t("damage")}</span>
         <span className="w-16 whitespace-nowrap text-center">{t("hitsToKill")}</span>
         <span className="w-16 text-center">OverKill</span>
@@ -134,7 +134,7 @@ export function OffensiveComparisonTable({ rows, onSelectMonster, selectedSpellN
                   {isMagic && activeSpell && !isNullified && (
                     <span className="text-[10px] text-indigo-400">
                       {activeSpell.spell.name}
-                      {selectedSpellName === null && " (最良)"}
+                      {selectedSpellName === null && ` ${t("bestSpell")}`}
                     </span>
                   )}
                   {!isMagic && row.hitRate !== null && row.hitRate !== undefined && row.hitRate < 100 && (
@@ -153,11 +153,11 @@ export function OffensiveComparisonTable({ rows, onSelectMonster, selectedSpellN
                   </div>
                   {!luckAchieved && row.additionalLuckNeeded !== undefined && row.additionalLuckNeeded > 0 && (
                     <div className="text-[10px] text-orange-500 tabular-nums whitespace-nowrap">
-                      あと{row.additionalLuckNeeded.toLocaleString()}
+                      {t("common:remaining", { value: row.additionalLuckNeeded.toLocaleString() })}
                     </div>
                   )}
                   {luckAchieved && (
-                    <div className="text-[10px] text-green-600">達成</div>
+                    <div className="text-[10px] text-green-600">{t("common:achieved")}</div>
                   )}
                 </div>
               )}

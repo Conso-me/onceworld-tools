@@ -361,7 +361,7 @@ function EquipSelectorModal({
             return (
               <div key={series} className="border-t border-gray-200">
                 <div className="px-4 py-1.5 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  {series}
+                  {t(`equipSeries.${series}`)}
                 </div>
                 <div className="bg-white">
                   {items.map((item) => {

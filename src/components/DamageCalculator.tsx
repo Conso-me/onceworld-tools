@@ -876,14 +876,14 @@ export function DamageCalculator() {
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                     </svg>
-                    コピー済
+                    {t("common:copied")}
                   </>
                 ) : (
                   <>
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                     </svg>
-                    URLをコピー
+                    {t("copyUrl")}
                   </>
                 )}
               </button>
@@ -905,7 +905,7 @@ export function DamageCalculator() {
               <button
                 onClick={() => setMyStatusOpen((v) => !v)}
                 className="lg:hidden p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
-                aria-label={myStatusOpen ? "折り畳む" : "展開する"}
+                aria-label={myStatusOpen ? t("common:collapse") : t("common:expand")}
               >
                 <svg
                   className={`w-4 h-4 transition-transform duration-200 ${myStatusOpen ? "" : "rotate-180"}`}
@@ -1194,7 +1194,7 @@ export function DamageCalculator() {
             <span className={`text-sm px-2 py-0.5 rounded-lg border font-medium ${elementColors[scaled.element]}`}>{t(`game:element.${scaled.element}`)}</span>
             <span className="text-sm bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-lg font-medium">{t(`game:attackType.${scaled.attackType}`)}</span>
             {scaled.magicImmune && (
-              <span className="text-sm px-2 py-0.5 rounded-lg font-bold bg-purple-100 text-purple-600 border border-purple-200">魔法無効</span>
+              <span className="text-sm px-2 py-0.5 rounded-lg font-bold bg-purple-100 text-purple-600 border border-purple-200">{t("magicImmune")}</span>
             )}
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-2">
@@ -1262,9 +1262,9 @@ export function DamageCalculator() {
                   ? "bg-green-100 border-green-300 text-green-700 font-medium"
                   : "bg-gray-50 border-gray-200 text-gray-400"
               }`}
-              title="木魔法デバフ：敵のDEFが半減"
+              title={t("woodMagicDebuffTitle")}
             >
-              木魔法 DEF×½
+              {t("woodMagicDebuff")}
             </button>
             <button
               onClick={() => setDarkMagicEffect(!darkMagicEffect)}
@@ -1273,9 +1273,9 @@ export function DamageCalculator() {
                   ? "bg-purple-100 border-purple-300 text-purple-700 font-medium"
                   : "bg-gray-50 border-gray-200 text-gray-400"
               }`}
-              title="闇魔法デバフ：敵のLUKが半減"
+              title={t("darkMagicDebuffTitle")}
             >
-              闇魔法 LUK×½
+              {t("darkMagicDebuff")}
             </button>
           </div>
         </div>
@@ -1311,7 +1311,7 @@ export function DamageCalculator() {
                 {scaled!.magicImmune && (
                   <div className="flex items-center gap-2 px-3 py-2 mb-2 rounded-xl bg-purple-50 border border-purple-200">
                     <span className="text-purple-500 text-base">🚫</span>
-                    <span className="text-sm font-bold text-purple-700">この敵は魔法が無効です（ダメージ 0）</span>
+                    <span className="text-sm font-bold text-purple-700">{t("magicImmuneDetail")}</span>
                   </div>
                 )}
                 {hasMyOffenseStats ? (
@@ -1345,7 +1345,7 @@ export function DamageCalculator() {
                         </div>
                         {effectivelyNullified ? (
                           <span className="col-span-4 text-xs text-purple-500 font-semibold px-2">
-                            {scaled!.magicImmune ? "魔法無効（ダメージ 0）" : t("cannotPenetrate")}
+                            {scaled!.magicImmune ? t("magicImmuneDamage0") : t("cannotPenetrate")}
                           </span>
                         ) : (
                           <>
@@ -1363,23 +1363,23 @@ export function DamageCalculator() {
                               <span className="text-gray-300">|</span>
                               {overkillGuaranteed ? (
                                 <span className="text-gray-700">
-                                  INT <span className="font-semibold text-gray-900">{overkillStatNeeded.toLocaleString()}</span> 達成
-                                  <span className="text-green-700 font-semibold ml-1">（+{Math.max(0, effInt - overkillStatNeeded).toLocaleString()} 超過）</span>
+                                  INT <span className="font-semibold text-gray-900">{overkillStatNeeded.toLocaleString()}</span> {t("overkillAchievedLabel")}
+                                  <span className="text-green-700 font-semibold ml-1">{t("overExcess", { value: Math.max(0, effInt - overkillStatNeeded).toLocaleString() })}</span>
                                 </span>
                               ) : (
                                 <span className="text-gray-600">
-                                  INT <span className="font-semibold text-gray-800">{overkillStatNeeded.toLocaleString()}</span> 必要
-                                  <span className="text-orange-700 font-semibold ml-1">（あと +{Math.max(0, overkillStatNeeded - effInt).toLocaleString()}）</span>
+                                  INT <span className="font-semibold text-gray-800">{overkillStatNeeded.toLocaleString()}</span> {t("overkillNeededLabel")}
+                                  <span className="text-orange-700 font-semibold ml-1">{t("overShortfall", { value: Math.max(0, overkillStatNeeded - effInt).toLocaleString() })}</span>
                                 </span>
                               )}
                             </div>
                             {!overkillGuaranteed && effInt > 0 && (
                               <div className="flex items-center justify-end gap-1 mt-0.5">
                                 {overkillCubesNeeded === null ? (
-                                  <span className="text-xs text-gray-400">魔晶立方体1000個でも不足</span>
+                                  <span className="text-xs text-gray-400">{t("cubesShortfall1k")}</span>
                                 ) : (
                                   <span className="text-xs text-purple-500 font-semibold">
-                                    魔晶立方体 あと{Math.max(0, overkillCubesNeeded - crystalCubeNum).toLocaleString()}個でOverKill可能
+                                    {t("cubesMoreForOverkill", { cubeCount: Math.max(0, overkillCubesNeeded - crystalCubeNum).toLocaleString() })}
                                   </span>
                                 )}
                               </div>
@@ -1461,9 +1461,9 @@ export function DamageCalculator() {
                                       ? "bg-orange-100 border-orange-300 text-orange-600"
                                       : "bg-gray-100 border-gray-300 text-gray-500"
                                   }`}
-                                  title="物理オーバーキル計算に多段攻撃を含めるか切り替え"
+                                  title={t("multiHitOn")}
                                 >
-                                  {physOverkillMultiHit ? "多段可" : "単発のみ"}
+                                  {physOverkillMultiHit ? t("multiHitOn") : t("multiHitOff")}
                                 </button>
                               )}
                             </div>
@@ -1475,17 +1475,17 @@ export function DamageCalculator() {
                                   ? "bg-orange-100 text-orange-600"
                                   : "bg-gray-100 text-gray-500"
                               }`}>
-                                {offensiveResult.overkillGuaranteed ? "確定" : offensiveResult.overkillPossible ? "可能性あり" : "不可"}
+                                {offensiveResult.overkillGuaranteed ? t("overkillConfirmed") : offensiveResult.overkillPossible ? t("overkillMaybe") : t("impossible")}
                               </span>
                               {offensiveResult.overkillGuaranteed ? (
                                 <span className="text-xs text-gray-700">
-                                  {statLabel} <span className="font-semibold text-gray-900">{needed.toLocaleString()}</span> 達成
-                                  <span className="text-green-700 font-semibold ml-1">(+{(currentStat - needed).toLocaleString()} 超過)</span>
+                                  {statLabel} <span className="font-semibold text-gray-900">{needed.toLocaleString()}</span> {t("overkillAchievedLabel")}
+                                  <span className="text-green-700 font-semibold ml-1">{t("overExcess", { value: (currentStat - needed).toLocaleString() })}</span>
                                 </span>
                               ) : (
                                 <span className="text-xs text-gray-600">
-                                  {statLabel} <span className="font-semibold text-gray-800">{needed.toLocaleString()}</span> 必要
-                                  <span className="text-orange-700 font-semibold ml-1">(あと +{shortfall.toLocaleString()})</span>
+                                  {statLabel} <span className="font-semibold text-gray-800">{needed.toLocaleString()}</span> {t("overkillNeededLabel")}
+                                  <span className="text-orange-700 font-semibold ml-1">{t("overShortfall", { value: shortfall.toLocaleString() })}</span>
                                 </span>
                               )}
                             </div>
@@ -1503,12 +1503,13 @@ export function DamageCalculator() {
                           <div className="mt-0.5">
                             {offensiveResult.hitRate >= 100 ? (
                               <span className="text-xs text-green-500 font-semibold">
-                                LUK {offensiveResult.requiredLuck!.toLocaleString()} で達成（+{(effLuck - offensiveResult.requiredLuck!).toLocaleString()} 超過）
+                                LUK {offensiveResult.requiredLuck!.toLocaleString()} {t("overkillAchievedLabel")}
+                                <span className="ml-1">{t("overExcess", { value: (effLuck - offensiveResult.requiredLuck!).toLocaleString() })}</span>
                               </span>
                             ) : (
                               <span className="text-xs text-gray-400">
-                                LUK {offensiveResult.requiredLuck!.toLocaleString()} 必要
-                                <span className="text-orange-500 font-semibold ml-1">(あと +{offensiveResult.luckShortfall!.toLocaleString()})</span>
+                                LUK {offensiveResult.requiredLuck!.toLocaleString()} {t("overkillNeededLabel")}
+                                <span className="text-orange-500 font-semibold ml-1">{t("overShortfall", { value: offensiveResult.luckShortfall!.toLocaleString() })}</span>
                               </span>
                             )}
                           </div>
