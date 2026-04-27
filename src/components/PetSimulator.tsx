@@ -29,15 +29,16 @@ function PetCompareTable({
   resultA: ReturnType<typeof calcPetStats>;
   resultB: ReturnType<typeof calcPetStats>;
 }) {
+  const { t } = useTranslation("pet");
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm border-collapse">
         <thead>
           <tr className="bg-gray-50 text-xs text-gray-500">
-            <th className="text-left px-3 py-2 border border-gray-100 sticky left-0 bg-gray-50 z-10">ステータス</th>
-            <th className="text-right px-3 py-2 border border-gray-100 text-blue-600">設定 A</th>
-            <th className="text-right px-3 py-2 border border-gray-100 text-orange-500">設定 B</th>
-            <th className="text-right px-3 py-2 border border-gray-100">差分</th>
+            <th className="text-left px-3 py-2 border border-gray-100 sticky left-0 bg-gray-50 z-10">{t("stat")}</th>
+            <th className="text-right px-3 py-2 border border-gray-100 text-blue-600">{t("configA")}</th>
+            <th className="text-right px-3 py-2 border border-gray-100 text-orange-500">{t("configB")}</th>
+            <th className="text-right px-3 py-2 border border-gray-100">{t("diff")}</th>
           </tr>
         </thead>
         <tbody>
@@ -86,18 +87,19 @@ function EquivalentLevelTable({
   eqLevels: Record<StatKey, number | null>;
   currentLevelB: number;
 }) {
+  const { t } = useTranslation("pet");
   return (
     <div className="space-y-2">
       <p className="text-xs text-gray-500">
-        設定 A の各ステータスに、設定 B が追いつく最低レベル
+        {t("catchupNote")}
       </p>
       <div className="overflow-x-auto">
         <table className="w-full text-sm border-collapse">
           <thead>
             <tr className="bg-gray-50 text-xs text-gray-500">
-              <th className="text-left px-3 py-2 border border-gray-100 sticky left-0 bg-gray-50 z-10">ステータス</th>
-              <th className="text-right px-3 py-2 border border-gray-100 text-blue-600">A の値</th>
-              <th className="text-right px-3 py-2 border border-gray-100 text-orange-500">B の追いつきLv</th>
+              <th className="text-left px-3 py-2 border border-gray-100 sticky left-0 bg-gray-50 z-10">{t("stat")}</th>
+              <th className="text-right px-3 py-2 border border-gray-100 text-blue-600">{t("configAValue")}</th>
+              <th className="text-right px-3 py-2 border border-gray-100 text-orange-500">{t("catchupLvB")}</th>
             </tr>
           </thead>
           <tbody>
@@ -111,9 +113,9 @@ function EquivalentLevelTable({
                   <td className="px-3 py-1.5 border border-gray-100 text-right tabular-nums text-blue-700 font-medium">{targetVal.toLocaleString()}</td>
                   <td className="px-3 py-1.5 border border-gray-100 text-right tabular-nums font-bold">
                     {eqLv === null ? (
-                      <span className="text-red-400">Lv.1200でも届かない</span>
+                      <span className="text-red-400">{t("cannotReach")}</span>
                     ) : isAlreadyAchieved ? (
-                      <span className="text-green-600">達成済み (Lv.{eqLv.toLocaleString()})</span>
+                      <span className="text-green-600">{t("achieved", { lv: eqLv.toLocaleString() })}</span>
                     ) : (
                       <span className="text-orange-600">Lv.{eqLv.toLocaleString()}</span>
                     )}
@@ -132,6 +134,7 @@ function EquivalentLevelTable({
 
 function PetStatPanel({ result, label }: { result: ReturnType<typeof calcPetStats>; label: string }) {
   const { t: tGame } = useTranslation("game");
+  const { t } = useTranslation("pet");
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
@@ -143,8 +146,8 @@ function PetStatPanel({ result, label }: { result: ReturnType<typeof calcPetStat
       <table className="w-full text-sm border-collapse">
         <thead>
           <tr className="bg-gray-50 text-xs text-gray-500">
-            <th className="text-left px-3 py-2 border border-gray-100">ステータス</th>
-            <th className="text-right px-3 py-2 border border-gray-100">値</th>
+            <th className="text-left px-3 py-2 border border-gray-100">{t("stat")}</th>
+            <th className="text-right px-3 py-2 border border-gray-100">{t("value")}</th>
           </tr>
         </thead>
         <tbody>
@@ -167,6 +170,7 @@ function PetStatPanel({ result, label }: { result: ReturnType<typeof calcPetStat
 // ── Main Component ────────────────────────────────────────────────────────────
 
 export function PetSimulator() {
+  const { t } = useTranslation("pet");
   type PetCfgTuple = [PetDamageConfig, <K extends keyof PetDamageConfig>(field: K, value: PetDamageConfig[K]) => void, () => void, (s: PetDamageConfig) => void];
   const [cfgA, setFieldA, resetA, replaceAllA] = usePersistedGroup<PetDamageConfig & Record<string, unknown>>(
     "pet-sim:a",
@@ -224,7 +228,7 @@ export function PetSimulator() {
                   : "bg-white text-gray-500 hover:bg-gray-50"
               }`}
             >
-              設定 {id}
+              {t("configLabel", { id })}
             </button>
           ))}
         </div>
@@ -245,14 +249,14 @@ export function PetSimulator() {
           <>
             {/* 比較テーブル */}
             <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
-              <h2 className="text-base font-bold text-gray-700">ステータス比較</h2>
+              <h2 className="text-base font-bold text-gray-700">{t("statComparison")}</h2>
               <PetCompareTable resultA={resultA} resultB={resultB} />
             </div>
 
             {/* 追いつきレベル */}
             {showEqLevels && (
               <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
-                <h2 className="text-base font-bold text-gray-700">追いつきレベル（A→B）</h2>
+                <h2 className="text-base font-bold text-gray-700">{t("catchupLevel")}</h2>
                 <EquivalentLevelTable
                   resultA={resultA}
                   eqLevels={eqLevels}
@@ -264,10 +268,10 @@ export function PetSimulator() {
             {/* 個別詳細（比較中も表示） */}
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-blue-50 rounded-xl border border-blue-100 p-4">
-                <PetStatPanel result={resultA} label="設定 A の詳細" />
+                <PetStatPanel result={resultA} label={t("configDetails", { id: "A" })} />
               </div>
               <div className="bg-orange-50 rounded-xl border border-orange-100 p-4">
-                <PetStatPanel result={resultB} label="設定 B の詳細" />
+                <PetStatPanel result={resultB} label={t("configDetails", { id: "B" })} />
               </div>
             </div>
           </>
@@ -276,12 +280,12 @@ export function PetSimulator() {
           <div className="bg-white rounded-xl border border-gray-200 p-4">
             <PetStatPanel
               result={activeResult}
-              label={`設定 ${activeConfig} のステータス`}
+              label={t("configStats", { id: activeConfig })}
             />
           </div>
         ) : (
           <div className="flex items-center justify-center h-40 text-gray-400 text-sm">
-            ペットを選択してください
+            {t("selectPet")}
           </div>
         )}
       </div>

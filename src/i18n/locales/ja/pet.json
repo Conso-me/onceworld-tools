@@ -1,0 +1,18 @@
+{
+  "stat": "ステータス",
+  "configLabel": "設定 {{id}}",
+  "configA": "設定 A",
+  "configB": "設定 B",
+  "diff": "差分",
+  "value": "値",
+  "statComparison": "ステータス比較",
+  "catchupLevel": "追いつきレベル（A→B）",
+  "catchupNote": "設定 A の各ステータスに、設定 B が追いつく最低レベル",
+  "configAValue": "A の値",
+  "catchupLvB": "B の追いつきLv",
+  "cannotReach": "Lv.1200でも届かない",
+  "achieved": "達成済み (Lv.{{lv}})",
+  "configDetails": "設定 {{id}} の詳細",
+  "configStats": "設定 {{id}} のステータス",
+  "selectPet": "ペットを選択してください"
+}

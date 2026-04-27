@@ -50,6 +50,7 @@
   "noMatchingMonsters": "No matching monsters",
   "sortBy": "Sort:",
   "captureRate": "Capture Rate (%)",
+  "captureRateShort": "Cap.",
   "gold": "Gold",
   "accSlot": {
     "1": "Slot 1",
