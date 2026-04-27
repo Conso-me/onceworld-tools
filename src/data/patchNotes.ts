@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-04-28",
     changes: [
+    { type: "improve", text: "feat(i18n): 装備・アクセサリ・ペット名の英語対応（wikiから取得）" },
     { type: "improve", text: "feat(i18n): EnemyPresetModal のモンスター名・マップ名・エリア名を英語対応" },
     ],
   },
