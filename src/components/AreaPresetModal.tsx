@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { enemyPresetGroups } from "../data/enemyPresets";
-import { getMonsterByName } from "../data/monsters";
+import { getMonsterByName, getMonsterDisplayName } from "../data/monsters";
 import { getMonsterDropInfo } from "../data/monsterDrops";
 import type { MonsterBase } from "../types/game";
 
@@ -31,7 +31,8 @@ export function AreaPresetModal({
   onPickGroup: (entries: AreaMonsterEntry[]) => void;
   onClose: () => void;
 }) {
-  const { t } = useTranslation("farm");
+  const { t, i18n } = useTranslation("farm");
+  const lang = i18n.language;
   const [selectedMap, setSelectedMap] = useState<string>(mapLabels[0] ?? "");
 
   useEffect(() => {
@@ -129,7 +130,10 @@ export function AreaPresetModal({
                   {group.presets.map((preset, pi) => (
                     <div key={pi} className="flex items-center gap-2 text-xs text-gray-500">
                       <span className="truncate flex-1">
-                        {preset.monsterName ?? t("game:unknownName")}
+                        {(() => {
+                          const m = preset.monsterName ? getMonsterByName(preset.monsterName) : null;
+                          return m ? getMonsterDisplayName(m, lang) : (preset.monsterName ?? t("game:unknownName"));
+                        })()}
                       </span>
                       <span className="shrink-0 text-gray-400">
                         Lv{preset.level.toLocaleString()}
