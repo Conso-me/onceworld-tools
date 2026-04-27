@@ -15,13 +15,19 @@ export interface AreaMonsterEntry {
   superRareDrop: string;
 }
 
-// mapLabel ごとにグルーピング
+// mapLabel ごとにグルーピング（キーはJA固定でIDとして使用）
 const mapLabels = [...new Set(enemyPresetGroups.map((g) => g.mapLabel))];
 const groupsByMap = new Map(
   mapLabels.map((label) => [
     label,
     enemyPresetGroups.filter((g) => g.mapLabel === label),
   ])
+);
+// mapLabel(JA) → mapLabelEn のルックアップ
+const mapLabelEnMap = new Map(
+  enemyPresetGroups
+    .filter((g) => g.mapLabelEn)
+    .map((g) => [g.mapLabel, g.mapLabelEn!])
 );
 
 export function AreaPresetModal({
@@ -108,7 +114,7 @@ export function AreaPresetModal({
                     : "text-gray-600 hover:bg-gray-50"
                 }`}
               >
-                {label}
+                {lang === "en" ? (mapLabelEnMap.get(label) ?? label) : label}
               </button>
             ))}
           </div>
@@ -118,7 +124,9 @@ export function AreaPresetModal({
             {groups.map((group, idx) => (
               <div key={idx} className="bg-gray-50 rounded-xl p-3">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-semibold text-gray-700">{group.label}</span>
+                  <span className="text-xs font-semibold text-gray-700">
+                    {lang === "en" ? (group.labelEn ?? group.label) : group.label}
+                  </span>
                   <button
                     onClick={() => handlePickGroup(idx)}
                     className="px-2.5 py-1 bg-indigo-500 text-white text-xs font-medium rounded-lg hover:bg-indigo-600 transition-colors"

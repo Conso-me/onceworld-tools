@@ -472,7 +472,7 @@ export function FarmCalculator() {
                         {preset.name}
                       </span>
                       <span className="text-[10px] text-gray-400 shrink-0">
-                        {preset.rows.length}体
+                        {t("monsterCount", { count: preset.rows.length })}
                       </span>
                       <button
                         onClick={() => loadPreset(preset)}
