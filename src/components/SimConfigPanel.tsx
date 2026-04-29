@@ -136,13 +136,24 @@ const accGroups = (() => {
   return map;
 })();
 
-function getAccSummary(acc: AccessoryItem): string {
+const ACC_EFFECT_TYPE_CATEGORY_KEY: Record<string, string> = {
+  "経験値": "経験値",
+  "捕獲率": "捕獲率",
+  "ドロップ率": "ドロップ率",
+  "HP回復": "HP回復",
+};
+
+function getAccSummary(acc: AccessoryItem, tFn?: (key: string) => string): string {
   const effects = acc.effects;
   // 全effectが同じ%値 → "ALL+X%" で圧縮
   if (effects.length >= 3 && effects.every(e => e.type.endsWith("%") && e.value === effects[0].value)) {
     return `ALL+${effects[0].value}%`;
   }
-  return effects.map((e) => `${e.type} +${e.value}`).join("・");
+  return effects.map((e) => {
+    const catKey = ACC_EFFECT_TYPE_CATEGORY_KEY[e.type];
+    const label = tFn && catKey ? tFn(`accCategory.${catKey}`) : e.type;
+    return `${label} +${e.value}`;
+  }).join("・");
 }
 
 function getAccMaxLvLabel(maxLevel: number, tFn: (key: string) => string): string {
@@ -549,7 +560,7 @@ function AccSelectorModal({
                         >
                           <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${selected ? "bg-blue-400" : "bg-gray-300"}`} />
                           <span className="flex-1 text-left text-xs truncate">{isEn ? (acc.nameEn ?? acc.name) : acc.name}</span>
-                          <span className="text-xs text-gray-400 shrink-0">{getAccSummary(acc)}</span>
+                          <span className="text-xs text-gray-400 shrink-0">{getAccSummary(acc, t)}</span>
                           <span className="text-xs text-gray-300 shrink-0">{getAccMaxLvLabel(acc.maxLevel, t)}</span>
                         </button>
                       );

@@ -190,7 +190,7 @@ export function EnemyPresetModal({
                       )}
                     </span>
                     <span className="w-28 text-right text-sm font-mono font-semibold text-indigo-600">{preset.level.toLocaleString()}</span>
-                    <span className="w-56 text-right text-sm text-gray-700">{preset.location}</span>
+                    <span className="w-56 text-right text-sm text-gray-700">{lang === "en" ? (preset.locationEn ?? preset.location) : preset.location}</span>
                   </div>
                   <div className="sm:hidden flex items-center gap-2">
                     {multiSelect && (
@@ -215,7 +215,7 @@ export function EnemyPresetModal({
                       </div>
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="text-xs font-mono font-semibold text-indigo-600">Lv {preset.level.toLocaleString()}</span>
-                        <span className="text-xs text-gray-500">{preset.location}</span>
+                        <span className="text-xs text-gray-500">{lang === "en" ? (preset.locationEn ?? preset.location) : preset.location}</span>
                       </div>
                     </div>
                   </div>

@@ -4,6 +4,7 @@ import type { PetDamageConfig, PetStatResult, Element } from "../../types/game";
 import { useAllMonsters } from "../../hooks/useAllMonsters";
 import { MonsterSelectorModal } from "../ui/MonsterSelectorModal";
 import { usePetPresets } from "../../hooks/usePetPresets";
+import { getMonsterDisplayName } from "../../data/monsters";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -125,8 +126,9 @@ function CompactInput({
 
 export function PetConfigPanel({ config, setField, reset, petResult, replaceConfig, showPetStats }: PetConfigPanelProps) {
   const { t } = useTranslation("damage");
-  const { t: tGame } = useTranslation("game");
+  const { t: tGame, i18n } = useTranslation("game");
   const { t: tCommon } = useTranslation("common");
+  const lang = i18n.language;
   const allMonsters = useAllMonsters();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { presets, savePreset, loadPreset, deletePreset } = usePetPresets();
@@ -186,7 +188,7 @@ export function PetConfigPanel({ config, setField, reset, petResult, replaceConf
         >
           {selectedMonster ? (
             <span className="flex items-center gap-2 min-w-0">
-              <span className="font-medium text-gray-800 truncate">{selectedMonster.name}</span>
+              <span className="font-medium text-gray-800 truncate">{getMonsterDisplayName(selectedMonster, lang)}</span>
               <span
                 className={`text-xs px-1.5 py-0.5 rounded-full flex-shrink-0 ${elementBadgeColors[selectedMonster.element]}`}
               >
