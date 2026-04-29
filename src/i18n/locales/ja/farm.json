@@ -36,5 +36,12 @@
   "deletePreset": "削除",
   "presetNamePlaceholder": "プリセット名を入力",
   "noSavedPresets": "保存済みプリセットなし",
-  "monsterCount": "{{count}}体"
+  "monsterCount": "{{count}}体",
+  "commonDrop": {
+    "mushroom": "しいたけ",
+    "starFlower": "スターフラワー",
+    "elementMushroom": "属性キノコ",
+    "kingCorn": "キングコォーン",
+    "whiteLotus": "極白花"
+  }
 }
