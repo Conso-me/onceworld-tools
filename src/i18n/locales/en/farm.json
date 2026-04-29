@@ -36,5 +36,12 @@
   "deletePreset": "Delete",
   "presetNamePlaceholder": "Enter preset name",
   "noSavedPresets": "No saved presets",
-  "monsterCount": "{{count}} monsters"
+  "monsterCount": "{{count}} monsters",
+  "commonDrop": {
+    "mushroom": "Mushroom",
+    "starFlower": "Star Flower",
+    "elementMushroom": "Element Mushroom",
+    "kingCorn": "King Corn",
+    "whiteLotus": "White Lotus"
+  }
 }

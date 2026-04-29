@@ -61,11 +61,11 @@ function saveCustomPresets(presets: FarmCustomPreset[]): void {
 }
 
 const COMMON_DROPS = [
-  { name: "しいたけ",       rate: 0.01,       note: undefined },
-  { name: "スターフラワー", rate: 0.001,      note: undefined },
-  { name: "属性キノコ",     rate: 0.001,      note: "OVER KILL時" },
-  { name: "キングコォーン", rate: 0.0001,     note: undefined },
-  { name: "極白花",         rate: 0.000001,   note: undefined },
+  { id: "mushroom",        rate: 0.01,       hasNote: false },
+  { id: "starFlower",      rate: 0.001,      hasNote: false },
+  { id: "elementMushroom", rate: 0.001,      hasNote: true  },
+  { id: "kingCorn",        rate: 0.0001,     hasNote: false },
+  { id: "whiteLotus",      rate: 0.000001,   hasNote: false },
 ] as const;
 
 let nextId = 1;
@@ -290,8 +290,8 @@ export function FarmCalculator() {
     const totalKillsPerHour = monsterRows.reduce((s, r) => s + r.count * runsPerHour, 0);
     const bonusMult = 1 + dropBonusNum / 100;
     return COMMON_DROPS.map((d) => ({
-      name: d.name,
-      note: d.note,
+      id: d.id,
+      hasNote: d.hasNote,
       count: Math.min(d.rate * bonusMult, 1) * totalKillsPerHour,
     }));
   }, [monsterRows, secondsNum, dropBonusNum]);
@@ -601,12 +601,16 @@ export function FarmCalculator() {
                 <div>
                   <p className="text-xs font-semibold mb-1.5 text-teal-600">{t("game:dropRarity.common")}</p>
                   <div className="space-y-1">
-                    {commonDropsPerHour.map(({ name, note, count }) => (
-                      <div key={name} className="bg-white/60 rounded-lg px-2 py-1.5">
-                        <p className="text-xs text-gray-700 truncate" title={note ? `${name}（${note}）` : name}>{name}</p>
-                        <p className="text-xs font-bold text-teal-600">{fmtDrop(count)}/h</p>
-                      </div>
-                    ))}
+                    {commonDropsPerHour.map(({ id, hasNote, count }) => {
+                      const displayName = t(`commonDrop.${id}`);
+                      const noteText = hasNote ? t("overKillNote") : undefined;
+                      return (
+                        <div key={id} className="bg-white/60 rounded-lg px-2 py-1.5">
+                          <p className="text-xs text-gray-700 truncate" title={noteText ? `${displayName}（${noteText}）` : displayName}>{displayName}</p>
+                          <p className="text-xs font-bold text-teal-600">{fmtDrop(count)}/h</p>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
