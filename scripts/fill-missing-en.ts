@@ -277,6 +277,47 @@ ${sections.join("\n\n")}
 `;
 }
 
+function buildIssueBodyNoTranslation(items: MissingItem[]): string {
+  const date = new Date().toISOString().slice(0, 10);
+
+  const bySource = new Map<MissingItem["source"], MissingItem[]>();
+  for (const item of items) {
+    const list = bySource.get(item.source) ?? [];
+    list.push(item);
+    bySource.set(item.source, list);
+  }
+
+  const sections: string[] = [];
+  for (const [src, srcItems] of bySource) {
+    const label =
+      src === "enemyPresets"
+        ? "モンスタープリセット (`src/data/enemyPresets.ts`)"
+        : "アクセサリー (`docs/data/accessories.json`)";
+    const rows = srcItems.map((i) => `| \`${i.field}\` | ${i.japanese} |`);
+    sections.push(
+      `### ${label}\n\n| フィールド | 日本語 |\n|---|---|\n${rows.join("\n")}`
+    );
+  }
+
+  return `## 英語訳の手動対応が必要
+
+**作成日**: ${date}
+**対象**: 新アプデで追加されたテキストに英語訳が設定されていません
+
+以下の項目について、[Wiki](${WIKI_URL}) を参照して英語訳を追加してください。
+
+${sections.join("\n\n")}
+
+## 対応方法
+
+1. Wiki で正式名称・説明文を確認
+2. 各ファイルの該当エントリに英語フィールドを追加
+3. 確認完了したらこの Issue をクローズ
+
+> 💡 \`ANTHROPIC_API_KEY\` を設定して \`npm run fill-en\` を実行すると機械翻訳で自動補完できます。
+`;
+}
+
 function createGithubIssue(title: string, body: string): void {
   // i18n-review ラベルが存在しない場合は作成
   try {
@@ -330,32 +371,43 @@ async function main() {
     return;
   }
 
-  // 2. 翻訳
-  console.log("🤖 Claude API で機械翻訳中...");
-  const translations = await translateBatch(allMissing.map((i) => i.japanese));
-  console.log(`   ${translations.size} 件翻訳完了\n`);
+  const hasApiKey = !!process.env.ANTHROPIC_API_KEY;
 
-  // 3. ファイル更新
-  if (presetsMissing.length > 0) {
-    console.log("📝 enemyPresets.ts を更新中...");
-    const updated = applyToEnemyPresetsSource(presetsSource, translations);
-    await fs.writeFile(ENEMY_PRESETS_PATH, updated, "utf-8");
-    console.log("   完了\n");
+  if (hasApiKey) {
+    // 2. 翻訳
+    console.log("🤖 Claude API で機械翻訳中...");
+    const translations = await translateBatch(allMissing.map((i) => i.japanese));
+    console.log(`   ${translations.size} 件翻訳完了\n`);
+
+    // 3. ファイル更新
+    if (presetsMissing.length > 0) {
+      console.log("📝 enemyPresets.ts を更新中...");
+      const updated = applyToEnemyPresetsSource(presetsSource, translations);
+      await fs.writeFile(ENEMY_PRESETS_PATH, updated, "utf-8");
+      console.log("   完了\n");
+    }
+
+    if (accMissing.length > 0) {
+      console.log("📝 accessories.json を更新中...");
+      const updated = applyToAccessories(accData, translations);
+      await fs.writeFile(ACCESSORIES_PATH, JSON.stringify(updated, null, 2) + "\n", "utf-8");
+      console.log("   完了\n");
+    }
+
+    // Issue 作成（翻訳結果付き）
+    console.log("📌 GitHub Issue を作成中...");
+    const date = new Date().toISOString().slice(0, 10);
+    const title = `[i18n] 機械翻訳レビュー待ち (${date}) — ${allMissing.length}件`;
+    createGithubIssue(title, buildIssueBody(allMissing, translations));
+    return;
   }
 
-  if (accMissing.length > 0) {
-    console.log("📝 accessories.json を更新中...");
-    const updated = applyToAccessories(accData, translations);
-    await fs.writeFile(ACCESSORIES_PATH, JSON.stringify(updated, null, 2) + "\n", "utf-8");
-    console.log("   完了\n");
-  }
-
-  // 4. GitHub Issue 作成
+  // API キーなし → Issue のみ作成（ファイル変更なし）
+  console.log("ℹ️  ANTHROPIC_API_KEY 未設定。Issue 作成のみ行います。\n");
   console.log("📌 GitHub Issue を作成中...");
   const date = new Date().toISOString().slice(0, 10);
-  const title = `[i18n] 機械翻訳レビュー待ち (${date}) — ${allMissing.length}件`;
-  const body = buildIssueBody(allMissing, translations);
-  createGithubIssue(title, body);
+  const title = `[i18n] 英語訳の手動対応が必要 (${date}) — ${allMissing.length}件`;
+  createGithubIssue(title, buildIssueBodyNoTranslation(allMissing));
 }
 
 main().catch((err) => {
