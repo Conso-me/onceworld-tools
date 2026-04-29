@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-04-29",
+    changes: [
+    { type: "improve", text: "feat(i18n): FarmCalculator の共通素材ドロップ名を英語対応" },
+    ],
+  },
+
+  {
     date: "2026-04-28",
     changes: [
     { type: "improve", text: "feat(i18n): 装備・アクセサリ・ペット名の英語対応（wikiから取得）" },
