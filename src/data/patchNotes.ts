@@ -15,6 +15,10 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-04-29",
     changes: [
+    { type: "improve", text: "fix: API キーなしの場合は Issue 作成のみに変更" },
+    { type: "improve", text: "ci: fill-missing-en を main push 時に自動実行" },
+    { type: "feature", text: "feat: 新アプデ英語対応自動化スクリプト追加 (fill-missing-en)" },
+    { type: "fix", text: "feat(i18n): 英語モードの未翻訳テキストを修正" },
     { type: "improve", text: "feat(i18n): FarmCalculator の共通素材ドロップ名を英語対応" },
     ],
   },
