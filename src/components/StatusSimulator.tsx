@@ -27,7 +27,7 @@ function StatTable({ breakdown, label }: { breakdown: ReturnType<typeof calcStat
       {setBonus && (
         <div className="inline-flex items-center gap-1.5 text-xs bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-full px-3 py-1">
           <span className="font-bold">{t("table.setEffect")}</span>
-          {setBonusSeries && <span className="text-yellow-500">({setBonusSeries})</span>}
+          {setBonusSeries && <span className="text-yellow-500">({t(`equipSeries.${setBonusSeries}`)})</span>}
         </div>
       )}
       <table className="w-full text-sm border-collapse">
@@ -76,12 +76,12 @@ function CompareTable({ resultA, resultB }: { resultA: ReturnType<typeof calcSta
       <div className="flex gap-2 flex-wrap">
         {resultA.setBonus && (
           <span className="text-xs bg-blue-50 text-blue-600 border border-blue-100 rounded-full px-2 py-0.5">
-            A: {t("table.setEffect")}{resultA.setBonusSeries ? ` (${resultA.setBonusSeries})` : ""}
+            A: {t("table.setEffect")}{resultA.setBonusSeries ? ` (${t(`equipSeries.${resultA.setBonusSeries}`)})` : ""}
           </span>
         )}
         {resultB.setBonus && (
           <span className="text-xs bg-orange-50 text-orange-600 border border-orange-100 rounded-full px-2 py-0.5">
-            B: {t("table.setEffect")}{resultB.setBonusSeries ? ` (${resultB.setBonusSeries})` : ""}
+            B: {t("table.setEffect")}{resultB.setBonusSeries ? ` (${t(`equipSeries.${resultB.setBonusSeries}`)})` : ""}
           </span>
         )}
       </div>

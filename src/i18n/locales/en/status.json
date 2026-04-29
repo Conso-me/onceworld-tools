@@ -16,6 +16,7 @@
   "cosmoCubeBonus": "(+{{points}}pt)",
   "allocationSection": "Stat Points",
   "johannePen": "Johane's Quill Pen (Avail pts×1%/ea)",
+  "johanneAltar": "Johanne's Altar (Quill Pen effect+0.2%/ea)",
   "availablePoints": "Available Points",
   "perStatLimit": "Per-Stat Limit",
   "allocationPoints": "Allocation Points",
