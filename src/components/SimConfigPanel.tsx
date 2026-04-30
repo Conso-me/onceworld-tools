@@ -1025,9 +1025,9 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
               <div className="space-y-1">
                 <NumInput label={t("tenmeiRinne")} value={cfg.reinCount} min={0}
                   onChange={(v) => setField("reinCount", v)} />
-                {cfg.reinCount > 0 && (
+                {cfg.reinCount >= 1 && (
                   <span className="block text-xs text-blue-500">
-                    {t("cosmoCubeBonus", { points: (cfg.reinCount * 10000).toLocaleString() })}
+                    {t("cosmoCubeBonus", { points: (990000).toLocaleString() })}
                   </span>
                 )}
               </div>
