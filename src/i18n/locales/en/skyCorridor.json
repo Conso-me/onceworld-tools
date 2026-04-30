@@ -8,8 +8,8 @@
   "displayFloor": "Floor",
   "lukEvasionLabel": "LUK (for evasion)",
   "overallMaxFloor": "Overall Max Floor",
-  "sectionPhysical": "Physical Top 10",
-  "sectionMagic": "Magic Top 10",
+  "sectionPhysical": "Physical Top 8",
+  "sectionMagic": "Magic Top 8",
   "tableHeaders": {
     "monster": "Monster",
     "type": "Type",

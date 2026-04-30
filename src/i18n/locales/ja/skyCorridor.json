@@ -8,8 +8,8 @@
   "displayFloor": "フロア",
   "lukEvasionLabel": "LUK（回避判定用）",
   "overallMaxFloor": "全体限界フロア",
-  "sectionPhysical": "物理攻撃上位10体",
-  "sectionMagic": "魔法攻撃上位10体",
+  "sectionPhysical": "物理攻撃上位8体",
+  "sectionMagic": "魔法攻撃上位8体",
   "tableHeaders": {
     "monster": "モンスター",
     "type": "種別",

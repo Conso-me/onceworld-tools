@@ -35,16 +35,18 @@ const EXCLUDE_MONSTERS = new Set([
   "罪環の監視者モルモ",
   "ダークウィッチ",
   "冥炎のハデス",
+  "スライムガール(物理)",
+  "スライムガール(魔法)",
 ]);
 
 function buildSkyCorridorMonsters(): { physical: MonsterBase[]; magic: MonsterBase[] } {
   const all = getAllMonsters().filter((m) => !EXCLUDE_MONSTERS.has(m.name));
   const physical = [...all.filter((m) => m.attackType === "物理")]
     .sort((a, b) => b.atk - a.atk)
-    .slice(0, 10);
+    .slice(0, 8);
   const magic = [...all.filter((m) => m.attackType !== "物理")]
     .sort((a, b) => b.int - a.int)
-    .slice(0, 10);
+    .slice(0, 8);
   return { physical, magic };
 }
 
