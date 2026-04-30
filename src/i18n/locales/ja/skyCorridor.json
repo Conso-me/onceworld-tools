@@ -1,0 +1,39 @@
+{
+  "presetLoad": "プリセット読み込み",
+  "syncWithDmg": "ダメ計と同期",
+  "on": "ON",
+  "off": "OFF",
+  "syncModeManual": "手動入力",
+  "syncModeSim": "装備設定",
+  "displayFloor": "フロア",
+  "lukEvasionLabel": "LUK（回避判定用）",
+  "overallMaxFloor": "全体限界フロア",
+  "sectionPhysical": "物理攻撃上位10体",
+  "sectionMagic": "魔法攻撃上位10体",
+  "tableHeaders": {
+    "monster": "モンスター",
+    "type": "種別",
+    "attackPower": "{{floor}}F攻撃力",
+    "nullify": "無効化",
+    "endurance": "耐久回数",
+    "maxFloor": "限界フロア",
+    "additionalDef": "要求DEF/MDEF",
+    "lukEvasion": "LUK回避",
+    "attackDmg": "想定与ダメ",
+    "hitRate": "HIT率"
+  },
+  "nullifiedMonsters": "無効化できているモンスター",
+  "cannotNullify": "無効化不可",
+  "nullifyAchieved": "無効化達成",
+  "notAchieved": "未達成",
+  "comfy": "余裕",
+  "lukEvasionGuide": "LUK回避目安：",
+  "lukLevel": {
+    "almost": "ほぼほぼ",
+    "mostly": "大体",
+    "maybe": "たぶん"
+  },
+  "enemyLukMultiplier": "敵LUK×{{n}}",
+  "lukEvasionNote": "※ LUK回避の計算式は非公式です。",
+  "cannotNullifyExists": "耐えられない敵あり"
+}

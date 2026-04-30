@@ -15,7 +15,9 @@
     "pet": "Pet Sim",
     "petShort": "Pet",
     "petbattle": "Pet Battle",
-    "petbattleShort": "Battle"
+    "petbattleShort": "Battle",
+    "skyCorridor": "Sky Corridor",
+    "skyCorridorShort": "Sky Cor."
   },
   "preparing": "Coming Soon",
   "add": "Add",

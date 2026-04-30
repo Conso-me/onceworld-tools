@@ -15,7 +15,9 @@
     "pet": "ペットシミュ",
     "petShort": "ペット",
     "petbattle": "ペットバトル",
-    "petbattleShort": "対戦"
+    "petbattleShort": "対戦",
+    "skyCorridor": "天空回廊",
+    "skyCorridorShort": "天空回廊"
   },
   "preparing": "準備中",
   "add": "追加",
