@@ -1022,15 +1022,8 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
                 <NumInput label={t("reincarnation")} value={cfg.tenseisCount} min={0} max={10}
                   onChange={(v) => setField("tenseisCount", v)} />
               )}
-              <div className="space-y-1">
-                <NumInput label={t("tenmeiRinne")} value={cfg.reinCount} min={0}
-                  onChange={(v) => setField("reinCount", v)} />
-                {cfg.reinCount >= 1 && (
-                  <span className="block text-xs text-blue-500">
-                    {t("cosmoCubeBonus", { points: (990000).toLocaleString() })}
-                  </span>
-                )}
-              </div>
+              <NumInput label={t("tenmeiRinne")} value={cfg.reinCount} min={0}
+                onChange={(v) => setField("reinCount", v)} />
             </div>
             <div className="grid grid-cols-2 gap-2">
               <label className="space-y-1">
@@ -1044,6 +1037,20 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
                     <option key={el} value={el}>{t(`game:element.${el}`)}</option>
                   ))}
                 </select>
+              </label>
+              <label className="flex items-center gap-2 text-sm cursor-pointer mt-5">
+                <input
+                  type="checkbox" checked={cfg.hasCosmoCube}
+                  onChange={(e) => setField("hasCosmoCube", e.target.checked)}
+                  className="accent-blue-500 w-4 h-4"
+                />
+                <span className="text-xs">{t("cosmoCube")}
+                  {cfg.hasCosmoCube && cfg.reinCount > 0 && (
+                    <span className="text-blue-500 ml-1">
+                      {t("cosmoCubeBonus", { points: (cfg.reinCount * 10000).toLocaleString() })}
+                    </span>
+                  )}
+                </span>
               </label>
             </div>
           </section>

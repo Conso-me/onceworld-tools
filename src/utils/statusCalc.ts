@@ -19,9 +19,8 @@ export function getAvailablePoints(cfg: SimConfig): number {
   const multiplied = (base + rebirthBonus) * (1 + cfg.reinCount);
   const pinnacleBonus =
     cfg.reinCount >= 10 ? Math.floor(5000 * Math.pow(cfg.reinCount - 9, 1.25)) : 0;
-  const cosmoCubeBonus = cfg.reinCount * 10000;
-  const reincarnationBonus = cfg.reinCount >= 1 ? 990000 : 0;
-  const subtotal = multiplied + pinnacleBonus + cosmoCubeBonus + reincarnationBonus;
+  const cosmoCubeBonus = cfg.hasCosmoCube ? cfg.reinCount * 10000 : 0;
+  const subtotal = multiplied + pinnacleBonus + cosmoCubeBonus;
   return Math.floor(subtotal * (1 + cfg.johaneCount / 100) * (1 + cfg.johanneAltarCount * 0.002));
 }
 
