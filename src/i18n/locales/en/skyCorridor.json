@@ -1,4 +1,12 @@
 {
+  "modeTabs": {
+    "endurance": "Endurance",
+    "attack": "Firepower"
+  },
+  "playerAttackMode": {
+    "physical": "Physical",
+    "magic": "Magic"
+  },
   "presetLoad": "Load Preset",
   "syncWithDmg": "Sync with DMG Calc",
   "on": "ON",
@@ -10,6 +18,10 @@
   "overallMaxFloor": "Overall Max Floor",
   "sectionPhysical": "Physical Top 8",
   "sectionMagic": "Magic Top 8",
+  "sectionPhysDefTop": "Top 8 by DEF",
+  "sectionPhysLukTop": "Top 8 by LUK",
+  "sectionMagMdefTop": "Top 10 by M-DEF",
+  "sectionMagImmune": "Magic Immune (all)",
   "tableHeaders": {
     "monster": "Monster",
     "type": "Type",
@@ -22,6 +34,13 @@
     "attackDmg": "Exp. DMG",
     "hitRate": "HIT%"
   },
+  "fireTableHeaders": {
+    "def": "DEF",
+    "luk": "LUK",
+    "mdef": "M-DEF"
+  },
+  "oneShot": "One-shot",
+  "magicImmune": "Mag.Immune",
   "nullifiedMonsters": "Nullified Monsters",
   "cannotNullify": "Cannot Nullify",
   "nullifyAchieved": "Nullified",

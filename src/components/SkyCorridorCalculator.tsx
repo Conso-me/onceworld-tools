@@ -10,7 +10,12 @@ import {
   calcAdditionalDefNeeded,
   calcDamage,
 } from "../utils/defenseCalc";
-import { calcMultiHitCount, calcPhysicalDamage, calcHitRate } from "../utils/damageCalc";
+import {
+  calcMultiHitCount,
+  calcPhysicalDamage,
+  calcPlayerMagicDamage,
+  calcHitRate,
+} from "../utils/damageCalc";
 import { calcStatus } from "../utils/statusCalc";
 import { getAllMonsters, getMonsterDisplayName } from "../data/monsters";
 import { InputField } from "./ui/InputField";
@@ -24,8 +29,13 @@ const floorToLevel = (floor: number) => 10000 + floor * 100;
 const levelToFloor = (lv: number) => Math.floor((lv - 10000) / 100);
 
 // ────────────────────────────────────────────
-// 天空回廊出現モンスター選定
-// 深淵回廊専用モンスターを除外し、ATK/INT上位10体を選定
+// モード型
+// ────────────────────────────────────────────
+type ViewMode = "endurance" | "attack";
+type PlayerAttackMode = "physical" | "magic";
+
+// ────────────────────────────────────────────
+// 除外モンスター（深淵回廊専用）
 // ────────────────────────────────────────────
 const EXCLUDE_MONSTERS = new Set([
   "イグニス・シスター",
@@ -42,6 +52,9 @@ const EXCLUDE_MONSTERS = new Set([
   "RAINBOW BOX",
 ]);
 
+// ────────────────────────────────────────────
+// 耐久モード: ATK/INT上位8体を選定
+// ────────────────────────────────────────────
 function buildSkyCorridorMonsters(): { physical: MonsterBase[]; magic: MonsterBase[] } {
   const all = getAllMonsters().filter((m) => !EXCLUDE_MONSTERS.has(m.name));
   const physical = [...all.filter((m) => m.attackType === "物理")]
@@ -54,6 +67,25 @@ function buildSkyCorridorMonsters(): { physical: MonsterBase[]; magic: MonsterBa
 }
 
 const SKY_MONSTERS = buildSkyCorridorMonsters();
+
+// ────────────────────────────────────────────
+// 火力モード: DEF/LUK上位8体・MDEF上位10体・魔法無効全体を選定
+// ────────────────────────────────────────────
+function buildFirepowerMonsters(): {
+  physDef: MonsterBase[];
+  physLuk: MonsterBase[];
+  magMdef: MonsterBase[];
+  magImmune: MonsterBase[];
+} {
+  const all = getAllMonsters().filter((m) => !EXCLUDE_MONSTERS.has(m.name));
+  const physDef = [...all].sort((a, b) => b.def - a.def).slice(0, 8);
+  const physLuk = [...all].sort((a, b) => b.luck - a.luck).slice(0, 8);
+  const magMdef = [...all].sort((a, b) => b.mdef - a.mdef).slice(0, 10);
+  const magImmune = all.filter((m) => !!m.magicImmune);
+  return { physDef, physLuk, magMdef, magImmune };
+}
+
+const FIRE_MONSTERS = buildFirepowerMonsters();
 
 // ────────────────────────────────────────────
 // LUK回避レベル
@@ -70,9 +102,6 @@ function calcLukEvasion(playerLuk: number, enemyLuk: number): LukEvasionLevel {
 
 // ────────────────────────────────────────────
 // 無効化限界フロア逆算
-// scaleStat(base, lv) = floor(base * ((lv-1)*0.1 + 1)) <= effective/1.75
-// => lv <= (effective/(base*1.75) - 1) / 0.1 + 1
-// 100単位でスナップしてフロアに変換
 // ────────────────────────────────────────────
 function calcMaxNullifyFloor(
   base: MonsterBase,
@@ -93,7 +122,7 @@ function calcMaxNullifyFloor(
 }
 
 // ────────────────────────────────────────────
-// バッジコンポーネント
+// バッジコンポーネント（耐久モード）
 // ────────────────────────────────────────────
 function LukEvasionBadge({ level, enemyLuk, t }: { level: LukEvasionLevel; enemyLuk: number; t: TFunction }) {
   if (level === "ほぼほぼ") {
@@ -188,7 +217,7 @@ function HitsToSurviveBadge({
 }
 
 // ────────────────────────────────────────────
-// 結果型
+// 耐久モード結果型
 // ────────────────────────────────────────────
 type SkyResult = {
   base: MonsterBase;
@@ -207,7 +236,22 @@ type SkyResult = {
 };
 
 // ────────────────────────────────────────────
-// 行コンポーネント
+// 火力モード結果型
+// ────────────────────────────────────────────
+type FireResult = {
+  base: MonsterBase;
+  scaled: ScaledMonster;
+  rankStat: number;
+  scaledHp: number;
+  playerDamageMin: number | null;
+  canOneShot: boolean;
+  hitRate: number | null;
+  isMagicImmune: boolean;
+  scaledLuck: number;
+};
+
+// ────────────────────────────────────────────
+// 耐久モード: 行コンポーネント
 // ────────────────────────────────────────────
 function SkyMonsterRow({
   result,
@@ -309,7 +353,7 @@ function SkyMonsterRow({
 }
 
 // ────────────────────────────────────────────
-// テーブルヘッダー
+// 耐久モード: テーブルヘッダー
 // ────────────────────────────────────────────
 function SkyTableHeader({ floor, t }: { floor: number; t: TFunction }) {
   return (
@@ -343,7 +387,7 @@ function SkyTableHeader({ floor, t }: { floor: number; t: TFunction }) {
 }
 
 // ────────────────────────────────────────────
-// テーブルセクション
+// 耐久モード: テーブルセクション
 // ────────────────────────────────────────────
 function SkySection({
   title,
@@ -406,24 +450,184 @@ function SkySection({
 }
 
 // ────────────────────────────────────────────
+// 火力モード: 行コンポーネント
+// ────────────────────────────────────────────
+function FireMonsterRow({
+  result,
+  t,
+  lang,
+}: {
+  result: FireResult;
+  t: TFunction;
+  lang: string;
+}) {
+  const rowBg = result.isMagicImmune
+    ? "bg-gray-50 border-gray-200"
+    : result.canOneShot
+    ? "bg-green-50 border-green-200"
+    : "bg-white border-gray-100";
+
+  return (
+    <tr className={`border-b ${rowBg} text-sm`}>
+      <td className="px-2 py-1.5 font-medium text-gray-800 whitespace-nowrap">
+        {getMonsterDisplayName(result.base, lang)}
+        {result.isMagicImmune && (
+          <span className="ml-1 inline-flex items-center px-1 py-0.5 rounded text-xs font-bold bg-gray-200 text-gray-600">
+            {t("magicImmune")}
+          </span>
+        )}
+      </td>
+      <td className="px-2 py-1.5 text-right text-sm font-medium text-gray-700 whitespace-nowrap">
+        {result.rankStat.toLocaleString()}
+      </td>
+      <td className="px-2 py-1.5 text-right text-sm text-gray-600 whitespace-nowrap">
+        {result.scaledHp.toLocaleString()}
+      </td>
+      <td className="px-2 py-1.5 text-right whitespace-nowrap">
+        {result.isMagicImmune ? (
+          <span className="text-gray-400 text-xs">—</span>
+        ) : result.playerDamageMin !== null ? (
+          <span className="text-sm text-gray-700">
+            {formatHitCount(result.playerDamageMin, lang)}~
+          </span>
+        ) : (
+          <span className="text-gray-400">—</span>
+        )}
+      </td>
+      <td className="px-2 py-1.5 text-center whitespace-nowrap">
+        {result.isMagicImmune ? (
+          <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-bold bg-gray-200 text-gray-600 border border-gray-300">
+            {t("magicImmune")}
+          </span>
+        ) : result.canOneShot ? (
+          <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
+            {t("oneShot")}
+          </span>
+        ) : (
+          <span className="text-orange-500 font-bold">✗</span>
+        )}
+      </td>
+      <td className="px-2 py-1.5 text-right whitespace-nowrap">
+        {result.hitRate !== null ? (
+          <span
+            className={`text-sm font-medium ${
+              result.hitRate === 100
+                ? "text-emerald-600"
+                : result.hitRate < 50
+                ? "text-red-500"
+                : "text-gray-700"
+            }`}
+          >
+            {result.hitRate}%
+          </span>
+        ) : (
+          <span className="text-gray-400">—</span>
+        )}
+      </td>
+    </tr>
+  );
+}
+
+// ────────────────────────────────────────────
+// 火力モード: テーブルヘッダー
+// ────────────────────────────────────────────
+function FireTableHeader({
+  floor,
+  rankHeader,
+  t,
+}: {
+  floor: number;
+  rankHeader: string;
+  t: TFunction;
+}) {
+  return (
+    <tr className="bg-gray-50 text-xs text-gray-500 border-b border-gray-200">
+      <th className="px-2 py-2 text-left font-medium">{t("tableHeaders.monster")}</th>
+      <th className="px-2 py-2 text-right font-medium whitespace-nowrap">
+        {rankHeader}({floor.toLocaleString()}F)
+      </th>
+      <th className="px-2 py-2 text-right font-medium whitespace-nowrap">HP</th>
+      <th className="px-2 py-2 text-right font-medium whitespace-nowrap">
+        {t("tableHeaders.attackDmg")}
+      </th>
+      <th className="px-2 py-2 text-center font-medium whitespace-nowrap">
+        {t("oneShot")}
+      </th>
+      <th className="px-2 py-2 text-right font-medium whitespace-nowrap">
+        {t("tableHeaders.hitRate")}
+      </th>
+    </tr>
+  );
+}
+
+// ────────────────────────────────────────────
+// 火力モード: テーブルセクション
+// ────────────────────────────────────────────
+function FireSection({
+  title,
+  results,
+  floor,
+  rankHeader,
+  t,
+  lang,
+}: {
+  title: string;
+  results: FireResult[];
+  floor: number;
+  rankHeader: string;
+  t: TFunction;
+  lang: string;
+}) {
+  if (results.length === 0) return null;
+  return (
+    <div className="bg-white rounded-2xl shadow shadow-gray-200/50 overflow-hidden">
+      <div className="px-3 py-2 bg-gray-50 border-b border-gray-200">
+        <span className="text-sm font-semibold text-gray-700">{title}</span>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm border-collapse">
+          <thead>
+            <FireTableHeader floor={floor} rankHeader={rankHeader} t={t} />
+          </thead>
+          <tbody>
+            {results.map((result) => (
+              <FireMonsterRow key={result.base.name} result={result} t={t} lang={lang} />
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ────────────────────────────────────────────
 // メインコンポーネント
 // ────────────────────────────────────────────
 export function SkyCorridorCalculator() {
   const { t, i18n } = useTranslation("skyCorridor");
+
+  // 表示モード
+  const [viewMode, setViewMode] = usePersistedState<ViewMode>("skyCorridor:viewMode", "endurance");
+  const [playerAttackMode, setPlayerAttackMode] = usePersistedState<PlayerAttackMode>("skyCorridor:attackMode", "physical");
+
+  // ステータス入力（手動）
   const [myDef, setMyDef] = usePersistedState("skyCorridor:def", "");
   const [myMdef, setMyMdef] = usePersistedState("skyCorridor:mdef", "");
   const [myVit, setMyVit] = usePersistedState("skyCorridor:vit", "");
   const [myLuk, setMyLuk] = usePersistedState("skyCorridor:luk", "");
   const [myAtk, setMyAtk] = usePersistedState("skyCorridor:atk", "");
+  const [myInt, setMyInt] = usePersistedState("skyCorridor:int", "");
   const [mySpd, setMySpd] = usePersistedState("skyCorridor:spd", "");
   const [syncWithDmg, setSyncWithDmg] = usePersistedState("skyCorridor:sync", false);
   const [syncMode, setSyncMode] = usePersistedState<"manual" | "sim">("skyCorridor:syncMode", "manual");
 
+  // ダメ計からの同期用
   const [dmgDef] = usePersistedState("dmg:def", "");
   const [dmgMdef] = usePersistedState("dmg:mdef", "");
   const [dmgVit] = usePersistedState("dmg:vit", "");
   const [dmgLuck] = usePersistedState("dmg:luck", "");
   const [dmgAtk] = usePersistedState("dmg:atk", "");
+  const [dmgInt] = usePersistedState("dmg:int", "");
   const [dmgSpd] = usePersistedState("dmg:spd", "");
   const [simCfg] = useSharedSimConfig();
   const simResult = useMemo(() => calcStatus(simCfg), [simCfg]);
@@ -432,6 +636,7 @@ export function SkyCorridorCalculator() {
   const [selectedSimPresetId, setSelectedSimPresetId] = useState("");
   const { presets: simPresets, loadPreset: loadSimPreset } = useSimPresets();
 
+  // 有効ステータス（同期 or 手動）
   const effectiveDef = syncWithDmg
     ? syncMode === "sim" ? simResult.final.def : parseInt(dmgDef) || 0
     : parseInt(myDef) || 0;
@@ -447,6 +652,9 @@ export function SkyCorridorCalculator() {
   const effectiveAtk = syncWithDmg
     ? syncMode === "sim" ? simResult.final.atk : parseInt(dmgAtk) || 0
     : parseInt(myAtk) || 0;
+  const effectiveInt = syncWithDmg
+    ? syncMode === "sim" ? simResult.final.int : parseInt(dmgInt) || 0
+    : parseInt(myInt) || 0;
   const effectiveSpd = syncWithDmg
     ? syncMode === "sim" ? simResult.final.spd : parseInt(dmgSpd) || 0
     : parseInt(mySpd) || 0;
@@ -470,6 +678,9 @@ export function SkyCorridorCalculator() {
     [skyFloor]
   );
 
+  // ────────────────────────────────────────────
+  // 耐久モード計算
+  // ────────────────────────────────────────────
   function calcSkyResult(base: MonsterBase): SkyResult {
     const lv = floorToLevel(floorNum);
     const scaled = scaleMonster(base, lv);
@@ -523,6 +734,39 @@ export function SkyCorridorCalculator() {
     };
   }
 
+  // ────────────────────────────────────────────
+  // 火力モード計算
+  // ────────────────────────────────────────────
+  function calcFireResult(base: MonsterBase, rankStat: number): FireResult {
+    const lv = floorToLevel(floorNum);
+    const scaled = scaleMonster(base, lv);
+    const scaledHp = scaled.scaledVit * 18 + 100;
+    const scaledLuck = scaled.scaledLuck;
+    const isMagicImmune = !!base.magicImmune;
+
+    let playerDamageMin: number | null = null;
+    let canOneShot = false;
+
+    if (playerAttackMode === "physical" && effectiveAtk > 0) {
+      const dmg = calcPhysicalDamage(effectiveAtk, scaled.scaledDef, scaled.scaledMdef);
+      const multiHit = calcMultiHitCount(effectiveSpd, false);
+      playerDamageMin = dmg.min * multiHit;
+      canOneShot = playerDamageMin >= scaledHp;
+    } else if (playerAttackMode === "magic" && effectiveInt > 0 && !isMagicImmune) {
+      const dmg = calcPlayerMagicDamage(effectiveInt, 0, 1.0, scaled.scaledDef, scaled.scaledMdef);
+      const multiHit = calcMultiHitCount(effectiveSpd, true);
+      playerDamageMin = dmg.min * multiHit;
+      canOneShot = playerDamageMin >= scaledHp;
+    }
+
+    const hitRate = effectiveLuk > 0 ? calcHitRate(effectiveLuk, scaledLuck) : null;
+
+    return { base, scaled, rankStat, scaledHp, playerDamageMin, canOneShot, hitRate, isMagicImmune, scaledLuck };
+  }
+
+  // ────────────────────────────────────────────
+  // 耐久モード結果 (memoized)
+  // ────────────────────────────────────────────
   const physicalResults = useMemo(
     () => SKY_MONSTERS.physical.map(calcSkyResult),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -538,7 +782,6 @@ export function SkyCorridorCalculator() {
   const allResults = [...physicalResults, ...magicResults];
   const nullifiedCount = allResults.filter((r) => r.nullifiedNow).length;
 
-  // 全体限界フロア：全モンスターの maxNullifyFloor の最小値（null あれば耐えられない）
   const overallMaxFloor = useMemo(() => {
     const floors = allResults.map((r) => r.maxNullifyFloor);
     if (floors.some((f) => f === null)) return null;
@@ -547,13 +790,102 @@ export function SkyCorridorCalculator() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [physicalResults, magicResults]);
 
+  // ────────────────────────────────────────────
+  // 火力モード結果 (memoized)
+  // ────────────────────────────────────────────
+  const firePhysDefResults = useMemo(
+    () => FIRE_MONSTERS.physDef.map((m) => {
+      const scaled = scaleMonster(m, floorToLevel(floorNum));
+      return calcFireResult(m, scaled.scaledDef);
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [effectiveAtk, effectiveInt, effectiveLuk, effectiveSpd, floorNum, playerAttackMode]
+  );
+
+  const firePhysLukResults = useMemo(
+    () => FIRE_MONSTERS.physLuk.map((m) => {
+      const scaled = scaleMonster(m, floorToLevel(floorNum));
+      return calcFireResult(m, scaled.scaledLuck);
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [effectiveAtk, effectiveInt, effectiveLuk, effectiveSpd, floorNum, playerAttackMode]
+  );
+
+  const fireMagMdefResults = useMemo(
+    () => FIRE_MONSTERS.magMdef.map((m) => {
+      const scaled = scaleMonster(m, floorToLevel(floorNum));
+      return calcFireResult(m, scaled.scaledMdef);
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [effectiveAtk, effectiveInt, effectiveLuk, effectiveSpd, floorNum, playerAttackMode]
+  );
+
+  const fireMagImmuneResults = useMemo(
+    () => FIRE_MONSTERS.magImmune.map((m) => {
+      const scaled = scaleMonster(m, floorToLevel(floorNum));
+      return calcFireResult(m, scaled.scaledMdef);
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [effectiveAtk, effectiveInt, effectiveLuk, effectiveSpd, floorNum, playerAttackMode]
+  );
+
   const handleFloorClick = (floor: number) => setSkyFloor(String(floor));
+
+  // ────────────────────────────────────────────
+  // ステータス入力フィールド定義
+  // ────────────────────────────────────────────
+  const statFields = [
+    { label: "VIT",                val: effectiveVit,  raw: myVit,  set: setMyVit  },
+    { label: "SPD",                val: effectiveSpd,  raw: mySpd,  set: setMySpd  },
+    { label: "ATK",                val: effectiveAtk,  raw: myAtk,  set: setMyAtk  },
+    { label: "INT",                val: effectiveInt,  raw: myInt,  set: setMyInt  },
+    { label: "DEF",                val: effectiveDef,  raw: myDef,  set: setMyDef  },
+    { label: "M-DEF",              val: effectiveMdef, raw: myMdef, set: setMyMdef },
+    { label: t("lukEvasionLabel"), val: effectiveLuk,  raw: myLuk,  set: setMyLuk  },
+  ] as const;
 
   return (
     <div className="max-w-lg mx-auto space-y-6 lg:max-w-none lg:space-y-0 lg:grid lg:grid-cols-[minmax(340px,400px)_1fr] lg:gap-2 lg:items-start">
       {/* ───── 左カラム: 入力パネル ───── */}
       <div className="space-y-6 lg:space-y-2">
         <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-5 lg:space-y-3">
+
+          {/* モード切り替えタブ */}
+          <div className="flex rounded-xl overflow-hidden border border-gray-200 text-xs font-medium">
+            {(["endurance", "attack"] as const).map((mode) => (
+              <button
+                key={mode}
+                onClick={() => setViewMode(mode)}
+                className={`flex-1 px-3 py-2 transition-colors ${
+                  viewMode === mode
+                    ? "bg-indigo-500 text-white"
+                    : "bg-white text-gray-500 hover:bg-gray-50"
+                }`}
+              >
+                {t(`modeTabs.${mode}`)}
+              </button>
+            ))}
+          </div>
+
+          {/* 火力モード: 攻撃タイプ選択 */}
+          {viewMode === "attack" && (
+            <div className="flex rounded-lg overflow-hidden border border-indigo-200 text-xs font-medium">
+              {(["physical", "magic"] as const).map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => setPlayerAttackMode(mode)}
+                  className={`flex-1 px-3 py-1.5 transition-colors ${
+                    playerAttackMode === mode
+                      ? "bg-indigo-500 text-white"
+                      : "bg-white text-gray-500 hover:bg-gray-50"
+                  }`}
+                >
+                  {t(`playerAttackMode.${mode}`)}
+                </button>
+              ))}
+            </div>
+          )}
+
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
               <span className="text-indigo-500 text-sm">{t("common:self")}</span>
@@ -593,16 +925,7 @@ export function SkyCorridorCalculator() {
 
           {/* ステータス入力 */}
           <div className="grid grid-cols-2 gap-4 lg:gap-2">
-            {(
-              [
-                { label: "VIT",                   val: effectiveVit,  raw: myVit,  set: setMyVit  },
-                { label: "SPD",                   val: effectiveSpd,  raw: mySpd,  set: setMySpd  },
-                { label: "ATK",                   val: effectiveAtk,  raw: myAtk,  set: setMyAtk  },
-                { label: "DEF",                   val: effectiveDef,  raw: myDef,  set: setMyDef  },
-                { label: "M-DEF",                 val: effectiveMdef, raw: myMdef, set: setMyMdef },
-                { label: t("lukEvasionLabel"),     val: effectiveLuk,  raw: myLuk,  set: setMyLuk  },
-              ] as const
-            ).map(({ label, val, raw, set }) =>
+            {statFields.map(({ label, val, raw, set }) =>
               syncWithDmg ? (
                 <div key={label} className="space-y-1.5 lg:space-y-1">
                   <label className="block text-sm lg:text-xs font-medium text-gray-400">{label}</label>
@@ -682,87 +1005,131 @@ export function SkyCorridorCalculator() {
           </div>
         </div>
 
-        {/* サマリー */}
-        <div className="bg-white rounded-2xl shadow shadow-gray-200/50 p-4 space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">{t("nullifiedMonsters")}</span>
-            <span
-              className={`text-lg font-bold ${
-                nullifiedCount === allResults.length
-                  ? "text-green-600"
-                  : nullifiedCount === 0
-                  ? "text-red-500"
-                  : "text-orange-500"
-              }`}
-            >
-              {nullifiedCount} / {allResults.length}
-            </span>
-          </div>
-          {playerHp > 0 && (
+        {/* サマリー（耐久モード時のみ） */}
+        {viewMode === "endurance" && (
+          <div className="bg-white rounded-2xl shadow shadow-gray-200/50 p-4 space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">HP</span>
-              <span className="text-lg font-bold text-gray-700">
-                {playerHp.toLocaleString()}
+              <span className="text-sm text-gray-600">{t("nullifiedMonsters")}</span>
+              <span
+                className={`text-lg font-bold ${
+                  nullifiedCount === allResults.length
+                    ? "text-green-600"
+                    : nullifiedCount === 0
+                    ? "text-red-500"
+                    : "text-orange-500"
+                }`}
+              >
+                {nullifiedCount} / {allResults.length}
               </span>
             </div>
-          )}
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">{t("overallMaxFloor")}</span>
-            <span
-              className={`text-lg font-bold ${
-                overallMaxFloor === null
-                  ? "text-red-500"
+            {playerHp > 0 && (
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">HP</span>
+                <span className="text-lg font-bold text-gray-700">
+                  {playerHp.toLocaleString()}
+                </span>
+              </div>
+            )}
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">{t("overallMaxFloor")}</span>
+              <span
+                className={`text-lg font-bold ${
+                  overallMaxFloor === null
+                    ? "text-red-500"
+                    : overallMaxFloor === Infinity
+                    ? "text-emerald-600"
+                    : "text-indigo-600"
+                }`}
+              >
+                {overallMaxFloor === null
+                  ? t("cannotNullifyExists")
                   : overallMaxFloor === Infinity
-                  ? "text-emerald-600"
-                  : "text-indigo-600"
-              }`}
-            >
-              {overallMaxFloor === null
-                ? t("cannotNullifyExists")
-                : overallMaxFloor === Infinity
-                ? "∞"
-                : `${overallMaxFloor.toLocaleString()}F`}
-            </span>
-          </div>
-          <div className="text-xs text-gray-400 space-y-0.5 pt-1">
-            <div className="flex flex-wrap gap-x-3 gap-y-0.5 items-center">
-              <span className="font-medium text-gray-500">{t("lukEvasionGuide")}</span>
-              <span className="flex items-center gap-1">
-                <span className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-bold bg-orange-100 text-orange-600 border border-orange-200">{t("lukLevel.maybe")}</span>
-                {t("enemyLukMultiplier", { n: 3 })}
-              </span>
-              <span className="flex items-center gap-1">
-                <span className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700 border border-yellow-200">{t("lukLevel.mostly")}</span>
-                {t("enemyLukMultiplier", { n: 4 })}
-              </span>
-              <span className="flex items-center gap-1">
-                <span className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">{t("lukLevel.almost")}</span>
-                {t("enemyLukMultiplier", { n: 5 })}
+                  ? "∞"
+                  : `${overallMaxFloor.toLocaleString()}F`}
               </span>
             </div>
-            <p>{t("lukEvasionNote")}</p>
+            <div className="text-xs text-gray-400 space-y-0.5 pt-1">
+              <div className="flex flex-wrap gap-x-3 gap-y-0.5 items-center">
+                <span className="font-medium text-gray-500">{t("lukEvasionGuide")}</span>
+                <span className="flex items-center gap-1">
+                  <span className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-bold bg-orange-100 text-orange-600 border border-orange-200">{t("lukLevel.maybe")}</span>
+                  {t("enemyLukMultiplier", { n: 3 })}
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700 border border-yellow-200">{t("lukLevel.mostly")}</span>
+                  {t("enemyLukMultiplier", { n: 4 })}
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">{t("lukLevel.almost")}</span>
+                  {t("enemyLukMultiplier", { n: 5 })}
+                </span>
+              </div>
+              <p>{t("lukEvasionNote")}</p>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* ───── 右カラム: 結果テーブル ───── */}
       <div className="space-y-3">
-        <SkySection
-          title={t("sectionPhysical")}
-          results={physicalResults}
-          floor={floorNum}
-          onFloorClick={handleFloorClick}
-          t={t}
-          lang={i18n.language}
-        />
-        <SkySection
-          title={t("sectionMagic")}
-          results={magicResults}
-          floor={floorNum}
-          onFloorClick={handleFloorClick}
-          t={t}
-          lang={i18n.language}
-        />
+        {viewMode === "endurance" ? (
+          <>
+            <SkySection
+              title={t("sectionPhysical")}
+              results={physicalResults}
+              floor={floorNum}
+              onFloorClick={handleFloorClick}
+              t={t}
+              lang={i18n.language}
+            />
+            <SkySection
+              title={t("sectionMagic")}
+              results={magicResults}
+              floor={floorNum}
+              onFloorClick={handleFloorClick}
+              t={t}
+              lang={i18n.language}
+            />
+          </>
+        ) : playerAttackMode === "physical" ? (
+          <>
+            <FireSection
+              title={t("sectionPhysDefTop")}
+              results={firePhysDefResults}
+              floor={floorNum}
+              rankHeader={t("fireTableHeaders.def")}
+              t={t}
+              lang={i18n.language}
+            />
+            <FireSection
+              title={t("sectionPhysLukTop")}
+              results={firePhysLukResults}
+              floor={floorNum}
+              rankHeader={t("fireTableHeaders.luk")}
+              t={t}
+              lang={i18n.language}
+            />
+          </>
+        ) : (
+          <>
+            <FireSection
+              title={t("sectionMagMdefTop")}
+              results={fireMagMdefResults}
+              floor={floorNum}
+              rankHeader={t("fireTableHeaders.mdef")}
+              t={t}
+              lang={i18n.language}
+            />
+            <FireSection
+              title={t("sectionMagImmune")}
+              results={fireMagImmuneResults}
+              floor={floorNum}
+              rankHeader={t("fireTableHeaders.mdef")}
+              t={t}
+              lang={i18n.language}
+            />
+          </>
+        )}
       </div>
     </div>
   );
