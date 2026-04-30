@@ -265,12 +265,14 @@ function SkyMonsterRow({
         <NullifyFloorBadge floor={result.maxNullifyFloor} onClick={onFloorClick} t={t} />
       </td>
       <td className="px-2 py-1.5 text-right text-xs whitespace-nowrap">
-        {result.nullifiedNow ? (
-          <span className="text-green-600 font-bold">✓</span>
-        ) : result.isPhysical ? (
-          <span className="text-orange-600 font-medium">{result.requiredDef.toLocaleString()}</span>
+        {result.isPhysical ? (
+          <span className={result.nullifiedNow ? "text-green-600 font-medium" : "text-orange-600 font-medium"}>
+            {result.requiredDef.toLocaleString()}
+          </span>
         ) : (
-          <span className="text-purple-600 font-medium">{result.requiredMdef.toLocaleString()}</span>
+          <span className={result.nullifiedNow ? "text-green-600 font-medium" : "text-purple-600 font-medium"}>
+            {result.requiredMdef.toLocaleString()}
+          </span>
         )}
       </td>
       <td className="px-2 py-1.5 text-center whitespace-nowrap">
