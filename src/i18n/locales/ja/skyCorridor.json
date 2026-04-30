@@ -17,7 +17,7 @@
     "nullify": "無効化",
     "endurance": "耐久回数",
     "maxFloor": "限界フロア",
-    "additionalDef": "要求DEF/MDEF",
+    "additionalDef": "無効化必要DEF/MDEF",
     "lukEvasion": "LUK回避",
     "attackDmg": "想定与ダメ",
     "hitRate": "HIT率"

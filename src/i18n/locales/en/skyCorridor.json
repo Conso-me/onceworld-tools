@@ -17,7 +17,7 @@
     "nullify": "Nullify",
     "endurance": "Survive",
     "maxFloor": "Max Floor",
-    "additionalDef": "Req. DEF/MDEF",
+    "additionalDef": "Nullify DEF/MDEF",
     "lukEvasion": "LUK Evasion",
     "attackDmg": "Exp. DMG",
     "hitRate": "HIT%"

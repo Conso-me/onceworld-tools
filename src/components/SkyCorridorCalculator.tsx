@@ -197,8 +197,8 @@ type SkyResult = {
   enemyStat: number;
   nullifiedNow: boolean;
   maxNullifyFloor: number | null;
-  additionalDef: number;
-  additionalMdef: number;
+  requiredDef: number;
+  requiredMdef: number;
   hitsToSurvive: { worst: number; best: number } | null;
   lukEvasionLevel: LukEvasionLevel;
   scaledLuck: number;
@@ -265,10 +265,12 @@ function SkyMonsterRow({
         <NullifyFloorBadge floor={result.maxNullifyFloor} onClick={onFloorClick} t={t} />
       </td>
       <td className="px-2 py-1.5 text-right text-xs whitespace-nowrap">
-        {result.isPhysical ? (
-          <span className="text-orange-600">{result.additionalDef.toLocaleString()}</span>
+        {result.nullifiedNow ? (
+          <span className="text-green-600 font-bold">✓</span>
+        ) : result.isPhysical ? (
+          <span className="text-orange-600 font-medium">{result.requiredDef.toLocaleString()}</span>
         ) : (
-          <span className="text-purple-600">{result.additionalMdef.toLocaleString()}</span>
+          <span className="text-purple-600 font-medium">{result.requiredMdef.toLocaleString()}</span>
         )}
       </td>
       <td className="px-2 py-1.5 text-center whitespace-nowrap">
@@ -391,10 +393,9 @@ function SkySection({
             <span className="w-3 h-3 rounded-sm bg-orange-100 border border-orange-200 inline-block" />
             {t("notAchieved")}
           </span>
-          <span className="ml-auto">
-            {t("tableHeaders.additionalDef")} ={" "}
-            <span className="text-orange-600">DEF</span> /{" "}
-            <span className="text-purple-600">M-DEF</span>
+          <span className="ml-auto text-gray-400">
+            物理:<span className="text-orange-600 ml-0.5">DEF</span>
+            　魔法:<span className="text-purple-600 ml-0.5">M-DEF</span>
           </span>
         </div>
       </div>
@@ -476,6 +477,8 @@ export function SkyCorridorCalculator() {
     const maxNullifyFloor = calcMaxNullifyFloor(base, effectiveDef, effectiveMdef);
 
     const additional = calcAdditionalDefNeeded(enemyStat, effectiveDef, effectiveMdef, isPhysical);
+    const requiredDef = effectiveDef + additional.additionalDef;
+    const requiredMdef = effectiveMdef + additional.additionalMdef;
 
     let hitsToSurvive: { worst: number; best: number } | null = null;
     if (playerHp > 0) {
@@ -508,8 +511,8 @@ export function SkyCorridorCalculator() {
       enemyStat,
       nullifiedNow,
       maxNullifyFloor,
-      additionalDef: additional.additionalDef,
-      additionalMdef: additional.additionalMdef,
+      requiredDef,
+      requiredMdef,
       hitsToSurvive,
       lukEvasionLevel,
       scaledLuck,
