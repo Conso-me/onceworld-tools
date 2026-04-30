@@ -37,6 +37,9 @@ const EXCLUDE_MONSTERS = new Set([
   "冥炎のハデス",
   "スライムガール(物理)",
   "スライムガール(魔法)",
+  "BIG BOX",
+  "SBB",
+  "RAINBOW BOX",
 ]);
 
 function buildSkyCorridorMonsters(): { physical: MonsterBase[]; magic: MonsterBase[] } {
