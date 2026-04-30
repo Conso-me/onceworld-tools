@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-05-01",
     changes: [
+    { type: "feature", text: "feat(skyCorridor): 火力モードを追加（Issue #140）" },
     { type: "improve", text: "fix(skyCorridor): 無効化達成済みでも必要値を数値表示" },
     { type: "improve", text: "feat(skyCorridor): 要求DEF/MDEFを無効化に必要な合計値に変更" },
     { type: "improve", text: "revert: コスモキューブチェックと計算式を元の状態に戻す" },
