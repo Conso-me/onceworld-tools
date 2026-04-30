@@ -4,6 +4,7 @@ import { DamageCalculator } from "./components/DamageCalculator";
 import { FarmCalculator } from "./components/FarmCalculator";
 import { StatusSimulator } from "./components/StatusSimulator";
 import { ArenaCalculator } from "./components/ArenaCalculator";
+import { SkyCorridorCalculator } from "./components/SkyCorridorCalculator";
 import { MonsterEditor } from "./components/MonsterEditor";
 import { PetSimulator } from "./components/PetSimulator";
 import { PetBattleSimulator } from "./components/PetBattleSimulator";
@@ -16,9 +17,10 @@ function App() {
 
   const tabs: Tab[] = [
     { id: "damage", label: t("tabs.damage"), shortLabel: t("tabs.damageShort"), icon: "⚔" },
-    { id: "arena", label: t("tabs.arena"), icon: "🏟" },
+    { id: "skyCorridor", label: t("tabs.skyCorridor"), shortLabel: t("tabs.skyCorridorShort"), icon: "☁" },
     { id: "status", label: t("tabs.status"), shortLabel: t("tabs.statusShort"), icon: "✦" },
     { id: "petbattle", label: t("tabs.petbattle"), shortLabel: t("tabs.petbattleShort"), icon: "⚡" },
+    { id: "arena", label: t("tabs.arena"), icon: "🏟", overflow: true },
     { id: "pet", label: t("tabs.pet"), shortLabel: t("tabs.petShort"), icon: "🐾", overflow: true },
     { id: "farm", label: t("tabs.farm"), shortLabel: t("tabs.farmShort"), icon: "♻", overflow: true },
     { id: "monsters", label: t("tabs.monsters"), shortLabel: t("tabs.monstersShort"), icon: "📋", overflow: true },
@@ -160,6 +162,9 @@ function App() {
         </div>
         <div className={activeTab === "petbattle" ? "" : "hidden"}>
           <PetBattleSimulator />
+        </div>
+        <div className={activeTab === "skyCorridor" ? "" : "hidden"}>
+          <SkyCorridorCalculator />
         </div>
         <div className={activeTab === "monsters" ? "" : "hidden"}>
           <MonsterEditor />

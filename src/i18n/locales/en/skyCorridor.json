@@ -1,0 +1,39 @@
+{
+  "presetLoad": "Load Preset",
+  "syncWithDmg": "Sync with DMG Calc",
+  "on": "ON",
+  "off": "OFF",
+  "syncModeManual": "Manual",
+  "syncModeSim": "Equipment",
+  "displayFloor": "Floor",
+  "lukEvasionLabel": "LUK (for evasion)",
+  "overallMaxFloor": "Overall Max Floor",
+  "sectionPhysical": "Physical Top 8",
+  "sectionMagic": "Magic Top 8",
+  "tableHeaders": {
+    "monster": "Monster",
+    "type": "Type",
+    "attackPower": "{{floor}}F ATK",
+    "nullify": "Nullify",
+    "endurance": "Survive",
+    "maxFloor": "Max Floor",
+    "additionalDef": "Nullify DEF/MDEF",
+    "lukEvasion": "LUK Evasion",
+    "attackDmg": "Exp. DMG",
+    "hitRate": "HIT%"
+  },
+  "nullifiedMonsters": "Nullified Monsters",
+  "cannotNullify": "Cannot Nullify",
+  "nullifyAchieved": "Nullified",
+  "notAchieved": "Not Yet",
+  "comfy": "Safe",
+  "lukEvasionGuide": "LUK Evasion Guide:",
+  "lukLevel": {
+    "almost": "Almost",
+    "mostly": "Mostly",
+    "maybe": "Maybe"
+  },
+  "enemyLukMultiplier": "Enemy LUK×{{n}}",
+  "lukEvasionNote": "* LUK evasion formula is unofficial.",
+  "cannotNullifyExists": "Invincible enemies exist"
+}
