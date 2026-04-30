@@ -276,6 +276,16 @@ export const enemyPresetGroups: EnemyPresetGroup[] = [
       { monsterName: "元ギルド長ノック", level: 39000, location: "アイスリッジ崖", locationEn: "Ice Ridge Cliff" },
     ],
   },
+  // ---- 天空回廊 ----
+  {
+    mapLabel: "天空回廊",
+    mapLabelEn: "Sky Corridor",
+    label: "天空回廊",
+    labelEn: "Sky Corridor",
+    presets: [
+      { monsterName: "スカイガーディアン", level: 1100, location: "天空回廊・100の倍数フロア", locationEn: "Sky Corridor - Floors divisible by 100" },
+    ],
+  },
   {
     mapLabel: "アイスリッジ山",
     mapLabelEn: "Ice Ridge Mtn",
