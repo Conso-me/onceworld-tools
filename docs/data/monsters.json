@@ -2282,5 +2282,22 @@
     "captureRate": 0.1,
     "exp": 4284000,
     "gold": 1400000
+  },
+  {
+    "name": "海賊船長ボンゴレ",
+    "level": 0,
+    "element": "水",
+    "attackType": "魔法",
+    "vit": 2900,
+    "spd": 260,
+    "atk": 170,
+    "int": 681,
+    "def": 515,
+    "mdef": 715,
+    "luck": 425,
+    "mov": 30,
+    "captureRate": 0,
+    "exp": 0,
+    "gold": 0
   }
 ]
