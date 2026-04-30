@@ -1,4 +1,12 @@
 {
+  "modeTabs": {
+    "endurance": "耐久モード",
+    "attack": "火力モード"
+  },
+  "playerAttackMode": {
+    "physical": "物理攻撃",
+    "magic": "魔法攻撃"
+  },
   "presetLoad": "プリセット読み込み",
   "syncWithDmg": "ダメ計と同期",
   "on": "ON",
@@ -10,6 +18,10 @@
   "overallMaxFloor": "全体限界フロア",
   "sectionPhysical": "物理攻撃上位8体",
   "sectionMagic": "魔法攻撃上位8体",
+  "sectionPhysDefTop": "物理防御（DEF）上位8体",
+  "sectionPhysLukTop": "幸運（LUK）上位8体",
+  "sectionMagMdefTop": "魔法防御（M-DEF）上位10体",
+  "sectionMagImmune": "魔法無効の敵（全体）",
   "tableHeaders": {
     "monster": "モンスター",
     "type": "種別",
@@ -22,6 +34,13 @@
     "attackDmg": "想定与ダメ",
     "hitRate": "HIT率"
   },
+  "fireTableHeaders": {
+    "def": "DEF",
+    "luk": "LUK",
+    "mdef": "M-DEF"
+  },
+  "oneShot": "一撃",
+  "magicImmune": "魔法無効",
   "nullifiedMonsters": "無効化できているモンスター",
   "cannotNullify": "無効化不可",
   "nullifyAchieved": "無効化達成",

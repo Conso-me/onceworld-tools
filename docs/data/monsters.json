@@ -2281,7 +2281,8 @@
     "mov": 7,
     "captureRate": 0.1,
     "exp": 4284000,
-    "gold": 1400000
+    "gold": 1400000,
+    "magicImmune": true
   },
   {
     "name": "海賊船長ボンゴレ",
