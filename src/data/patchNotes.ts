@@ -13,6 +13,29 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-05-01",
+    changes: [
+    { type: "improve", text: "fix(skyCorridor): 無効化達成済みでも必要値を数値表示" },
+    { type: "improve", text: "feat(skyCorridor): 要求DEF/MDEFを無効化に必要な合計値に変更" },
+    { type: "improve", text: "revert: コスモキューブチェックと計算式を元の状態に戻す" },
+    { type: "fix", text: "fix: 天命輪廻ボーナスをコスモキューブ計算+99万加算に修正" },
+    { type: "feature", text: "feat(v2.20): 海賊船長ボンゴレを追加（天空回廊10000F以上）" },
+    ],
+  },
+  {
+    date: "2026-04-30",
+    changes: [
+    { type: "improve", text: "fix: 天命輪廻ボーナスを暫定で一律+990,000に変更" },
+    { type: "improve", text: "fix: 天命輪廻ごとの基礎振り分けポイントを全員に適用（魔晶立方体不要）" },
+    { type: "improve", text: "refactor: 天空回廊をメインタブに昇格、裏路地を…メニューへ移動" },
+    { type: "feature", text: "feat(v2.20): BIG BOX・SBB・RAINBOW BOX・スカイガーディアンをmonsters.jsonに追加" },
+    { type: "improve", text: "fix(skyCorridor): 上位8体に変更・スライムガール系を除外" },
+    { type: "feature", text: "feat(v2.20): 天空回廊シミュレータを新タブとして追加" },
+    { type: "feature", text: "feat(v2.20): 天空回廊・スカイガーディアンのプリセットを追加" },
+    ],
+  },
+
+  {
     date: "2026-04-29",
     changes: [
     { type: "improve", text: "fix: API キーなしの場合は Issue 作成のみに変更" },
