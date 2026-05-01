@@ -37,6 +37,7 @@ function App() {
     setDamageJumpVersion(version);
     setDamageJump({ monsterName, level, version });
     setActiveTab("damage");
+    window.location.hash = "damage";
   }, [damageJumpVersion]);
 
   const [activeTab, setActiveTab] = useState(() => {

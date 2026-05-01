@@ -231,6 +231,11 @@ export function DamageCalculator({
 
   useEffect(() => {
     if (!externalJump) return;
+    const monster = getMonsterByName(externalJump.monsterName);
+    if (monster) {
+      setSelectedMonster(monster);
+      setMonsterLevel(externalJump.level);
+    }
     setInjectedMonsterName(externalJump.monsterName);
     setInjectedLevel(externalJump.level);
     setPresetVersion(externalJump.version);
