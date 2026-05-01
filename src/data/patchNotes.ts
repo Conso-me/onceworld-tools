@@ -15,6 +15,8 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-05-01",
     changes: [
+    { type: "fix", text: "fix(statusCalc): 振り分けポイントのpinnacleBonus式を正しく修正" },
+    { type: "fix", text: "fix(statusCalc): v2.2.0 振り分けポイント計算式を修正 (Issue #144)" },
     { type: "improve", text: "fix(skyCorridor): 火力モードの物理/LUKテーブルのヘッダー列幅を統一" },
     { type: "fix", text: "fix(skyCorridor): タブ切り替えとモンスター選択の不具合を修正" },
     { type: "fix", text: "fix(skyCorridor): モンスター名クリックでダメ計遷移・攻撃力数字の桁揃えを修正（Issue #142）" },
