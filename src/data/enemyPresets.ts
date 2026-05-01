@@ -283,7 +283,29 @@ export const enemyPresetGroups: EnemyPresetGroup[] = [
     label: "天空回廊",
     labelEn: "Sky Corridor",
     presets: [
-      { monsterName: "スカイガーディアン", level: 1100, location: "天空回廊・100の倍数フロア", locationEn: "Sky Corridor - Floors divisible by 100" },
+      { monsterName: "BIG BOX",          level: 10100, location: "天空回廊", locationEn: "Sky Corridor" },
+      { monsterName: "SBB",              level: 10100, location: "天空回廊", locationEn: "Sky Corridor" },
+      { monsterName: "RAINBOW BOX",      level: 10100, location: "天空回廊", locationEn: "Sky Corridor" },
+      { monsterName: "スカイガーディアン", level: 20000, location: "天空回廊・100Fごと", locationEn: "Sky Corridor - Every 100 Floors" },
+    ],
+  },
+  {
+    mapLabel: "天空回廊",
+    mapLabelEn: "Sky Corridor",
+    label: "天空宝物庫",
+    labelEn: "Sky Treasury",
+    presets: [
+      { monsterName: "虹ペリカンEXP", level: 10000, location: "天空宝物庫", locationEn: "Sky Treasury" },
+    ],
+  },
+  {
+    mapLabel: "天空回廊",
+    mapLabelEn: "Sky Corridor",
+    label: "天空大航海",
+    labelEn: "Sky Voyage",
+    presets: [
+      { monsterName: "海賊船",         level: 1009900, location: "天空大航海", locationEn: "Sky Voyage" },
+      { monsterName: "海賊船長ボンゴレ", level: 1009900, location: "天空大航海", locationEn: "Sky Voyage" },
     ],
   },
   {
