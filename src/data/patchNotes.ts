@@ -15,6 +15,8 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-05-01",
     changes: [
+    { type: "feature", text: "feat: 天空回廊の新モンスタープリセット・ペットスキルを追加" },
+    { type: "feature", text: "feat(enemyPresets): 深淵回廊26Fのモンスタープリセットを追加" },
     { type: "fix", text: "fix(statusCalc): 振り分けポイントのpinnacleBonus式を正しく修正" },
     { type: "fix", text: "fix(statusCalc): v2.2.0 振り分けポイント計算式を修正 (Issue #144)" },
     { type: "improve", text: "fix(skyCorridor): 火力モードの物理/LUKテーブルのヘッダー列幅を統一" },
