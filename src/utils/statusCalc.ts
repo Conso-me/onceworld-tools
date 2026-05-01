@@ -15,12 +15,15 @@ function zeroStats(): CoreStats {
 export function getAvailablePoints(cfg: SimConfig): number {
   const entry = statPointsData.levelPoints.find((e) => e.level === cfg.charLevel);
   const base = entry?.points ?? 0;
-  const rebirthBonus = cfg.reinCount < 10 ? cfg.tenseisCount * 30 : 0;
+  // v2.2.0: 天命輪廻1回以上から転生不要（reinCount=0 のみ転生ボーナス適用）
+  const rebirthBonus = cfg.reinCount === 0 ? cfg.tenseisCount * 30 : 0;
   const multiplied = (base + rebirthBonus) * (1 + cfg.reinCount);
   const pinnacleBonus =
     cfg.reinCount >= 10 ? Math.floor(5000 * Math.pow(cfg.reinCount - 9, 1.25)) : 0;
   const cosmoCubeBonus = cfg.hasCosmoCube ? cfg.reinCount * 10000 : 0;
-  const subtotal = multiplied + pinnacleBonus + cosmoCubeBonus;
+  // v2.2.0: 天命輪廻ごとに増える基礎振り分けポイント
+  const reinBaseBonus = cfg.reinCount * 1500;
+  const subtotal = multiplied + pinnacleBonus + cosmoCubeBonus + reinBaseBonus;
   return Math.floor(subtotal * (1 + cfg.johaneCount / 100) * (1 + cfg.johanneAltarCount * 0.002));
 }
 
