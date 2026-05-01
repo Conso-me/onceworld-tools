@@ -15,6 +15,9 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-05-01",
     changes: [
+    { type: "improve", text: "fix(skyCorridor): 火力モードの物理/LUKテーブルのヘッダー列幅を統一" },
+    { type: "fix", text: "fix(skyCorridor): タブ切り替えとモンスター選択の不具合を修正" },
+    { type: "fix", text: "fix(skyCorridor): モンスター名クリックでダメ計遷移・攻撃力数字の桁揃えを修正（Issue #142）" },
     { type: "feature", text: "feat(skyCorridor): 火力モードを追加（Issue #140）" },
     { type: "improve", text: "fix(skyCorridor): 無効化達成済みでも必要値を数値表示" },
     { type: "improve", text: "feat(skyCorridor): 要求DEF/MDEFを無効化に必要な合計値に変更" },
