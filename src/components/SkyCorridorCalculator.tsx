@@ -502,13 +502,13 @@ function FireMonsterRow({
           </span>
         )}
       </td>
-      <td className="px-2 py-1.5 text-right text-sm font-medium text-gray-700 whitespace-nowrap">
+      <td className="px-2 py-1.5 text-right text-sm font-medium text-gray-700 whitespace-nowrap tabular-nums w-24">
         {result.rankStat.toLocaleString()}
       </td>
-      <td className="px-2 py-1.5 text-right text-sm text-gray-600 whitespace-nowrap">
+      <td className="px-2 py-1.5 text-right text-sm text-gray-600 whitespace-nowrap tabular-nums w-20">
         {result.scaledHp.toLocaleString()}
       </td>
-      <td className="px-2 py-1.5 text-right whitespace-nowrap">
+      <td className="px-2 py-1.5 text-right whitespace-nowrap w-20">
         {result.isMagicImmune ? (
           <span className="text-gray-400 text-xs">—</span>
         ) : result.playerDamageMin !== null ? (
@@ -519,7 +519,7 @@ function FireMonsterRow({
           <span className="text-gray-400">—</span>
         )}
       </td>
-      <td className="px-2 py-1.5 text-center whitespace-nowrap">
+      <td className="px-2 py-1.5 text-center whitespace-nowrap w-16">
         {result.isMagicImmune ? (
           <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-bold bg-gray-200 text-gray-600 border border-gray-300">
             {t("magicImmune")}
@@ -532,7 +532,7 @@ function FireMonsterRow({
           <span className="text-orange-500 font-bold">✗</span>
         )}
       </td>
-      <td className="px-2 py-1.5 text-right whitespace-nowrap">
+      <td className="px-2 py-1.5 text-right whitespace-nowrap w-16">
         {result.hitRate !== null ? (
           <span
             className={`text-sm font-medium ${
@@ -568,17 +568,17 @@ function FireTableHeader({
   return (
     <tr className="bg-gray-50 text-xs text-gray-500 border-b border-gray-200">
       <th className="px-2 py-2 text-left font-medium">{t("tableHeaders.monster")}</th>
-      <th className="px-2 py-2 text-right font-medium whitespace-nowrap">
+      <th className="px-2 py-2 text-right font-medium whitespace-nowrap w-24">
         {rankHeader}({floor.toLocaleString()}F)
       </th>
-      <th className="px-2 py-2 text-right font-medium whitespace-nowrap">HP</th>
-      <th className="px-2 py-2 text-right font-medium whitespace-nowrap">
+      <th className="px-2 py-2 text-right font-medium whitespace-nowrap w-20">HP</th>
+      <th className="px-2 py-2 text-right font-medium whitespace-nowrap w-20">
         {t("tableHeaders.attackDmg")}
       </th>
-      <th className="px-2 py-2 text-center font-medium whitespace-nowrap">
+      <th className="px-2 py-2 text-center font-medium whitespace-nowrap w-16">
         {t("oneShot")}
       </th>
-      <th className="px-2 py-2 text-right font-medium whitespace-nowrap">
+      <th className="px-2 py-2 text-right font-medium whitespace-nowrap w-16">
         {t("tableHeaders.hitRate")}
       </th>
     </tr>
@@ -612,7 +612,7 @@ function FireSection({
         <span className="text-sm font-semibold text-gray-700">{title}</span>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm border-collapse">
+        <table className="w-full text-sm border-collapse table-fixed">
           <thead>
             <FireTableHeader floor={floor} rankHeader={rankHeader} t={t} />
           </thead>
