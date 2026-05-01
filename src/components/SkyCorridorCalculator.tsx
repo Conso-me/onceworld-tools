@@ -256,11 +256,13 @@ type FireResult = {
 function SkyMonsterRow({
   result,
   onFloorClick,
+  onMonsterClick,
   t,
   lang,
 }: {
   result: SkyResult;
   onFloorClick?: (floor: number) => void;
+  onMonsterClick?: (monsterName: string) => void;
   t: TFunction;
   lang: string;
 }) {
@@ -279,7 +281,16 @@ function SkyMonsterRow({
   return (
     <tr className={`border-b ${rowBg} text-sm`}>
       <td className="px-2 py-1.5 font-medium text-gray-800 whitespace-nowrap">
-        {getMonsterDisplayName(result.base, lang)}
+        {onMonsterClick ? (
+          <button
+            className="text-indigo-600 hover:underline font-medium"
+            onClick={() => onMonsterClick(result.base.name)}
+          >
+            {getMonsterDisplayName(result.base, lang)}
+          </button>
+        ) : (
+          getMonsterDisplayName(result.base, lang)
+        )}
       </td>
       <td className="px-2 py-1.5 whitespace-nowrap">
         <span
@@ -292,7 +303,7 @@ function SkyMonsterRow({
           {result.isPhysical ? t("game:attackLabel.physical") : t("game:attackLabel.magic")}
         </span>
       </td>
-      <td className="px-2 py-1.5 text-right font-medium text-gray-700 whitespace-nowrap">
+      <td className="px-2 py-1.5 text-right font-medium text-gray-700 whitespace-nowrap tabular-nums">
         {result.enemyStat.toLocaleString()}
       </td>
       <td className="px-2 py-1.5 text-center whitespace-nowrap">
@@ -394,6 +405,7 @@ function SkySection({
   results,
   floor,
   onFloorClick,
+  onMonsterClick,
   t,
   lang,
 }: {
@@ -401,6 +413,7 @@ function SkySection({
   results: SkyResult[];
   floor: number;
   onFloorClick: (floor: number) => void;
+  onMonsterClick?: (monsterName: string) => void;
   t: TFunction;
   lang: string;
 }) {
@@ -420,6 +433,7 @@ function SkySection({
                 key={result.base.name}
                 result={result}
                 onFloorClick={(f) => onFloorClick(f)}
+                onMonsterClick={onMonsterClick}
                 t={t}
                 lang={lang}
               />
@@ -454,10 +468,12 @@ function SkySection({
 // ────────────────────────────────────────────
 function FireMonsterRow({
   result,
+  onMonsterClick,
   t,
   lang,
 }: {
   result: FireResult;
+  onMonsterClick?: (monsterName: string) => void;
   t: TFunction;
   lang: string;
 }) {
@@ -470,20 +486,29 @@ function FireMonsterRow({
   return (
     <tr className={`border-b ${rowBg} text-sm`}>
       <td className="px-2 py-1.5 font-medium text-gray-800 whitespace-nowrap">
-        {getMonsterDisplayName(result.base, lang)}
+        {onMonsterClick ? (
+          <button
+            className="text-indigo-600 hover:underline font-medium"
+            onClick={() => onMonsterClick(result.base.name)}
+          >
+            {getMonsterDisplayName(result.base, lang)}
+          </button>
+        ) : (
+          getMonsterDisplayName(result.base, lang)
+        )}
         {result.isMagicImmune && (
           <span className="ml-1 inline-flex items-center px-1 py-0.5 rounded text-xs font-bold bg-gray-200 text-gray-600">
             {t("magicImmune")}
           </span>
         )}
       </td>
-      <td className="px-2 py-1.5 text-right text-sm font-medium text-gray-700 whitespace-nowrap">
+      <td className="px-2 py-1.5 text-right text-sm font-medium text-gray-700 whitespace-nowrap tabular-nums w-24">
         {result.rankStat.toLocaleString()}
       </td>
-      <td className="px-2 py-1.5 text-right text-sm text-gray-600 whitespace-nowrap">
+      <td className="px-2 py-1.5 text-right text-sm text-gray-600 whitespace-nowrap tabular-nums w-20">
         {result.scaledHp.toLocaleString()}
       </td>
-      <td className="px-2 py-1.5 text-right whitespace-nowrap">
+      <td className="px-2 py-1.5 text-right whitespace-nowrap w-20">
         {result.isMagicImmune ? (
           <span className="text-gray-400 text-xs">—</span>
         ) : result.playerDamageMin !== null ? (
@@ -494,7 +519,7 @@ function FireMonsterRow({
           <span className="text-gray-400">—</span>
         )}
       </td>
-      <td className="px-2 py-1.5 text-center whitespace-nowrap">
+      <td className="px-2 py-1.5 text-center whitespace-nowrap w-16">
         {result.isMagicImmune ? (
           <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-bold bg-gray-200 text-gray-600 border border-gray-300">
             {t("magicImmune")}
@@ -507,7 +532,7 @@ function FireMonsterRow({
           <span className="text-orange-500 font-bold">✗</span>
         )}
       </td>
-      <td className="px-2 py-1.5 text-right whitespace-nowrap">
+      <td className="px-2 py-1.5 text-right whitespace-nowrap w-16">
         {result.hitRate !== null ? (
           <span
             className={`text-sm font-medium ${
@@ -543,17 +568,17 @@ function FireTableHeader({
   return (
     <tr className="bg-gray-50 text-xs text-gray-500 border-b border-gray-200">
       <th className="px-2 py-2 text-left font-medium">{t("tableHeaders.monster")}</th>
-      <th className="px-2 py-2 text-right font-medium whitespace-nowrap">
+      <th className="px-2 py-2 text-right font-medium whitespace-nowrap w-24">
         {rankHeader}({floor.toLocaleString()}F)
       </th>
-      <th className="px-2 py-2 text-right font-medium whitespace-nowrap">HP</th>
-      <th className="px-2 py-2 text-right font-medium whitespace-nowrap">
+      <th className="px-2 py-2 text-right font-medium whitespace-nowrap w-20">HP</th>
+      <th className="px-2 py-2 text-right font-medium whitespace-nowrap w-20">
         {t("tableHeaders.attackDmg")}
       </th>
-      <th className="px-2 py-2 text-center font-medium whitespace-nowrap">
+      <th className="px-2 py-2 text-center font-medium whitespace-nowrap w-16">
         {t("oneShot")}
       </th>
-      <th className="px-2 py-2 text-right font-medium whitespace-nowrap">
+      <th className="px-2 py-2 text-right font-medium whitespace-nowrap w-16">
         {t("tableHeaders.hitRate")}
       </th>
     </tr>
@@ -568,6 +593,7 @@ function FireSection({
   results,
   floor,
   rankHeader,
+  onMonsterClick,
   t,
   lang,
 }: {
@@ -575,6 +601,7 @@ function FireSection({
   results: FireResult[];
   floor: number;
   rankHeader: string;
+  onMonsterClick?: (monsterName: string) => void;
   t: TFunction;
   lang: string;
 }) {
@@ -585,13 +612,13 @@ function FireSection({
         <span className="text-sm font-semibold text-gray-700">{title}</span>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm border-collapse">
+        <table className="w-full text-sm border-collapse table-fixed">
           <thead>
             <FireTableHeader floor={floor} rankHeader={rankHeader} t={t} />
           </thead>
           <tbody>
             {results.map((result) => (
-              <FireMonsterRow key={result.base.name} result={result} t={t} lang={lang} />
+              <FireMonsterRow key={result.base.name} result={result} onMonsterClick={onMonsterClick} t={t} lang={lang} />
             ))}
           </tbody>
         </table>
@@ -603,7 +630,11 @@ function FireSection({
 // ────────────────────────────────────────────
 // メインコンポーネント
 // ────────────────────────────────────────────
-export function SkyCorridorCalculator() {
+export function SkyCorridorCalculator({
+  onNavigateToDamage,
+}: {
+  onNavigateToDamage?: (monsterName: string, level: number) => void;
+} = {}) {
   const { t, i18n } = useTranslation("skyCorridor");
 
   // 表示モード
@@ -830,6 +861,10 @@ export function SkyCorridorCalculator() {
   );
 
   const handleFloorClick = (floor: number) => setSkyFloor(String(floor));
+
+  const handleMonsterClick = onNavigateToDamage
+    ? (monsterName: string) => onNavigateToDamage(monsterName, floorToLevel(floorNum))
+    : undefined;
 
   // ────────────────────────────────────────────
   // ステータス入力フィールド定義
@@ -1079,6 +1114,7 @@ export function SkyCorridorCalculator() {
               results={physicalResults}
               floor={floorNum}
               onFloorClick={handleFloorClick}
+              onMonsterClick={handleMonsterClick}
               t={t}
               lang={i18n.language}
             />
@@ -1087,6 +1123,7 @@ export function SkyCorridorCalculator() {
               results={magicResults}
               floor={floorNum}
               onFloorClick={handleFloorClick}
+              onMonsterClick={handleMonsterClick}
               t={t}
               lang={i18n.language}
             />
@@ -1098,6 +1135,7 @@ export function SkyCorridorCalculator() {
               results={firePhysDefResults}
               floor={floorNum}
               rankHeader={t("fireTableHeaders.def")}
+              onMonsterClick={handleMonsterClick}
               t={t}
               lang={i18n.language}
             />
@@ -1106,6 +1144,7 @@ export function SkyCorridorCalculator() {
               results={firePhysLukResults}
               floor={floorNum}
               rankHeader={t("fireTableHeaders.luk")}
+              onMonsterClick={handleMonsterClick}
               t={t}
               lang={i18n.language}
             />
@@ -1117,6 +1156,7 @@ export function SkyCorridorCalculator() {
               results={fireMagMdefResults}
               floor={floorNum}
               rankHeader={t("fireTableHeaders.mdef")}
+              onMonsterClick={handleMonsterClick}
               t={t}
               lang={i18n.language}
             />
@@ -1125,6 +1165,7 @@ export function SkyCorridorCalculator() {
               results={fireMagImmuneResults}
               floor={floorNum}
               rankHeader={t("fireTableHeaders.mdef")}
+              onMonsterClick={handleMonsterClick}
               t={t}
               lang={i18n.language}
             />

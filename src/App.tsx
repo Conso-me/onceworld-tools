@@ -29,6 +29,17 @@ function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
+  const [damageJumpVersion, setDamageJumpVersion] = useState(0);
+  const [damageJump, setDamageJump] = useState<{ monsterName: string; level: number; version: number } | undefined>(undefined);
+
+  const handleNavigateToDamage = useCallback((monsterName: string, level: number) => {
+    const version = damageJumpVersion + 1;
+    setDamageJumpVersion(version);
+    setDamageJump({ monsterName, level, version });
+    setActiveTab("damage");
+    window.location.hash = "damage";
+  }, [damageJumpVersion]);
+
   const [activeTab, setActiveTab] = useState(() => {
     const hash = window.location.hash.slice(1);
     return tabs.find((t) => t.id === hash && !t.disabled)?.id ?? "damage";
@@ -146,7 +157,7 @@ function App() {
       {/* メインコンテンツ */}
       <main className="max-w-3xl lg:max-w-[1400px] mx-auto px-4 py-6 lg:py-2">
         <div className={activeTab === "damage" ? "" : "hidden"}>
-          <DamageCalculator />
+          <DamageCalculator externalJump={damageJump} />
         </div>
         <div className={activeTab === "farm" ? "" : "hidden"}>
           <FarmCalculator />
@@ -164,7 +175,7 @@ function App() {
           <PetBattleSimulator />
         </div>
         <div className={activeTab === "skyCorridor" ? "" : "hidden"}>
-          <SkyCorridorCalculator />
+          <SkyCorridorCalculator onNavigateToDamage={handleNavigateToDamage} />
         </div>
         <div className={activeTab === "monsters" ? "" : "hidden"}>
           <MonsterEditor />

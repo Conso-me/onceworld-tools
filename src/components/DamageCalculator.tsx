@@ -65,7 +65,11 @@ import {
 
 type PlayerAttackMode = "物理" | "魔弾" | "魔攻" | "魔法";
 
-export function DamageCalculator() {
+export function DamageCalculator({
+  externalJump,
+}: {
+  externalJump?: { monsterName: string; level: number; version: number };
+} = {}) {
   const { t } = useTranslation("damage");
   const customMonsters = useCustomMonsters();
   const allGroups = useMemo(() => {
@@ -224,6 +228,18 @@ export function DamageCalculator() {
   const [enemyModalOpen, setEnemyModalOpen] = useState(false);
   const [selectedPresetLabel, setSelectedPresetLabel] = useState<string | null>(null);
   const [presetVersion, setPresetVersion] = useState(0);
+
+  useEffect(() => {
+    if (!externalJump) return;
+    const monster = getMonsterByName(externalJump.monsterName);
+    if (monster) {
+      setSelectedMonster(monster);
+      setMonsterLevel(externalJump.level);
+    }
+    setInjectedMonsterName(externalJump.monsterName);
+    setInjectedLevel(externalJump.level);
+    setPresetVersion(externalJump.version);
+  }, [externalJump]);
 
   // 複数モンスター比較
   const [comparisonMonsters, setComparisonMonsters] = useState<MultiMonsterEntry[]>([]);
