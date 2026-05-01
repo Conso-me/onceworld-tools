@@ -3196,5 +3196,167 @@
         "value": 50
       }
     ]
+  },
+  {
+    "name": "BIG BOX",
+    "pattern": 1,
+    "skills": [
+      {
+        "level": 31,
+        "type": "DEF",
+        "value": 10000
+      },
+      {
+        "level": 71,
+        "type": "DEF",
+        "value": 100000
+      },
+      {
+        "level": 121,
+        "type": "DEF",
+        "value": 1000000
+      }
+    ]
+  },
+  {
+    "name": "SBB",
+    "pattern": 1,
+    "skills": [
+      {
+        "level": 31,
+        "type": "ドロップ率",
+        "value": 1000
+      },
+      {
+        "level": 71,
+        "type": "ドロップ率",
+        "value": 1000
+      },
+      {
+        "level": 121,
+        "type": "ドロップ率",
+        "value": 1000
+      }
+    ]
+  },
+  {
+    "name": "RAINBOW BOX",
+    "pattern": 1,
+    "skills": [
+      {
+        "level": 31,
+        "type": "経験値",
+        "value": 1500
+      },
+      {
+        "level": 71,
+        "type": "経験値",
+        "value": 1500
+      },
+      {
+        "level": 121,
+        "type": "経験値",
+        "value": 1500
+      }
+    ]
+  },
+  {
+    "name": "スカイガーディアン",
+    "pattern": 1,
+    "skills": [
+      {
+        "level": 31,
+        "type": "VIT%",
+        "value": 100
+      },
+      {
+        "level": 71,
+        "type": "VIT%",
+        "value": 100
+      },
+      {
+        "level": 121,
+        "type": "VIT%",
+        "value": 100
+      },
+      {
+        "level": 181,
+        "type": "DEF%",
+        "value": 300
+      }
+    ]
+  },
+  {
+    "name": "海賊船長ボンゴレ",
+    "pattern": 1,
+    "skills": [
+      {
+        "level": 31,
+        "type": "LUCK%",
+        "value": 100
+      },
+      {
+        "level": 71,
+        "type": "DEF%",
+        "value": 100
+      },
+      {
+        "level": 121,
+        "type": "M-DEF%",
+        "value": 100
+      },
+      {
+        "level": 181,
+        "type": "INT%",
+        "value": 300
+      }
+    ]
+  },
+  {
+    "name": "だいこんに見えないだいこん",
+    "pattern": 1,
+    "skills": [
+      {
+        "level": 31,
+        "type": "最終INT%",
+        "value": 10
+      },
+      {
+        "level": 71,
+        "type": "最終INT%",
+        "value": 20
+      },
+      {
+        "level": 121,
+        "type": "最終INT%",
+        "value": 30
+      },
+      {
+        "level": 181,
+        "type": "最終INT%",
+        "value": 40
+      }
+    ]
+  },
+  {
+    "name": "ハイパーギガント",
+    "pattern": 1,
+    "skills": [
+      {
+        "level": 31,
+        "type": "最終VIT%",
+        "value": 25
+      },
+      {
+        "level": 71,
+        "type": "最終VIT%",
+        "value": 25
+      },
+      {
+        "level": 121,
+        "type": "最終VIT%",
+        "value": 50
+      }
+    ]
   }
 ]
