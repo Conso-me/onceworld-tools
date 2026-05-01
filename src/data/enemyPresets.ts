@@ -187,6 +187,17 @@ export const enemyPresetGroups: EnemyPresetGroup[] = [
       { monsterName: "冥炎のハデス",       level: 250000, location: "25層",              locationEn: "Floor 25" },
     ],
   },
+  {
+    mapLabel: "深淵回廊",
+    mapLabelEn: "Abyssal Corridor",
+    label: "26F",
+    labelEn: "26F",
+    presets: [
+      { monsterName: "ダークウィッチ", level: 7777777, location: "26層", locationEn: "Floor 26" },
+      { monsterName: "冥炎のハデス",   level: 7777777, location: "26層", locationEn: "Floor 26" },
+      { monsterName: "BOX",           level: 9999999, location: "26層", locationEn: "Floor 26" },
+    ],
+  },
   // ---- アイスリッジ山 ----
   {
     mapLabel: "アイスリッジ山",
