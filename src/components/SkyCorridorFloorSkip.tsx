@@ -318,6 +318,8 @@ function renderInitialStep(
 ): string {
   const adv = step.toFloor - step.fromFloor;
   const params = {
+    from: step.fromFloor.toLocaleString(),
+    to: step.toFloor.toLocaleString(),
     placed: step.placedBefore,
     adv: adv.toLocaleString(),
   };
