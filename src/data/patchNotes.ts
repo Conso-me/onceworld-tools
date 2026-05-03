@@ -15,6 +15,8 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-05-03",
     changes: [
+    { type: "improve", text: "fix(skyCorridor): ステータス表示をモンスター一覧の上（右カラム）に移動" },
+    { type: "improve", text: "feat(skyCorridor): 耐久モードサマリーにDEF/M-DEF/VIT/LUKを表示" },
     { type: "improve", text: "fix(skyCorridor): フロア入力を先頭に移動し「目標フロア」に改称" },
     { type: "fix", text: "fix(skyCorridor): SimConfigPanelのprop名を修正 onReset→reset, onReplaceAll→replaceAll" },
     { type: "improve", text: "refactor(skyCorridor): 同期時にSimConfigPanel（基本・装備・アクセ・ペット）をそのまま表示" },
