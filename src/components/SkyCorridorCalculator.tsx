@@ -18,6 +18,7 @@ import { calcStatus } from "../utils/statusCalc";
 import { getAllMonsters, getMonsterDisplayName } from "../data/monsters";
 import { InputField } from "./ui/InputField";
 import { SimConfigPanel } from "./SimConfigPanel";
+import { SkyCorridorFloorSkip } from "./SkyCorridorFloorSkip";
 import type { MonsterBase, ScaledMonster } from "../types/game";
 import type { TFunction } from "i18next";
 
@@ -30,6 +31,7 @@ const levelToFloor = (lv: number) => Math.floor((lv - 10000) / 100);
 // ────────────────────────────────────────────
 // モード型
 // ────────────────────────────────────────────
+type MainTab = "damage" | "floorSkip";
 type ViewMode = "endurance" | "attack";
 type PlayerAttackMode = "physical" | "magic";
 
@@ -636,6 +638,9 @@ export function SkyCorridorCalculator({
 } = {}) {
   const { t, i18n } = useTranslation("skyCorridor");
 
+  // 上位タブ（被ダメシミュ / 階層スキップシミュ）
+  const [mainTab, setMainTab] = usePersistedState<MainTab>("skyCorridor:mainTab", "damage");
+
   // 表示モード
   const [viewMode, setViewMode] = usePersistedState<ViewMode>("skyCorridor:viewMode", "endurance");
   const [playerAttackMode, setPlayerAttackMode] = usePersistedState<PlayerAttackMode>("skyCorridor:attackMode", "physical");
@@ -856,8 +861,37 @@ export function SkyCorridorCalculator({
     { label: t("lukEvasionLabel"), raw: myLuk,  set: setMyLuk  },
   ] as const;
 
+  const mainTabUi = (
+    <div className="flex rounded-xl overflow-hidden border border-indigo-200 text-sm font-medium max-w-lg mx-auto lg:max-w-md">
+      {(["damage", "floorSkip"] as const).map((tab) => (
+        <button
+          key={tab}
+          onClick={() => setMainTab(tab)}
+          className={`flex-1 px-4 py-2 transition-colors ${
+            mainTab === tab
+              ? "bg-indigo-500 text-white"
+              : "bg-white text-gray-600 hover:bg-indigo-50"
+          }`}
+        >
+          {t(`mainTabs.${tab}`)}
+        </button>
+      ))}
+    </div>
+  );
+
+  if (mainTab === "floorSkip") {
+    return (
+      <div className="space-y-3">
+        {mainTabUi}
+        <SkyCorridorFloorSkip />
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-lg mx-auto space-y-6 lg:max-w-none lg:space-y-0 lg:grid lg:grid-cols-[minmax(340px,400px)_1fr] lg:gap-2 lg:items-start">
+    <div className="space-y-3">
+      {mainTabUi}
+      <div className="max-w-lg mx-auto space-y-6 lg:max-w-none lg:space-y-0 lg:grid lg:grid-cols-[minmax(340px,400px)_1fr] lg:gap-2 lg:items-start">
       {/* ───── 左カラム: 入力パネル ───── */}
       <div className="space-y-6 lg:space-y-2">
         <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-5 lg:space-y-3">
@@ -1131,6 +1165,7 @@ export function SkyCorridorCalculator({
             />
           </>
         )}
+      </div>
       </div>
     </div>
   );

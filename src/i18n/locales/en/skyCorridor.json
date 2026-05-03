@@ -1,4 +1,33 @@
 {
+  "mainTabs": {
+    "damage": "Damage Sim",
+    "floorSkip": "Floor Skip"
+  },
+  "floorSkip": {
+    "adventurerStatues": "Adventurer Statue (owned)",
+    "demonStatues": "Demon Statue (owned)",
+    "targetFloor": "Target Floor",
+    "placeLimit": "Place Limit (Adventurer)",
+    "resultsTitle": "Reachable Combinations",
+    "noResults": "No matching combination. Try adjusting the place limit or owned counts.",
+    "headers": {
+      "startFloor": "Start F",
+      "demonUsed": "Demon",
+      "cycles": "Cycles",
+      "cycleProgress": "Per Cycle",
+      "totalOps": "Ops (approx)"
+    },
+    "expand": "Detail",
+    "collapse": "Close",
+    "initialPlanTitle": "Initial: 1F → {{floor}}F",
+    "cycleDetailTitle": "Cycle Detail",
+    "stepLeft": "{{from}}F → {{to}}F: place {{placed}}, single-side kill (statues used: {{used}})",
+    "stepBoth": "{{from}}F → {{to}}F: place {{placed}}, left kill → pick up → right kill (total statues used: {{used}})",
+    "cycleFormula": "Per cycle = (1+B) + (99+100A) = 100 + {{B}} + {{cycA}} = {{delta}}F",
+    "cycleParams": "B={{B}} (effective Adventurer), A={{A}} (Demon), place p={{p}}",
+    "noCycleNeeded": "No cycle needed (initial step alone reaches target)",
+    "explanation": "Enter your owned Adventurer/Demon statues and find combinations that land exactly on the target floor. Default target: 10000F. Adventurer statues can be 'placed' to tune the effective count."
+  },
   "modeTabs": {
     "endurance": "Endurance",
     "attack": "Firepower"

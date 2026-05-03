@@ -1,4 +1,33 @@
 {
+  "mainTabs": {
+    "damage": "被ダメシミュ",
+    "floorSkip": "階層スキップ"
+  },
+  "floorSkip": {
+    "adventurerStatues": "天空像〜冒険者〜（所持数）",
+    "demonStatues": "天空像〜悪魔〜（所持数）",
+    "targetFloor": "目標フロア",
+    "placeLimit": "床置き上限（冒険者像）",
+    "resultsTitle": "到達可能な組み合わせ",
+    "noResults": "該当する組み合わせがありません。床置き上限や所持数を見直してください。",
+    "headers": {
+      "startFloor": "スタートF",
+      "demonUsed": "悪魔像数",
+      "cycles": "サイクル数",
+      "cycleProgress": "1サイクル進行",
+      "totalOps": "操作数(概算)"
+    },
+    "expand": "詳細",
+    "collapse": "閉じる",
+    "initialPlanTitle": "初動: 1F→{{floor}}F",
+    "cycleDetailTitle": "サイクル詳細",
+    "stepLeft": "{{from}}F → {{to}}F: 床置き{{placed}}個・片側殲滅（像{{used}}個効果）",
+    "stepBoth": "{{from}}F → {{to}}F: 床置き{{placed}}個・左殲滅→像回収→右殲滅（合計像{{used}}個効果）",
+    "cycleFormula": "1サイクル進行 = (1+B) + (99+100A) = 100 + {{B}} + {{cycA}} = {{delta}}F",
+    "cycleParams": "B={{B}} (冒険者像有効使用数)、A={{A}} (悪魔像)、床置きp={{p}}個",
+    "noCycleNeeded": "サイクル不要（初動のみで到達）",
+    "explanation": "持っている冒険者像と悪魔像の数を入力すると、目標フロアにちょうど到達する組み合わせを列挙します。デフォルトの目標は10000F。冒険者像は床置きで有効使用数を調整可能です。"
+  },
   "modeTabs": {
     "endurance": "耐久モード",
     "attack": "火力モード"
