@@ -237,24 +237,34 @@ describe("enumerateFloorSkip - 10000Fボス階層回避", () => {
 });
 
 // ---------------------------------------------------------------------------
-// 冒険者像も上限以下で自由列挙
+// 床置き上限は全階層 (初動・サイクル) に適用される
 // ---------------------------------------------------------------------------
-describe("enumerateFloorSkip - B<N の組み合わせも列挙", () => {
-  it("N=100, M=0, target=10000: B=0 (冒険者像非使用) で S=100, cycles=99 も列挙される", () => {
+describe("enumerateFloorSkip - 床置き上限は全階層に適用", () => {
+  it("N=100, placeLimit=10: B=0 (床置き100個) は上限超過で除外", () => {
     const results = enumerateFloorSkip({
       adventurerStatues: 100,
       demonStatues: 0,
       targetFloor: 10000,
       placeLimit: 10,
     });
-    // B=0 → delta=100 → 9900/100=99 cycles
+    expect(
+      results.find((r) => r.startFloor === 100 && r.effectiveAdventurer === 0)
+    ).toBeUndefined();
+  });
+
+  it("N=100, placeLimit=100: B=0 (床置き100個) も列挙対象に入る", () => {
+    const results = enumerateFloorSkip({
+      adventurerStatues: 100,
+      demonStatues: 0,
+      targetFloor: 10000,
+      placeLimit: 100,
+    });
     const sol = results.find(
-      (r) => r.startFloor === 100 && r.demonUsed === 0 && r.effectiveAdventurer === 0
+      (r) => r.startFloor === 100 && r.effectiveAdventurer === 0
     );
     expect(sol).toBeDefined();
     expect(sol!.cycles).toBe(99);
-    expect(sol!.cycleProgress).toBe(100);
-    expect(sol!.placedDuringCycle).toBe(100); // 全冒険者像を床置き
+    expect(sol!.placedDuringCycle).toBe(100);
   });
 
   it("N=100, M=10, target=10000: 同じ (S,A) では最も大きい B (=100) を採用", () => {
@@ -266,7 +276,6 @@ describe("enumerateFloorSkip - B<N の組み合わせも列挙", () => {
     });
     const sol = results.find((r) => r.startFloor === 100 && r.demonUsed === 9);
     expect(sol).toBeDefined();
-    // B=100, delta=1100, cycles=9
     expect(sol!.effectiveAdventurer).toBe(100);
     expect(sol!.cycles).toBe(9);
   });

@@ -78,6 +78,8 @@ interface FrontierState {
 
 /**
  * 1F→S F の初動プラン（最小ステップ数の代表 1 案）を BFS で探索
+ *
+ * frontier は floor で重複排除（同じ floor に到達する複数経路は最小床置きのみ保持）
  */
 export function findInitialPlans(
   adventurerStatues: number,
@@ -90,11 +92,13 @@ export function findInitialPlans(
   const N = adventurerStatues;
   const cap = Math.min(placeLimit, N);
 
-  let frontier: FrontierState[] = [{ floor: 1, steps: [] }];
+  let frontier = new Map<number, FrontierState>();
+  frontier.set(1, { floor: 1, steps: [] });
+
   for (let depth = 0; depth < maxDepth; depth++) {
     const found: InitialPlan[] = [];
-    const next: FrontierState[] = [];
-    for (const st of frontier) {
+    const next = new Map<number, FrontierState>();
+    for (const st of frontier.values()) {
       for (let p = 0; p <= cap; p++) {
         // 片側殲滅: 進む = 1 + (N - p)
         const adv1 = 1 + (N - p);
@@ -108,8 +112,8 @@ export function findInitialPlans(
         };
         if (to1 === startFloor) {
           found.push({ startFloor, steps: [...st.steps, step1] });
-        } else if (to1 < startFloor) {
-          next.push({ floor: to1, steps: [...st.steps, step1] });
+        } else if (to1 < startFloor && !next.has(to1)) {
+          next.set(to1, { floor: to1, steps: [...st.steps, step1] });
         }
 
         // 両側殲滅 (左→像回収→右): 進む = (1 + (N - p)) + (1 + N)
@@ -124,8 +128,8 @@ export function findInitialPlans(
         };
         if (to2 === startFloor) {
           found.push({ startFloor, steps: [...st.steps, step2] });
-        } else if (to2 < startFloor) {
-          next.push({ floor: to2, steps: [...st.steps, step2] });
+        } else if (to2 < startFloor && !next.has(to2)) {
+          next.set(to2, { floor: to2, steps: [...st.steps, step2] });
         }
       }
     }
@@ -135,7 +139,7 @@ export function findInitialPlans(
       return [found[0]];
     }
     frontier = next;
-    if (frontier.length === 0) break;
+    if (frontier.size === 0) break;
   }
   return [];
 }
@@ -180,11 +184,14 @@ export function enumerateFloorSkip(input: FloorSkipInput): CycleSolution[] {
       continue;
     }
 
-    // 冒険者像・悪魔像はいずれも入力値を上限として自由に [0, max] で探索
-    // サイクル中の有効使用数 B は 100 の倍数必須（cycle後に 100F 倍数へ着地するため）
+    // 冒険者像・悪魔像は入力値を上限として 0..max で探索
+    // 床置き上限はサイクルにも適用 → B = N - p, p ∈ [0, placeLimit]
+    // さらに B は 100 の倍数必須（cycle後に 100F 倍数へ着地するため）
     const maxB = Math.floor(N / 100) * 100;
+    const minB = Math.max(0, N - placeLimit);
     for (let A = 0; A <= M; A++) {
-      for (let B = maxB; B >= 0; B -= 100) {
+      for (let B = maxB; B >= minB; B -= 100) {
+        if (B < 0) break;
         const delta = 100 + B + 100 * A;
         if (delta <= 0) continue;
         if (remaining % delta !== 0) continue;

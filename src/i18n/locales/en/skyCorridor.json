@@ -7,7 +7,7 @@
     "adventurerStatues": "Adventurer Statue (owned)",
     "demonStatues": "Demon Statue (owned)",
     "targetFloor": "Target Floor",
-    "placeLimit": "Initial Place Limit (1F → S tuning)",
+    "placeLimit": "Place Limit",
     "resultsTitle": "Reachable Combinations (top 10 by fewest operations)",
     "noResults": "No matching combination. Try adjusting the place limit or owned counts.",
     "headers": {
@@ -29,8 +29,7 @@
     "cycleStepAnnihilationWithPlace": "On next floor, place {{p}} + single-side kill → +1F + {{B}} Adventurer statues = +{{advStep}}F",
     "cycleSummary": "Cycle total = +{{delta}}F",
     "noCycleNeeded": "No cycle needed (reached by initial step alone)",
-    "explanation": "Sky Corridor starts at 1F. Defeating the Sky Guardian at every 100F enables huge skips. Enter your statue counts to find combinations that land exactly on the target floor.",
-    "bossNote": "* Boss floors (10000F, 20000F, ...) have no Sky Guardian, so Demon Statues don't trigger. The simulator filters out combinations that would land on a 10000F multiple mid-route (only the final target may be a boss floor)."
+    "explanation": "Enter your owned Adventurer/Demon statues to find combinations that land exactly on the target floor."
   },
   "modeTabs": {
     "endurance": "Endurance",

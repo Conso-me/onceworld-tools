@@ -72,12 +72,6 @@ export function SkyCorridorFloorSkip() {
       {/* ───── 左カラム: 入力 ───── */}
       <div className="space-y-6 lg:space-y-2">
         <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-5 lg:space-y-3">
-          <p className="text-sm text-gray-600 leading-relaxed">
-            {t("floorSkip.explanation")}
-          </p>
-          <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 leading-relaxed">
-            {t("floorSkip.bossNote")}
-          </p>
 
           <InputField
             label={t("floorSkip.targetFloor")}
