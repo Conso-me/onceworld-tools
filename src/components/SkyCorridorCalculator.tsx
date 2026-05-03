@@ -1,8 +1,7 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { usePersistedState } from "../hooks/usePersistedState";
 import { useSharedSimConfig } from "../hooks/useSharedSimConfig";
-import { useSimPresets } from "../hooks/useSimPresets";
 import { scaleMonster } from "../utils/monsterScaling";
 import { formatHitCount } from "../utils/formatNumber";
 import {
@@ -19,6 +18,7 @@ import {
 import { calcStatus } from "../utils/statusCalc";
 import { getAllMonsters, getMonsterDisplayName } from "../data/monsters";
 import { InputField } from "./ui/InputField";
+import { SimConfigPanel } from "./SimConfigPanel";
 import type { MonsterBase, ScaledMonster } from "../types/game";
 import type { TFunction } from "i18next";
 
@@ -650,48 +650,24 @@ export function SkyCorridorCalculator({
   const [myInt, setMyInt] = usePersistedState("skyCorridor:int", "");
   const [mySpd, setMySpd] = usePersistedState("skyCorridor:spd", "");
   const [syncWithDmg, setSyncWithDmg] = usePersistedState("skyCorridor:sync", false);
-  const [syncMode, setSyncMode] = usePersistedState<"manual" | "sim">("skyCorridor:syncMode", "manual");
 
-  // ダメ計からの同期用
-  const [dmgDef] = usePersistedState("dmg:def", "");
-  const [dmgMdef] = usePersistedState("dmg:mdef", "");
-  const [dmgVit] = usePersistedState("dmg:vit", "");
-  const [dmgLuck] = usePersistedState("dmg:luck", "");
-  const [dmgAtk] = usePersistedState("dmg:atk", "");
-  const [dmgInt] = usePersistedState("dmg:int", "");
-  const [dmgSpd] = usePersistedState("dmg:spd", "");
+  // ダメ計の装備入力（解析書・魔晶）を同期
   const [dmgCrystalCube] = usePersistedState("dmg:crystalCube", "");
   const [dmgAnalysisBook] = usePersistedState("dmg:analysisBook", "");
   const [dmgAnalysisAnalysisBook] = usePersistedState("dmg:analysisAnalysisBook", "");
-  const [simCfg] = useSharedSimConfig();
+  const [simCfg, setSimField, resetSim, replaceAllSim] = useSharedSimConfig();
   const simResult = useMemo(() => calcStatus(simCfg), [simCfg]);
 
   const [skyFloor, setSkyFloor] = usePersistedState("skyCorridor:floor", "1");
-  const [selectedSimPresetId, setSelectedSimPresetId] = useState("");
-  const { presets: simPresets, loadPreset: loadSimPreset } = useSimPresets();
 
-  // 有効ステータス（同期 or 手動）
-  const effectiveDef = syncWithDmg
-    ? syncMode === "sim" ? simResult.final.def : parseInt(dmgDef) || 0
-    : parseInt(myDef) || 0;
-  const effectiveMdef = syncWithDmg
-    ? syncMode === "sim" ? simResult.final.mdef : parseInt(dmgMdef) || 0
-    : parseInt(myMdef) || 0;
-  const effectiveVit = syncWithDmg
-    ? syncMode === "sim" ? simResult.final.vit : parseInt(dmgVit) || 0
-    : parseInt(myVit) || 0;
-  const effectiveLuk = syncWithDmg
-    ? syncMode === "sim" ? simResult.final.luck : parseInt(dmgLuck) || 0
-    : parseInt(myLuk) || 0;
-  const effectiveAtk = syncWithDmg
-    ? syncMode === "sim" ? simResult.final.atk : parseInt(dmgAtk) || 0
-    : parseInt(myAtk) || 0;
-  const effectiveInt = syncWithDmg
-    ? syncMode === "sim" ? simResult.final.int : parseInt(dmgInt) || 0
-    : parseInt(myInt) || 0;
-  const effectiveSpd = syncWithDmg
-    ? syncMode === "sim" ? simResult.final.spd : parseInt(dmgSpd) || 0
-    : parseInt(mySpd) || 0;
+  // 有効ステータス（同期 = シミュ計算結果、手動 = 直接入力）
+  const effectiveDef  = syncWithDmg ? simResult.final.def  : parseInt(myDef)  || 0;
+  const effectiveMdef = syncWithDmg ? simResult.final.mdef : parseInt(myMdef) || 0;
+  const effectiveVit  = syncWithDmg ? simResult.final.vit  : parseInt(myVit)  || 0;
+  const effectiveLuk  = syncWithDmg ? simResult.final.luck : parseInt(myLuk)  || 0;
+  const effectiveAtk  = syncWithDmg ? simResult.final.atk  : parseInt(myAtk)  || 0;
+  const effectiveInt  = syncWithDmg ? simResult.final.int  : parseInt(myInt)  || 0;
+  const effectiveSpd  = syncWithDmg ? simResult.final.spd  : parseInt(mySpd)  || 0;
 
   const playerHp = effectiveVit > 0 ? effectiveVit * 18 + 100 : 0;
 
@@ -701,18 +677,6 @@ export function SkyCorridorCalculator({
   const syncedAnalysisAnalysisBookNum = syncWithDmg ? parseInt(dmgAnalysisAnalysisBook) || 0 : 0;
   const syncedMagicBaseInt = syncedAnalysisBookNum * (1 + syncedAnalysisAnalysisBookNum * 0.1);
   const syncedCrystalCubePreMult = 1 + syncedCrystalCubeNum * 0.01;
-
-  const handleLoadSimPreset = (id: string) => {
-    const simPreset = loadSimPreset(id);
-    if (!simPreset) return;
-    const result = calcStatus(simPreset.config);
-    setMyDef(String(result.final.def));
-    setMyMdef(String(result.final.mdef));
-    setMyVit(String(result.final.vit));
-    setMyLuk(String(result.final.luck));
-    setSyncWithDmg(false);
-    setSelectedSimPresetId(id);
-  };
 
   const floorNum = useMemo(
     () => Math.max(1, parseInt(skyFloor.replace(/[^0-9]/g, "")) || 1),
@@ -880,13 +844,13 @@ export function SkyCorridorCalculator({
   // ステータス入力フィールド定義
   // ────────────────────────────────────────────
   const statFields = [
-    { label: "VIT",                val: effectiveVit,  raw: myVit,  set: setMyVit  },
-    { label: "SPD",                val: effectiveSpd,  raw: mySpd,  set: setMySpd  },
-    { label: "ATK",                val: effectiveAtk,  raw: myAtk,  set: setMyAtk  },
-    { label: "INT",                val: effectiveInt,  raw: myInt,  set: setMyInt  },
-    { label: "DEF",                val: effectiveDef,  raw: myDef,  set: setMyDef  },
-    { label: "M-DEF",              val: effectiveMdef, raw: myMdef, set: setMyMdef },
-    { label: t("lukEvasionLabel"), val: effectiveLuk,  raw: myLuk,  set: setMyLuk  },
+    { label: "VIT",                raw: myVit,  set: setMyVit  },
+    { label: "SPD",                raw: mySpd,  set: setMySpd  },
+    { label: "ATK",                raw: myAtk,  set: setMyAtk  },
+    { label: "INT",                raw: myInt,  set: setMyInt  },
+    { label: "DEF",                raw: myDef,  set: setMyDef  },
+    { label: "M-DEF",              raw: myMdef, set: setMyMdef },
+    { label: t("lukEvasionLabel"), raw: myLuk,  set: setMyLuk  },
   ] as const;
 
   return (
@@ -938,54 +902,8 @@ export function SkyCorridorCalculator({
             <h3 className="font-semibold text-gray-800">{t("common:myStatus")}</h3>
           </div>
 
-          {/* プリセット読み込み */}
-          <div className="space-y-1.5">
-            <label className="block text-xs font-medium text-gray-500">
-              {t("presetLoad")}
-            </label>
-            <div className="flex gap-1.5">
-              <select
-                value={selectedSimPresetId}
-                onChange={(e) => setSelectedSimPresetId(e.target.value)}
-                className="flex-1 min-w-0 text-sm rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-gray-700"
-              >
-                <option value="">{t("common:select")}</option>
-                {simPresets.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={() => handleLoadSimPreset(selectedSimPresetId)}
-                disabled={!selectedSimPresetId}
-                className="px-3 py-1.5 text-xs rounded-lg bg-indigo-100 text-indigo-600 font-medium disabled:opacity-40 hover:bg-indigo-200 transition-colors"
-              >
-                {t("common:load")}
-              </button>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-100" />
-
-          {/* ステータス入力 */}
-          <div className="grid grid-cols-2 gap-4 lg:gap-2">
-            {statFields.map(({ label, val, raw, set }) =>
-              syncWithDmg ? (
-                <div key={label} className="space-y-1.5 lg:space-y-1">
-                  <label className="block text-sm lg:text-xs font-medium text-gray-400">{label}</label>
-                  <div className="w-full px-4 py-3 lg:py-2 bg-gray-50 border border-gray-200 rounded-xl text-lg lg:text-base font-medium text-gray-400">
-                    {val > 0 ? val.toLocaleString() : "—"}
-                  </div>
-                </div>
-              ) : (
-                <InputField key={label} label={label} value={raw} onChange={set} />
-              )
-            )}
-          </div>
-
           {/* ダメ計と同期トグル */}
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-3">
             <span className="text-sm text-gray-600">{t("syncWithDmg")}</span>
             <button
               onClick={() => setSyncWithDmg(!syncWithDmg)}
@@ -1002,34 +920,35 @@ export function SkyCorridorCalculator({
             <span className={`text-xs font-medium ${syncWithDmg ? "text-indigo-600" : "text-gray-400"}`}>
               {syncWithDmg ? t("on") : t("off")}
             </span>
-            {syncWithDmg && (
-              <div className="flex rounded-lg overflow-hidden border border-indigo-200 text-xs">
-                {(["manual", "sim"] as const).map((mode) => (
-                  <button
-                    key={mode}
-                    onClick={() => setSyncMode(mode)}
-                    className={`px-2 py-1 font-medium transition-colors ${
-                      syncMode === mode
-                        ? "bg-indigo-500 text-white"
-                        : "bg-white text-gray-500 hover:bg-gray-50"
-                    }`}
-                  >
-                    {mode === "manual" ? t("syncModeManual") : t("syncModeSim")}
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
 
-          {/* 同期時の装備情報表示 */}
-          {syncWithDmg && (syncedCrystalCubeNum > 0 || syncedAnalysisBookNum > 0) && (
-            <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-500">
-              {syncedAnalysisBookNum > 0 && (
-                <span>解析書 +{syncedMagicBaseInt.toLocaleString(undefined, { maximumFractionDigits: 1 })} INT</span>
+          {syncWithDmg ? (
+            <>
+              {/* 装備情報（解析書・魔晶）バッジ */}
+              {(syncedCrystalCubeNum > 0 || syncedAnalysisBookNum > 0) && (
+                <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-500">
+                  {syncedAnalysisBookNum > 0 && (
+                    <span>解析書 +{syncedMagicBaseInt.toLocaleString(undefined, { maximumFractionDigits: 1 })} INT</span>
+                  )}
+                  {syncedCrystalCubeNum > 0 && (
+                    <span>魔晶 ×{syncedCrystalCubePreMult.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                  )}
+                </div>
               )}
-              {syncedCrystalCubeNum > 0 && (
-                <span>魔晶 ×{syncedCrystalCubePreMult.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
-              )}
+              {/* シミュ設定パネル（ダメ計・ステータスシミュと共有） */}
+              <SimConfigPanel
+                cfg={simCfg}
+                setField={setSimField}
+                onReset={resetSim}
+                onReplaceAll={replaceAllSim}
+              />
+            </>
+          ) : (
+            /* 手動ステータス入力 */
+            <div className="grid grid-cols-2 gap-4 lg:gap-2">
+              {statFields.map(({ label, raw, set }) => (
+                <InputField key={label} label={label} value={raw} onChange={set} />
+              ))}
             </div>
           )}
 
