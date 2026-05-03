@@ -13,6 +13,15 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-05-03",
+    changes: [
+    { type: "fix", text: "fix(skyCorridor): SimConfigPanelのprop名を修正 onReset→reset, onReplaceAll→replaceAll" },
+    { type: "improve", text: "refactor(skyCorridor): 同期時にSimConfigPanel（基本・装備・アクセ・ペット）をそのまま表示" },
+    { type: "improve", text: "feat(skyCorridor): 同期時にダメ計の装備入力（解析書・魔晶）を魔法ダメージに反映" },
+    ],
+  },
+
+  {
     date: "2026-05-01",
     changes: [
     { type: "feature", text: "feat: 天空回廊の新モンスタープリセット・ペットスキルを追加" },
