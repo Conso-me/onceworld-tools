@@ -6,7 +6,6 @@ import { scaleMonster } from "../utils/monsterScaling";
 import { formatHitCount } from "../utils/formatNumber";
 import {
   canNullifyDamage,
-  calcAdditionalDefNeeded,
   calcDamage,
 } from "../utils/defenseCalc";
 import {
@@ -694,9 +693,13 @@ export function SkyCorridorCalculator({
     const nullifiedNow = canNullifyDamage(enemyStat, effectiveDef, effectiveMdef, isPhysical);
     const maxNullifyFloor = calcMaxNullifyFloor(base, effectiveDef, effectiveMdef);
 
-    const additional = calcAdditionalDefNeeded(enemyStat, effectiveDef, effectiveMdef, isPhysical);
-    const requiredDef = effectiveDef + additional.additionalDef;
-    const requiredMdef = effectiveMdef + additional.additionalMdef;
+    const threshold = enemyStat * 1.75;
+    const requiredDef = isPhysical
+      ? Math.max(0, Math.ceil(threshold - effectiveMdef / 10))
+      : Math.max(0, Math.ceil((threshold - effectiveMdef) * 10));
+    const requiredMdef = isPhysical
+      ? Math.max(0, Math.ceil((threshold - effectiveDef) * 10))
+      : Math.max(0, Math.ceil(threshold - effectiveDef / 10));
 
     let hitsToSurvive: { worst: number; best: number } | null = null;
     if (playerHp > 0) {
