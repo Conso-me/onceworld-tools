@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-05-03",
     changes: [
+    { type: "improve", text: "fix(skyCorridor): 無効化済み時も必要DEF/MDEFを正しく表示" },
     { type: "improve", text: "fix(skyCorridor): ステータス表示をモンスター一覧の上（右カラム）に移動" },
     { type: "improve", text: "feat(skyCorridor): 耐久モードサマリーにDEF/M-DEF/VIT/LUKを表示" },
     { type: "improve", text: "fix(skyCorridor): フロア入力を先頭に移動し「目標フロア」に改称" },
