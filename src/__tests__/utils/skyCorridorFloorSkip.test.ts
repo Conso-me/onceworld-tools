@@ -237,40 +237,13 @@ describe("enumerateFloorSkip - 10000Fボス階層回避", () => {
 });
 
 // ---------------------------------------------------------------------------
-// 床置き上限は全階層 (初動・サイクル) に適用される
+// 冒険者像も悪魔像と同じく自由列挙（倉庫から任意数を持参）
 // ---------------------------------------------------------------------------
-describe("enumerateFloorSkip - 床置き上限は全階層に適用", () => {
-  it("N=100, placeLimit=10: B=0 (床置き100個) は上限超過で除外", () => {
+describe("enumerateFloorSkip - 冒険者像持参数の自由列挙", () => {
+  it("N=100, M=9, target=10000: brought=100 のとき S=100, A=9, cycles=9, B=100 が見つかる", () => {
     const results = enumerateFloorSkip({
       adventurerStatues: 100,
-      demonStatues: 0,
-      targetFloor: 10000,
-      placeLimit: 10,
-    });
-    expect(
-      results.find((r) => r.startFloor === 100 && r.effectiveAdventurer === 0)
-    ).toBeUndefined();
-  });
-
-  it("N=100, placeLimit=100: B=0 (床置き100個) も列挙対象に入る", () => {
-    const results = enumerateFloorSkip({
-      adventurerStatues: 100,
-      demonStatues: 0,
-      targetFloor: 10000,
-      placeLimit: 100,
-    });
-    const sol = results.find(
-      (r) => r.startFloor === 100 && r.effectiveAdventurer === 0
-    );
-    expect(sol).toBeDefined();
-    expect(sol!.cycles).toBe(99);
-    expect(sol!.placedDuringCycle).toBe(100);
-  });
-
-  it("N=100, M=10, target=10000: 同じ (S,A) では最も大きい B (=100) を採用", () => {
-    const results = enumerateFloorSkip({
-      adventurerStatues: 100,
-      demonStatues: 10,
+      demonStatues: 9,
       targetFloor: 10000,
       placeLimit: 10,
     });
@@ -278,5 +251,47 @@ describe("enumerateFloorSkip - 床置き上限は全階層に適用", () => {
     expect(sol).toBeDefined();
     expect(sol!.effectiveAdventurer).toBe(100);
     expect(sol!.cycles).toBe(9);
+    expect(sol!.placedDuringCycle).toBe(0); // サイクル中は床置きしない
+  });
+
+  it("brought=0 では初動が成立しない（S=100 まで進めない）→ 結果に含まれない", () => {
+    const results = enumerateFloorSkip({
+      adventurerStatues: 100,
+      demonStatues: 0,
+      targetFloor: 10000,
+      placeLimit: 10,
+    });
+    expect(
+      results.find((r) => r.effectiveAdventurer === 0)
+    ).toBeUndefined();
+  });
+
+  it("N=200, placeLimit=10: brought=100 (倉庫から100だけ持参) も列挙される", () => {
+    const results = enumerateFloorSkip({
+      adventurerStatues: 200,
+      demonStatues: 97,
+      targetFloor: 10000,
+      placeLimit: 10,
+    });
+    // brought=100 の場合: B=100, A=97, delta=9900, K=1
+    const sol = results.find(
+      (r) => r.effectiveAdventurer === 100 && r.demonUsed === 97
+    );
+    expect(sol).toBeDefined();
+    expect(sol!.cycles).toBe(1);
+  });
+
+  it("結果には brought ごとの effectiveAdventurer が記録される", () => {
+    const results = enumerateFloorSkip({
+      adventurerStatues: 100,
+      demonStatues: 100,
+      targetFloor: 10000,
+      placeLimit: 10,
+    });
+    for (const r of results) {
+      expect(r.effectiveAdventurer % 100).toBe(0);
+      expect(r.effectiveAdventurer).toBeGreaterThanOrEqual(0);
+      expect(r.effectiveAdventurer).toBeLessThanOrEqual(100);
+    }
   });
 });

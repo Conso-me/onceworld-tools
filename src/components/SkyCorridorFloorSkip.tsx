@@ -177,8 +177,9 @@ function SolutionCard({
         <div className="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 text-sm font-bold flex-shrink-0">
           {idx + 1}
         </div>
-        <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-x-3 gap-y-1 text-sm">
+        <div className="flex-1 grid grid-cols-2 sm:grid-cols-5 gap-x-3 gap-y-1 text-sm">
           <Stat label={t("floorSkip.headers.startFloor")} value={`${sol.startFloor.toLocaleString()}F`} />
+          <Stat label={t("floorSkip.headers.adventurerUsed")} value={`${sol.effectiveAdventurer}`} />
           <Stat label={t("floorSkip.headers.demonUsed")} value={`${sol.demonUsed}`} />
           <Stat
             label={t("floorSkip.headers.cycles")}

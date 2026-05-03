@@ -12,6 +12,7 @@
     "noResults": "No matching combination. Try adjusting the place limit or owned counts.",
     "headers": {
       "startFloor": "Initial",
+      "adventurerUsed": "Adventurer",
       "demonUsed": "Demon",
       "cycles": "Cycles",
       "cycleProgress": "Per Cycle",

@@ -158,41 +158,45 @@ export function enumerateFloorSkip(input: FloorSkipInput): CycleSolution[] {
   if (targetFloor < 100 || targetFloor % 100 !== 0) return [];
   if (placeLimit < 0) return [];
 
-  // (S, A) 単位で最小サイクル数を保持
+  // (S, A, B) 単位で最小サイクル数を保持
   const best = new Map<string, CycleSolution>();
 
-  for (let S = 100; S <= targetFloor; S += 100) {
-    // S 自体がボス階層なら、最終目標と一致する場合のみ許容
-    if (S % BOSS_PERIOD === 0 && S !== targetFloor) continue;
+  // 冒険者像・悪魔像は入力値を上限として、倉庫から好きな数だけ持ち出して挑戦できる
+  // → サイクル中の有効使用数 B (= 持参数) を 100 の倍数で 0..N まで全列挙
+  // 床置きは初動 (1F→S) のみで使用、サイクル中は床置きしない (placed=0)
+  const maxBrought = Math.floor(N / 100) * 100;
 
-    const initialPlans = findInitialPlans(N, S, placeLimit);
-    if (initialPlans.length === 0) continue;
-    const initial = initialPlans[0];
-    const remaining = targetFloor - S;
+  for (let brought = maxBrought; brought >= 0; brought -= 100) {
+    const initialCap = Math.min(placeLimit, brought);
 
-    if (remaining === 0) {
-      best.set(`${S}-0`, {
-        startFloor: S,
-        demonUsed: 0,
-        cycles: 0,
-        cycleProgress: 0,
-        placedDuringCycle: 0,
-        effectiveAdventurer: N,
-        totalOperations: initial.steps.length,
-        initial,
-      });
-      continue;
-    }
+    for (let S = 100; S <= targetFloor; S += 100) {
+      // S 自体がボス階層なら、最終目標と一致する場合のみ許容
+      if (S % BOSS_PERIOD === 0 && S !== targetFloor) continue;
 
-    // 冒険者像・悪魔像は入力値を上限として 0..max で探索
-    // 床置き上限はサイクルにも適用 → B = N - p, p ∈ [0, placeLimit]
-    // さらに B は 100 の倍数必須（cycle後に 100F 倍数へ着地するため）
-    const maxB = Math.floor(N / 100) * 100;
-    const minB = Math.max(0, N - placeLimit);
-    for (let A = 0; A <= M; A++) {
-      for (let B = maxB; B >= minB; B -= 100) {
-        if (B < 0) break;
-        const delta = 100 + B + 100 * A;
+      const initialPlans = findInitialPlans(brought, S, initialCap);
+      if (initialPlans.length === 0) continue;
+      const initial = initialPlans[0];
+      const remaining = targetFloor - S;
+
+      if (remaining === 0) {
+        const key = `${S}-0-${brought}`;
+        if (!best.has(key)) {
+          best.set(key, {
+            startFloor: S,
+            demonUsed: 0,
+            cycles: 0,
+            cycleProgress: 0,
+            placedDuringCycle: 0,
+            effectiveAdventurer: brought,
+            totalOperations: initial.steps.length,
+            initial,
+          });
+        }
+        continue;
+      }
+
+      for (let A = 0; A <= M; A++) {
+        const delta = 100 + brought + 100 * A;
         if (delta <= 0) continue;
         if (remaining % delta !== 0) continue;
         const cycles = remaining / delta;
@@ -201,17 +205,16 @@ export function enumerateFloorSkip(input: FloorSkipInput): CycleSolution[] {
         // ボス階層 (10000F の倍数) を中間で踏むパスは無効
         if (hasMidRouteBoss(S, delta, cycles)) continue;
 
-        const key = `${S}-${A}`;
+        const key = `${S}-${A}-${brought}`;
         const existing = best.get(key);
-        // 同じ (S, A) ならサイクル数の小さい方 (= delta が大きい = B が大きい) を採用
         if (!existing || cycles < existing.cycles) {
           best.set(key, {
             startFloor: S,
             demonUsed: A,
             cycles,
             cycleProgress: delta,
-            placedDuringCycle: N - B,
-            effectiveAdventurer: B,
+            placedDuringCycle: 0,
+            effectiveAdventurer: brought,
             totalOperations: initial.steps.length + cycles * 2,
             initial,
           });

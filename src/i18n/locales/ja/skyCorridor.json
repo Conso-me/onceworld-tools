@@ -12,6 +12,7 @@
     "noResults": "該当する組み合わせがありません。床置き上限や所持数を見直してください。",
     "headers": {
       "startFloor": "初動到達",
+      "adventurerUsed": "冒険者像",
       "demonUsed": "悪魔像",
       "cycles": "サイクル",
       "cycleProgress": "1サイクル進行",
