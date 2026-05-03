@@ -11,6 +11,7 @@ import { InputField } from "./ui/InputField";
 const STATUE_MAX = 1000;
 const PLACE_LIMIT_MAX = 100;
 const TARGET_MAX = 10_000_000;
+const MAX_SOLUTIONS = 10;
 
 function parseClampedInt(raw: string, max: number, fallback: number = 0): number {
   const n = parseInt(raw || "", 10);
@@ -47,12 +48,13 @@ export function SkyCorridorFloorSkip() {
 
   const solutions = useMemo<CycleSolution[]>(() => {
     if (!targetIsValid) return [];
-    return enumerateFloorSkip({
+    const all = enumerateFloorSkip({
       adventurerStatues: adventurer,
       demonStatues: demon,
       targetFloor,
       placeLimit,
     });
+    return all.slice(0, MAX_SOLUTIONS);
   }, [adventurer, demon, targetFloor, placeLimit, targetIsValid]);
 
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
@@ -70,7 +72,7 @@ export function SkyCorridorFloorSkip() {
       {/* ───── 左カラム: 入力 ───── */}
       <div className="space-y-6 lg:space-y-2">
         <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-5 lg:space-y-3">
-          <p className="text-xs text-gray-500 leading-relaxed">
+          <p className="text-sm text-gray-600 leading-relaxed">
             {t("floorSkip.explanation")}
           </p>
 
@@ -114,55 +116,32 @@ export function SkyCorridorFloorSkip() {
       {/* ───── 右カラム: 結果テーブル ───── */}
       <div className="space-y-3">
         <div className="bg-white rounded-2xl shadow shadow-gray-200/50 p-4 lg:p-3">
-          <h3 className="text-sm font-semibold text-gray-700 mb-2">
+          <h3 className="text-base font-semibold text-gray-800 mb-3">
             {t("floorSkip.resultsTitle")}
-            <span className="ml-2 text-xs font-normal text-gray-400">
+            <span className="ml-2 text-sm font-normal text-gray-400">
               ({solutions.length})
             </span>
           </h3>
 
           {solutions.length === 0 ? (
-            <p className="text-xs text-gray-500 py-4 text-center">
+            <p className="text-sm text-gray-500 py-6 text-center">
               {t("floorSkip.noResults")}
             </p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs lg:text-[11px]">
-                <thead>
-                  <tr className="text-gray-500 border-b border-gray-200">
-                    <th className="text-left px-2 py-1.5 font-medium">
-                      {t("floorSkip.headers.startFloor")}
-                    </th>
-                    <th className="text-right px-2 py-1.5 font-medium">
-                      {t("floorSkip.headers.demonUsed")}
-                    </th>
-                    <th className="text-right px-2 py-1.5 font-medium">
-                      {t("floorSkip.headers.cycles")}
-                    </th>
-                    <th className="text-right px-2 py-1.5 font-medium">
-                      {t("floorSkip.headers.cycleProgress")}
-                    </th>
-                    <th className="text-right px-2 py-1.5 font-medium">
-                      {t("floorSkip.headers.totalOps")}
-                    </th>
-                    <th className="px-2 py-1.5"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {solutions.map((sol, idx) => {
-                    const isOpen = expanded.has(idx);
-                    return (
-                      <RowGroup
-                        key={idx}
-                        idx={idx}
-                        sol={sol}
-                        isOpen={isOpen}
-                        toggle={toggleExpand}
-                      />
-                    );
-                  })}
-                </tbody>
-              </table>
+            <div className="space-y-2">
+              {solutions.map((sol, idx) => {
+                const isOpen = expanded.has(idx);
+                return (
+                  <SolutionCard
+                    key={idx}
+                    idx={idx}
+                    sol={sol}
+                    targetFloor={targetFloor}
+                    isOpen={isOpen}
+                    toggle={toggleExpand}
+                  />
+                );
+              })}
             </div>
           )}
         </div>
@@ -171,107 +150,178 @@ export function SkyCorridorFloorSkip() {
   );
 }
 
-function RowGroup({
+function SolutionCard({
   idx,
   sol,
+  targetFloor,
   isOpen,
   toggle,
 }: {
   idx: number;
   sol: CycleSolution;
+  targetFloor: number;
   isOpen: boolean;
   toggle: (idx: number) => void;
 }) {
   const { t } = useTranslation("skyCorridor");
   return (
-    <>
-      <tr
-        className={`border-b border-gray-100 cursor-pointer hover:bg-indigo-50/50 ${
-          isOpen ? "bg-indigo-50/50" : ""
-        }`}
+    <div
+      className={`rounded-xl border transition-colors ${
+        isOpen
+          ? "border-indigo-300 bg-indigo-50/30"
+          : "border-gray-200 bg-white hover:border-indigo-200"
+      }`}
+    >
+      <button
+        type="button"
         onClick={() => toggle(idx)}
+        className="w-full text-left px-4 py-3 flex items-center gap-3 cursor-pointer"
       >
-        <td className="px-2 py-1.5 font-medium text-gray-800">
-          {sol.startFloor.toLocaleString()}F
-        </td>
-        <td className="text-right px-2 py-1.5 text-gray-700">
-          {sol.demonUsed}
-        </td>
-        <td className="text-right px-2 py-1.5 text-gray-700">{sol.cycles}</td>
-        <td className="text-right px-2 py-1.5 text-gray-700">
-          {sol.cycleProgress > 0 ? `${sol.cycleProgress.toLocaleString()}F` : "—"}
-        </td>
-        <td className="text-right px-2 py-1.5 text-gray-700">
-          {sol.totalOperations}
-        </td>
-        <td className="text-right px-2 py-1.5">
-          <span className="text-indigo-500 text-[10px] font-medium">
-            {isOpen ? t("floorSkip.collapse") : t("floorSkip.expand")}
-          </span>
-        </td>
-      </tr>
+        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 text-sm font-bold flex-shrink-0">
+          {idx + 1}
+        </div>
+        <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-x-3 gap-y-1 text-sm">
+          <Stat label={t("floorSkip.headers.startFloor")} value={`${sol.startFloor.toLocaleString()}F`} />
+          <Stat label={t("floorSkip.headers.demonUsed")} value={`${sol.demonUsed}`} />
+          <Stat
+            label={t("floorSkip.headers.cycles")}
+            value={sol.cycles > 0 ? `${sol.cycles}` : "—"}
+          />
+          <Stat
+            label={t("floorSkip.headers.cycleProgress")}
+            value={sol.cycleProgress > 0 ? `+${sol.cycleProgress.toLocaleString()}F` : "—"}
+          />
+        </div>
+        <span className="text-xs font-medium text-indigo-600 flex-shrink-0 ml-2">
+          {isOpen ? t("floorSkip.collapse") : t("floorSkip.expand")}
+        </span>
+      </button>
       {isOpen && (
-        <tr className="border-b border-gray-100 bg-gray-50/50">
-          <td colSpan={6} className="px-3 py-2 text-[11px] text-gray-700">
-            <DetailBlock sol={sol} />
-          </td>
-        </tr>
-      )}
-    </>
-  );
-}
-
-function DetailBlock({ sol }: { sol: CycleSolution }) {
-  const { t } = useTranslation("skyCorridor");
-  return (
-    <div className="space-y-2">
-      {sol.initial.steps.length > 0 && (
-        <div>
-          <div className="font-semibold text-gray-700 mb-1">
-            {t("floorSkip.initialPlanTitle", { floor: sol.startFloor })}
-          </div>
-          <ol className="list-decimal list-inside space-y-0.5 text-gray-600">
-            {sol.initial.steps.map((step, i) => (
-              <li key={i}>{renderStep(step, t)}</li>
-            ))}
-          </ol>
+        <div className="border-t border-indigo-200 px-4 py-3">
+          <DetailBlock sol={sol} targetFloor={targetFloor} />
         </div>
       )}
-      <div>
-        <div className="font-semibold text-gray-700 mb-1">
-          {t("floorSkip.cycleDetailTitle")}
-        </div>
-        {sol.cycles === 0 ? (
-          <p className="text-gray-500">{t("floorSkip.noCycleNeeded")}</p>
-        ) : (
-          <ul className="space-y-0.5 text-gray-600">
-            <li>
-              {t("floorSkip.cycleParams", {
-                B: sol.effectiveAdventurer,
-                A: sol.demonUsed,
-                p: sol.placedDuringCycle,
-              })}
-            </li>
-            <li>
-              {t("floorSkip.cycleFormula", {
-                B: sol.effectiveAdventurer,
-                cycA: 100 * sol.demonUsed,
-                delta: sol.cycleProgress,
-              })}
-            </li>
-          </ul>
-        )}
-      </div>
     </div>
   );
 }
 
-function renderStep(step: InitialStep, t: ReturnType<typeof useTranslation>["t"]): string {
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex flex-col">
+      <span className="text-[10px] uppercase tracking-wide text-gray-400 leading-tight">
+        {label}
+      </span>
+      <span className="text-sm font-semibold text-gray-800 leading-tight">
+        {value}
+      </span>
+    </div>
+  );
+}
+
+function DetailBlock({
+  sol,
+  targetFloor,
+}: {
+  sol: CycleSolution;
+  targetFloor: number;
+}) {
+  const { t } = useTranslation("skyCorridor");
+  const cycleEnd = sol.startFloor + sol.cycles * sol.cycleProgress;
+
+  const guardianGain = 99 + 100 * sol.demonUsed;
+  const advanceGain = 1 + sol.effectiveAdventurer;
+  const placeUsed = sol.placedDuringCycle;
+
+  return (
+    <div className="space-y-3 text-sm text-gray-700">
+      {/* STEP 1 初動 */}
+      {sol.initial.steps.length > 0 && (
+        <StepBlock title={t("floorSkip.stepInitialTitle", { floor: sol.startFloor })}>
+          <ol className="list-decimal list-inside space-y-1 marker:text-indigo-500 marker:font-bold">
+            {sol.initial.steps.map((step, i) => (
+              <li key={i} className="leading-relaxed">{renderInitialStep(step, t)}</li>
+            ))}
+          </ol>
+        </StepBlock>
+      )}
+
+      {/* STEP 2 サイクル繰り返し */}
+      {sol.cycles > 0 ? (
+        <StepBlock
+          title={t("floorSkip.stepCycleTitle", {
+            count: sol.cycles,
+            from: sol.startFloor.toLocaleString(),
+            to: cycleEnd.toLocaleString(),
+          })}
+        >
+          <ol className="list-decimal list-inside space-y-1 marker:text-indigo-500 marker:font-bold">
+            <li className="leading-relaxed">
+              {t("floorSkip.cycleStepGuardian", {
+                A: sol.demonUsed,
+                guard: guardianGain.toLocaleString(),
+              })}
+            </li>
+            <li className="leading-relaxed">
+              {placeUsed > 0
+                ? t("floorSkip.cycleStepAnnihilationWithPlace", {
+                    p: placeUsed,
+                    B: sol.effectiveAdventurer,
+                    advStep: advanceGain.toLocaleString(),
+                  })
+                : t("floorSkip.cycleStepAnnihilation", {
+                    B: sol.effectiveAdventurer,
+                    advStep: advanceGain.toLocaleString(),
+                  })}
+            </li>
+          </ol>
+          <p className="mt-2 text-sm font-semibold text-indigo-700">
+            {t("floorSkip.cycleSummary", { delta: sol.cycleProgress.toLocaleString() })}
+          </p>
+        </StepBlock>
+      ) : (
+        <StepBlock title={t("floorSkip.stepCycleTitle", { count: 0, from: sol.startFloor, to: sol.startFloor })}>
+          <p className="text-sm text-gray-500">{t("floorSkip.noCycleNeeded")}</p>
+        </StepBlock>
+      )}
+
+      {/* STEP 3 到達 */}
+      <StepBlock
+        title={t("floorSkip.stepGoalTitle", { floor: targetFloor.toLocaleString() })}
+        accent="goal"
+      />
+    </div>
+  );
+}
+
+function StepBlock({
+  title,
+  children,
+  accent,
+}: {
+  title: string;
+  children?: React.ReactNode;
+  accent?: "goal";
+}) {
+  const titleClass =
+    accent === "goal"
+      ? "text-base font-bold text-emerald-700"
+      : "text-sm font-bold text-indigo-700";
+  return (
+    <div className={accent === "goal" ? "border-t border-emerald-200 pt-2" : ""}>
+      <div className={titleClass}>{title}</div>
+      {children && <div className="mt-1 ml-1">{children}</div>}
+    </div>
+  );
+}
+
+function renderInitialStep(
+  step: InitialStep,
+  t: ReturnType<typeof useTranslation>["t"]
+): string {
+  const adv = step.toFloor - step.fromFloor;
   const params = {
-    from: step.fromFloor,
-    to: step.toFloor,
     placed: step.placedBefore,
-    used: step.usedStatues,
+    adv: adv.toLocaleString(),
   };
   if (step.side === "both") return t("floorSkip.stepBoth", params);
   return t("floorSkip.stepLeft", params);
