@@ -660,6 +660,9 @@ export function SkyCorridorCalculator({
   const [dmgAtk] = usePersistedState("dmg:atk", "");
   const [dmgInt] = usePersistedState("dmg:int", "");
   const [dmgSpd] = usePersistedState("dmg:spd", "");
+  const [dmgCrystalCube] = usePersistedState("dmg:crystalCube", "");
+  const [dmgAnalysisBook] = usePersistedState("dmg:analysisBook", "");
+  const [dmgAnalysisAnalysisBook] = usePersistedState("dmg:analysisAnalysisBook", "");
   const [simCfg] = useSharedSimConfig();
   const simResult = useMemo(() => calcStatus(simCfg), [simCfg]);
 
@@ -691,6 +694,13 @@ export function SkyCorridorCalculator({
     : parseInt(mySpd) || 0;
 
   const playerHp = effectiveVit > 0 ? effectiveVit * 18 + 100 : 0;
+
+  // 同期時はダメ計の装備入力をそのまま使う
+  const syncedCrystalCubeNum = syncWithDmg ? Math.min(parseInt(dmgCrystalCube) || 0, 1000) : 0;
+  const syncedAnalysisBookNum = syncWithDmg ? parseInt(dmgAnalysisBook) || 0 : 0;
+  const syncedAnalysisAnalysisBookNum = syncWithDmg ? parseInt(dmgAnalysisAnalysisBook) || 0 : 0;
+  const syncedMagicBaseInt = syncedAnalysisBookNum * (1 + syncedAnalysisAnalysisBookNum * 0.1);
+  const syncedCrystalCubePreMult = 1 + syncedCrystalCubeNum * 0.01;
 
   const handleLoadSimPreset = (id: string) => {
     const simPreset = loadSimPreset(id);
@@ -784,7 +794,7 @@ export function SkyCorridorCalculator({
       playerDamageMin = dmg.min * multiHit;
       canOneShot = playerDamageMin >= scaledHp;
     } else if (playerAttackMode === "magic" && effectiveInt > 0 && !isMagicImmune) {
-      const dmg = calcPlayerMagicDamage(effectiveInt, 0, 1.0, scaled.scaledDef, scaled.scaledMdef);
+      const dmg = calcPlayerMagicDamage(effectiveInt, syncedMagicBaseInt, syncedCrystalCubePreMult, scaled.scaledDef, scaled.scaledMdef);
       const multiHit = calcMultiHitCount(effectiveSpd, true);
       playerDamageMin = dmg.min * multiHit;
       canOneShot = playerDamageMin >= scaledHp;
@@ -830,7 +840,7 @@ export function SkyCorridorCalculator({
       return calcFireResult(m, scaled.scaledDef);
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [effectiveAtk, effectiveInt, effectiveLuk, effectiveSpd, floorNum, playerAttackMode]
+    [effectiveAtk, effectiveInt, effectiveLuk, effectiveSpd, floorNum, playerAttackMode, syncedMagicBaseInt, syncedCrystalCubePreMult]
   );
 
   const firePhysLukResults = useMemo(
@@ -839,7 +849,7 @@ export function SkyCorridorCalculator({
       return calcFireResult(m, scaled.scaledLuck);
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [effectiveAtk, effectiveInt, effectiveLuk, effectiveSpd, floorNum, playerAttackMode]
+    [effectiveAtk, effectiveInt, effectiveLuk, effectiveSpd, floorNum, playerAttackMode, syncedMagicBaseInt, syncedCrystalCubePreMult]
   );
 
   const fireMagMdefResults = useMemo(
@@ -848,7 +858,7 @@ export function SkyCorridorCalculator({
       return calcFireResult(m, scaled.scaledMdef);
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [effectiveAtk, effectiveInt, effectiveLuk, effectiveSpd, floorNum, playerAttackMode]
+    [effectiveAtk, effectiveInt, effectiveLuk, effectiveSpd, floorNum, playerAttackMode, syncedMagicBaseInt, syncedCrystalCubePreMult]
   );
 
   const fireMagImmuneResults = useMemo(
@@ -857,7 +867,7 @@ export function SkyCorridorCalculator({
       return calcFireResult(m, scaled.scaledMdef);
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [effectiveAtk, effectiveInt, effectiveLuk, effectiveSpd, floorNum, playerAttackMode]
+    [effectiveAtk, effectiveInt, effectiveLuk, effectiveSpd, floorNum, playerAttackMode, syncedMagicBaseInt, syncedCrystalCubePreMult]
   );
 
   const handleFloorClick = (floor: number) => setSkyFloor(String(floor));
@@ -1010,6 +1020,18 @@ export function SkyCorridorCalculator({
               </div>
             )}
           </div>
+
+          {/* 同期時の装備情報表示 */}
+          {syncWithDmg && (syncedCrystalCubeNum > 0 || syncedAnalysisBookNum > 0) && (
+            <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-500">
+              {syncedAnalysisBookNum > 0 && (
+                <span>解析書 +{syncedMagicBaseInt.toLocaleString(undefined, { maximumFractionDigits: 1 })} INT</span>
+              )}
+              {syncedCrystalCubeNum > 0 && (
+                <span>魔晶 ×{syncedCrystalCubePreMult.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+              )}
+            </div>
+          )}
 
           <div className="border-t border-gray-100" />
 
