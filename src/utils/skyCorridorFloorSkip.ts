@@ -180,12 +180,11 @@ export function enumerateFloorSkip(input: FloorSkipInput): CycleSolution[] {
       continue;
     }
 
+    // 冒険者像・悪魔像はいずれも入力値を上限として自由に [0, max] で探索
+    // サイクル中の有効使用数 B は 100 の倍数必須（cycle後に 100F 倍数へ着地するため）
+    const maxB = Math.floor(N / 100) * 100;
     for (let A = 0; A <= M; A++) {
-      for (let p = 0; p <= placeLimit; p++) {
-        const B = N - p;
-        if (B < 0) continue;
-        // サイクル後に必ず 100F の倍数へ着地するため delta は 100 の倍数必須
-        if (B % 100 !== 0) continue;
+      for (let B = maxB; B >= 0; B -= 100) {
         const delta = 100 + B + 100 * A;
         if (delta <= 0) continue;
         if (remaining % delta !== 0) continue;
@@ -197,14 +196,14 @@ export function enumerateFloorSkip(input: FloorSkipInput): CycleSolution[] {
 
         const key = `${S}-${A}`;
         const existing = best.get(key);
-        // 同じ (S, A) ならサイクル数の小さい方 (= delta が大きい = p が小さい) を採用
+        // 同じ (S, A) ならサイクル数の小さい方 (= delta が大きい = B が大きい) を採用
         if (!existing || cycles < existing.cycles) {
           best.set(key, {
             startFloor: S,
             demonUsed: A,
             cycles,
             cycleProgress: delta,
-            placedDuringCycle: p,
+            placedDuringCycle: N - B,
             effectiveAdventurer: B,
             totalOperations: initial.steps.length + cycles * 2,
             initial,

@@ -235,3 +235,39 @@ describe("enumerateFloorSkip - 10000Fボス階層回避", () => {
     expect(ok!.cycles).toBe(1);
   });
 });
+
+// ---------------------------------------------------------------------------
+// 冒険者像も上限以下で自由列挙
+// ---------------------------------------------------------------------------
+describe("enumerateFloorSkip - B<N の組み合わせも列挙", () => {
+  it("N=100, M=0, target=10000: B=0 (冒険者像非使用) で S=100, cycles=99 も列挙される", () => {
+    const results = enumerateFloorSkip({
+      adventurerStatues: 100,
+      demonStatues: 0,
+      targetFloor: 10000,
+      placeLimit: 10,
+    });
+    // B=0 → delta=100 → 9900/100=99 cycles
+    const sol = results.find(
+      (r) => r.startFloor === 100 && r.demonUsed === 0 && r.effectiveAdventurer === 0
+    );
+    expect(sol).toBeDefined();
+    expect(sol!.cycles).toBe(99);
+    expect(sol!.cycleProgress).toBe(100);
+    expect(sol!.placedDuringCycle).toBe(100); // 全冒険者像を床置き
+  });
+
+  it("N=100, M=10, target=10000: 同じ (S,A) では最も大きい B (=100) を採用", () => {
+    const results = enumerateFloorSkip({
+      adventurerStatues: 100,
+      demonStatues: 10,
+      targetFloor: 10000,
+      placeLimit: 10,
+    });
+    const sol = results.find((r) => r.startFloor === 100 && r.demonUsed === 9);
+    expect(sol).toBeDefined();
+    // B=100, delta=1100, cycles=9
+    expect(sol!.effectiveAdventurer).toBe(100);
+    expect(sol!.cycles).toBe(9);
+  });
+});

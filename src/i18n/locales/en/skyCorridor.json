@@ -7,7 +7,7 @@
     "adventurerStatues": "Adventurer Statue (owned)",
     "demonStatues": "Demon Statue (owned)",
     "targetFloor": "Target Floor",
-    "placeLimit": "Place Limit (Adventurer)",
+    "placeLimit": "Initial Place Limit (1F → S tuning)",
     "resultsTitle": "Reachable Combinations (top 10 by fewest operations)",
     "noResults": "No matching combination. Try adjusting the place limit or owned counts.",
     "headers": {

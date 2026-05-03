@@ -7,7 +7,7 @@
     "adventurerStatues": "天空像〜冒険者〜（所持数）",
     "demonStatues": "天空像〜悪魔〜（所持数）",
     "targetFloor": "目標フロア",
-    "placeLimit": "床置き上限（冒険者像）",
+    "placeLimit": "初動の床置き上限（1F→Sの調整用）",
     "resultsTitle": "到達可能な組み合わせ（操作数の少ない順 上位10件）",
     "noResults": "該当する組み合わせがありません。床置き上限や所持数を見直してください。",
     "headers": {
