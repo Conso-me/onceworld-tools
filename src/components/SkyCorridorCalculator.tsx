@@ -939,8 +939,8 @@ export function SkyCorridorCalculator({
               <SimConfigPanel
                 cfg={simCfg}
                 setField={setSimField}
-                onReset={resetSim}
-                onReplaceAll={replaceAllSim}
+                reset={resetSim}
+                replaceAll={replaceAllSim}
               />
             </>
           ) : (
