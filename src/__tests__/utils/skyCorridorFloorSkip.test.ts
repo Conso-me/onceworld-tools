@@ -160,3 +160,78 @@ describe("enumerateFloorSkip", () => {
     }
   });
 });
+
+// ---------------------------------------------------------------------------
+// 10000F ボス階層の回避（目標 = 100000F など）
+// ---------------------------------------------------------------------------
+describe("enumerateFloorSkip - 10000Fボス階層回避", () => {
+  it("S=100,A=1 (delta=300,K=333) は k=33 で 10000F に着地するため除外", () => {
+    const results = enumerateFloorSkip({
+      adventurerStatues: 100,
+      demonStatues: 1000,
+      targetFloor: 100000,
+      placeLimit: 10,
+    });
+    const bad = results.find((r) => r.startFloor === 100 && r.demonUsed === 1);
+    expect(bad).toBeUndefined();
+  });
+
+  it("S=100,A=997 (delta=99900,K=1) は中間踏みなしで採用される", () => {
+    const results = enumerateFloorSkip({
+      adventurerStatues: 100,
+      demonStatues: 1000,
+      targetFloor: 100000,
+      placeLimit: 10,
+    });
+    const ok = results.find((r) => r.startFloor === 100 && r.demonUsed === 997);
+    expect(ok).toBeDefined();
+    expect(ok!.cycles).toBe(1);
+    expect(ok!.cycleProgress).toBe(99900);
+  });
+
+  it("S=100,A=331 (delta=33300,K=3) は中間 33400,66700 が非ボスで採用", () => {
+    const results = enumerateFloorSkip({
+      adventurerStatues: 100,
+      demonStatues: 1000,
+      targetFloor: 100000,
+      placeLimit: 10,
+    });
+    const ok = results.find((r) => r.startFloor === 100 && r.demonUsed === 331);
+    expect(ok).toBeDefined();
+    expect(ok!.cycles).toBe(3);
+  });
+
+  it("S 自体が 10000F の倍数（target でない）は除外される", () => {
+    const results = enumerateFloorSkip({
+      adventurerStatues: 100,
+      demonStatues: 1000,
+      targetFloor: 100000,
+      placeLimit: 10,
+    });
+    expect(results.find((r) => r.startFloor === 10000)).toBeUndefined();
+    expect(results.find((r) => r.startFloor === 50000)).toBeUndefined();
+  });
+
+  it("delta が 100 の倍数でない (B%100 !== 0) パターンは除外", () => {
+    // N=100, p=1, B=99 → delta=199+100A、100の倍数でない
+    const results = enumerateFloorSkip({
+      adventurerStatues: 100,
+      demonStatues: 1000,
+      targetFloor: 10000,
+      placeLimit: 10,
+    });
+    expect(results.find((r) => r.placedDuringCycle === 1)).toBeUndefined();
+  });
+
+  it("target=10000F (1万Fボス) は終点なのでサイクル末端で踏むのは OK", () => {
+    const results = enumerateFloorSkip({
+      adventurerStatues: 100,
+      demonStatues: 97,
+      targetFloor: 10000,
+      placeLimit: 10,
+    });
+    const ok = results.find((r) => r.startFloor === 100 && r.demonUsed === 97);
+    expect(ok).toBeDefined();
+    expect(ok!.cycles).toBe(1);
+  });
+});

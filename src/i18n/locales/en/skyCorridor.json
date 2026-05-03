@@ -29,7 +29,8 @@
     "cycleStepAnnihilationWithPlace": "On next floor, place {{p}} + single-side kill → +1F + {{B}} Adventurer statues = +{{advStep}}F",
     "cycleSummary": "Cycle total = +{{delta}}F",
     "noCycleNeeded": "No cycle needed (reached by initial step alone)",
-    "explanation": "Sky Corridor starts at 1F. Defeating the Sky Guardian at every 100F enables huge skips. Enter your statue counts to find combinations that land exactly on the target floor."
+    "explanation": "Sky Corridor starts at 1F. Defeating the Sky Guardian at every 100F enables huge skips. Enter your statue counts to find combinations that land exactly on the target floor.",
+    "bossNote": "* Boss floors (10000F, 20000F, ...) have no Sky Guardian, so Demon Statues don't trigger. The simulator filters out combinations that would land on a 10000F multiple mid-route (only the final target may be a boss floor)."
   },
   "modeTabs": {
     "endurance": "Endurance",

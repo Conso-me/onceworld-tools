@@ -2,17 +2,26 @@
  * 天空回廊 階層スキップシミュ
  *
  * 進行ルール:
- * - 片側殲滅で +1F 進む / 両側殲滅(左→像回収→右)で +2F + 像効果2回分
+ * - 片側殲滅で +1F + N (冒険者像所持数) 進む
+ * - 両側殲滅(左→像回収→右)で +2F + 2N - p (床置き p 個分は左で像効果から外れる)
  * - 100F毎にスカイガーディアンが出現、討伐で +99F 進む
  * - 冒険者像 N 個: 階層移動時、有効使用数 B (= N - 床置き p) の分追加で進む
  * - 悪魔像 A 個: スカイガーディアン討伐時に +100×A 階層進む
+ * - 10000F の倍数はボス階層。スカイガーディアンが出現せず悪魔像スキップ不可。
+ *   よって途中で 10000F の倍数に "land" する経路はサイクルが崩れて無効。
+ *   ただし最終目標 (targetFloor) が 10000F の倍数の場合はそこで終わるため OK。
  *
- * 1サイクル進行 (片側殲滅 + ガーディアン討伐):
- *   delta = (1 + B) + (99 + 100A) = 100 + B + 100A
+ * 1サイクル進行 (ガーディアン討伐 + 片側殲滅):
+ *   delta = (99 + 100A) + (1 + B) = 100 + B + 100A
+ *   ※ サイクル後の到達位置が 100F の倍数になるよう delta は 100 の倍数必須
+ *     → B % 100 === 0
  *
- * 1F→S F (S は 100 の倍数) へ初動 → S F→targetFloor をサイクル化:
- *   (targetFloor - S) % delta === 0 となる (S, A, p) を列挙
+ * 1F→S F (S は 100 の倍数、ボス階層 = 10000 倍数を除く) へ初動 → S F→targetFloor をサイクル化:
+ *   - (targetFloor - S) % delta === 0
+ *   - k=1..K-1 のいずれの中間位置 S+k*delta も 10000 の倍数でないこと
  */
+
+const BOSS_PERIOD = 10000;
 
 export interface FloorSkipInput {
   /** 冒険者像所持数 N */
@@ -149,6 +158,9 @@ export function enumerateFloorSkip(input: FloorSkipInput): CycleSolution[] {
   const best = new Map<string, CycleSolution>();
 
   for (let S = 100; S <= targetFloor; S += 100) {
+    // S 自体がボス階層なら、最終目標と一致する場合のみ許容
+    if (S % BOSS_PERIOD === 0 && S !== targetFloor) continue;
+
     const initialPlans = findInitialPlans(N, S, placeLimit);
     if (initialPlans.length === 0) continue;
     const initial = initialPlans[0];
@@ -172,11 +184,16 @@ export function enumerateFloorSkip(input: FloorSkipInput): CycleSolution[] {
       for (let p = 0; p <= placeLimit; p++) {
         const B = N - p;
         if (B < 0) continue;
+        // サイクル後に必ず 100F の倍数へ着地するため delta は 100 の倍数必須
+        if (B % 100 !== 0) continue;
         const delta = 100 + B + 100 * A;
         if (delta <= 0) continue;
         if (remaining % delta !== 0) continue;
         const cycles = remaining / delta;
         if (cycles < 1) continue;
+
+        // ボス階層 (10000F の倍数) を中間で踏むパスは無効
+        if (hasMidRouteBoss(S, delta, cycles)) continue;
 
         const key = `${S}-${A}`;
         const existing = best.get(key);
@@ -206,4 +223,52 @@ export function enumerateFloorSkip(input: FloorSkipInput): CycleSolution[] {
       a.startFloor - b.startFloor
   );
   return arr;
+}
+
+/**
+ * 中間サイクル (k=1..K-1) で 10000F の倍数に着地するかを判定
+ * S, delta, cycles はいずれも整数。delta は 100 の倍数前提。
+ */
+function hasMidRouteBoss(
+  startFloor: number,
+  delta: number,
+  cycles: number,
+  bossPeriod: number = BOSS_PERIOD
+): boolean {
+  if (cycles <= 1) return false;
+  // 線形合同方程式 k*delta ≡ -S (mod bossPeriod) を解く
+  const target = ((-startFloor % bossPeriod) + bossPeriod) % bossPeriod;
+  const g = gcd(delta % bossPeriod, bossPeriod);
+  if (target % g !== 0) return false; // 解なし → 中間にボスなし
+  const m = bossPeriod / g;
+  const a = (delta / g) % m;
+  const b = (target / g) % m;
+  const aInv = modInverse(a, m);
+  if (aInv === null) return false;
+  let kStar = (b * aInv) % m;
+  if (kStar <= 0) kStar += m;
+  // 解は kStar, kStar+m, kStar+2m, ... のいずれか。最小の kStar が cycles-1 以下なら BOSS 中間踏み
+  return kStar >= 1 && kStar <= cycles - 1;
+}
+
+function gcd(a: number, b: number): number {
+  let x = Math.abs(a);
+  let y = Math.abs(b);
+  while (y !== 0) {
+    [x, y] = [y, x % y];
+  }
+  return x;
+}
+
+function modInverse(a: number, m: number): number | null {
+  if (m === 1) return 0;
+  let [oldR, r] = [a, m];
+  let [oldS, s] = [1, 0];
+  while (r !== 0) {
+    const q = Math.floor(oldR / r);
+    [oldR, r] = [r, oldR - q * r];
+    [oldS, s] = [s, oldS - q * s];
+  }
+  if (oldR !== 1) return null;
+  return ((oldS % m) + m) % m;
 }
