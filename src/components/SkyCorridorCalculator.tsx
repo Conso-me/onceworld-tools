@@ -1049,6 +1049,21 @@ export function SkyCorridorCalculator({
 
       {/* ───── 右カラム: 結果テーブル ───── */}
       <div className="space-y-3">
+        {viewMode === "endurance" && (
+          <div className="bg-white rounded-2xl shadow shadow-gray-200/50 px-4 py-3 grid grid-cols-4 gap-x-2 text-center">
+            {[
+              { label: "DEF",   value: effectiveDef  },
+              { label: "M-DEF", value: effectiveMdef },
+              { label: "VIT",   value: effectiveVit  },
+              { label: "LUK",   value: effectiveLuk  },
+            ].map(({ label, value }) => (
+              <div key={label}>
+                <div className="text-xs text-gray-400">{label}</div>
+                <div className="text-sm font-semibold text-gray-700">{value > 0 ? value.toLocaleString() : "—"}</div>
+              </div>
+            ))}
+          </div>
+        )}
         {viewMode === "endurance" ? (
           <>
             <SkySection
