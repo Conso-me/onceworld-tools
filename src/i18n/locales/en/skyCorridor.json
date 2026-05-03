@@ -13,7 +13,7 @@
   "off": "OFF",
   "syncModeManual": "Manual",
   "syncModeSim": "Equipment",
-  "displayFloor": "Floor",
+  "displayFloor": "Target Floor",
   "lukEvasionLabel": "LUK (for evasion)",
   "overallMaxFloor": "Overall Max Floor",
   "sectionPhysical": "Physical Top 8",

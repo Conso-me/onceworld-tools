@@ -859,6 +859,34 @@ export function SkyCorridorCalculator({
       <div className="space-y-6 lg:space-y-2">
         <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-5 lg:space-y-3">
 
+          {/* フロア入力 */}
+          <div className="space-y-1.5">
+            <label className="block text-sm lg:text-xs font-medium text-gray-600">
+              {t("displayFloor")}
+            </label>
+            <input
+              type="text"
+              inputMode="numeric"
+              value={(() => {
+                const n = parseInt(skyFloor, 10);
+                return isNaN(n) ? "" : n.toLocaleString();
+              })()}
+              onChange={(e) => {
+                const raw = e.target.value.replace(/[^0-9]/g, "");
+                setSkyFloor(raw);
+              }}
+              onBlur={(e) => {
+                const raw = e.target.value.replace(/[^0-9]/g, "");
+                const clamped = Math.max(1, parseInt(raw || "1") || 1);
+                setSkyFloor(String(clamped));
+              }}
+              placeholder="1"
+              className="w-full px-4 py-3 lg:py-2 bg-white border border-gray-200 rounded-xl text-lg lg:text-base font-medium text-gray-800 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+            />
+          </div>
+
+          <div className="border-t border-gray-100" />
+
           {/* モード切り替えタブ */}
           <div className="flex rounded-xl overflow-hidden border border-gray-200 text-xs font-medium">
             {(["endurance", "attack"] as const).map((mode) => (
@@ -952,33 +980,6 @@ export function SkyCorridorCalculator({
             </div>
           )}
 
-          <div className="border-t border-gray-100" />
-
-          {/* フロア入力 */}
-          <div className="space-y-1.5">
-            <label className="block text-sm lg:text-xs font-medium text-gray-600">
-              {t("displayFloor")}
-            </label>
-            <input
-              type="text"
-              inputMode="numeric"
-              value={(() => {
-                const n = parseInt(skyFloor, 10);
-                return isNaN(n) ? "" : n.toLocaleString();
-              })()}
-              onChange={(e) => {
-                const raw = e.target.value.replace(/[^0-9]/g, "");
-                setSkyFloor(raw);
-              }}
-              onBlur={(e) => {
-                const raw = e.target.value.replace(/[^0-9]/g, "");
-                const clamped = Math.max(1, parseInt(raw || "1") || 1);
-                setSkyFloor(String(clamped));
-              }}
-              placeholder="1"
-              className="w-full px-4 py-3 lg:py-2 bg-white border border-gray-200 rounded-xl text-lg lg:text-base font-medium text-gray-800 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
-            />
-          </div>
         </div>
 
         {/* サマリー（耐久モード時のみ） */}
