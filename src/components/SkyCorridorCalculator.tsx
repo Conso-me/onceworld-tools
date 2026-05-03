@@ -1025,19 +1025,6 @@ export function SkyCorridorCalculator({
                   : `${overallMaxFloor.toLocaleString()}F`}
               </span>
             </div>
-            <div className="border-t border-gray-100 pt-2 mt-1 grid grid-cols-4 gap-x-2 gap-y-0.5 text-center">
-              {[
-                { label: "DEF",   value: effectiveDef  },
-                { label: "M-DEF", value: effectiveMdef },
-                { label: "VIT",   value: effectiveVit  },
-                { label: "LUK",   value: effectiveLuk  },
-              ].map(({ label, value }) => (
-                <div key={label}>
-                  <div className="text-xs text-gray-400">{label}</div>
-                  <div className="text-sm font-semibold text-gray-700">{value > 0 ? value.toLocaleString() : "—"}</div>
-                </div>
-              ))}
-            </div>
             <div className="text-xs text-gray-400 space-y-0.5 pt-1">
               <div className="flex flex-wrap gap-x-3 gap-y-0.5 items-center">
                 <span className="font-medium text-gray-500">{t("lukEvasionGuide")}</span>
@@ -1062,6 +1049,21 @@ export function SkyCorridorCalculator({
 
       {/* ───── 右カラム: 結果テーブル ───── */}
       <div className="space-y-3">
+        {viewMode === "endurance" && (
+          <div className="bg-white rounded-2xl shadow shadow-gray-200/50 px-4 py-3 grid grid-cols-4 gap-x-2 text-center">
+            {[
+              { label: "DEF",   value: effectiveDef  },
+              { label: "M-DEF", value: effectiveMdef },
+              { label: "VIT",   value: effectiveVit  },
+              { label: "LUK",   value: effectiveLuk  },
+            ].map(({ label, value }) => (
+              <div key={label}>
+                <div className="text-xs text-gray-400">{label}</div>
+                <div className="text-sm font-semibold text-gray-700">{value > 0 ? value.toLocaleString() : "—"}</div>
+              </div>
+            ))}
+          </div>
+        )}
         {viewMode === "endurance" ? (
           <>
             <SkySection
