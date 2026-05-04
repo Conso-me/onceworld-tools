@@ -217,7 +217,7 @@ export function enumerateFloorSkip(input: FloorSkipInput): CycleSolution[] {
             cycleProgress: delta,
             placedDuringCycle: 0,
             effectiveAdventurer: brought,
-            totalOperations: initial.steps.length + cycles * 2,
+            totalOperations: initial.steps.length + cycles,
             initial,
           });
         }

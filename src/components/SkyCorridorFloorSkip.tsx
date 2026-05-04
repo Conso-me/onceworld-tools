@@ -253,6 +253,7 @@ function DetailBlock({
             {t("floorSkip.cycleSummary", { delta: sol.cycleProgress.toLocaleString() })}
           </p>
         </StepBlock>
+        <OperationSummary sol={sol} />
         <StepBlock
           title={t("floorSkip.stepGoalTitle", { floor: targetFloor.toLocaleString() })}
           accent="goal"
@@ -301,6 +302,9 @@ function DetailBlock({
           <p className="text-sm text-gray-500">{t("floorSkip.noCycleNeeded")}</p>
         </StepBlock>
       )}
+
+      {/* 操作回数まとめ */}
+      <OperationSummary sol={sol} />
 
       {/* STEP 3 到達 */}
       <StepBlock
@@ -482,6 +486,25 @@ function BroughtSummary({
   );
 }
 
+
+function OperationSummary({ sol }: { sol: CycleSolution }) {
+  const initialCount = sol.initial.steps.length;
+  const cycleCount = sol.cycles;
+  const total = initialCount + cycleCount;
+
+  return (
+    <div className="rounded-lg border border-indigo-200 bg-indigo-50/40 px-3 py-2 text-sm">
+      <div className="font-semibold text-indigo-700 mb-1">操作回数まとめ</div>
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-0.5 text-gray-700">
+        {initialCount > 0 && (
+          <span>STEP1の手順 <strong>{initialCount}</strong>回</span>
+        )}
+        <span>STEP2のサイクル <strong>{cycleCount}</strong>回</span>
+        <span className="font-bold text-indigo-700">合計 {total}回</span>
+      </div>
+    </div>
+  );
+}
 
 function CycleSampleCard({
   sol,
