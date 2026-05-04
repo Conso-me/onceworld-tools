@@ -177,18 +177,21 @@ function SolutionCard({
         <div className="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 text-sm font-bold flex-shrink-0">
           {idx + 1}
         </div>
-        <div className="flex-1 grid grid-cols-2 sm:grid-cols-5 gap-x-3 gap-y-1 text-sm">
-          <Stat label={t("floorSkip.headers.startFloor")} value={`${sol.startFloor.toLocaleString()}F`} />
-          <Stat label={t("floorSkip.headers.adventurerUsed")} value={`${sol.effectiveAdventurer}`} />
-          <Stat label={t("floorSkip.headers.demonUsed")} value={`${sol.demonUsed}`} />
-          <Stat
-            label={t("floorSkip.headers.cycles")}
-            value={sol.cycles > 0 ? `${sol.cycles}` : "—"}
-          />
-          <Stat
-            label={t("floorSkip.headers.cycleProgress")}
-            value={sol.cycleProgress > 0 ? `+${sol.cycleProgress.toLocaleString()}F` : "—"}
-          />
+        <div className="flex-1 space-y-1">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-x-3 gap-y-1 text-sm">
+            <Stat label={t("floorSkip.headers.startFloor")} value={`${sol.startFloor.toLocaleString()}F`} />
+            <Stat label={t("floorSkip.headers.adventurerUsed")} value={`${sol.effectiveAdventurer}`} />
+            <Stat label={t("floorSkip.headers.demonUsed")} value={`${sol.demonUsed}`} />
+            <Stat
+              label={t("floorSkip.headers.cycles")}
+              value={sol.cycles > 0 ? `${sol.cycles}` : "—"}
+            />
+            <Stat
+              label={t("floorSkip.headers.cycleProgress")}
+              value={sol.cycleProgress > 0 ? `+${sol.cycleProgress.toLocaleString()}F` : "—"}
+            />
+          </div>
+          <OperationSummaryInline sol={sol} />
         </div>
         <div className="flex flex-col items-end gap-1 flex-shrink-0 ml-2">
           {sol.noGuardian && (
@@ -482,6 +485,22 @@ function BroughtSummary({
   );
 }
 
+
+function OperationSummaryInline({ sol }: { sol: CycleSolution }) {
+  const initialCount = sol.initial.steps.length;
+  const cycleCount = sol.cycles;
+  const total = initialCount + cycleCount;
+
+  return (
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-0 text-xs text-gray-500">
+      {initialCount > 0 && (
+        <span>STEP1の手順 <strong className="text-gray-700">{initialCount}</strong>回</span>
+      )}
+      <span>STEP2のサイクル <strong className="text-gray-700">{cycleCount}</strong>回</span>
+      <span className="font-semibold text-indigo-600">合計 {total}回</span>
+    </div>
+  );
+}
 
 function CycleSampleCard({
   sol,
