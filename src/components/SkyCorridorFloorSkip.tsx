@@ -236,6 +236,7 @@ function DetailBlock({
   if (sol.noGuardian) {
     return (
       <div className="space-y-3 text-sm text-gray-700">
+        <BroughtSummary sol={sol} t={t} />
         <StepBlock
           title={t("floorSkip.stepNoGuardianTitle", {
             count: sol.cycles,
@@ -264,6 +265,9 @@ function DetailBlock({
 
   return (
     <div className="space-y-3 text-sm text-gray-700">
+      {/* 持参像サマリー */}
+      <BroughtSummary sol={sol} t={t} />
+
       {/* STEP 1 初動 */}
       {sol.initial.steps.length > 0 && (
         <StepBlock title={t("floorSkip.stepInitialTitle", { floor: sol.startFloor })}>
@@ -390,6 +394,34 @@ function InitialStepCard({
           adv: adv.toLocaleString(),
           to: step.toFloor.toLocaleString(),
         })}
+      </div>
+    </div>
+  );
+}
+
+function BroughtSummary({
+  sol,
+  t,
+}: {
+  sol: CycleSolution;
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  return (
+    <div className="rounded-lg border-2 border-emerald-300 bg-emerald-50 px-3 py-2.5 flex flex-wrap items-center gap-x-4 gap-y-1">
+      <span className="text-xs font-bold text-emerald-800 uppercase tracking-wide">
+        🎒 {t("floorSkip.broughtTitle")}
+      </span>
+      <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-sm">
+        <span className="flex items-baseline gap-1">
+          <span className="text-gray-600">{t("floorSkip.broughtAdventurer")}:</span>
+          <strong className="text-gray-900 text-base">{sol.effectiveAdventurer}</strong>
+          <span className="text-xs text-gray-500">個</span>
+        </span>
+        <span className="flex items-baseline gap-1">
+          <span className="text-gray-600">{t("floorSkip.broughtDemon")}:</span>
+          <strong className="text-gray-900 text-base">{sol.demonUsed}</strong>
+          <span className="text-xs text-gray-500">個</span>
+        </span>
       </div>
     </div>
   );
