@@ -2300,5 +2300,22 @@
     "captureRate": 0,
     "exp": 0,
     "gold": 0
+  },
+  {
+    "name": "アルティメットアヌビス",
+    "level": 0,
+    "element": "光",
+    "attackType": "物理",
+    "vit": 3610,
+    "spd": 510,
+    "atk": 910,
+    "int": 91,
+    "def": 510,
+    "mdef": 510,
+    "luck": 510,
+    "mov": 61,
+    "captureRate": 0.1,
+    "exp": 9311400,
+    "gold": 3000000
   }
 ]

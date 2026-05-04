@@ -2980,12 +2980,12 @@
       {
         "level": 800,
         "type": "DEF%",
-        "value": null
+        "value": 200
       },
       {
         "level": 1200,
         "type": "DEF%",
-        "value": null
+        "value": 250
       }
     ]
   },
@@ -3215,6 +3215,11 @@
         "level": 121,
         "type": "DEF",
         "value": 1000000
+      },
+      {
+        "level": 181,
+        "type": "DEF",
+        "value": 10000000
       }
     ]
   },
@@ -3356,6 +3361,37 @@
         "level": 121,
         "type": "最終VIT%",
         "value": 50
+      },
+      {
+        "level": 181,
+        "type": "最終VIT%",
+        "value": 100
+      }
+    ]
+  },
+  {
+    "name": "アルティメットアヌビス",
+    "pattern": 1,
+    "skills": [
+      {
+        "level": 31,
+        "type": "ATK",
+        "value": 1000000
+      },
+      {
+        "level": 71,
+        "type": "ATK",
+        "value": 1000000
+      },
+      {
+        "level": 121,
+        "type": "ATK",
+        "value": 1000000
+      },
+      {
+        "level": 181,
+        "type": "ATK",
+        "value": 7000000
       }
     ]
   }

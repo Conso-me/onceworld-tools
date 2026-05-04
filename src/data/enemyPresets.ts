@@ -320,6 +320,15 @@ export const enemyPresetGroups: EnemyPresetGroup[] = [
     ],
   },
   {
+    mapLabel: "天空回廊",
+    mapLabelEn: "Sky Corridor",
+    label: "天空砂漠神",
+    presets: [
+      { monsterName: "アルティメットアヌビス", level: 10009900, location: "天空砂漠神" },
+      { monsterName: "禁域のアヌビシュ",       level: 10009900, location: "天空砂漠神" },
+    ],
+  },
+  {
     mapLabel: "アイスリッジ山",
     mapLabelEn: "Ice Ridge Mtn",
     label: "アイスリッジ氷葬",
