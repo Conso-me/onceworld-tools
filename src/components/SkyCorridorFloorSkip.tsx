@@ -351,7 +351,7 @@ function InitialStepCard({
     : undefined;
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
+    <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden max-w-sm">
       <div className="px-3 py-1.5 bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500">
         {step.fromFloor.toLocaleString()}F
       </div>
@@ -492,7 +492,7 @@ function CycleSampleCard({
   const placeUsed = sol.placedDuringCycle;
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
+    <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden max-w-sm">
       <div className="px-3 py-1.5 bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500">
         {cycleStart.toLocaleString()}F
       </div>
