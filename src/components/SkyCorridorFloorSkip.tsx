@@ -364,7 +364,7 @@ function InitialStepCard({
         <RoomKillRow label="左部屋" statues={leftStatues} />
         {isBoth ? (
           <>
-            <PickupRow />
+            {step.placedBefore > 0 && <PickupRow />}
             <RoomKillRow label="右部屋" statues={rightStatues!} />
           </>
         ) : (
