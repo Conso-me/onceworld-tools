@@ -341,52 +341,35 @@ function InitialStepCard({
 }) {
   const adv = step.toFloor - step.fromFloor;
   const isBoth = step.side === "both";
-  const placed = step.placedBefore > 0;
+
+  // "both": usedStatues = 2N - p → left = (used - p)/2, right = (used + p)/2
+  const leftStatues = isBoth
+    ? (step.usedStatues - step.placedBefore) / 2
+    : step.usedStatues;
+  const rightStatues = isBoth
+    ? (step.usedStatues + step.placedBefore) / 2
+    : undefined;
 
   return (
-    <div className="rounded-lg border border-gray-300 bg-white shadow-sm p-3 space-y-2">
+    <div className="rounded-lg border border-gray-200 bg-white shadow-sm p-3 space-y-2">
       <div className="text-xs font-semibold text-gray-500">
         {step.fromFloor.toLocaleString()}F
       </div>
 
-      {/* 像を置く / 置かない（明示） */}
-      {placed ? (
-        <PlacementBadge variant="emphasis">
-          📍 {t("floorSkip.actionPlace", { count: step.placedBefore })}
-        </PlacementBadge>
-      ) : (
-        <PlacementBadge variant="neutral">
-          🚫 {t("floorSkip.actionNoPlace")}
-        </PlacementBadge>
-      )}
-
-      {/* 小部屋アクション: 順序付きリスト */}
-      <ol className="space-y-1.5 text-sm text-gray-800 pl-1">
-        {isBoth ? (
-          <>
-            <li className="flex gap-2">
-              <span className="text-indigo-500 font-bold">1.</span>
-              <span>{t("floorSkip.actionKillLeft")}</span>
-            </li>
-            {placed && (
-              <li>
-                <PlacementBadge variant="emphasis">
-                  📍 {t("floorSkip.actionPickup")}
-                </PlacementBadge>
-              </li>
-            )}
-            <li className="flex gap-2">
-              <span className="text-indigo-500 font-bold">{placed ? "2." : "2."}</span>
-              <span>{t("floorSkip.actionKillRight")}</span>
-            </li>
-          </>
-        ) : (
-          <li className="flex gap-2">
-            <span className="text-indigo-500 font-bold">1.</span>
-            <span>{t("floorSkip.actionKillSingle")}</span>
-          </li>
-        )}
-      </ol>
+      <div className="flex gap-2">
+        <RoomPanel
+          label="左部屋"
+          active={true}
+          placed={step.placedBefore > 0 ? step.placedBefore : undefined}
+          statues={leftStatues}
+          pickup={isBoth && step.placedBefore > 0}
+        />
+        <RoomPanel
+          label="右部屋"
+          active={isBoth}
+          statues={rightStatues}
+        />
+      </div>
 
       <div className="border-t border-gray-200 pt-1.5 text-sm font-semibold text-indigo-700">
         {t("floorSkip.stepResultLine", {
@@ -395,6 +378,72 @@ function InitialStepCard({
           to: step.toFloor.toLocaleString(),
         })}
       </div>
+    </div>
+  );
+}
+
+function RoomPanel({
+  label,
+  active,
+  placed,
+  statues,
+  pickup,
+}: {
+  label: string;
+  active: boolean;
+  placed?: number;
+  statues?: number;
+  pickup?: boolean;
+}) {
+  if (!active) {
+    return (
+      <div className="flex-1 rounded-lg border border-dashed border-gray-200 bg-gray-50 p-2.5 flex flex-col items-center gap-1 opacity-60">
+        <span className="text-[11px] font-bold text-gray-400 tracking-wide">{label}</span>
+        <span className="text-xs font-semibold text-gray-400 line-through decoration-gray-300">
+          倒さない
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex-1 rounded-lg border border-emerald-200 bg-emerald-50/50 p-2.5 flex flex-col items-center gap-1.5">
+      <span className="text-[11px] font-bold text-gray-600 tracking-wide">{label}</span>
+      <span className="text-xs font-bold text-emerald-700">⚔ 倒す</span>
+      {placed !== undefined && (
+        <span className="text-[10px] bg-amber-100 border border-amber-300 text-amber-900 rounded px-2 py-0.5 leading-tight text-center w-full">
+          📍 像 {placed} 個置く
+        </span>
+      )}
+      {statues !== undefined && (
+        <span className="text-[10px] text-gray-400 leading-tight">
+          （冒険者像 {statues} 個）
+        </span>
+      )}
+      {pickup && (
+        <span className="text-[10px] bg-sky-100 border border-sky-200 text-sky-800 rounded px-2 py-0.5 leading-tight w-full text-center">
+          📦 像を全て回収
+        </span>
+      )}
+    </div>
+  );
+}
+
+function GuardianPanel({
+  demonUsed,
+  guardianGain,
+}: {
+  demonUsed: number;
+  guardianGain: number;
+}) {
+  return (
+    <div className="rounded-lg border border-violet-200 bg-violet-50/60 p-2.5 flex flex-col gap-0.5">
+      <span className="text-[11px] font-bold text-violet-700 uppercase tracking-wide">
+        🛡 スカイガーディアン討伐
+      </span>
+      <span className="text-xs text-violet-900">
+        +99F + 悪魔像 {demonUsed} 個効果 = +{guardianGain.toLocaleString()}F
+      </span>
     </div>
   );
 }
@@ -427,25 +476,6 @@ function BroughtSummary({
   );
 }
 
-function PlacementBadge({
-  children,
-  variant = "emphasis",
-}: {
-  children: React.ReactNode;
-  variant?: "emphasis" | "neutral";
-}) {
-  const cls =
-    variant === "emphasis"
-      ? "bg-amber-100 border-amber-300 text-amber-900"
-      : "bg-gray-100 border-gray-300 text-gray-600";
-  return (
-    <div
-      className={`inline-flex items-center border rounded-md px-2 py-1 font-semibold text-sm ${cls}`}
-    >
-      {children}
-    </div>
-  );
-}
 
 function CycleSampleCard({
   sol,
@@ -461,49 +491,27 @@ function CycleSampleCard({
   const placeUsed = sol.placedDuringCycle;
 
   return (
-    <div className="rounded-lg border border-gray-300 bg-white shadow-sm p-3 space-y-2">
+    <div className="rounded-lg border border-gray-200 bg-white shadow-sm p-3 space-y-2">
       <div className="text-xs font-semibold text-gray-500">
         {cycleStart.toLocaleString()}F
       </div>
 
-      {/* サイクル中の床置き状況 */}
-      {placeUsed > 0 ? (
-        <PlacementBadge variant="emphasis">
-          📍 {t("floorSkip.actionPlace", { count: placeUsed })}
-        </PlacementBadge>
-      ) : (
-        <PlacementBadge variant="neutral">
-          🚫 {t("floorSkip.actionNoPlace")}
-        </PlacementBadge>
-      )}
+      {/* 片側殲滅: 左右部屋パネル */}
+      <div className="flex gap-2">
+        <RoomPanel
+          label="左部屋"
+          active={true}
+          placed={placeUsed > 0 ? placeUsed : undefined}
+          statues={sol.effectiveAdventurer}
+        />
+        <RoomPanel label="右部屋" active={false} />
+      </div>
+      <div className="text-[10px] text-gray-400 text-right -mt-0.5">
+        片側殲滅 → +{annihilationGain.toLocaleString()}F
+      </div>
 
-      {/* サイクル内アクション (片側殲滅 → ガーディアン討伐の順、中間フロアは表記しない) */}
-      <ol className="space-y-1.5 text-sm text-gray-800 pl-1">
-        <li className="flex gap-2">
-          <span className="text-indigo-500 font-bold">1.</span>
-          <span>
-            {placeUsed > 0
-              ? t("floorSkip.cycleStepAnnihilationWithPlace", {
-                  p: placeUsed,
-                  B: sol.effectiveAdventurer,
-                  advStep: annihilationGain.toLocaleString(),
-                })
-              : t("floorSkip.cycleStepAnnihilation", {
-                  B: sol.effectiveAdventurer,
-                  advStep: annihilationGain.toLocaleString(),
-                })}
-          </span>
-        </li>
-        <li className="flex gap-2">
-          <span className="text-indigo-500 font-bold">2.</span>
-          <span>
-            {t("floorSkip.cycleStepGuardian", {
-              A: sol.demonUsed,
-              guard: guardianGain.toLocaleString(),
-            })}
-          </span>
-        </li>
-      </ol>
+      {/* スカイガーディアン討伐 */}
+      <GuardianPanel demonUsed={sol.demonUsed} guardianGain={guardianGain} />
 
       <div className="border-t border-gray-200 pt-1.5 text-sm font-semibold text-indigo-700">
         {t("floorSkip.cycleTotalLine", {
