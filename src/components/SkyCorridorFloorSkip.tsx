@@ -456,7 +456,6 @@ function CycleSampleCard({
 }) {
   const cycleStart = sol.startFloor;
   const guardianGain = 99 + 100 * sol.demonUsed;
-  const midFloor = cycleStart + guardianGain;
   const annihilationGain = 1 + sol.effectiveAdventurer;
   const cycleEnd = cycleStart + sol.cycleProgress;
   const placeUsed = sol.placedDuringCycle;
@@ -478,44 +477,38 @@ function CycleSampleCard({
         </PlacementBadge>
       )}
 
-      {/* サイクル内アクション */}
+      {/* サイクル内アクション (片側殲滅 → ガーディアン討伐の順、中間フロアは表記しない) */}
       <ol className="space-y-1.5 text-sm text-gray-800 pl-1">
         <li className="flex gap-2">
           <span className="text-indigo-500 font-bold">1.</span>
           <span>
-            {t("floorSkip.cycleStepGuardian", {
-              from: cycleStart.toLocaleString(),
-              A: sol.demonUsed,
-              guard: guardianGain.toLocaleString(),
-              to: midFloor.toLocaleString(),
-            })}
+            {placeUsed > 0
+              ? t("floorSkip.cycleStepAnnihilationWithPlace", {
+                  p: placeUsed,
+                  B: sol.effectiveAdventurer,
+                  advStep: annihilationGain.toLocaleString(),
+                })
+              : t("floorSkip.cycleStepAnnihilation", {
+                  B: sol.effectiveAdventurer,
+                  advStep: annihilationGain.toLocaleString(),
+                })}
           </span>
         </li>
         <li className="flex gap-2">
           <span className="text-indigo-500 font-bold">2.</span>
           <span>
-            {placeUsed > 0
-              ? t("floorSkip.cycleStepAnnihilationWithPlace", {
-                  from: midFloor.toLocaleString(),
-                  p: placeUsed,
-                  B: sol.effectiveAdventurer,
-                  advStep: annihilationGain.toLocaleString(),
-                  to: cycleEnd.toLocaleString(),
-                })
-              : t("floorSkip.cycleStepAnnihilation", {
-                  from: midFloor.toLocaleString(),
-                  B: sol.effectiveAdventurer,
-                  advStep: annihilationGain.toLocaleString(),
-                  to: cycleEnd.toLocaleString(),
-                })}
+            {t("floorSkip.cycleStepGuardian", {
+              A: sol.demonUsed,
+              guard: guardianGain.toLocaleString(),
+            })}
           </span>
         </li>
       </ol>
 
       <div className="border-t border-gray-200 pt-1.5 text-sm font-semibold text-indigo-700">
-        {t("floorSkip.stepResultLine", {
+        {t("floorSkip.cycleTotalLine", {
+          delta: sol.cycleProgress.toLocaleString(),
           from: cycleStart.toLocaleString(),
-          adv: sol.cycleProgress.toLocaleString(),
           to: cycleEnd.toLocaleString(),
         })}
       </div>
