@@ -15,6 +15,14 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-05-04",
     changes: [
+    { type: "improve", text: "fix(skyCorridor): 結果行をslateに戻し置くバッジとの色被りを解消" },
+    { type: "improve", text: "fix(skyCorridor): ステップ結果行をamberに変更" },
+    { type: "improve", text: "fix(skyCorridor): ステップ結果行をslateに変更しSTEPヘッダーと区別" },
+    { type: "improve", text: "fix(skyCorridor): StepBlock をカード枠で囲みSTEP境目を明確化" },
+    { type: "improve", text: "fix(skyCorridor): 像未設置時は回収行を非表示に" },
+    { type: "improve", text: "fix(skyCorridor): ステップカードの幅を max-w-sm に制限" },
+    { type: "improve", text: "refactor(skyCorridor): 行レイアウトに変更しアクション順を整理" },
+    { type: "feature", text: "feat(skyCorridor): 左右部屋パネルとガーディアン別枠を追加" },
     { type: "improve", text: "fix(skyCorridor): サイクル手順表示を分かりやすく整理" },
     { type: "improve", text: "fix(skyCorridor): サイクル手順を片側殲滅→ガーディアン討伐の順に変更し、合計進行Fを末尾に表示" },
     { type: "improve", text: "feat(skyCorridor): 詳細展開先頭に持参像数のサマリーを表示" },
