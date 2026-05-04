@@ -130,6 +130,7 @@ export interface SimConfig extends Record<string, unknown> {
   hasCosmoCube: boolean;
   johaneCount: number;
   johanneAltarCount: number;
+  statusTenshouCount: number;    // ステータス天晶（+10000pt/個、ヨハネ効果なし、上限1000）
   // ステータス割り振り
   allocVit: number;
   allocSpd: number;

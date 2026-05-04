@@ -12,6 +12,7 @@ export const DEFAULT_SIM_CONFIG: SimConfig = {
   hasCosmoCube: false,
   johaneCount: 0,
   johanneAltarCount: 0,
+  statusTenshouCount: 0,
   allocVit: 0, allocSpd: 0, allocAtk: 0, allocInt: 0,
   allocDef: 0, allocMdef: 0, allocLuck: 0,
   equipWeapon: "", enhWeapon: 1100,
