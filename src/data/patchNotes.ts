@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-05-05",
+    changes: [
+    { type: "feature", text: "feat(statusSim): ステータス天晶をステータスシミュレータに追加" },
+    ],
+  },
+
+  {
     date: "2026-05-04",
     changes: [
     { type: "improve", text: "fix(skyCorridor): 結果行をslateに戻し置くバッジとの色被りを解消" },
