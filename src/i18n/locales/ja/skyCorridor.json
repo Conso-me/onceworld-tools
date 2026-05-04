@@ -1,4 +1,51 @@
 {
+  "mainTabs": {
+    "damage": "被ダメシミュ",
+    "floorSkip": "階層スキップ"
+  },
+  "floorSkip": {
+    "adventurerStatues": "天空像〜冒険者〜（所持数）",
+    "demonStatues": "天空像〜悪魔〜（所持数）",
+    "targetFloor": "目標フロア",
+    "placeLimit": "床置き上限",
+    "resultsTitle": "到達可能な組み合わせ（操作数の少ない順 上位10件）",
+    "noResults": "該当する組み合わせがありません。床置き上限や所持数を見直してください。",
+    "headers": {
+      "startFloor": "初動到達",
+      "adventurerUsed": "冒険者像",
+      "demonUsed": "悪魔像",
+      "cycles": "サイクル",
+      "cycleProgress": "1サイクル進行",
+      "totalOps": "操作数"
+    },
+    "expand": "▼ 手順を見る",
+    "collapse": "▲ 閉じる",
+    "stepInitialTitle": "STEP 1　初動: 1F → {{floor}}F",
+    "stepCycleTitle": "STEP 2　{{count}}サイクル繰り返し（{{from}}F → {{to}}F）",
+    "stepGoalTitle": "STEP 3　目標 {{floor}}F 到達",
+    "stepNoGuardianTitle": "STEP 1　1F から {{count}} 回の片側殲滅で {{to}}F 到達",
+    "stepNoGuardianDetail": "各回: 片側殲滅 → +1F + 冒険者像 {{B}} 個効果 = +{{advStep}}F",
+    "noGuardianBadge": "ガーディアン討伐なし",
+    "stepLeft": "{{from}}Fで床に冒険者像 {{placed}} 個置く → 片側のみ殲滅（+{{adv}}F → {{to}}F到達）",
+    "stepBoth": "{{from}}Fで床に冒険者像 {{placed}} 個置く → 左殲滅 → 像を全て回収 → 右殲滅（合計 +{{adv}}F → {{to}}F到達）",
+    "broughtTitle": "持って行く像",
+    "broughtAdventurer": "冒険者像",
+    "broughtDemon": "悪魔像",
+    "actionPlace": "冒険者像を {{count}} 個 床に置く",
+    "actionNoPlace": "冒険者像は置かない",
+    "actionPickup": "床の像を全て回収する",
+    "actionKillSingle": "小部屋の敵を片側だけ殲滅",
+    "actionKillLeft": "左の小部屋の敵を殲滅",
+    "actionKillRight": "右の小部屋の敵を殲滅",
+    "stepResultLine": "{{from}}Fから +{{adv}}F → {{to}}Fへ到達",
+    "cycleStepGuardian": "{{from}}F でスカイガーディアン討伐 → +99F + 悪魔像 {{A}} 個効果 = +{{guard}}F → {{to}}F到達",
+    "cycleStepAnnihilation": "{{from}}F で片側殲滅 → +1F + 冒険者像 {{B}} 個効果 = +{{advStep}}F → {{to}}F到達",
+    "cycleStepAnnihilationWithPlace": "{{from}}F で床置き {{p}} 個 + 片側殲滅 → +1F + 冒険者像 {{B}} 個効果 = +{{advStep}}F → {{to}}F到達",
+    "cycleSummary": "1サイクル合計 = +{{delta}}F",
+    "cycleRepeatNote": "このサイクルを {{count}} 回繰り返して {{target}}F へ到達",
+    "noCycleNeeded": "サイクル不要（初動のみで到達）",
+    "explanation": "持っている冒険者像と悪魔像の数を入力すると、目標フロアにちょうど到達する組み合わせを列挙します。"
+  },
   "modeTabs": {
     "endurance": "耐久モード",
     "attack": "火力モード"

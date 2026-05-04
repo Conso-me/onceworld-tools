@@ -1,4 +1,51 @@
 {
+  "mainTabs": {
+    "damage": "Damage Sim",
+    "floorSkip": "Floor Skip"
+  },
+  "floorSkip": {
+    "adventurerStatues": "Adventurer Statue (owned)",
+    "demonStatues": "Demon Statue (owned)",
+    "targetFloor": "Target Floor",
+    "placeLimit": "Place Limit",
+    "resultsTitle": "Reachable Combinations (top 10 by fewest operations)",
+    "noResults": "No matching combination. Try adjusting the place limit or owned counts.",
+    "headers": {
+      "startFloor": "Initial",
+      "adventurerUsed": "Adventurer",
+      "demonUsed": "Demon",
+      "cycles": "Cycles",
+      "cycleProgress": "Per Cycle",
+      "totalOps": "Ops"
+    },
+    "expand": "▼ Show steps",
+    "collapse": "▲ Close",
+    "stepInitialTitle": "STEP 1  Initial: 1F → {{floor}}F",
+    "stepCycleTitle": "STEP 2  Repeat {{count}} cycles ({{from}}F → {{to}}F)",
+    "stepGoalTitle": "STEP 3  Reach goal {{floor}}F",
+    "stepNoGuardianTitle": "STEP 1  Chain {{count}} single-side kills from 1F → reach {{to}}F",
+    "stepNoGuardianDetail": "Each step: kill one side → +1F + {{B}} Adventurer statues = +{{advStep}}F",
+    "noGuardianBadge": "No Guardian",
+    "stepLeft": "At {{from}}F, place {{placed}} Adventurer statues → kill one side (+{{adv}}F → reach {{to}}F)",
+    "stepBoth": "At {{from}}F, place {{placed}} statues → kill left → pick up all → kill right (total +{{adv}}F → reach {{to}}F)",
+    "broughtTitle": "Statues to bring",
+    "broughtAdventurer": "Adventurer",
+    "broughtDemon": "Demon",
+    "actionPlace": "Place {{count}} Adventurer statues on the floor",
+    "actionNoPlace": "Do not place any statues",
+    "actionPickup": "Pick up all placed statues",
+    "actionKillSingle": "Kill enemies on one side only",
+    "actionKillLeft": "Kill left side enemies",
+    "actionKillRight": "Kill right side enemies",
+    "stepResultLine": "From {{from}}F, +{{adv}}F → reach {{to}}F",
+    "cycleStepGuardian": "At {{from}}F, defeat Sky Guardian → +99F + {{A}} Demon = +{{guard}}F → reach {{to}}F",
+    "cycleStepAnnihilation": "At {{from}}F, single-side kill → +1F + {{B}} Adventurer = +{{advStep}}F → reach {{to}}F",
+    "cycleStepAnnihilationWithPlace": "At {{from}}F, place {{p}} + single-side kill → +1F + {{B}} Adventurer = +{{advStep}}F → reach {{to}}F",
+    "cycleSummary": "Cycle total = +{{delta}}F",
+    "cycleRepeatNote": "Repeat this cycle {{count}} times → reach {{target}}F",
+    "noCycleNeeded": "No cycle needed (reached by initial step alone)",
+    "explanation": "Enter your owned Adventurer/Demon statues to find combinations that land exactly on the target floor."
+  },
   "modeTabs": {
     "endurance": "Endurance",
     "attack": "Firepower"
