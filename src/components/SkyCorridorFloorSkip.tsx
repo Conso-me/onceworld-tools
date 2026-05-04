@@ -351,27 +351,28 @@ function InitialStepCard({
     : undefined;
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white shadow-sm p-3 space-y-2">
-      <div className="text-xs font-semibold text-gray-500">
+    <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
+      <div className="px-3 py-1.5 bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500">
         {step.fromFloor.toLocaleString()}F
       </div>
 
-      <div className="flex gap-2">
-        <RoomPanel
-          label="左部屋"
-          active={true}
-          placed={step.placedBefore > 0 ? step.placedBefore : undefined}
-          statues={leftStatues}
-          pickup={isBoth && step.placedBefore > 0}
-        />
-        <RoomPanel
-          label="右部屋"
-          active={isBoth}
-          statues={rightStatues}
-        />
+      <div className="p-3 space-y-1.5">
+        {/* 1. 置く（最初に行動） */}
+        <PlaceRow count={step.placedBefore} />
+
+        {/* 2. 部屋アクション */}
+        <RoomKillRow label="左部屋" statues={leftStatues} />
+        {isBoth ? (
+          <>
+            <PickupRow />
+            <RoomKillRow label="右部屋" statues={rightStatues!} />
+          </>
+        ) : (
+          <RoomSkipRow label="右部屋" />
+        )}
       </div>
 
-      <div className="border-t border-gray-200 pt-1.5 text-sm font-semibold text-indigo-700">
+      <div className="px-3 py-2 bg-indigo-50 border-t border-indigo-100 text-sm font-semibold text-indigo-700">
         {t("floorSkip.stepResultLine", {
           from: step.fromFloor.toLocaleString(),
           adv: adv.toLocaleString(),
@@ -382,49 +383,48 @@ function InitialStepCard({
   );
 }
 
-function RoomPanel({
-  label,
-  active,
-  placed,
-  statues,
-  pickup,
-}: {
-  label: string;
-  active: boolean;
-  placed?: number;
-  statues?: number;
-  pickup?: boolean;
-}) {
-  if (!active) {
+function PlaceRow({ count }: { count: number }) {
+  if (count > 0) {
     return (
-      <div className="flex-1 rounded-lg border border-dashed border-gray-200 bg-gray-50 p-2.5 flex flex-col items-center gap-1 opacity-60">
-        <span className="text-[11px] font-bold text-gray-400 tracking-wide">{label}</span>
-        <span className="text-xs font-semibold text-gray-400 line-through decoration-gray-300">
-          倒さない
+      <div className="flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-300 px-3 py-2">
+        <span>📍</span>
+        <span className="text-sm font-semibold text-amber-900">
+          冒険者像を {count} 個 床に置く
         </span>
       </div>
     );
   }
-
   return (
-    <div className="flex-1 rounded-lg border border-emerald-200 bg-emerald-50/50 p-2.5 flex flex-col items-center gap-1.5">
-      <span className="text-[11px] font-bold text-gray-600 tracking-wide">{label}</span>
-      <span className="text-xs font-bold text-emerald-700">⚔ 倒す</span>
-      {placed !== undefined && (
-        <span className="text-[10px] bg-amber-100 border border-amber-300 text-amber-900 rounded px-2 py-0.5 leading-tight text-center w-full">
-          📍 像 {placed} 個置く
-        </span>
-      )}
-      {statues !== undefined && (
-        <span className="text-[10px] text-gray-400 leading-tight">
-          （冒険者像 {statues} 個）
-        </span>
-      )}
-      {pickup && (
-        <span className="text-[10px] bg-sky-100 border border-sky-200 text-sky-800 rounded px-2 py-0.5 leading-tight w-full text-center">
-          📦 像を全て回収
-        </span>
-      )}
+    <div className="flex items-center gap-2 rounded-lg bg-gray-50 border border-gray-200 px-3 py-1.5">
+      <span className="text-sm text-gray-400">像は置かない</span>
+    </div>
+  );
+}
+
+function RoomKillRow({ label, statues }: { label: string; statues: number }) {
+  return (
+    <div className="flex items-center gap-2 rounded-lg bg-emerald-50 border border-emerald-200 px-3 py-2">
+      <span className="font-bold text-emerald-600">⚔</span>
+      <span className="text-sm font-semibold text-emerald-900">{label}を殲滅</span>
+      <span className="ml-auto text-xs text-gray-500">冒険者像 {statues} 個</span>
+    </div>
+  );
+}
+
+function RoomSkipRow({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-2 rounded-lg border border-dashed border-gray-200 bg-gray-50 px-3 py-2 opacity-55">
+      <span className="font-bold text-gray-400 text-sm">✕</span>
+      <span className="text-sm text-gray-400">{label}: 倒さない</span>
+    </div>
+  );
+}
+
+function PickupRow() {
+  return (
+    <div className="flex items-center gap-2 pl-4 text-xs text-sky-700 font-medium">
+      <span>📦</span>
+      <span>床の像を全て回収する</span>
     </div>
   );
 }
@@ -437,13 +437,14 @@ function GuardianPanel({
   guardianGain: number;
 }) {
   return (
-    <div className="rounded-lg border border-violet-200 bg-violet-50/60 p-2.5 flex flex-col gap-0.5">
-      <span className="text-[11px] font-bold text-violet-700 uppercase tracking-wide">
-        🛡 スカイガーディアン討伐
-      </span>
-      <span className="text-xs text-violet-900">
-        +99F + 悪魔像 {demonUsed} 個効果 = +{guardianGain.toLocaleString()}F
-      </span>
+    <div className="rounded-lg border border-violet-200 bg-violet-50/60 px-3 py-2 flex items-center gap-2">
+      <span>🛡</span>
+      <div className="flex flex-col gap-0">
+        <span className="text-[11px] font-bold text-violet-700">スカイガーディアン討伐</span>
+        <span className="text-xs text-violet-900">
+          +99F + 悪魔像 {demonUsed} 個効果 = +{guardianGain.toLocaleString()}F
+        </span>
+      </div>
     </div>
   );
 }
@@ -491,29 +492,27 @@ function CycleSampleCard({
   const placeUsed = sol.placedDuringCycle;
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white shadow-sm p-3 space-y-2">
-      <div className="text-xs font-semibold text-gray-500">
+    <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
+      <div className="px-3 py-1.5 bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500">
         {cycleStart.toLocaleString()}F
       </div>
 
-      {/* 片側殲滅: 左右部屋パネル */}
-      <div className="flex gap-2">
-        <RoomPanel
-          label="左部屋"
-          active={true}
-          placed={placeUsed > 0 ? placeUsed : undefined}
-          statues={sol.effectiveAdventurer}
-        />
-        <RoomPanel label="右部屋" active={false} />
-      </div>
-      <div className="text-[10px] text-gray-400 text-right -mt-0.5">
-        片側殲滅 → +{annihilationGain.toLocaleString()}F
+      <div className="p-3 space-y-1.5">
+        {/* 1. 置く（最初に行動） */}
+        <PlaceRow count={placeUsed} />
+
+        {/* 2. 部屋アクション（片側殲滅） */}
+        <RoomKillRow label="左部屋" statues={sol.effectiveAdventurer} />
+        <RoomSkipRow label="右部屋" />
+        <div className="text-[10px] text-gray-400 text-right">
+          片側殲滅 → +{annihilationGain.toLocaleString()}F
+        </div>
+
+        {/* 3. スカイガーディアン討伐 */}
+        <GuardianPanel demonUsed={sol.demonUsed} guardianGain={guardianGain} />
       </div>
 
-      {/* スカイガーディアン討伐 */}
-      <GuardianPanel demonUsed={sol.demonUsed} guardianGain={guardianGain} />
-
-      <div className="border-t border-gray-200 pt-1.5 text-sm font-semibold text-indigo-700">
+      <div className="px-3 py-2 bg-indigo-50 border-t border-indigo-100 text-sm font-semibold text-indigo-700">
         {t("floorSkip.cycleTotalLine", {
           delta: sol.cycleProgress.toLocaleString(),
           from: cycleStart.toLocaleString(),
