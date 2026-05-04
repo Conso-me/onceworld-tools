@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-05-05",
     changes: [
+    { type: "feature", text: "feat(data): アルティメットアヌビスの追加とペットスキル更新" },
     { type: "improve", text: "fix(skyCorridor): ソート順を合計→STEP1→STEP2の優先順に変更" },
     { type: "improve", text: "refactor(skyCorridor): 操作回数まとめをカード折りたたみ行に移動" },
     { type: "feature", text: "feat(skyCorridor): 階層スキップシミュに操作回数まとめを追加" },
