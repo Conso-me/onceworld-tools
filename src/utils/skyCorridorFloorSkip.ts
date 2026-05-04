@@ -252,12 +252,12 @@ export function enumerateFloorSkip(input: FloorSkipInput): CycleSolution[] {
   }
 
   const arr = Array.from(best.values());
-  // ソート: 操作数が少ない順 → サイクル数が少ない順 → スタートF が小さい順
+  // ソート: 合計回数少ない順 → STEP1（初動手順）少ない順 → STEP2（サイクル）少ない順
   arr.sort(
     (a, b) =>
       a.totalOperations - b.totalOperations ||
-      a.cycles - b.cycles ||
-      a.startFloor - b.startFloor
+      a.initial.steps.length - b.initial.steps.length ||
+      a.cycles - b.cycles
   );
   return arr;
 }
