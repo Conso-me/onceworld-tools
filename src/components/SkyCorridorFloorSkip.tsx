@@ -320,14 +320,19 @@ function StepBlock({
   children?: React.ReactNode;
   accent?: "goal";
 }) {
-  const titleClass =
-    accent === "goal"
-      ? "text-base font-bold text-emerald-700"
-      : "text-sm font-bold text-indigo-700";
+  if (accent === "goal") {
+    return (
+      <div className="rounded-lg bg-emerald-50 border border-emerald-200 px-3 py-2.5">
+        <div className="text-base font-bold text-emerald-700">{title}</div>
+      </div>
+    );
+  }
   return (
-    <div className={accent === "goal" ? "border-t border-emerald-200 pt-2" : ""}>
-      <div className={titleClass}>{title}</div>
-      {children && <div className="mt-1 ml-1">{children}</div>}
+    <div className="rounded-lg border border-gray-200 overflow-hidden">
+      <div className="bg-indigo-50 border-b border-indigo-100 px-3 py-2 text-sm font-bold text-indigo-700">
+        {title}
+      </div>
+      {children && <div className="p-3">{children}</div>}
     </div>
   );
 }
