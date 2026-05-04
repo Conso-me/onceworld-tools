@@ -377,7 +377,7 @@ function InitialStepCard({
         )}
       </div>
 
-      <div className="px-3 py-2 bg-amber-50 border-t border-amber-200 text-sm font-semibold text-amber-800">
+      <div className="px-3 py-2 bg-slate-50 border-t border-slate-200 text-sm font-semibold text-slate-600">
         {t("floorSkip.stepResultLine", {
           from: step.fromFloor.toLocaleString(),
           adv: adv.toLocaleString(),
@@ -517,7 +517,7 @@ function CycleSampleCard({
         <GuardianPanel demonUsed={sol.demonUsed} guardianGain={guardianGain} />
       </div>
 
-      <div className="px-3 py-2 bg-amber-50 border-t border-amber-200 text-sm font-semibold text-amber-800">
+      <div className="px-3 py-2 bg-slate-50 border-t border-slate-200 text-sm font-semibold text-slate-600">
         {t("floorSkip.cycleTotalLine", {
           delta: sol.cycleProgress.toLocaleString(),
           from: cycleStart.toLocaleString(),
