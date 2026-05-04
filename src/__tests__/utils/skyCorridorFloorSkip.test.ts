@@ -254,15 +254,17 @@ describe("enumerateFloorSkip - 冒険者像持参数の自由列挙", () => {
     expect(sol!.placedDuringCycle).toBe(0); // サイクル中は床置きしない
   });
 
-  it("brought=0 では初動が成立しない（S=100 まで進めない）→ 結果に含まれない", () => {
+  it("brought=0 では初動付きガーディアンサイクル解は存在しない", () => {
     const results = enumerateFloorSkip({
       adventurerStatues: 100,
       demonStatues: 0,
       targetFloor: 10000,
       placeLimit: 10,
     });
+    // ガーディアン解 (noGuardian でない) で effectiveAdventurer=0 はない
+    // (1F→S F の初動が成立しないため)
     expect(
-      results.find((r) => r.effectiveAdventurer === 0)
+      results.find((r) => !r.noGuardian && r.effectiveAdventurer === 0)
     ).toBeUndefined();
   });
 
@@ -293,5 +295,73 @@ describe("enumerateFloorSkip - 冒険者像持参数の自由列挙", () => {
       expect(r.effectiveAdventurer).toBeGreaterThanOrEqual(0);
       expect(r.effectiveAdventurer).toBeLessThanOrEqual(100);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// スカイガーディアンを倒さない片側殲滅チェイン
+// ---------------------------------------------------------------------------
+describe("enumerateFloorSkip - ガーディアン討伐なしチェイン", () => {
+  it("brought=100, target=10000: 99 回の片側殲滅で到達 (noGuardian=true)", () => {
+    const results = enumerateFloorSkip({
+      adventurerStatues: 100,
+      demonStatues: 0,
+      targetFloor: 10000,
+      placeLimit: 10,
+    });
+    const sol = results.find(
+      (r) => r.noGuardian === true && r.effectiveAdventurer === 100
+    );
+    expect(sol).toBeDefined();
+    expect(sol!.cycles).toBe(99);
+    expect(sol!.cycleProgress).toBe(101); // 1 + 100
+    expect(sol!.totalOperations).toBe(99);
+    expect(sol!.demonUsed).toBe(0);
+    expect(sol!.startFloor).toBe(1);
+  });
+
+  it("brought=100, target=2000: (2000-1)/101 が整数でないので候補に入らない", () => {
+    // 1999 / 101 = 19.79... not integer
+    const results = enumerateFloorSkip({
+      adventurerStatues: 100,
+      demonStatues: 0,
+      targetFloor: 2000,
+      placeLimit: 10,
+    });
+    const sol = results.find(
+      (r) => r.noGuardian === true && r.effectiveAdventurer === 100
+    );
+    expect(sol).toBeUndefined();
+  });
+
+  it("brought=0, target=10000: 9999 回の片側殲滅でも候補に入る (但し操作数大)", () => {
+    const results = enumerateFloorSkip({
+      adventurerStatues: 0,
+      demonStatues: 0,
+      targetFloor: 10000,
+      placeLimit: 10,
+    });
+    const sol = results.find(
+      (r) => r.noGuardian === true && r.effectiveAdventurer === 0
+    );
+    expect(sol).toBeDefined();
+    expect(sol!.cycles).toBe(9999);
+    expect(sol!.cycleProgress).toBe(1);
+  });
+
+  it("noGuardian チェインは中間 10000F 倍数を踏んでもよい (ボス回避不要)", () => {
+    // brought=100, target=20100 → (20100-1)/101 = 199 cycles。
+    // 中間で k=99 のとき 1+99*101=10000F を踏むがガーディアン依存しないので OK
+    const results = enumerateFloorSkip({
+      adventurerStatues: 100,
+      demonStatues: 0,
+      targetFloor: 20100,
+      placeLimit: 10,
+    });
+    const sol = results.find(
+      (r) => r.noGuardian === true && r.effectiveAdventurer === 100
+    );
+    expect(sol).toBeDefined();
+    expect(sol!.cycles).toBe(199);
   });
 });

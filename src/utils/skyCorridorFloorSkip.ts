@@ -53,22 +53,24 @@ export interface InitialPlan {
 }
 
 export interface CycleSolution {
-  /** スタート階層 S (100の倍数) */
+  /** スタート階層 S (100の倍数)。noGuardian=true の場合は 1 (= 1Fから直接 chain) */
   startFloor: number;
-  /** 1サイクルで使う悪魔像数 A */
+  /** 1サイクルで使う悪魔像数 A (noGuardian=true なら 0) */
   demonUsed: number;
-  /** サイクル数 K */
+  /** サイクル数 K (= 片側殲滅 + ガーディアン討伐 の繰り返し回数 / noGuardian=true なら片側殲滅のみの回数) */
   cycles: number;
-  /** 1サイクルで進む階層 = 100 + B + 100A */
+  /** 1サイクルで進む階層 = 100 + B + 100A (noGuardian=true なら 1 + B) */
   cycleProgress: number;
   /** サイクル中の床置き p（B = N - p） */
   placedDuringCycle: number;
   /** サイクル中の冒険者像有効使用数 B */
   effectiveAdventurer: number;
-  /** 概算操作数（初動ステップ数 + サイクル数 × 2） */
+  /** 概算操作数（初動ステップ数 + サイクル数 × 2 / noGuardian=true なら cycles 回数そのまま） */
   totalOperations: number;
-  /** 初動 1F→S F の手順 */
+  /** 初動 1F→S F の手順 (noGuardian=true なら steps=[]) */
   initial: InitialPlan;
+  /** スカイガーディアン討伐を行わない片側殲滅チェインの場合 true */
+  noGuardian?: boolean;
 }
 
 interface FrontierState {
@@ -220,6 +222,32 @@ export function enumerateFloorSkip(input: FloorSkipInput): CycleSolution[] {
           });
         }
       }
+    }
+  }
+
+  // スカイガーディアンを討伐しない選択肢: 1F から片側殲滅のみで chain
+  // 各ステップで +1F + B 進行、1 + K*(1+B) === targetFloor となる brought, K を列挙
+  // ガーディアン討伐に依存しないため 10000F 倍数を踏んでも問題なし → boss check 不要
+  for (let brought = maxBrought; brought >= 0; brought -= 100) {
+    const stepAdv = 1 + brought;
+    if (stepAdv <= 0) continue;
+    if ((targetFloor - 1) % stepAdv !== 0) continue;
+    const K = (targetFloor - 1) / stepAdv;
+    if (K < 1) continue;
+
+    const key = `noGuard-${brought}`;
+    if (!best.has(key)) {
+      best.set(key, {
+        startFloor: 1,
+        demonUsed: 0,
+        cycles: K,
+        cycleProgress: stepAdv,
+        placedDuringCycle: 0,
+        effectiveAdventurer: brought,
+        totalOperations: K,
+        initial: { startFloor: 1, steps: [] },
+        noGuardian: true,
+      });
     }
   }
 

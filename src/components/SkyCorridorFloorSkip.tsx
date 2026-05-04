@@ -190,9 +190,16 @@ function SolutionCard({
             value={sol.cycleProgress > 0 ? `+${sol.cycleProgress.toLocaleString()}F` : "—"}
           />
         </div>
-        <span className="text-xs font-medium text-indigo-600 flex-shrink-0 ml-2">
-          {isOpen ? t("floorSkip.collapse") : t("floorSkip.expand")}
-        </span>
+        <div className="flex flex-col items-end gap-1 flex-shrink-0 ml-2">
+          {sol.noGuardian && (
+            <span className="text-[10px] font-medium text-amber-700 bg-amber-100 border border-amber-200 rounded-full px-2 py-0.5">
+              {t("floorSkip.noGuardianBadge")}
+            </span>
+          )}
+          <span className="text-xs font-medium text-indigo-600">
+            {isOpen ? t("floorSkip.collapse") : t("floorSkip.expand")}
+          </span>
+        </div>
       </button>
       {isOpen && (
         <div className="border-t border-indigo-200 px-4 py-3">
@@ -224,6 +231,35 @@ function DetailBlock({
   targetFloor: number;
 }) {
   const { t } = useTranslation("skyCorridor");
+
+  // ガーディアン討伐なしの片側殲滅チェイン
+  if (sol.noGuardian) {
+    return (
+      <div className="space-y-3 text-sm text-gray-700">
+        <StepBlock
+          title={t("floorSkip.stepNoGuardianTitle", {
+            count: sol.cycles,
+            to: targetFloor.toLocaleString(),
+          })}
+        >
+          <p className="leading-relaxed">
+            {t("floorSkip.stepNoGuardianDetail", {
+              B: sol.effectiveAdventurer,
+              advStep: sol.cycleProgress.toLocaleString(),
+            })}
+          </p>
+          <p className="mt-2 text-sm font-semibold text-indigo-700">
+            {t("floorSkip.cycleSummary", { delta: sol.cycleProgress.toLocaleString() })}
+          </p>
+        </StepBlock>
+        <StepBlock
+          title={t("floorSkip.stepGoalTitle", { floor: targetFloor.toLocaleString() })}
+          accent="goal"
+        />
+      </div>
+    );
+  }
+
   const cycleEnd = sol.startFloor + sol.cycles * sol.cycleProgress;
 
   const guardianGain = 99 + 100 * sol.demonUsed;
