@@ -271,11 +271,11 @@ function DetailBlock({
       {/* STEP 1 初動 */}
       {sol.initial.steps.length > 0 && (
         <StepBlock title={t("floorSkip.stepInitialTitle", { floor: sol.startFloor })}>
-          <ol className="list-decimal list-inside space-y-1 marker:text-indigo-500 marker:font-bold">
+          <div className="space-y-2">
             {sol.initial.steps.map((step, i) => (
-              <li key={i} className="leading-relaxed">{renderInitialStep(step, t)}</li>
+              <InitialStepCard key={i} step={step} t={t} />
             ))}
-          </ol>
+          </div>
         </StepBlock>
       )}
 
@@ -348,17 +348,69 @@ function StepBlock({
   );
 }
 
-function renderInitialStep(
-  step: InitialStep,
-  t: ReturnType<typeof useTranslation>["t"]
-): string {
+function InitialStepCard({
+  step,
+  t,
+}: {
+  step: InitialStep;
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
   const adv = step.toFloor - step.fromFloor;
-  const params = {
-    from: step.fromFloor.toLocaleString(),
-    to: step.toFloor.toLocaleString(),
-    placed: step.placedBefore,
-    adv: adv.toLocaleString(),
-  };
-  if (step.side === "both") return t("floorSkip.stepBoth", params);
-  return t("floorSkip.stepLeft", params);
+  const isBoth = step.side === "both";
+
+  return (
+    <div className="rounded-lg border border-gray-300 bg-white shadow-sm p-3 space-y-2">
+      <div className="text-xs font-semibold text-gray-500">
+        {step.fromFloor.toLocaleString()}F
+      </div>
+
+      {/* 像を置く: 強調表示 */}
+      {step.placedBefore > 0 && (
+        <PlacementBadge>
+          📍 {t("floorSkip.actionPlace", { count: step.placedBefore })}
+        </PlacementBadge>
+      )}
+
+      {/* 小部屋アクション: 順序付きリスト */}
+      <ol className="space-y-1.5 text-sm text-gray-800 pl-1">
+        {isBoth ? (
+          <>
+            <li className="flex gap-2">
+              <span className="text-indigo-500 font-bold">1.</span>
+              <span>{t("floorSkip.actionKillLeft")}</span>
+            </li>
+            <li>
+              <PlacementBadge>
+                📍 {t("floorSkip.actionPickup")}
+              </PlacementBadge>
+            </li>
+            <li className="flex gap-2">
+              <span className="text-indigo-500 font-bold">2.</span>
+              <span>{t("floorSkip.actionKillRight")}</span>
+            </li>
+          </>
+        ) : (
+          <li className="flex gap-2">
+            <span className="text-indigo-500 font-bold">1.</span>
+            <span>{t("floorSkip.actionKillSingle")}</span>
+          </li>
+        )}
+      </ol>
+
+      <div className="border-t border-gray-200 pt-1.5 text-sm font-semibold text-indigo-700">
+        {t("floorSkip.stepResultLine", {
+          adv: adv.toLocaleString(),
+          to: step.toFloor.toLocaleString(),
+        })}
+      </div>
+    </div>
+  );
+}
+
+function PlacementBadge({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="inline-flex items-center bg-amber-100 border border-amber-300 rounded-md px-2 py-1 text-amber-900 font-semibold text-sm">
+      {children}
+    </div>
+  );
 }
