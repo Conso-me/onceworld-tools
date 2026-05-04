@@ -262,10 +262,6 @@ function DetailBlock({
 
   const cycleEnd = sol.startFloor + sol.cycles * sol.cycleProgress;
 
-  const guardianGain = 99 + 100 * sol.demonUsed;
-  const advanceGain = 1 + sol.effectiveAdventurer;
-  const placeUsed = sol.placedDuringCycle;
-
   return (
     <div className="space-y-3 text-sm text-gray-700">
       {/* STEP 1 初動 */}
@@ -288,28 +284,12 @@ function DetailBlock({
             to: cycleEnd.toLocaleString(),
           })}
         >
-          <ol className="list-decimal list-inside space-y-1 marker:text-indigo-500 marker:font-bold">
-            <li className="leading-relaxed">
-              {t("floorSkip.cycleStepGuardian", {
-                A: sol.demonUsed,
-                guard: guardianGain.toLocaleString(),
-              })}
-            </li>
-            <li className="leading-relaxed">
-              {placeUsed > 0
-                ? t("floorSkip.cycleStepAnnihilationWithPlace", {
-                    p: placeUsed,
-                    B: sol.effectiveAdventurer,
-                    advStep: advanceGain.toLocaleString(),
-                  })
-                : t("floorSkip.cycleStepAnnihilation", {
-                    B: sol.effectiveAdventurer,
-                    advStep: advanceGain.toLocaleString(),
-                  })}
-            </li>
-          </ol>
-          <p className="mt-2 text-sm font-semibold text-indigo-700">
-            {t("floorSkip.cycleSummary", { delta: sol.cycleProgress.toLocaleString() })}
+          <CycleSampleCard sol={sol} t={t} />
+          <p className="mt-2 text-sm text-gray-600">
+            {t("floorSkip.cycleRepeatNote", {
+              count: sol.cycles,
+              target: cycleEnd.toLocaleString(),
+            })}
           </p>
         </StepBlock>
       ) : (
@@ -357,6 +337,7 @@ function InitialStepCard({
 }) {
   const adv = step.toFloor - step.fromFloor;
   const isBoth = step.side === "both";
+  const placed = step.placedBefore > 0;
 
   return (
     <div className="rounded-lg border border-gray-300 bg-white shadow-sm p-3 space-y-2">
@@ -364,10 +345,14 @@ function InitialStepCard({
         {step.fromFloor.toLocaleString()}F
       </div>
 
-      {/* 像を置く: 強調表示 */}
-      {step.placedBefore > 0 && (
-        <PlacementBadge>
+      {/* 像を置く / 置かない（明示） */}
+      {placed ? (
+        <PlacementBadge variant="emphasis">
           📍 {t("floorSkip.actionPlace", { count: step.placedBefore })}
+        </PlacementBadge>
+      ) : (
+        <PlacementBadge variant="neutral">
+          🚫 {t("floorSkip.actionNoPlace")}
         </PlacementBadge>
       )}
 
@@ -379,13 +364,15 @@ function InitialStepCard({
               <span className="text-indigo-500 font-bold">1.</span>
               <span>{t("floorSkip.actionKillLeft")}</span>
             </li>
-            <li>
-              <PlacementBadge>
-                📍 {t("floorSkip.actionPickup")}
-              </PlacementBadge>
-            </li>
+            {placed && (
+              <li>
+                <PlacementBadge variant="emphasis">
+                  📍 {t("floorSkip.actionPickup")}
+                </PlacementBadge>
+              </li>
+            )}
             <li className="flex gap-2">
-              <span className="text-indigo-500 font-bold">2.</span>
+              <span className="text-indigo-500 font-bold">{placed ? "2." : "2."}</span>
               <span>{t("floorSkip.actionKillRight")}</span>
             </li>
           </>
@@ -399,6 +386,7 @@ function InitialStepCard({
 
       <div className="border-t border-gray-200 pt-1.5 text-sm font-semibold text-indigo-700">
         {t("floorSkip.stepResultLine", {
+          from: step.fromFloor.toLocaleString(),
           adv: adv.toLocaleString(),
           to: step.toFloor.toLocaleString(),
         })}
@@ -407,10 +395,98 @@ function InitialStepCard({
   );
 }
 
-function PlacementBadge({ children }: { children: React.ReactNode }) {
+function PlacementBadge({
+  children,
+  variant = "emphasis",
+}: {
+  children: React.ReactNode;
+  variant?: "emphasis" | "neutral";
+}) {
+  const cls =
+    variant === "emphasis"
+      ? "bg-amber-100 border-amber-300 text-amber-900"
+      : "bg-gray-100 border-gray-300 text-gray-600";
   return (
-    <div className="inline-flex items-center bg-amber-100 border border-amber-300 rounded-md px-2 py-1 text-amber-900 font-semibold text-sm">
+    <div
+      className={`inline-flex items-center border rounded-md px-2 py-1 font-semibold text-sm ${cls}`}
+    >
       {children}
+    </div>
+  );
+}
+
+function CycleSampleCard({
+  sol,
+  t,
+}: {
+  sol: CycleSolution;
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  const cycleStart = sol.startFloor;
+  const guardianGain = 99 + 100 * sol.demonUsed;
+  const midFloor = cycleStart + guardianGain;
+  const annihilationGain = 1 + sol.effectiveAdventurer;
+  const cycleEnd = cycleStart + sol.cycleProgress;
+  const placeUsed = sol.placedDuringCycle;
+
+  return (
+    <div className="rounded-lg border border-gray-300 bg-white shadow-sm p-3 space-y-2">
+      <div className="text-xs font-semibold text-gray-500">
+        {cycleStart.toLocaleString()}F
+      </div>
+
+      {/* サイクル中の床置き状況 */}
+      {placeUsed > 0 ? (
+        <PlacementBadge variant="emphasis">
+          📍 {t("floorSkip.actionPlace", { count: placeUsed })}
+        </PlacementBadge>
+      ) : (
+        <PlacementBadge variant="neutral">
+          🚫 {t("floorSkip.actionNoPlace")}
+        </PlacementBadge>
+      )}
+
+      {/* サイクル内アクション */}
+      <ol className="space-y-1.5 text-sm text-gray-800 pl-1">
+        <li className="flex gap-2">
+          <span className="text-indigo-500 font-bold">1.</span>
+          <span>
+            {t("floorSkip.cycleStepGuardian", {
+              from: cycleStart.toLocaleString(),
+              A: sol.demonUsed,
+              guard: guardianGain.toLocaleString(),
+              to: midFloor.toLocaleString(),
+            })}
+          </span>
+        </li>
+        <li className="flex gap-2">
+          <span className="text-indigo-500 font-bold">2.</span>
+          <span>
+            {placeUsed > 0
+              ? t("floorSkip.cycleStepAnnihilationWithPlace", {
+                  from: midFloor.toLocaleString(),
+                  p: placeUsed,
+                  B: sol.effectiveAdventurer,
+                  advStep: annihilationGain.toLocaleString(),
+                  to: cycleEnd.toLocaleString(),
+                })
+              : t("floorSkip.cycleStepAnnihilation", {
+                  from: midFloor.toLocaleString(),
+                  B: sol.effectiveAdventurer,
+                  advStep: annihilationGain.toLocaleString(),
+                  to: cycleEnd.toLocaleString(),
+                })}
+          </span>
+        </li>
+      </ol>
+
+      <div className="border-t border-gray-200 pt-1.5 text-sm font-semibold text-indigo-700">
+        {t("floorSkip.stepResultLine", {
+          from: cycleStart.toLocaleString(),
+          adv: sol.cycleProgress.toLocaleString(),
+          to: cycleEnd.toLocaleString(),
+        })}
+      </div>
     </div>
   );
 }
