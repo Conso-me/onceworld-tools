@@ -320,7 +320,7 @@ function SkyMonsterRow({
       <td className="px-2 py-1.5 text-right whitespace-nowrap">
         <NullifyFloorBadge floor={result.maxNullifyFloor} onClick={onFloorClick} t={t} />
       </td>
-      <td className="px-2 py-1.5 text-right text-xs whitespace-nowrap">
+      <td className="px-2 py-1.5 text-right text-xs whitespace-nowrap tabular-nums">
         {result.isPhysical ? (
           <span className={result.nullifiedNow ? "text-green-600 font-medium" : "text-orange-600 font-medium"}>
             {result.requiredDef.toLocaleString()}
@@ -334,7 +334,7 @@ function SkyMonsterRow({
       <td className="px-2 py-1.5 text-center whitespace-nowrap">
         <LukEvasionBadge level={result.lukEvasionLevel} enemyLuk={result.scaledLuck} t={t} />
       </td>
-      <td className="px-2 py-1.5 text-right text-xs whitespace-nowrap border-l-2 border-l-gray-300">
+      <td className="px-2 py-1.5 text-right text-xs whitespace-nowrap border-l-2 border-l-gray-300 tabular-nums">
         {result.playerDamage ? (
           <span className="text-sm text-gray-700">
             {formatHitCount(result.playerDamage.min, lang)}~
@@ -343,7 +343,7 @@ function SkyMonsterRow({
           <span className="text-gray-400">—</span>
         )}
       </td>
-      <td className="px-2 py-1.5 text-right whitespace-nowrap">
+      <td className="px-2 py-1.5 text-right whitespace-nowrap tabular-nums">
         {result.attackHitRate !== null ? (
           <span
             className={`text-sm font-medium ${
@@ -509,7 +509,7 @@ function FireMonsterRow({
       <td className="px-2 py-1.5 text-right text-sm text-gray-600 whitespace-nowrap tabular-nums w-20">
         {result.scaledHp.toLocaleString()}
       </td>
-      <td className="px-2 py-1.5 text-right whitespace-nowrap w-20">
+      <td className="px-2 py-1.5 text-right whitespace-nowrap w-20 tabular-nums">
         {result.isMagicImmune ? (
           <span className="text-gray-400 text-xs">—</span>
         ) : result.playerDamageMin !== null ? (
@@ -533,7 +533,7 @@ function FireMonsterRow({
           <span className="text-orange-500 font-bold">✗</span>
         )}
       </td>
-      <td className="px-2 py-1.5 text-right whitespace-nowrap w-16">
+      <td className="px-2 py-1.5 text-right whitespace-nowrap w-16 tabular-nums">
         {result.hitRate !== null ? (
           <span
             className={`text-sm font-medium ${
@@ -1039,7 +1039,7 @@ export function SkyCorridorCalculator({
             {playerHp > 0 && (
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">HP</span>
-                <span className="text-lg font-bold text-gray-700">
+                <span className="text-lg font-bold text-gray-700 tabular-nums">
                   {playerHp.toLocaleString()}
                 </span>
               </div>
@@ -1047,7 +1047,7 @@ export function SkyCorridorCalculator({
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">{t("overallMaxFloor")}</span>
               <span
-                className={`text-lg font-bold ${
+                className={`text-lg font-bold tabular-nums ${
                   overallMaxFloor === null
                     ? "text-red-500"
                     : overallMaxFloor === Infinity
@@ -1096,7 +1096,7 @@ export function SkyCorridorCalculator({
             ].map(({ label, value }) => (
               <div key={label}>
                 <div className="text-xs text-gray-400">{label}</div>
-                <div className="text-sm font-semibold text-gray-700">{value > 0 ? value.toLocaleString() : "—"}</div>
+                <div className="text-sm font-semibold text-gray-700 tabular-nums">{value > 0 ? value.toLocaleString() : "—"}</div>
               </div>
             ))}
           </div>
