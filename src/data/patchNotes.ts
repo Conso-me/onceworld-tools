@@ -13,6 +13,23 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-05-04",
+    changes: [
+    { type: "improve", text: "feat(skyCorridor): 詳細展開先頭に持参像数のサマリーを表示" },
+    { type: "improve", text: "fix(skyCorridor): 到達表記を「Aから+XF→Bへ到達」に統一、置かない明示" },
+    { type: "improve", text: "fix(skyCorridor): 初動ステップを階層パネル化、像を置く操作を強調表示" },
+    { type: "feature", text: "feat(skyCorridor): スカイガーディアンを倒さない選択肢を追加" },
+    { type: "improve", text: "feat(skyCorridor): 初動ステップに到達フロアを表示" },
+    { type: "improve", text: "feat(skyCorridor): 冒険者像も持参数を自由列挙し結果に表示" },
+    { type: "improve", text: "fix(skyCorridor): 床置き上限を全階層に統一適用、注釈削除" },
+    { type: "improve", text: "fix(skyCorridor): 冒険者像も上限以下で自由に組み合わせ列挙" },
+    { type: "improve", text: "feat(skyCorridor): 10000Fボス階層を考慮した経路探索に対応" },
+    { type: "improve", text: "fix(skyCorridor): 階層スキップシミュのUIを見やすく改善" },
+    { type: "feature", text: "feat(skyCorridor): 階層スキップシミュを追加" },
+    ],
+  },
+
+  {
     date: "2026-05-03",
     changes: [
     { type: "improve", text: "fix(skyCorridor): 無効化済み時も必要DEF/MDEFを正しく表示" },
