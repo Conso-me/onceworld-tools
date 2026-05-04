@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-05-04",
     changes: [
+    { type: "improve", text: "fix(skyCorridor): サイクル手順表示を分かりやすく整理" },
     { type: "improve", text: "fix(skyCorridor): サイクル手順を片側殲滅→ガーディアン討伐の順に変更し、合計進行Fを末尾に表示" },
     { type: "improve", text: "feat(skyCorridor): 詳細展開先頭に持参像数のサマリーを表示" },
     { type: "improve", text: "fix(skyCorridor): 到達表記を「Aから+XF→Bへ到達」に統一、置かない明示" },
