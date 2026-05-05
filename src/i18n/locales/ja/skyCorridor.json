@@ -4,6 +4,11 @@
     "floorSkip": "階層スキップ"
   },
   "floorSkip": {
+    "subMode": {
+      "exactReach": "目標到達",
+      "maxMultiples": "X倍数踏み"
+    },
+    "multipleX": "X (倍数フロア)",
     "adventurerStatues": "天空像〜冒険者〜（所持数）",
     "demonStatues": "天空像〜悪魔〜（所持数）",
     "targetFloor": "目標フロア",
@@ -16,7 +21,8 @@
       "demonUsed": "悪魔像",
       "cycles": "サイクル",
       "cycleProgress": "1サイクル進行",
-      "totalOps": "操作数"
+      "totalOps": "操作数",
+      "landings": "{{x}}倍数踏み"
     },
     "expand": "▼ 手順を見る",
     "collapse": "▲ 閉じる",

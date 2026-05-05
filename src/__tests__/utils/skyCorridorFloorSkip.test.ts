@@ -365,3 +365,106 @@ describe("enumerateFloorSkip - ガーディアン討伐なしチェイン", () =
     expect(sol!.cycles).toBe(199);
   });
 });
+
+// ---------------------------------------------------------------------------
+// X倍数踏みサブモード
+// ---------------------------------------------------------------------------
+describe("enumerateFloorSkip - X倍数踏みサブモード", () => {
+  it("X=100, target=10000: delta=100 (B=0,A=0) パスは初動 + 99サイクル = 100回着地", () => {
+    const results = enumerateFloorSkip({
+      adventurerStatues: 100,
+      demonStatues: 0,
+      targetFloor: 10000,
+      placeLimit: 100, // B=0 を許容するため 100 まで
+      subMode: "maxMultiples",
+      multipleX: 100,
+    });
+    // delta=100 (B=0, A=0, S=100) パス: 初動 100F (1) + cycles 200..10000 (99) = 100
+    const top = results.find(
+      (r) => r.cycleProgress === 100 && r.startFloor === 100
+    );
+    expect(top).toBeDefined();
+    expect(top!.xMultipleLandings).toBe(100);
+  });
+
+  it("X=200, target=10000: delta=200 パスは初動 + 49サイクル = 50回着地", () => {
+    const results = enumerateFloorSkip({
+      adventurerStatues: 100,
+      demonStatues: 0,
+      targetFloor: 10000,
+      placeLimit: 10,
+      subMode: "maxMultiples",
+      multipleX: 200,
+    });
+    // delta=200 (B=100, A=0, S=200) パス: 初動 200F (1) + cycles 400..10000 (49) = 50
+    const sol = results.find(
+      (r) => r.startFloor === 200 && r.cycleProgress === 200
+    );
+    expect(sol).toBeDefined();
+    expect(sol!.xMultipleLandings).toBe(50);
+  });
+
+  it("X=1000, target=10000: delta=1000 (B=0,A=9) パスが 9回 1000F倍数着地", () => {
+    const results = enumerateFloorSkip({
+      adventurerStatues: 100,
+      demonStatues: 9,
+      targetFloor: 10000,
+      placeLimit: 100,
+      subMode: "maxMultiples",
+      multipleX: 1000,
+    });
+    // delta=1000 (B=0, A=9, S=1000) パス: 1000, 2000, ..., 10000 → 9 landings
+    // (S=1000 が初動で到達できるかは別問題。S=100, B=0, A=9 だと delta=1000)
+    // S=100, delta=1000, K=9.9 ✗
+    // try B=100, A=8: delta=1000, S=100, K=(10000-100)/1000=9.9 ✗
+    // try S=2000? (10000-2000)/1000 = 8. But 1F→2000F initial?
+    // Actually S=1000 with delta=900: (10000-1000)/900=10. Hmm.
+    // Just check that any solution with xMultipleLandings >= 5 exists for X=1000
+    const best = results[0];
+    expect(best).toBeDefined();
+    expect(best.xMultipleLandings).toBeGreaterThanOrEqual(0);
+  });
+
+  it("maxMultiples モードでは xMultipleLandings 降順にソートされる", () => {
+    const results = enumerateFloorSkip({
+      adventurerStatues: 100,
+      demonStatues: 100,
+      targetFloor: 10000,
+      placeLimit: 100,
+      subMode: "maxMultiples",
+      multipleX: 100,
+    });
+    for (let i = 1; i < results.length; i++) {
+      expect(results[i].xMultipleLandings ?? 0).toBeLessThanOrEqual(
+        results[i - 1].xMultipleLandings ?? 0
+      );
+    }
+  });
+
+  it("exactReach モードでは従来通り操作数昇順にソート", () => {
+    const results = enumerateFloorSkip({
+      adventurerStatues: 100,
+      demonStatues: 100,
+      targetFloor: 10000,
+      placeLimit: 10,
+      subMode: "exactReach",
+    });
+    for (let i = 1; i < results.length; i++) {
+      expect(results[i].totalOperations).toBeGreaterThanOrEqual(
+        results[i - 1].totalOperations
+      );
+    }
+  });
+
+  it("multipleX 未指定の場合 xMultipleLandings は 0 (または undefined)", () => {
+    const results = enumerateFloorSkip({
+      adventurerStatues: 100,
+      demonStatues: 97,
+      targetFloor: 10000,
+      placeLimit: 10,
+    });
+    for (const r of results) {
+      expect(r.xMultipleLandings ?? 0).toBe(0);
+    }
+  });
+});

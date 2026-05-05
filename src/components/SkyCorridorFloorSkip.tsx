@@ -5,6 +5,7 @@ import {
   enumerateFloorSkip,
   type CycleSolution,
   type InitialStep,
+  type SubMode,
 } from "../utils/skyCorridorFloorSkip";
 import { InputField } from "./ui/InputField";
 
@@ -12,6 +13,7 @@ const STATUE_MAX = 1000;
 const PLACE_LIMIT_MAX = 100;
 const TARGET_MAX = 1_000_000;
 const MAX_SOLUTIONS = 10;
+const MULTIPLE_X_MAX = 1_000_000;
 
 function parseClampedInt(raw: string, max: number, fallback: number = 0): number {
   const n = parseInt(raw || "", 10);
@@ -22,6 +24,10 @@ function parseClampedInt(raw: string, max: number, fallback: number = 0): number
 export function SkyCorridorFloorSkip() {
   const { t } = useTranslation("skyCorridor");
 
+  const [subMode, setSubMode] = usePersistedState<SubMode>(
+    "skyCorridor:floorSkip:subMode",
+    "exactReach"
+  );
   const [advRaw, setAdvRaw] = usePersistedState(
     "skyCorridor:floorSkip:adventurer",
     "100"
@@ -38,13 +44,19 @@ export function SkyCorridorFloorSkip() {
     "skyCorridor:floorSkip:placeLimit",
     "10"
   );
+  const [multipleXRaw, setMultipleXRaw] = usePersistedState(
+    "skyCorridor:floorSkip:multipleX",
+    "10000"
+  );
 
   const adventurer = parseClampedInt(advRaw, STATUE_MAX);
   const demon = parseClampedInt(demRaw, STATUE_MAX);
   const targetFloor = parseClampedInt(targetRaw, TARGET_MAX, 10000);
   const placeLimit = parseClampedInt(placeLimitRaw, PLACE_LIMIT_MAX, 10);
+  const multipleX = parseClampedInt(multipleXRaw, MULTIPLE_X_MAX, 10000);
 
   const targetIsValid = targetFloor >= 100 && targetFloor % 100 === 0;
+  const isMaxMultiples = subMode === "maxMultiples";
 
   const solutions = useMemo<CycleSolution[]>(() => {
     if (!targetIsValid) return [];
@@ -53,9 +65,20 @@ export function SkyCorridorFloorSkip() {
       demonStatues: demon,
       targetFloor,
       placeLimit,
+      subMode,
+      multipleX: isMaxMultiples ? multipleX : 0,
     });
     return all.slice(0, MAX_SOLUTIONS);
-  }, [adventurer, demon, targetFloor, placeLimit, targetIsValid]);
+  }, [
+    adventurer,
+    demon,
+    targetFloor,
+    placeLimit,
+    targetIsValid,
+    subMode,
+    multipleX,
+    isMaxMultiples,
+  ]);
 
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   const toggleExpand = (idx: number) => {
@@ -73,6 +96,23 @@ export function SkyCorridorFloorSkip() {
       <div className="space-y-6 lg:space-y-2">
         <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-5 lg:space-y-3">
 
+          {/* サブモード切り替え */}
+          <div className="flex rounded-xl overflow-hidden border border-gray-200 text-xs font-medium">
+            {(["exactReach", "maxMultiples"] as const).map((m) => (
+              <button
+                key={m}
+                onClick={() => setSubMode(m)}
+                className={`flex-1 px-3 py-2 transition-colors ${
+                  subMode === m
+                    ? "bg-indigo-500 text-white"
+                    : "bg-white text-gray-500 hover:bg-gray-50"
+                }`}
+              >
+                {t(`floorSkip.subMode.${m}`)}
+              </button>
+            ))}
+          </div>
+
           <InputField
             label={t("floorSkip.targetFloor")}
             value={targetRaw}
@@ -81,6 +121,16 @@ export function SkyCorridorFloorSkip() {
             max={TARGET_MAX}
             showReset
           />
+          {isMaxMultiples && (
+            <InputField
+              label={t("floorSkip.multipleX")}
+              value={multipleXRaw}
+              onChange={setMultipleXRaw}
+              placeholder="10000"
+              max={MULTIPLE_X_MAX}
+              showReset
+            />
+          )}
           <InputField
             label={t("floorSkip.adventurerStatues")}
             value={advRaw}
@@ -134,6 +184,8 @@ export function SkyCorridorFloorSkip() {
                     idx={idx}
                     sol={sol}
                     targetFloor={targetFloor}
+                    showLandings={isMaxMultiples}
+                    multipleX={multipleX}
                     isOpen={isOpen}
                     toggle={toggleExpand}
                   />
@@ -151,12 +203,16 @@ function SolutionCard({
   idx,
   sol,
   targetFloor,
+  showLandings,
+  multipleX,
   isOpen,
   toggle,
 }: {
   idx: number;
   sol: CycleSolution;
   targetFloor: number;
+  showLandings: boolean;
+  multipleX: number;
   isOpen: boolean;
   toggle: (idx: number) => void;
 }) {
@@ -181,10 +237,17 @@ function SolutionCard({
           <Stat label={t("floorSkip.headers.startFloor")} value={`${sol.startFloor.toLocaleString()}F`} />
           <Stat label={t("floorSkip.headers.adventurerUsed")} value={`${sol.effectiveAdventurer}`} />
           <Stat label={t("floorSkip.headers.demonUsed")} value={`${sol.demonUsed}`} />
-          <Stat
-            label={t("floorSkip.headers.cycles")}
-            value={sol.cycles > 0 ? `${sol.cycles}` : "—"}
-          />
+          {showLandings ? (
+            <Stat
+              label={t("floorSkip.headers.landings", { x: multipleX.toLocaleString() })}
+              value={`${sol.xMultipleLandings ?? 0}`}
+            />
+          ) : (
+            <Stat
+              label={t("floorSkip.headers.cycles")}
+              value={sol.cycles > 0 ? `${sol.cycles}` : "—"}
+            />
+          )}
           <Stat
             label={t("floorSkip.headers.cycleProgress")}
             value={sol.cycleProgress > 0 ? `+${sol.cycleProgress.toLocaleString()}F` : "—"}

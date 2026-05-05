@@ -23,6 +23,8 @@
 
 const BOSS_PERIOD = 10000;
 
+export type SubMode = "exactReach" | "maxMultiples";
+
 export interface FloorSkipInput {
   /** 冒険者像所持数 N */
   adventurerStatues: number;
@@ -32,6 +34,10 @@ export interface FloorSkipInput {
   targetFloor: number;
   /** 床置き上限（冒険者像のみ対象） */
   placeLimit: number;
+  /** サブモード: "exactReach" = 最少操作, "maxMultiples" = X倍数踏み回数最大 */
+  subMode?: SubMode;
+  /** X倍数踏みモードでの X 値（multipleX > 0 で有効） */
+  multipleX?: number;
 }
 
 export type AnnihilationSide = "left" | "right" | "both";
@@ -71,6 +77,8 @@ export interface CycleSolution {
   initial: InitialPlan;
   /** スカイガーディアン討伐を行わない片側殲滅チェインの場合 true */
   noGuardian?: boolean;
+  /** 経路上の X倍数着地回数（multipleX 指定時のみ非0、初動 + サイクル全体） */
+  xMultipleLandings?: number;
 }
 
 interface FrontierState {
@@ -160,16 +168,18 @@ export function enumerateFloorSkip(input: FloorSkipInput): CycleSolution[] {
   if (targetFloor < 100 || targetFloor % 100 !== 0) return [];
   if (placeLimit < 0) return [];
 
-  // (S, A, B) 単位で最小サイクル数を保持
+  // (S, A, B) 単位で最小操作数を保持
   const best = new Map<string, CycleSolution>();
 
   // 冒険者像・悪魔像は入力値を上限として、倉庫から好きな数だけ持ち出して挑戦できる
-  // → サイクル中の有効使用数 B (= 持参数) を 100 の倍数で 0..N まで全列挙
-  // 床置きは初動 (1F→S) のみで使用、サイクル中は床置きしない (placed=0)
+  // 持参数 brought ∈ {0, 100, ..., N}、サイクル中の床置き p_cycle ∈ [0, placeLimit]
+  // サイクル有効数 B = brought - p_cycle (B%100=0 必須)
+  // brought を大きい順に走査し、同じ (S, A, B) では最初に見つかったエントリ (= brought 最大) を採用
   const maxBrought = Math.floor(N / 100) * 100;
 
   for (let brought = maxBrought; brought >= 0; brought -= 100) {
     const initialCap = Math.min(placeLimit, brought);
+    const maxPCycle = Math.min(placeLimit, brought);
 
     for (let S = 100; S <= targetFloor; S += 100) {
       // S 自体がボス階層なら、最終目標と一致する場合のみ許容
@@ -181,7 +191,7 @@ export function enumerateFloorSkip(input: FloorSkipInput): CycleSolution[] {
       const remaining = targetFloor - S;
 
       if (remaining === 0) {
-        const key = `${S}-0-${brought}`;
+        const key = `${S}-0-${brought}-0`;
         if (!best.has(key)) {
           best.set(key, {
             startFloor: S,
@@ -198,28 +208,33 @@ export function enumerateFloorSkip(input: FloorSkipInput): CycleSolution[] {
       }
 
       for (let A = 0; A <= M; A++) {
-        const delta = 100 + brought + 100 * A;
-        if (delta <= 0) continue;
-        if (remaining % delta !== 0) continue;
-        const cycles = remaining / delta;
-        if (cycles < 1) continue;
+        for (let pCycle = 0; pCycle <= maxPCycle; pCycle += 100) {
+          const B = brought - pCycle;
+          if (B < 0) break;
+          const delta = 100 + B + 100 * A;
+          if (delta <= 0) continue;
+          if (remaining % delta !== 0) continue;
+          const cycles = remaining / delta;
+          if (cycles < 1) continue;
 
-        // ボス階層 (10000F の倍数) を中間で踏むパスは無効
-        if (hasMidRouteBoss(S, delta, cycles)) continue;
+          // ボス階層 (10000F の倍数) を中間で踏むパスは無効
+          if (hasMidRouteBoss(S, delta, cycles)) continue;
 
-        const key = `${S}-${A}-${brought}`;
-        const existing = best.get(key);
-        if (!existing || cycles < existing.cycles) {
-          best.set(key, {
-            startFloor: S,
-            demonUsed: A,
-            cycles,
-            cycleProgress: delta,
-            placedDuringCycle: 0,
-            effectiveAdventurer: brought,
-            totalOperations: initial.steps.length + cycles * 2,
-            initial,
-          });
+          // dedup by (S, A, B) — brought 最大の entry を保持 (= 初動最少)
+          const key = `${S}-${A}-${B}`;
+          const existing = best.get(key);
+          if (!existing) {
+            best.set(key, {
+              startFloor: S,
+              demonUsed: A,
+              cycles,
+              cycleProgress: delta,
+              placedDuringCycle: pCycle,
+              effectiveAdventurer: B,
+              totalOperations: initial.steps.length + cycles * 2,
+              initial,
+            });
+          }
         }
       }
     }
@@ -252,14 +267,56 @@ export function enumerateFloorSkip(input: FloorSkipInput): CycleSolution[] {
   }
 
   const arr = Array.from(best.values());
-  // ソート: 操作数が少ない順 → サイクル数が少ない順 → スタートF が小さい順
-  arr.sort(
-    (a, b) =>
-      a.totalOperations - b.totalOperations ||
-      a.cycles - b.cycles ||
-      a.startFloor - b.startFloor
-  );
+
+  // X倍数踏み数を計算（multipleX > 0 のとき）
+  const X = input.multipleX && input.multipleX > 0 ? input.multipleX : 0;
+  if (X > 0) {
+    for (const sol of arr) {
+      sol.xMultipleLandings = countXMultipleLandings(sol, X);
+    }
+  }
+
+  const subMode: SubMode = input.subMode ?? "exactReach";
+  if (subMode === "maxMultiples" && X > 0) {
+    // X倍数踏み回数 desc → 操作数 asc → サイクル数 asc → スタートF asc
+    arr.sort(
+      (a, b) =>
+        (b.xMultipleLandings ?? 0) - (a.xMultipleLandings ?? 0) ||
+        a.totalOperations - b.totalOperations ||
+        a.cycles - b.cycles ||
+        a.startFloor - b.startFloor
+    );
+  } else {
+    // 既定: 操作数が少ない順 → サイクル数が少ない順 → スタートF が小さい順
+    arr.sort(
+      (a, b) =>
+        a.totalOperations - b.totalOperations ||
+        a.cycles - b.cycles ||
+        a.startFloor - b.startFloor
+    );
+  }
   return arr;
+}
+
+/**
+ * 経路上で X の倍数フロアに着地する回数を数える
+ * 初動の各ステップ末 + サイクル末 (k=1..K) を対象とする
+ */
+function countXMultipleLandings(sol: CycleSolution, X: number): number {
+  if (X <= 0) return 0;
+  let count = 0;
+  // 初動ステップ末の着地
+  for (const step of sol.initial.steps) {
+    if (step.toFloor % X === 0) count++;
+  }
+  // サイクル末 / noGuardian チェインの各ステップ末の着地
+  if (sol.cycles > 0 && sol.cycleProgress > 0) {
+    const baseFloor = sol.noGuardian ? 1 : sol.startFloor;
+    for (let k = 1; k <= sol.cycles; k++) {
+      if ((baseFloor + k * sol.cycleProgress) % X === 0) count++;
+    }
+  }
+  return count;
 }
 
 /**

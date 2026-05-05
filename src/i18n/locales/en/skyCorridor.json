@@ -4,6 +4,11 @@
     "floorSkip": "Floor Skip"
   },
   "floorSkip": {
+    "subMode": {
+      "exactReach": "Exact Target",
+      "maxMultiples": "Max X-Multiples"
+    },
+    "multipleX": "X (multiple floor)",
     "adventurerStatues": "Adventurer Statue (owned)",
     "demonStatues": "Demon Statue (owned)",
     "targetFloor": "Target Floor",
@@ -16,7 +21,8 @@
       "demonUsed": "Demon",
       "cycles": "Cycles",
       "cycleProgress": "Per Cycle",
-      "totalOps": "Ops"
+      "totalOps": "Ops",
+      "landings": "{{x}}-Multi Hits"
     },
     "expand": "▼ Show steps",
     "collapse": "▲ Close",
