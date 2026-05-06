@@ -27,8 +27,9 @@ const FEATURES: Record<string, Feature[]> = {
       icon: "⚔",
       title: "ダメージ計算",
       points: [
-        "物理・魔弾・魔攻・魔法の4種の攻撃手段に対応",
+        "物理・魔弾・魔法の3種の攻撃手段に対応",
         "与ダメ・被ダメ・確殺回数・命中率を一括計算",
+        "オーバーキル判定：必要INTと魔晶立方体数の達成状況を確認できる",
         "複数モンスターをリスト表示して一括比較できる",
         "ステータス手動入力 or ステータス計算タブの装備設定と連携",
         "ペット攻撃切り替えでペット主体のダメージ計算も可能",
@@ -102,14 +103,25 @@ const FEATURES: Record<string, Feature[]> = {
         "登録データはJSONでエクスポート・インポート可能",
       ],
     },
+    {
+      icon: "🔧",
+      title: "ヘッダーのメニューについて",
+      points: [
+        "【装備確認】現在の装備・アクセ・ステータス割り振りを一覧表示。テキストコピーで他の人への情報共有に便利",
+        "【更新履歴】ツールの修正・機能追加・改善のパッチノートを確認できる",
+        "【フィードバック】バグ報告や機能要望はこちらのフォームから送れます",
+        "【機能説明】このガイドはいつでもヘッダーのボタンから開ける",
+      ],
+    },
   ],
   en: [
     {
       icon: "⚔",
       title: "Damage Calculator",
       points: [
-        "Supports 4 attack types: physical, magic bullet, magic ATK, and spell",
+        "Supports 3 attack types: physical, magic bullet, and spell",
         "Calculates dealt damage, received damage, kill count, and hit rate",
+        "Overkill check: shows required INT and crystal cube count to reach the threshold",
         "Compare multiple monsters side-by-side in list view",
         "Manual stat input or sync with equipment settings from Status tab",
         "Switch to pet mode for pet-based damage calculation",
@@ -183,6 +195,16 @@ const FEATURES: Record<string, Feature[]> = {
         "Export and import your registered monsters as JSON",
       ],
     },
+    {
+      icon: "🔧",
+      title: "Header Menu",
+      points: [
+        "[Equipment] Shows your current equipment, accessories, and stat allocation at a glance — use the text copy button to share your setup with others",
+        "[Patch Notes] View the history of fixes, new features, and improvements",
+        "[Feedback] Use the form to report bugs or request features",
+        "[Features] This guide can be reopened anytime from the header button",
+      ],
+    },
   ],
 };
 
@@ -220,7 +242,7 @@ export function FeatureGuideModal({ onClose }: { onClose: () => void }) {
       onClick={handleClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-sm flex flex-col h-[400px]"
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-md flex flex-col h-[560px]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ヘッダー */}
