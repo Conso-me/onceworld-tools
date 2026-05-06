@@ -11,6 +11,7 @@ import { PetBattleSimulator } from "./components/PetBattleSimulator";
 import { TabNav, type Tab } from "./components/ui/TabNav";
 import { PatchNotesModal } from "./components/PatchNotesModal";
 import { EquipmentSummaryModal } from "./components/ui/EquipmentSummaryModal";
+import { FeatureGuideModal, useFeatureGuide } from "./components/FeatureGuideModal";
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -46,6 +47,7 @@ function App() {
   });
   const [showPatchNotes, setShowPatchNotes] = useState(false);
   const [showEquipSummary, setShowEquipSummary] = useState(false);
+  const featureGuide = useFeatureGuide();
 
   const handleTabChange = useCallback((tabId: string) => {
     setActiveTab(tabId);
@@ -77,6 +79,12 @@ function App() {
             <h1 className="text-xl font-bold text-indigo-900 tracking-wide whitespace-nowrap">⚔ OnceWorld Tools</h1>
             <div className="flex items-center gap-1.5">
               {/* Desktop: フィードバック・更新履歴を直接表示 */}
+              <button
+                onClick={() => featureGuide.open()}
+                className="hidden sm:inline-flex text-xs px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors font-medium"
+              >
+                {t("featureGuide")}
+              </button>
               <a
                 href="https://docs.google.com/forms/d/e/1FAIpQLSf6NFySGmPNkQdFJEIwk11gtyvfiFVoJdwUVlwQ3MkN-vNHcg/viewform?usp=dialog"
                 target="_blank"
@@ -108,6 +116,12 @@ function App() {
                 </button>
                 {mobileMenuOpen && (
                   <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-20 py-1 min-w-[140px]">
+                    <button
+                      onClick={() => { featureGuide.open(); setMobileMenuOpen(false); }}
+                      className="w-full text-left px-4 py-2.5 text-sm text-indigo-600 hover:bg-gray-50"
+                    >
+                      {t("featureGuide")}
+                    </button>
                     <a
                       href="https://docs.google.com/forms/d/e/1FAIpQLSf6NFySGmPNkQdFJEIwk11gtyvfiFVoJdwUVlwQ3MkN-vNHcg/viewform?usp=dialog"
                       target="_blank"
@@ -189,6 +203,7 @@ function App() {
 
       {showPatchNotes && <PatchNotesModal onClose={() => setShowPatchNotes(false)} />}
       {showEquipSummary && <EquipmentSummaryModal onClose={() => setShowEquipSummary(false)} />}
+      {featureGuide.show && <FeatureGuideModal onClose={featureGuide.close} />}
     </div>
   );
 }
