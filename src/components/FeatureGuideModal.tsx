@@ -186,8 +186,7 @@ export function FeatureGuideModal({ onClose }: { onClose: () => void }) {
       onClick={handleClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-sm flex flex-col"
-        style={{ minHeight: "360px" }}
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-sm flex flex-col h-[400px]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ヘッダー */}
@@ -205,7 +204,7 @@ export function FeatureGuideModal({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* フィーチャーページ */}
-        <div className="flex-1 px-5 pb-2">
+        <div className="flex-1 px-5 pb-2 overflow-y-auto">
           <div className="text-4xl mb-3">{feature.icon}</div>
           <h2 className="text-lg font-bold text-gray-800 mb-3">{feature.title}</h2>
           <ul className="space-y-2">
