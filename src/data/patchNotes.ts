@@ -13,6 +13,16 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-05-06",
+    changes: [
+    { type: "fix", text: "feat(featureGuide): モーダル拡大・ヘッダーメニューページ追加・ダメ計説明修正" },
+    { type: "feature", text: "docs(featureGuide): 実装ベースの正確な説明文に書き直し" },
+    { type: "fix", text: "fix: 機能説明モーダルの高さを固定してページ間でサイズが変わらないよう修正" },
+    { type: "feature", text: "feat: 機能説明モーダルを追加 (close #161)" },
+    ],
+  },
+
+  {
     date: "2026-05-05",
     changes: [
     { type: "feature", text: "feat(data): アルティメットアヌビスの追加とペットスキル更新" },
