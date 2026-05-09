@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-05-09",
+    changes: [
+    { type: "fix", text: "fix(mobile): スマホで数値入力欄が狭すぎる問題を修正 (close #163)" },
+    ],
+  },
+
+  {
     date: "2026-05-06",
     changes: [
     { type: "fix", text: "feat(featureGuide): モーダル拡大・ヘッダーメニューページ追加・ダメ計説明修正" },
