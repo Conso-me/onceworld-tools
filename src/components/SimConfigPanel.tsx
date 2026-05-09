@@ -436,23 +436,23 @@ function EquipSelector({
   return (
     <div className="space-y-1.5">
       <span className="text-xs text-gray-500 font-medium">{slotLabel}</span>
-      <div className="flex gap-2 items-center">
+      <div className="flex flex-col sm:flex-row gap-1.5 sm:gap-2 sm:items-center">
         <button
           type="button"
           onClick={() => setModalOpen(true)}
-          className="flex-1 text-left border border-gray-200 rounded-lg px-3 py-1.5 text-xs bg-white hover:bg-gray-50 transition-colors min-w-0"
+          className="w-full sm:flex-1 text-left border border-gray-200 rounded-lg px-3 py-1.5 text-xs bg-white hover:bg-gray-50 transition-colors min-w-0"
         >
           {!isNone
             ? <span className="text-gray-700 truncate block">{isEn ? (item?.nameEn ?? selectedName) : selectedName}</span>
             : <span className="text-gray-400">{t("common:noneTapToSelect")}</span>
           }
         </button>
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex items-center gap-1 sm:shrink-0">
           <span className="text-xs text-gray-400">+</span>
           <SmallNumInput
             value={enhVal} onChange={onEnhChange} min={0} max={1100}
             disabled={!canEnhance}
-            className="w-16 border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:bg-gray-50 disabled:text-gray-300"
+            className="flex-1 sm:w-16 border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:bg-gray-50 disabled:text-gray-300"
           />
           <button onClick={() => onEnhChange(1100)} disabled={!canEnhance} className={maxBtnCls}>MAX</button>
         </div>
@@ -604,23 +604,23 @@ function AccSelector({
   return (
     <div className="space-y-1.5">
       <span className="text-xs text-gray-500 font-medium">{slotLabel}</span>
-      <div className="flex gap-2 items-center">
+      <div className="flex flex-col sm:flex-row gap-1.5 sm:gap-2 sm:items-center">
         <button
           type="button"
           onClick={() => setModalOpen(true)}
-          className="flex-1 text-left border border-gray-200 rounded-lg px-3 py-1.5 text-xs bg-white hover:bg-gray-50 transition-colors min-w-0"
+          className="w-full sm:flex-1 text-left border border-gray-200 rounded-lg px-3 py-1.5 text-xs bg-white hover:bg-gray-50 transition-colors min-w-0"
         >
           {accName
             ? <span className="text-gray-700 truncate block">{isEn ? (accItem?.nameEn ?? accName) : accName}</span>
             : <span className="text-gray-400">{t("common:noneTapToSelect")}</span>
           }
         </button>
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex items-center gap-1 sm:shrink-0">
           <span className="text-xs text-gray-400">Lv</span>
           <SmallNumInput
             value={accLevel} onChange={onLevelChange} min={1} max={effMax}
             disabled={!accName}
-            className="w-16 border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:bg-gray-50 disabled:text-gray-300"
+            className="flex-1 sm:w-16 border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:bg-gray-50 disabled:text-gray-300"
           />
           <button
             onClick={() => onLevelChange(effMax)}
@@ -1072,7 +1072,7 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
                 </button>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-x-2 gap-y-1.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-2 gap-y-1.5">
               {ALLOC_KEYS.map(({ cfg: cfgKey, label }) => {
                 const val = cfg[cfgKey] as number;
                 const over = val > perStatLimit;
