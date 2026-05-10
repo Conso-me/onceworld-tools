@@ -2317,5 +2317,39 @@
     "captureRate": 0.1,
     "exp": 9311400,
     "gold": 3000000
+  },
+  {
+    "name": "だいこんに見えないだいこん",
+    "level": 0,
+    "element": "木",
+    "attackType": "魔弾",
+    "vit": 910,
+    "spd": 215,
+    "atk": 115,
+    "int": 415,
+    "def": 315,
+    "mdef": 515,
+    "luck": 415,
+    "mov": 0,
+    "captureRate": 1,
+    "exp": 0,
+    "gold": 0
+  },
+  {
+    "name": "ハイパーギガント",
+    "level": 0,
+    "element": "火",
+    "attackType": "物理",
+    "vit": 1210,
+    "spd": 333,
+    "atk": 333,
+    "int": 333,
+    "def": 333,
+    "mdef": 333,
+    "luck": 333,
+    "mov": 39,
+    "captureRate": 1,
+    "exp": 0,
+    "gold": 0
   }
 ]
