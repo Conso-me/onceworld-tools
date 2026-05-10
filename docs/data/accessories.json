@@ -490,5 +490,58 @@
       }
     ],
     "nameEn": "Band of Seven Principles"
+  },
+  {
+    "name": "風律瓶",
+    "maxLevel": 10,
+    "effects": [
+      {
+        "type": "ATK%",
+        "value": 200,
+        "scalePercent": 2
+      },
+      {
+        "type": "SPD%",
+        "value": 200,
+        "scalePercent": 2
+      }
+    ],
+    "nameEn": null
+  },
+  {
+    "name": "ルクスチャーム",
+    "maxLevel": 10,
+    "effects": [
+      {
+        "type": "LUCK%",
+        "value": 300,
+        "scalePercent": 3
+      }
+    ],
+    "nameEn": null
+  },
+  {
+    "name": "リジェネコア",
+    "maxLevel": 1,
+    "effects": [
+      {
+        "type": "HP回復",
+        "value": 5,
+        "scalePercent": 0
+      }
+    ],
+    "nameEn": null
+  },
+  {
+    "name": "学命書",
+    "maxLevel": 2000,
+    "effects": [
+      {
+        "type": "経験値",
+        "value": 100,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": null
   }
 ]
