@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-05-10",
+    changes: [
+    { type: "feature", text: "feat(data): 深淵回廊27F・武器・アクセ・モンスターを追加" },
+    ],
+  },
+
+  {
     date: "2026-05-09",
     changes: [
     { type: "fix", text: "fix(mobile): スマホで数値入力欄が狭すぎる問題を修正 (close #163)" },
