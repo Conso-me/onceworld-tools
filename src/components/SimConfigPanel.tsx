@@ -432,6 +432,7 @@ function EquipSelector({
   const item = selectedName ? getEquipmentByName(selectedName) : undefined;
   const canEnhance = item ? item.material !== "強化できない" : false;
   const isNone = !selectedName || selectedName === "なし";
+  const previewMode = localStorage.getItem('ow_preview') === '1';
 
   return (
     <div className="space-y-1.5">
@@ -450,7 +451,7 @@ function EquipSelector({
         <div className="flex items-center gap-1 sm:shrink-0">
           <span className="text-xs text-gray-400">+</span>
           <SmallNumInput
-            value={enhVal} onChange={onEnhChange} min={0} max={1100}
+            value={enhVal} onChange={onEnhChange} min={0} max={previewMode ? undefined : 1100}
             disabled={!canEnhance}
             className="flex-1 sm:w-16 border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:bg-gray-50 disabled:text-gray-300"
           />
