@@ -543,5 +543,29 @@
       }
     ],
     "nameEn": null
+  },
+  {
+    "name": "冥護紋",
+    "maxLevel": 100,
+    "effects": [
+      {
+        "type": "DEF%",
+        "value": 500,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": null
+  },
+  {
+    "name": "反映鏡",
+    "maxLevel": 100,
+    "effects": [
+      {
+        "type": "M-DEF%",
+        "value": 500,
+        "scalePercent": 1
+      }
+    ],
+    "nameEn": null
   }
 ]
