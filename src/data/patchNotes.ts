@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-05-14",
+    changes: [
+    { type: "feature", text: "feat(data): 天空交換アクセ「冥護紋」「反映鏡」を追加" },
+    ],
+  },
+
+  {
     date: "2026-05-10",
     changes: [
     { type: "feature", text: "feat(data): 深淵回廊27F・武器・アクセ・モンスターを追加" },
