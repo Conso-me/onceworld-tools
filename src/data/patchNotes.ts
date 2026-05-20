@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-05-20",
+    changes: [
+    { type: "feature", text: "feat(sim): 装備の金強化（ゴールド強化）をシミュレータに追加" },
+    ],
+  },
+
+  {
     date: "2026-05-14",
     changes: [
     { type: "feature", text: "feat(data): 天空交換アクセ「冥護紋」「反映鏡」を追加" },
