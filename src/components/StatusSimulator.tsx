@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { usePersistedState, usePersistedGroup } from "../hooks/usePersistedState";
 import { useStatPresets } from "../hooks/useStatPresets";
 import { useSharedSimConfig, DEFAULT_SIM_CONFIG } from "../hooks/useSharedSimConfig";
-import { calcStatus } from "../utils/statusCalc";
+import { calcStatus, calcGoldEnhCost } from "../utils/statusCalc";
 import type { SimConfig } from "../types/game";
 import { SimConfigPanel, STAT_LABELS } from "./SimConfigPanel";
 
@@ -129,6 +129,18 @@ function CompareTable({ resultA, resultB }: { resultA: ReturnType<typeof calcSta
   );
 }
 
+function GoldEnhCostBadge({ cfg, label }: { cfg: SimConfig; label?: string }) {
+  const cost = calcGoldEnhCost(cfg);
+  if (cost <= 0) return null;
+  return (
+    <div className="flex items-center gap-2 text-xs text-yellow-700 bg-yellow-50 border border-yellow-200 rounded-lg px-3 py-2">
+      {label && <span className="font-medium text-yellow-600">{label}</span>}
+      <span>金強化コスト合計</span>
+      <span className="font-mono font-semibold ml-auto">{cost.toLocaleString()} G</span>
+    </div>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function StatusSimulator() {
@@ -235,13 +247,17 @@ export function StatusSimulator() {
           </div>
         )}
 
+        {!compareMode && <GoldEnhCostBadge cfg={cfgA} />}
+
         {compareMode && (
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-blue-50 rounded-xl border border-blue-100 p-4">
+            <div className="bg-blue-50 rounded-xl border border-blue-100 p-4 space-y-3">
               <StatTable breakdown={resultA} label={t("configBreakdown", { id: "A" })} />
+              <GoldEnhCostBadge cfg={cfgA} label="A" />
             </div>
-            <div className="bg-orange-50 rounded-xl border border-orange-100 p-4">
+            <div className="bg-orange-50 rounded-xl border border-orange-100 p-4 space-y-3">
               <StatTable breakdown={resultB} label={t("configBreakdown", { id: "B" })} />
+              <GoldEnhCostBadge cfg={cfgB} label="B" />
             </div>
           </div>
         )}
