@@ -76,20 +76,20 @@ function ResultRow({
         #{result.rank}
       </td>
       {/* 装備名 */}
-      <td className="px-2 py-2">
+      <td className="px-2 py-2 min-w-[180px]">
         <div className="space-y-0.5">
           {allItems.map((item, i) => (
-            <div key={i} className="flex items-center gap-1 text-xs">
-              <span className="shrink-0 text-gray-400 w-5 text-right">
+            <div key={i} className="flex items-center gap-1.5 text-xs whitespace-nowrap">
+              <span className="shrink-0 text-gray-400 w-7 text-right">
                 {slotLabels[EQUIP_SLOTS[i]]}
               </span>
-              <span className="truncate text-gray-700 max-w-[120px]" title={item.name}>
+              <span className="truncate text-gray-700 max-w-[160px]" title={item.name}>
                 {name(item)}
               </span>
             </div>
           ))}
           {result.hasSetBonus && (
-            <div className="mt-1 inline-flex items-center gap-1 text-[10px] bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-full px-2 py-0.5">
+            <div className="mt-1 inline-flex items-center gap-1 text-[10px] bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-full px-2 py-0.5 whitespace-nowrap">
               ✦ セット効果
               {result.series && (
                 <span className="opacity-70">({result.series})</span>
@@ -99,11 +99,11 @@ function ResultRow({
         </div>
       </td>
       {/* G強化配分 */}
-      <td className="px-2 py-2">
+      <td className="px-2 py-2 min-w-[90px]">
         <div className="space-y-0.5">
           {allItems.map((_item, i) => (
-            <div key={i} className="flex items-center gap-1 text-xs">
-              <span className="shrink-0 text-gray-400 w-5 text-right">
+            <div key={i} className="flex items-center gap-1.5 text-xs whitespace-nowrap">
+              <span className="shrink-0 text-gray-400 w-7 text-right">
                 {slotLabels[EQUIP_SLOTS[i]]}
               </span>
               <GoldLevelBadge g={result.goldLevels[i]} />
