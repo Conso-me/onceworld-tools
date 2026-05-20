@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-05-20",
     changes: [
+    { type: "feature", text: "fix(optimizer): ステータス優先度リセットを全0に・除外操作ボタンを追加" },
     { type: "feature", text: "fix(optimizer): G強化上限を1000に拡張・100以降の段階コストを実装" },
     { type: "improve", text: "fix(optimizer): G強化コストを日本語表記（万/億/兆）に変更" },
     { type: "fix", text: "fix(optimizer): G強化バグ修正 + 武器スロット除外オプション追加" },
