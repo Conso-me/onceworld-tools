@@ -1312,7 +1312,7 @@
     "name": "天空剣ソラシド",
     "slot": "武器",
     "series": null,
-    "material": null,
+    "material": "強化できない",
     "vit": 0,
     "spd": 0,
     "atk": 6789000,
