@@ -39,7 +39,7 @@ const inputCls =
   "border border-gray-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300";
 
 interface Props {
-  onApply: (overrides: Partial<SimConfig>) => void;
+  onApply: (overrides: Partial<SimConfig>, target: "A" | "B") => void;
 }
 
 function fmtG(n: number): string {
@@ -59,11 +59,15 @@ function GoldLevelBadge({ g }: { g: number }) {
 function ResultRow({
   result,
   slotLabels,
+  appliedA,
+  appliedB,
   onApply,
 }: {
   result: EquipOptResult;
   slotLabels: Record<EquipSlot, string>;
-  onApply: (r: EquipOptResult) => void;
+  appliedA: number | null;
+  appliedB: number | null;
+  onApply: (r: EquipOptResult, target: "A" | "B") => void;
 }) {
   const { i18n } = useTranslation("status");
   const isEn = i18n.language === "en";
@@ -144,14 +148,30 @@ function ResultRow({
       <td className="px-2 py-2 text-right text-sm font-bold tabular-nums text-blue-700 whitespace-nowrap">
         {Math.round(result.score).toLocaleString()}
       </td>
-      {/* 反映ボタン */}
+      {/* 反映ボタン A/B */}
       <td className="px-2 py-2 text-center">
-        <button
-          onClick={() => onApply(result)}
-          className="text-[11px] px-2 py-1 rounded-lg bg-green-500 text-white hover:bg-green-600 font-medium whitespace-nowrap transition-colors"
-        >
-          反映
-        </button>
+        <div className="flex flex-col gap-1">
+          <button
+            onClick={() => onApply(result, "A")}
+            className={`text-[11px] px-2 py-1 rounded-lg font-semibold whitespace-nowrap transition-colors ${
+              appliedA === result.rank
+                ? "bg-blue-500 text-white"
+                : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+            }`}
+          >
+            A
+          </button>
+          <button
+            onClick={() => onApply(result, "B")}
+            className={`text-[11px] px-2 py-1 rounded-lg font-semibold whitespace-nowrap transition-colors ${
+              appliedB === result.rank
+                ? "bg-orange-400 text-white"
+                : "bg-orange-100 text-orange-700 hover:bg-orange-200"
+            }`}
+          >
+            B
+          </button>
+        </div>
       </td>
     </tr>
   );
@@ -165,6 +185,8 @@ export function EquipmentOptimizer({ onApply }: Props) {
   const [weights, setWeights] = useState<StatWeights>({ ...DEFAULT_WEIGHTS });
   const [excluded, setExcluded] = useState<Set<string>>(new Set());
   const [showExclude, setShowExclude] = useState(false);
+  const [appliedA, setAppliedA] = useState<number | null>(null);
+  const [appliedB, setAppliedB] = useState<number | null>(null);
 
   const budget = unlimited ? Infinity : (Number(budgetStr.replace(/,/g, "")) || 0);
 
@@ -198,7 +220,7 @@ export function EquipmentOptimizer({ onApply }: Props) {
     });
   }
 
-  function handleApply(result: EquipOptResult) {
+  function handleApply(result: EquipOptResult, target: "A" | "B") {
     const allItems = [result.weapon, ...result.armors];
     const overrides: Partial<SimConfig> = {};
     EQUIP_SLOTS.forEach((slot, i) => {
@@ -208,7 +230,9 @@ export function EquipmentOptimizer({ onApply }: Props) {
       overrides[keys.enh] = item.material !== "強化できない" ? 1100 : 0;
       overrides[keys.gold] = result.goldLevels[i];
     });
-    onApply(overrides);
+    onApply(overrides, target);
+    if (target === "A") setAppliedA(result.rank);
+    else setAppliedB(result.rank);
   }
 
   return (
@@ -374,6 +398,8 @@ export function EquipmentOptimizer({ onApply }: Props) {
                       key={r.rank}
                       result={r}
                       slotLabels={slotLabels}
+                      appliedA={appliedA}
+                      appliedB={appliedB}
                       onApply={handleApply}
                     />
                   ))}
@@ -385,7 +411,7 @@ export function EquipmentOptimizer({ onApply }: Props) {
           <div className="px-4 py-2 border-t border-gray-100 bg-gray-50/50">
             <p className="text-[10px] text-gray-400">
               スコア = 各優先度重み × 装備ステータス（通常強化+1100想定）の合計。
-              「反映」で通常モードの設定A に装備・ゴールド強化を上書きします。
+              A/B ボタンで設定A・Bに反映し、通常モードのA/B比較で差分を確認できます。
             </p>
           </div>
         </div>

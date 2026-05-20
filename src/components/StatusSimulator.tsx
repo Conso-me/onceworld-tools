@@ -212,7 +212,15 @@ export function StatusSimulator() {
 
       {simMode === "optimize" ? (
         <EquipmentOptimizer
-          onApply={(overrides) => replaceAllA({ ...cfgA, ...overrides })}
+          onApply={(overrides, target) => {
+            if (target === "A") {
+              replaceAllA({ ...cfgA, ...overrides });
+            } else {
+              replaceAllB({ ...cfgB, ...overrides });
+              setCompareMode(true);
+              setSimMode("normal");
+            }
+          }}
         />
       ) : (
     <div className="lg:grid lg:grid-cols-[minmax(360px,420px)_1fr] gap-6">
