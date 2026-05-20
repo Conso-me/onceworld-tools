@@ -110,7 +110,6 @@ function ResultRow({
               { key: "def",  label: "DEF",   val: result.stats.def,  cls: "text-green-600"  },
               { key: "mdef", label: "M-DEF", val: result.stats.mdef, cls: "text-purple-600" },
               { key: "luck", label: "LUK",   val: result.stats.luck, cls: "text-yellow-600" },
-              { key: "mov",  label: "MOV",   val: result.mov,        cls: "text-teal-500"   },
             ] as const
           ).map(({ key, label, val, cls }) => (
             <div key={key} className="flex items-center gap-1.5 text-[10px] whitespace-nowrap">
