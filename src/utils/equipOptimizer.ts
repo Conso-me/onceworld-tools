@@ -8,6 +8,7 @@ const MAX_ENH = 1100;
 const MAX_GOLD_ENH = 1000;
 const GOLD_COST_FACTOR = 10_000_000;
 const GOLD_STAT_PER_G = 10_000;
+const TIER_EXTRA = 10_000_000_000; // G101〜 の段階コスト係数（statusCalc.ts と同値）
 
 export type StatWeights = Record<keyof CoreStats, number>;
 
@@ -90,17 +91,6 @@ function computeEquipStats(
   return result;
 }
 
-function maxAffordableG(bSum: number, budget: number, maxGoldEnh: number): number {
-  let lo = 0,
-    hi = maxGoldEnh;
-  while (lo < hi) {
-    const mid = Math.ceil((lo + hi) / 2);
-    if (calcItemGoldCost(bSum, mid) <= budget) lo = mid;
-    else hi = mid - 1;
-  }
-  return lo;
-}
-
 function computeTotalCost(
   items: EquipmentItem[],
   goldLevels: number[],
@@ -120,28 +110,56 @@ function optimizeGoldAlloc(
 ): number[] {
   if (budget <= 0) return items.map(() => 0);
 
-  const efficiencies = items.map((item) => {
+  // 各スロットの G1本あたりのスタット上昇量（Gレベルに関わらず一定）
+  const gainPerG = items.map((item) => {
     if (!canEnhance(item)) return 0;
     const bSum = baseStatSum(item);
     if (bSum === 0) return 0;
-    const gainPerG = STAT_KEYS.reduce((s, k) => {
+    return STAT_KEYS.reduce((s, k) => {
       const v = val1100(item, k);
       if (v === 0) return s;
       return s + weights[k] * (v * (25 / 111) + GOLD_STAT_PER_G);
     }, 0);
-    return gainPerG / (bSum * GOLD_COST_FACTOR);
   });
 
-  const order = items.map((_, i) => i).sort((a, b) => efficiencies[b] - efficiencies[a]);
-  let remaining = budget;
-  const levels = items.map(() => 0);
+  // 段階ごとのバケット: tier t = G(100t+1)〜G(100t+100) の範囲
+  // G101以降はコストが急増するため、tier境界をまたいで最適配分する
+  interface Bucket {
+    itemIdx: number;
+    tier: number;
+    eff: number;   // スタット上昇 / Gコスト（このtier内では一定）
+    capacity: number; // このtierで追加できる最大G数
+    costPerG: number;
+  }
 
-  for (const i of order) {
-    if (remaining <= 0 || efficiencies[i] === 0) continue;
+  const buckets: Bucket[] = [];
+  for (let i = 0; i < items.length; i++) {
+    if (gainPerG[i] === 0) continue;
     const bSum = baseStatSum(items[i]);
-    const g = maxAffordableG(bSum, remaining, maxGoldEnh);
-    levels[i] = g;
-    remaining -= calcItemGoldCost(bSum, g);
+    for (let t = 0; t * 100 < maxGoldEnh; t++) {
+      const tierEnd = Math.min((t + 1) * 100, maxGoldEnh);
+      const capacity = tierEnd - t * 100;
+      // tier t の G1本あたりコスト = baseSum × 基本係数 + t² × 段階係数
+      const costPerG = bSum * GOLD_COST_FACTOR + t * t * TIER_EXTRA;
+      buckets.push({ itemIdx: i, tier: t, eff: gainPerG[i] / costPerG, capacity, costPerG });
+    }
+  }
+
+  // 効率の高い順に配分（同アイテムのtier 0は必ずtier 1より先に来る）
+  buckets.sort((a, b) => b.eff - a.eff);
+
+  const levels = items.map(() => 0);
+  let remaining = budget;
+
+  for (const { itemIdx: i, tier, capacity, costPerG } of buckets) {
+    if (remaining <= 0) break;
+    // 前のtierが完了していない場合はスキップ（バジェット不足で途中止まりの場合）
+    if (levels[i] < tier * 100) continue;
+    const toAdd = Math.min(capacity, Math.floor(remaining / costPerG));
+    if (toAdd > 0) {
+      levels[i] += toAdd;
+      remaining -= toAdd * costPerG;
+    }
   }
 
   return levels;
