@@ -463,7 +463,7 @@ function EquipSelector({
             <span className="text-xs text-yellow-500 font-semibold">G+</span>
             <SmallNumInput
               value={goldEnhVal} onChange={onGoldEnhChange} min={0} max={1000}
-              className="flex-1 sm:w-12 border border-yellow-200 rounded-lg px-2 py-1.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-yellow-300"
+              className="flex-1 sm:w-14 border border-yellow-200 rounded-lg px-2 py-1.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-yellow-300"
             />
             <button onClick={() => onGoldEnhChange(1000)} className={maxBtnCls}>MAX</button>
           </div>
