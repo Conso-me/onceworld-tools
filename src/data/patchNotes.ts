@@ -15,6 +15,8 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-05-20",
     changes: [
+    { type: "fix", text: "fix(sim): G強化計算のSPD除外バグとゼロステ誤加算バグを修正" },
+    { type: "feature", text: "feat(sim): A/B比較モードに構成コピー機能を追加" },
     { type: "fix", text: "fix(data): 天空剣ソラシドを強化できない武器に修正" },
     { type: "feature", text: "feat(sim): 装備最適化からA/B比較へ直接反映できるボタンを追加" },
     { type: "feature", text: "feat(sim): 最適装備ランキングに実ステータス列を追加" },
