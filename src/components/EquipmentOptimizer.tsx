@@ -139,12 +139,13 @@ function ResultRow({
 export function EquipmentOptimizer({ onApply }: Props) {
   const { t } = useTranslation("status");
 
+  const [unlimited, setUnlimited] = useState(true);
   const [budgetStr, setBudgetStr] = useState("");
   const [weights, setWeights] = useState<StatWeights>({ ...DEFAULT_WEIGHTS });
   const [excluded, setExcluded] = useState<Set<string>>(new Set());
   const [showExclude, setShowExclude] = useState(false);
 
-  const budget = Number(budgetStr.replace(/,/g, "")) || 0;
+  const budget = unlimited ? Infinity : (Number(budgetStr.replace(/,/g, "")) || 0);
 
   const allBySlot = useMemo(
     () =>
@@ -196,19 +197,36 @@ export function EquipmentOptimizer({ onApply }: Props) {
         {/* 所持金 */}
         <div className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
           <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">所持金（予算）</h3>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              inputMode="numeric"
-              placeholder="0"
-              value={budgetStr}
-              onChange={(e) => setBudgetStr(e.target.value)}
-              className={`${inputCls} w-full`}
-            />
-            <span className="text-sm text-gray-500 shrink-0">G</span>
-          </div>
-          {budget > 0 && (
-            <p className="text-xs text-gray-400">{fmtG(budget)} G</p>
+          <button
+            onClick={() => setUnlimited((v) => !v)}
+            className={`flex items-center gap-2 w-full px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
+              unlimited
+                ? "bg-yellow-50 border-yellow-300 text-yellow-700"
+                : "bg-gray-50 border-gray-200 text-gray-500"
+            }`}
+          >
+            <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${unlimited ? "border-yellow-400 bg-yellow-400" : "border-gray-300"}`}>
+              {unlimited && <span className="w-2 h-2 rounded-full bg-white" />}
+            </span>
+            青天井（ゴールド強化MAX）
+          </button>
+          {!unlimited && (
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="0"
+                  value={budgetStr}
+                  onChange={(e) => setBudgetStr(e.target.value)}
+                  className={`${inputCls} w-full`}
+                />
+                <span className="text-sm text-gray-500 shrink-0">G</span>
+              </div>
+              {budget > 0 && (
+                <p className="text-xs text-gray-400">{fmtG(budget)} G</p>
+              )}
+            </div>
           )}
         </div>
 
@@ -305,9 +323,10 @@ export function EquipmentOptimizer({ onApply }: Props) {
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden h-full">
           <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
             <h3 className="text-sm font-semibold text-gray-700">最適装備ランキング</h3>
-            {budget === 0 && (
-              <span className="text-[11px] text-gray-400">所持金=0: ゴールド強化なし</span>
-            )}
+            {unlimited
+              ? <span className="text-[11px] text-yellow-600 font-medium">青天井モード: G強化MAX</span>
+              : budget === 0 && <span className="text-[11px] text-gray-400">予算0: ゴールド強化なし</span>
+            }
           </div>
 
           {results.length === 0 ? (
