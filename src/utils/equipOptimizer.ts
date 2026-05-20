@@ -4,8 +4,9 @@ import { getEquipmentBySlot } from "../data/equipment";
 const STAT_KEYS = ["vit", "spd", "atk", "int", "def", "mdef", "luck"] as const;
 const ARMOR_SLOTS = ["頭", "服", "手", "盾", "脚"] as const;
 const MAX_ENH = 1100;
-const MAX_GOLD_ENH = 100;
+const MAX_GOLD_ENH = 1000;
 const GOLD_COST_FACTOR = 10_000_000;
+const TIER_EXTRA = 10_000_000_000; // 100億 × tier²/G level (level 100以降)
 
 export type StatWeights = Record<keyof CoreStats, number>;
 
@@ -88,6 +89,31 @@ function computeEquipStats(
   return result;
 }
 
+function tierSurcharge(g: number): number {
+  const fullTiers = Math.floor(g / 100);
+  const remainder = g % 100;
+  let total = 0;
+  for (let n = 1; n < fullTiers; n++) total += 100 * n * n * TIER_EXTRA;
+  if (fullTiers > 0) total += remainder * fullTiers * fullTiers * TIER_EXTRA;
+  return total;
+}
+
+function itemGoldCost(bSum: number, g: number): number {
+  if (g <= 0) return 0;
+  return g * bSum * GOLD_COST_FACTOR + tierSurcharge(g);
+}
+
+function maxAffordableG(bSum: number, budget: number): number {
+  let lo = 0,
+    hi = MAX_GOLD_ENH;
+  while (lo < hi) {
+    const mid = Math.ceil((lo + hi) / 2);
+    if (itemGoldCost(bSum, mid) <= budget) lo = mid;
+    else hi = mid - 1;
+  }
+  return lo;
+}
+
 function computeTotalCost(
   items: EquipmentItem[],
   goldLevels: number[],
@@ -95,7 +121,7 @@ function computeTotalCost(
   return items.reduce((sum, item, i) => {
     const g = goldLevels[i];
     if (g <= 0 || !canEnhance(item)) return sum;
-    return sum + g * baseStatSum(item) * GOLD_COST_FACTOR;
+    return sum + itemGoldCost(baseStatSum(item), g);
   }, 0);
 }
 
@@ -125,11 +151,9 @@ function optimizeGoldAlloc(
   for (const i of order) {
     if (remaining <= 0 || efficiencies[i] === 0) continue;
     const bSum = baseStatSum(items[i]);
-    const costPerG = bSum * GOLD_COST_FACTOR;
-    const maxAffordable = Math.floor(remaining / costPerG);
-    const g = Math.min(MAX_GOLD_ENH, maxAffordable);
+    const g = maxAffordableG(bSum, remaining);
     levels[i] = g;
-    remaining -= g * costPerG;
+    remaining -= itemGoldCost(bSum, g);
   }
 
   return levels;
