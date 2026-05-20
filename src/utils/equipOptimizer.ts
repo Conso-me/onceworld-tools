@@ -6,7 +6,8 @@ const STAT_KEYS = ["vit", "spd", "atk", "int", "def", "mdef", "luck"] as const;
 const ARMOR_SLOTS = ["頭", "服", "手", "盾", "脚"] as const;
 const MAX_ENH = 1100;
 const MAX_GOLD_ENH = 1000;
-const GOLD_COST_FACTOR = 10_000_000; // stat計算用（金強化ステ式のper-G定数）
+const GOLD_COST_FACTOR = 10_000_000;
+const GOLD_STAT_PER_G = 10_000;
 
 export type StatWeights = Record<keyof CoreStats, number>;
 
@@ -52,7 +53,7 @@ function scoreItemAt1100(item: EquipmentItem, weights: StatWeights): number {
 function computeGoldEnhStat(item: EquipmentItem, k: keyof CoreStats, g: number): number {
   const v = val1100(item, k);
   if (!canEnhance(item) || g === 0 || v === 0) return v;
-  return Math.floor(v * (1 + (25 / 111) * g) + GOLD_COST_FACTOR * g);
+  return Math.floor(v * (1 + (25 / 111) * g) + GOLD_STAT_PER_G * g);
 }
 
 function slotScore(
@@ -125,7 +126,7 @@ function optimizeGoldAlloc(
     const gainPerG = STAT_KEYS.reduce((s, k) => {
       const v = val1100(item, k);
       if (v === 0) return s;
-      return s + weights[k] * (v * (25 / 111) + GOLD_COST_FACTOR);
+      return s + weights[k] * (v * (25 / 111) + GOLD_STAT_PER_G);
     }, 0);
     return gainPerG / (bSum * GOLD_COST_FACTOR);
   });
