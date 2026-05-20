@@ -96,26 +96,28 @@ function ResultRow({
               )}
             </div>
           )}
-          {/* ステータス実数値（ゲーム内順） */}
-          <div className="mt-1.5 space-y-0.5">
-            {(
-              [
-                { key: "vit",  label: "VIT",   val: result.stats.vit,  cls: "text-orange-500" },
-                { key: "spd",  label: "SPD",   val: result.stats.spd,  cls: "text-gray-500"   },
-                { key: "atk",  label: "ATK",   val: result.stats.atk,  cls: "text-red-500"    },
-                { key: "int",  label: "INT",   val: result.stats.int,  cls: "text-blue-600"   },
-                { key: "def",  label: "DEF",   val: result.stats.def,  cls: "text-green-600"  },
-                { key: "mdef", label: "M-DEF", val: result.stats.mdef, cls: "text-purple-600" },
-                { key: "luck", label: "LUK",   val: result.stats.luck, cls: "text-yellow-600" },
-                { key: "mov",  label: "MOV",   val: result.mov,        cls: "text-teal-500"   },
-              ] as const
-            ).map(({ key, label, val, cls }) => (
-              <div key={key} className="flex items-center gap-1.5 text-[10px] whitespace-nowrap">
-                <span className={`font-semibold w-10 ${cls}`}>{label}</span>
-                <span className="tabular-nums text-gray-600">{val.toLocaleString()}</span>
-              </div>
-            ))}
-          </div>
+        </div>
+      </td>
+      {/* 実ステータス */}
+      <td className="px-2 py-2">
+        <div className="space-y-0.5">
+          {(
+            [
+              { key: "vit",  label: "VIT",   val: result.stats.vit,  cls: "text-orange-500" },
+              { key: "spd",  label: "SPD",   val: result.stats.spd,  cls: "text-gray-500"   },
+              { key: "atk",  label: "ATK",   val: result.stats.atk,  cls: "text-red-500"    },
+              { key: "int",  label: "INT",   val: result.stats.int,  cls: "text-blue-600"   },
+              { key: "def",  label: "DEF",   val: result.stats.def,  cls: "text-green-600"  },
+              { key: "mdef", label: "M-DEF", val: result.stats.mdef, cls: "text-purple-600" },
+              { key: "luck", label: "LUK",   val: result.stats.luck, cls: "text-yellow-600" },
+              { key: "mov",  label: "MOV",   val: result.mov,        cls: "text-teal-500"   },
+            ] as const
+          ).map(({ key, label, val, cls }) => (
+            <div key={key} className="flex items-center gap-1.5 text-[10px] whitespace-nowrap">
+              <span className={`font-semibold w-10 ${cls}`}>{label}</span>
+              <span className="tabular-nums text-gray-600">{val.toLocaleString()}</span>
+            </div>
+          ))}
         </div>
       </td>
       {/* G強化配分 */}
@@ -360,6 +362,7 @@ export function EquipmentOptimizer({ onApply }: Props) {
                   <tr className="bg-gray-50 text-[10px] text-gray-500 uppercase">
                     <th className="px-2 py-2 text-center w-8">位</th>
                     <th className="px-2 py-2 text-left">装備</th>
+                    <th className="px-2 py-2 text-left whitespace-nowrap">実ステータス</th>
                     <th className="px-2 py-2 text-left whitespace-nowrap">G強化配分</th>
                     <th className="px-2 py-2 text-right whitespace-nowrap">コスト</th>
                     <th className="px-2 py-2 text-right whitespace-nowrap">スコア</th>
