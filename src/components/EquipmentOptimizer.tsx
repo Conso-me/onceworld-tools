@@ -72,7 +72,10 @@ function ResultRow({
   const { i18n } = useTranslation("status");
   const isEn = i18n.language === "en";
   const name = (item: EquipmentItem) => (isEn ? (item.nameEn ?? item.name) : item.name);
-  const allItems = [result.weapon, ...result.armors];
+  const displayItems = result.weapon ? [result.weapon, ...result.armors] : result.armors;
+  const displaySlots = result.weapon
+    ? EQUIP_SLOTS
+    : EQUIP_SLOTS.filter((s): s is EquipSlot => s !== "武器");
 
   return (
     <tr className="group hover:bg-blue-50/40 transition-colors border-b border-gray-100">
@@ -82,10 +85,10 @@ function ResultRow({
       {/* 装備名 */}
       <td className="px-2 py-2 min-w-[180px]">
         <div className="space-y-0.5">
-          {allItems.map((item, i) => (
+          {displayItems.map((item, i) => (
             <div key={i} className="flex items-center gap-1.5 text-xs whitespace-nowrap">
               <span className="shrink-0 text-gray-400 w-7 text-right">
-                {slotLabels[EQUIP_SLOTS[i]]}
+                {slotLabels[displaySlots[i]]}
               </span>
               <span className="truncate text-gray-700 max-w-[160px]" title={item.name}>
                 {name(item)}
@@ -126,10 +129,10 @@ function ResultRow({
       {/* G強化配分 */}
       <td className="px-2 py-2 min-w-[90px]">
         <div className="space-y-0.5">
-          {allItems.map((_item, i) => (
+          {displayItems.map((_item, i) => (
             <div key={i} className="flex items-center gap-1.5 text-xs whitespace-nowrap">
               <span className="shrink-0 text-gray-400 w-7 text-right">
-                {slotLabels[EQUIP_SLOTS[i]]}
+                {slotLabels[displaySlots[i]]}
               </span>
               <GoldLevelBadge g={result.goldLevels[i]} />
             </div>
@@ -185,6 +188,7 @@ export function EquipmentOptimizer({ onApply }: Props) {
   const [weights, setWeights] = useState<StatWeights>({ ...DEFAULT_WEIGHTS });
   const [excluded, setExcluded] = useState<Set<string>>(new Set());
   const [showExclude, setShowExclude] = useState(false);
+  const [includeWeapon, setIncludeWeapon] = useState(true);
   const [appliedA, setAppliedA] = useState<number | null>(null);
   const [appliedB, setAppliedB] = useState<number | null>(null);
 
@@ -207,8 +211,8 @@ export function EquipmentOptimizer({ onApply }: Props) {
   );
 
   const results = useMemo(
-    () => optimizeEquipment(excluded, weights, budget),
-    [excluded, weights, budget],
+    () => optimizeEquipment(excluded, weights, budget, includeWeapon),
+    [excluded, weights, budget, includeWeapon],
   );
 
   function toggleExclude(name: string) {
@@ -221,10 +225,13 @@ export function EquipmentOptimizer({ onApply }: Props) {
   }
 
   function handleApply(result: EquipOptResult, target: "A" | "B") {
-    const allItems = [result.weapon, ...result.armors];
+    const displayItems = result.weapon ? [result.weapon, ...result.armors] : result.armors;
+    const slots = result.weapon
+      ? EQUIP_SLOTS
+      : EQUIP_SLOTS.filter((s) => s !== "武器");
     const overrides: Partial<SimConfig> = {};
-    EQUIP_SLOTS.forEach((slot, i) => {
-      const item = allItems[i];
+    slots.forEach((slot, i) => {
+      const item = displayItems[i];
       const keys = SLOT_CONFIG_KEYS[slot];
       overrides[keys.equip] = item.name;
       overrides[keys.enh] = item.material !== "強化できない" ? 1100 : 0;
@@ -239,6 +246,24 @@ export function EquipmentOptimizer({ onApply }: Props) {
     <div className="lg:grid lg:grid-cols-[minmax(300px,360px)_1fr] gap-4">
       {/* 左パネル */}
       <div className="space-y-3">
+        {/* 最適化スロット */}
+        <div className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
+          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">最適化対象スロット</h3>
+          <button
+            onClick={() => setIncludeWeapon((v) => !v)}
+            className={`flex items-center gap-2 w-full px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
+              includeWeapon
+                ? "bg-blue-50 border-blue-300 text-blue-700"
+                : "bg-gray-50 border-gray-200 text-gray-500"
+            }`}
+          >
+            <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${includeWeapon ? "border-blue-400 bg-blue-400" : "border-gray-300"}`}>
+              {includeWeapon && <span className="w-2 h-2 rounded-full bg-white" />}
+            </span>
+            武器スロットを含める
+          </button>
+        </div>
+
         {/* 所持金 */}
         <div className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
           <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">所持金（予算）</h3>
