@@ -6,6 +6,7 @@ import { useSharedSimConfig, DEFAULT_SIM_CONFIG } from "../hooks/useSharedSimCon
 import { calcStatus, calcGoldEnhCost } from "../utils/statusCalc";
 import type { SimConfig } from "../types/game";
 import { SimConfigPanel, STAT_LABELS } from "./SimConfigPanel";
+import { EquipmentOptimizer } from "./EquipmentOptimizer";
 
 // ── Result Tables ─────────────────────────────────────────────────────────────
 
@@ -150,6 +151,8 @@ export function StatusSimulator() {
   const [activeConfig, setActiveConfig] = usePersistedState<"A" | "B">("sim-active", "A");
   const [compareMode, setCompareMode] = usePersistedState<boolean>("sim-compare", false);
 
+  const [simMode, setSimMode] = usePersistedState<"normal" | "optimize">("sim-mode", "normal");
+
   const { presets, savePreset } = useStatPresets();
   const [presetName, setPresetName] = useState("");
   const [attackModeForExport, setAttackModeForExport] = useState<"物理" | "魔攻">("物理");
@@ -189,6 +192,37 @@ export function StatusSimulator() {
   }
 
   return (
+    <div className="space-y-4">
+      {/* モード切り替え */}
+      <div className="flex rounded-xl overflow-hidden border border-gray-200 w-fit">
+        {(["normal", "optimize"] as const).map((mode) => (
+          <button
+            key={mode}
+            onClick={() => setSimMode(mode)}
+            className={`px-4 py-2 text-sm font-semibold transition-colors ${
+              simMode === mode
+                ? "bg-blue-500 text-white"
+                : "bg-white text-gray-500 hover:bg-gray-50"
+            }`}
+          >
+            {mode === "normal" ? "通常モード" : "装備最適化"}
+          </button>
+        ))}
+      </div>
+
+      {simMode === "optimize" ? (
+        <EquipmentOptimizer
+          onApply={(overrides, target) => {
+            if (target === "A") {
+              replaceAllA({ ...cfgA, ...overrides });
+            } else {
+              replaceAllB({ ...cfgB, ...overrides });
+              setCompareMode(true);
+              setSimMode("normal");
+            }
+          }}
+        />
+      ) : (
     <div className="lg:grid lg:grid-cols-[minmax(360px,420px)_1fr] gap-6">
       {/* 左パネル（入力） */}
       <div className="space-y-4">
@@ -350,6 +384,8 @@ export function StatusSimulator() {
           )}
         </div>
       </div>
+    </div>
+      )}
     </div>
   );
 }
