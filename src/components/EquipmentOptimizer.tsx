@@ -233,17 +233,14 @@ export function EquipmentOptimizer({ onApply }: Props) {
   }
 
   function excludeSlot(slot: EquipSlot) {
-    setExcluded((prev) => {
-      const next = new Set(prev);
-      allBySlot[slot].forEach((item) => next.add(item.name));
-      return next;
+    setExcludedArr((prev) => {
+      const toAdd = allBySlot[slot].map((item) => item.name).filter((n) => !prev.includes(n));
+      return [...prev, ...toAdd];
     });
   }
 
   function excludeAll() {
-    setExcluded(
-      new Set(Object.values(allBySlot).flat().map((item) => item.name)),
-    );
+    setExcludedArr(Object.values(allBySlot).flat().map((item) => item.name));
   }
 
   function handleApply(result: EquipOptResult, target: "A" | "B") {
