@@ -140,12 +140,12 @@ export interface SimConfig extends Record<string, unknown> {
   allocMdef: number;
   allocLuck: number;
   // 装備 + 強化値（0=未強化, 1100=最大。強化不可アイテムは計算時に無視）
-  equipWeapon: string;  enhWeapon: number;
-  equipHead: string;    enhHead: number;
-  equipBody: string;    enhBody: number;
-  equipHand: string;    enhHand: number;
-  equipShield: string;  enhShield: number;
-  equipFoot: string;    enhFoot: number;
+  equipWeapon: string;  enhWeapon: number;  goldEnhWeapon: number;
+  equipHead: string;    enhHead: number;    goldEnhHead: number;
+  equipBody: string;    enhBody: number;    goldEnhBody: number;
+  equipHand: string;    enhHand: number;    goldEnhHand: number;
+  equipShield: string;  enhShield: number;  goldEnhShield: number;
+  equipFoot: string;    enhFoot: number;    goldEnhFoot: number;
   // アクセサリー（4枠 + 各レベル）
   acc1: string; acc1Level: number;
   acc2: string; acc2Level: number;

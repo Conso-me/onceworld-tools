@@ -58,31 +58,61 @@ function detectSetBonus(cfg: SimConfig): { active: boolean; series: string | nul
     : { active: false, series: null };
 }
 
-/** 装備スタット（強化値を乗算済み）
- *  強化式: floor(base * (1 + enhance * 0.1))
- *  "強化できない" アイテムは enhance を無視
+/** 装備スタット（強化値・金強化値を適用済み）
+ *  通常強化式: floor(base * (1 + enhance * 0.1))
+ *  金強化式:   floor(val1100 * (1 + (25/111) * goldEnh) + 10000 * goldEnh)  ※spd除外
+ *  "強化できない" アイテムは enhance / goldEnh を無視
  */
 function equipmentStats(cfg: SimConfig): CoreStats {
-  const slots: [string, number][] = [
-    [cfg.equipWeapon, cfg.enhWeapon],
-    [cfg.equipHead,   cfg.enhHead],
-    [cfg.equipBody,   cfg.enhBody],
-    [cfg.equipHand,   cfg.enhHand],
-    [cfg.equipShield, cfg.enhShield],
-    [cfg.equipFoot,   cfg.enhFoot],
+  const slots: [string, number, number][] = [
+    [cfg.equipWeapon, cfg.enhWeapon, cfg.goldEnhWeapon],
+    [cfg.equipHead,   cfg.enhHead,   cfg.goldEnhHead],
+    [cfg.equipBody,   cfg.enhBody,   cfg.goldEnhBody],
+    [cfg.equipHand,   cfg.enhHand,   cfg.goldEnhHand],
+    [cfg.equipShield, cfg.enhShield, cfg.goldEnhShield],
+    [cfg.equipFoot,   cfg.enhFoot,   cfg.goldEnhFoot],
   ];
   const result = zeroStats();
-  for (const [name, enh] of slots) {
+  for (const [name, enh, goldEnh] of slots) {
     if (!name) continue;
     const item = getEquipmentByName(name);
     if (!item) continue;
     const canEnhance = item.material !== "強化できない";
     const factor = canEnhance ? 1 + enh * 0.1 : 1;
     for (const k of STAT_KEYS) {
-      result[k] += Math.floor((item[k] ?? 0) * factor);
+      const base = item[k] ?? 0;
+      const val1100 = Math.floor(base * factor);
+      const gN = (canEnhance && k !== "spd" && goldEnh > 0) ? goldEnh : 0;
+      result[k] += gN > 0
+        ? Math.floor(val1100 * (1 + (25 / 111) * gN) + 10000 * gN)
+        : val1100;
     }
   }
   return result;
+}
+
+/**
+ * 金強化に必要なゴールド総量
+ * 各スロット: goldEnh × 初期ステ合計 × 10,000,000
+ */
+export function calcGoldEnhCost(cfg: SimConfig): number {
+  const slots: [string, number][] = [
+    [cfg.equipWeapon, cfg.goldEnhWeapon],
+    [cfg.equipHead,   cfg.goldEnhHead],
+    [cfg.equipBody,   cfg.goldEnhBody],
+    [cfg.equipHand,   cfg.goldEnhHand],
+    [cfg.equipShield, cfg.goldEnhShield],
+    [cfg.equipFoot,   cfg.goldEnhFoot],
+  ];
+  let total = 0;
+  for (const [name, goldEnh] of slots) {
+    if (!name || goldEnh <= 0) continue;
+    const item = getEquipmentByName(name);
+    if (!item || item.material === "強化できない") continue;
+    const baseSum = STAT_KEYS.reduce((s, k) => s + (item[k] ?? 0), 0);
+    total += goldEnh * baseSum * 10_000_000;
+  }
+  return total;
 }
 
 function proteinStats(cfg: SimConfig): CoreStats {

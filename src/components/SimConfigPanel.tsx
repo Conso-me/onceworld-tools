@@ -29,14 +29,14 @@ export const STAT_LABELS: { key: keyof CoreStats; label: string }[] = [
 
 const EQUIPMENT_SLOTS: {
   slot: EquipmentSlot;
-  cfgKey: keyof SimConfig; enhKey: keyof SimConfig;
+  cfgKey: keyof SimConfig; enhKey: keyof SimConfig; goldEnhKey: keyof SimConfig;
 }[] = [
-  { slot: "武器", cfgKey: "equipWeapon",  enhKey: "enhWeapon"  },
-  { slot: "頭",   cfgKey: "equipHead",    enhKey: "enhHead"    },
-  { slot: "服",   cfgKey: "equipBody",    enhKey: "enhBody"    },
-  { slot: "手",   cfgKey: "equipHand",    enhKey: "enhHand"    },
-  { slot: "盾",   cfgKey: "equipShield",  enhKey: "enhShield"  },
-  { slot: "脚",   cfgKey: "equipFoot",    enhKey: "enhFoot"    },
+  { slot: "武器", cfgKey: "equipWeapon",  enhKey: "enhWeapon",  goldEnhKey: "goldEnhWeapon"  },
+  { slot: "頭",   cfgKey: "equipHead",    enhKey: "enhHead",    goldEnhKey: "goldEnhHead"    },
+  { slot: "服",   cfgKey: "equipBody",    enhKey: "enhBody",    goldEnhKey: "goldEnhBody"    },
+  { slot: "手",   cfgKey: "equipHand",    enhKey: "enhHand",    goldEnhKey: "goldEnhHand"    },
+  { slot: "盾",   cfgKey: "equipShield",  enhKey: "enhShield",  goldEnhKey: "goldEnhShield"  },
+  { slot: "脚",   cfgKey: "equipFoot",    enhKey: "enhFoot",    goldEnhKey: "goldEnhFoot"    },
 ];
 
 const ACC_SLOTS: {
@@ -417,14 +417,16 @@ function EquipSelectorModal({
 }
 
 function EquipSelector({
-  slot, slotLabel, selectedName, enhVal, onEquipChange, onEnhChange,
+  slot, slotLabel, selectedName, enhVal, goldEnhVal, onEquipChange, onEnhChange, onGoldEnhChange,
 }: {
   slot: EquipmentSlot;
   slotLabel: string;
   selectedName: string;
   enhVal: number;
+  goldEnhVal: number;
   onEquipChange: (name: string) => void;
   onEnhChange: (v: number) => void;
+  onGoldEnhChange: (v: number) => void;
 }) {
   const { t, i18n } = useTranslation("status");
   const isEn = i18n.language === "en";
@@ -456,6 +458,16 @@ function EquipSelector({
           />
           <button onClick={() => onEnhChange(1100)} disabled={!canEnhance} className={maxBtnCls}>MAX</button>
         </div>
+        {canEnhance && (
+          <div className="flex items-center gap-1 sm:shrink-0">
+            <span className="text-xs text-yellow-500 font-semibold">G+</span>
+            <SmallNumInput
+              value={goldEnhVal} onChange={onGoldEnhChange} min={0} max={100}
+              className="flex-1 sm:w-12 border border-yellow-200 rounded-lg px-2 py-1.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-yellow-300"
+            />
+            <button onClick={() => onGoldEnhChange(100)} className={maxBtnCls}>MAX</button>
+          </div>
+        )}
       </div>
       {modalOpen && (
         <EquipSelectorModal
@@ -951,8 +963,9 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
   }
 
   function maxAllEquip() {
-    for (const { enhKey } of EQUIPMENT_SLOTS) {
+    for (const { enhKey, goldEnhKey } of EQUIPMENT_SLOTS) {
       setField(enhKey, 1100);
+      setField(goldEnhKey, 100);
     }
   }
 
@@ -1128,15 +1141,17 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
           <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
             <SectionHeader title={t("equipment")} onAllMax={maxAllEquip} />
             <div className="space-y-3">
-              {EQUIPMENT_SLOTS.map(({ slot, cfgKey, enhKey }) => (
+              {EQUIPMENT_SLOTS.map(({ slot, cfgKey, enhKey, goldEnhKey }) => (
                 <EquipSelector
                   key={slot}
                   slot={slot}
                   slotLabel={equipmentSlotLabels[slot]}
                   selectedName={cfg[cfgKey] as string}
                   enhVal={cfg[enhKey] as number}
+                  goldEnhVal={cfg[goldEnhKey] as number}
                   onEquipChange={(name) => setField(cfgKey, name)}
                   onEnhChange={(v) => setField(enhKey, v)}
+                  onGoldEnhChange={(v) => setField(goldEnhKey, v)}
                 />
               ))}
             </div>
