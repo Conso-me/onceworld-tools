@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-05-21",
+    changes: [
+    { type: "fix", text: "fix(simulator): G強化上限を100→1000に統一・コスト計算を段階コスト式に修正" },
+    ],
+  },
+
+  {
     date: "2026-05-20",
     changes: [
     { type: "feature", text: "fix(optimizer): ステータス優先度リセットを全0に・除外操作ボタンを追加" },
