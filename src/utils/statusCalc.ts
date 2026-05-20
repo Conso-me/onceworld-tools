@@ -60,7 +60,7 @@ function detectSetBonus(cfg: SimConfig): { active: boolean; series: string | nul
 
 /** 装備スタット（強化値・金強化値を適用済み）
  *  通常強化式: floor(base * (1 + enhance * 0.1))
- *  金強化式:   floor(val1100 * (1 + (25/111) * goldEnh) + 10000 * goldEnh)  ※spd除外
+ *  金強化式:   floor(val1100 * (1 + (25/111) * goldEnh) + 10000 * goldEnh)  ※val1100>0のみ
  *  "強化できない" アイテムは enhance / goldEnh を無視
  */
 function equipmentStats(cfg: SimConfig): CoreStats {
@@ -82,7 +82,7 @@ function equipmentStats(cfg: SimConfig): CoreStats {
     for (const k of STAT_KEYS) {
       const base = item[k] ?? 0;
       const val1100 = Math.floor(base * factor);
-      const gN = (canEnhance && k !== "spd" && goldEnh > 0) ? goldEnh : 0;
+      const gN = (canEnhance && goldEnh > 0 && val1100 > 0) ? goldEnh : 0;
       result[k] += gN > 0
         ? Math.floor(val1100 * (1 + (25 / 111) * gN) + 10000 * gN)
         : val1100;
