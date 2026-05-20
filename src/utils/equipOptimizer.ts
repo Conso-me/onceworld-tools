@@ -21,7 +21,7 @@ export const DEFAULT_WEIGHTS: StatWeights = {
 
 export interface EquipOptResult {
   rank: number;
-  weapon: EquipmentItem;
+  weapon: EquipmentItem | null;
   armors: EquipmentItem[];
   goldLevels: number[];
   totalCost: number;
@@ -49,8 +49,8 @@ function scoreItemAt1100(item: EquipmentItem, weights: StatWeights): number {
 }
 
 function computeGoldEnhStat(item: EquipmentItem, k: keyof CoreStats, g: number): number {
-  if (!canEnhance(item) || k === "spd" || g === 0) return val1100(item, k);
   const v = val1100(item, k);
+  if (!canEnhance(item) || g === 0 || v === 0) return v;
   return Math.floor(v * (1 + (25 / 111) * g) + GOLD_COST_FACTOR * g);
 }
 
@@ -67,38 +67,32 @@ function slotScore(
 }
 
 function computeTotalScore(
-  weapon: EquipmentItem,
-  armors: EquipmentItem[],
+  items: EquipmentItem[],
   goldLevels: number[],
   weights: StatWeights,
   setMult: number,
 ): number {
-  const all = [weapon, ...armors];
-  return all.reduce((s, item, i) => s + slotScore(item, goldLevels[i], weights, setMult), 0);
+  return items.reduce((s, item, i) => s + slotScore(item, goldLevels[i], weights, setMult), 0);
 }
 
 function computeEquipStats(
-  weapon: EquipmentItem,
-  armors: EquipmentItem[],
+  items: EquipmentItem[],
   goldLevels: number[],
 ): CoreStats {
-  const all = [weapon, ...armors];
   const result: CoreStats = { vit: 0, spd: 0, atk: 0, int: 0, def: 0, mdef: 0, luck: 0 };
-  for (let i = 0; i < all.length; i++) {
+  for (let i = 0; i < items.length; i++) {
     for (const k of STAT_KEYS) {
-      result[k] += computeGoldEnhStat(all[i], k, goldLevels[i]);
+      result[k] += computeGoldEnhStat(items[i], k, goldLevels[i]);
     }
   }
   return result;
 }
 
 function computeTotalCost(
-  weapon: EquipmentItem,
-  armors: EquipmentItem[],
+  items: EquipmentItem[],
   goldLevels: number[],
 ): number {
-  const all = [weapon, ...armors];
-  return all.reduce((sum, item, i) => {
+  return items.reduce((sum, item, i) => {
     const g = goldLevels[i];
     if (g <= 0 || !canEnhance(item)) return sum;
     return sum + g * baseStatSum(item) * GOLD_COST_FACTOR;
@@ -106,32 +100,31 @@ function computeTotalCost(
 }
 
 function optimizeGoldAlloc(
-  weapon: EquipmentItem,
-  armors: EquipmentItem[],
+  items: EquipmentItem[],
   weights: StatWeights,
   budget: number,
 ): number[] {
-  const all = [weapon, ...armors];
-  if (budget <= 0) return all.map(() => 0);
+  if (budget <= 0) return items.map(() => 0);
 
-  const efficiencies = all.map((item) => {
+  const efficiencies = items.map((item) => {
     if (!canEnhance(item)) return 0;
     const bSum = baseStatSum(item);
     if (bSum === 0) return 0;
-    const gainPerG = STAT_KEYS.filter((k) => k !== "spd").reduce((s, k) => {
+    const gainPerG = STAT_KEYS.reduce((s, k) => {
       const v = val1100(item, k);
+      if (v === 0) return s;
       return s + weights[k] * (v * (25 / 111) + GOLD_COST_FACTOR);
     }, 0);
     return gainPerG / (bSum * GOLD_COST_FACTOR);
   });
 
-  const order = [0, 1, 2, 3, 4, 5].sort((a, b) => efficiencies[b] - efficiencies[a]);
+  const order = items.map((_, i) => i).sort((a, b) => efficiencies[b] - efficiencies[a]);
   let remaining = budget;
-  const levels = all.map(() => 0);
+  const levels = items.map(() => 0);
 
   for (const i of order) {
     if (remaining <= 0 || efficiencies[i] === 0) continue;
-    const bSum = baseStatSum(all[i]);
+    const bSum = baseStatSum(items[i]);
     const costPerG = bSum * GOLD_COST_FACTOR;
     const maxAffordable = Math.floor(remaining / costPerG);
     const g = Math.min(MAX_GOLD_ENH, maxAffordable);
@@ -146,10 +139,10 @@ export function optimizeEquipment(
   excluded: Set<string>,
   weights: StatWeights,
   budget: number,
+  includeWeapon = true,
 ): EquipOptResult[] {
   const filter = (items: EquipmentItem[]) => items.filter((i) => !excluded.has(i.name));
 
-  const weapons = filter(getEquipmentBySlot("武器"));
   const head = filter(getEquipmentBySlot("頭"));
   const body = filter(getEquipmentBySlot("服"));
   const hand = filter(getEquipmentBySlot("手"));
@@ -157,7 +150,6 @@ export function optimizeEquipment(
   const foot = filter(getEquipmentBySlot("脚"));
 
   if (
-    weapons.length === 0 ||
     head.length === 0 ||
     body.length === 0 ||
     hand.length === 0 ||
@@ -167,7 +159,6 @@ export function optimizeEquipment(
     return [];
   }
 
-  // Step 1: アーマー5スロット全列挙（最大9^5=59,049）
   interface ArmorCombo {
     items: EquipmentItem[];
     score: number;
@@ -200,23 +191,45 @@ export function optimizeEquipment(
   armorCombos.sort((a, b) => b.score - a.score);
   const topArmors = armorCombos.slice(0, 20);
 
-  // Step 2: 武器上位10件
-  const topWeapons = [...weapons]
-    .sort((a, b) => scoreItemAt1100(b, weights) - scoreItemAt1100(a, weights))
-    .slice(0, 10);
-
-  // Step 3: 200通りの詳細評価（ゴールド強化込み）
   const results: Omit<EquipOptResult, "rank">[] = [];
 
-  for (const weapon of topWeapons) {
+  if (includeWeapon) {
+    const weapons = filter(getEquipmentBySlot("武器"));
+    if (weapons.length === 0) return [];
+
+    const topWeapons = [...weapons]
+      .sort((a, b) => scoreItemAt1100(b, weights) - scoreItemAt1100(a, weights))
+      .slice(0, 10);
+
+    for (const weapon of topWeapons) {
+      for (const armor of topArmors) {
+        const allItems = [weapon, ...armor.items];
+        const goldLevels = optimizeGoldAlloc(allItems, weights, budget);
+        const setMult = armor.hasSetBonus ? 1.1 : 1.0;
+        const score = computeTotalScore(allItems, goldLevels, weights, setMult);
+        const totalCost = computeTotalCost(allItems, goldLevels);
+        const stats = computeEquipStats(allItems, goldLevels);
+        results.push({
+          weapon,
+          armors: armor.items,
+          goldLevels,
+          totalCost,
+          score,
+          hasSetBonus: armor.hasSetBonus,
+          series: armor.series,
+          stats,
+        });
+      }
+    }
+  } else {
     for (const armor of topArmors) {
-      const goldLevels = optimizeGoldAlloc(weapon, armor.items, weights, budget);
+      const goldLevels = optimizeGoldAlloc(armor.items, weights, budget);
       const setMult = armor.hasSetBonus ? 1.1 : 1.0;
-      const score = computeTotalScore(weapon, armor.items, goldLevels, weights, setMult);
-      const totalCost = computeTotalCost(weapon, armor.items, goldLevels);
-      const stats = computeEquipStats(weapon, armor.items, goldLevels);
+      const score = computeTotalScore(armor.items, goldLevels, weights, setMult);
+      const totalCost = computeTotalCost(armor.items, goldLevels);
+      const stats = computeEquipStats(armor.items, goldLevels);
       results.push({
-        weapon,
+        weapon: null,
         armors: armor.items,
         goldLevels,
         totalCost,
@@ -229,7 +242,6 @@ export function optimizeEquipment(
   }
 
   results.sort((a, b) => b.score - a.score);
-
   return results.slice(0, 10).map((r, i) => ({ ...r, rank: i + 1 }));
 }
 
