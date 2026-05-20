@@ -15,6 +15,8 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-05-21",
     changes: [
+    { type: "fix", text: "fix(optimizer): excludeSlot/excludeAll の setExcluded 参照漏れを修正" },
+    { type: "fix", text: "fix(optimizer): 装備最適化の状態保持・ステータス順序・実ステ計算バグを修正" },
     { type: "fix", text: "fix(simulator): G強化上限を100→1000に統一・コスト計算を段階コスト式に修正" },
     ],
   },
