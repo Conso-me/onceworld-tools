@@ -233,6 +233,20 @@ export function EquipmentOptimizer({ onApply }: Props) {
     });
   }
 
+  function excludeSlot(slot: EquipSlot) {
+    setExcluded((prev) => {
+      const next = new Set(prev);
+      allBySlot[slot].forEach((item) => next.add(item.name));
+      return next;
+    });
+  }
+
+  function excludeAll() {
+    setExcluded(
+      new Set(Object.values(allBySlot).flat().map((item) => item.name)),
+    );
+  }
+
   function handleApply(result: EquipOptResult, target: "A" | "B") {
     const displayItems = result.weapon ? [result.weapon, ...result.armors] : result.armors;
     const slots = result.weapon
@@ -314,7 +328,9 @@ export function EquipmentOptimizer({ onApply }: Props) {
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">ステータス優先度</h3>
             <button
-              onClick={() => setWeights({ ...DEFAULT_WEIGHTS })}
+              onClick={() =>
+                setWeights({ vit: 0, spd: 0, atk: 0, int: 0, def: 0, mdef: 0, luck: 0 })
+              }
               className="text-[11px] text-gray-400 hover:text-gray-600 transition-colors"
             >
               リセット
@@ -359,19 +375,33 @@ export function EquipmentOptimizer({ onApply }: Props) {
 
           {showExclude && (
             <div className="space-y-2 pt-1">
-              {excluded.size > 0 && (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={excludeAll}
+                  className="text-[11px] text-gray-500 hover:text-gray-700 border border-gray-200 rounded px-2 py-0.5 transition-colors"
+                >
+                  全除外
+                </button>
                 <button
                   onClick={() => setExcluded(new Set())}
-                  className="text-[11px] text-red-400 hover:text-red-600 transition-colors"
+                  className="text-[11px] text-red-400 hover:text-red-600 border border-red-100 rounded px-2 py-0.5 transition-colors"
                 >
-                  すべてクリア
+                  リセット
                 </button>
-              )}
+              </div>
               {EQUIP_SLOTS.map((slot) => (
                 <div key={slot} className="space-y-1">
-                  <p className="text-[10px] font-semibold text-gray-400 uppercase">
-                    {slotLabels[slot]}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-[10px] font-semibold text-gray-400 uppercase">
+                      {slotLabels[slot]}
+                    </p>
+                    <button
+                      onClick={() => excludeSlot(slot)}
+                      className="text-[10px] text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      一式除外
+                    </button>
+                  </div>
                   <div className="flex flex-wrap gap-1">
                     {allBySlot[slot].map((item) => {
                       const isExcluded = excluded.has(item.name);
