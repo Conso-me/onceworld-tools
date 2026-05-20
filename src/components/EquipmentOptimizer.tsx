@@ -96,23 +96,24 @@ function ResultRow({
               )}
             </div>
           )}
-          {/* ステータス実数値 */}
-          <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5">
+          {/* ステータス実数値（ゲーム内順） */}
+          <div className="mt-1.5 space-y-0.5">
             {(
               [
-                { key: "mdef" as const, label: "M-DEF", cls: "text-purple-600" },
-                { key: "int"  as const, label: "INT",   cls: "text-blue-600"   },
-                { key: "atk"  as const, label: "ATK",   cls: "text-red-500"    },
-                { key: "luck" as const, label: "LUK",   cls: "text-yellow-600" },
-                { key: "def"  as const, label: "DEF",   cls: "text-green-600"  },
-                { key: "vit"  as const, label: "VIT",   cls: "text-orange-500" },
-                { key: "spd"  as const, label: "SPD",   cls: "text-gray-500"   },
+                { key: "vit",  label: "VIT",   val: result.stats.vit,  cls: "text-orange-500" },
+                { key: "spd",  label: "SPD",   val: result.stats.spd,  cls: "text-gray-500"   },
+                { key: "atk",  label: "ATK",   val: result.stats.atk,  cls: "text-red-500"    },
+                { key: "int",  label: "INT",   val: result.stats.int,  cls: "text-blue-600"   },
+                { key: "def",  label: "DEF",   val: result.stats.def,  cls: "text-green-600"  },
+                { key: "mdef", label: "M-DEF", val: result.stats.mdef, cls: "text-purple-600" },
+                { key: "luck", label: "LUK",   val: result.stats.luck, cls: "text-yellow-600" },
+                { key: "mov",  label: "MOV",   val: result.mov,        cls: "text-teal-500"   },
               ] as const
-            ).map(({ key, label, cls }) => (
-              <span key={key} className="text-[10px] tabular-nums whitespace-nowrap">
-                <span className={`font-semibold ${cls}`}>{label}</span>
-                <span className="text-gray-500 ml-0.5">{result.stats[key].toLocaleString()}</span>
-              </span>
+            ).map(({ key, label, val, cls }) => (
+              <div key={key} className="flex items-center gap-1.5 text-[10px] whitespace-nowrap">
+                <span className={`font-semibold w-10 ${cls}`}>{label}</span>
+                <span className="tabular-nums text-gray-600">{val.toLocaleString()}</span>
+              </div>
             ))}
           </div>
         </div>

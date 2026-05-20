@@ -29,6 +29,7 @@ export interface EquipOptResult {
   hasSetBonus: boolean;
   series: string | null;
   stats: CoreStats;
+  mov: number;
 }
 
 function canEnhance(item: EquipmentItem): boolean {
@@ -215,6 +216,8 @@ export function optimizeEquipment(
       const score = computeTotalScore(weapon, armor.items, goldLevels, weights, setMult);
       const totalCost = computeTotalCost(weapon, armor.items, goldLevels);
       const stats = computeEquipStats(weapon, armor.items, goldLevels);
+      const allItems = [weapon, ...armor.items];
+      const mov = allItems.reduce((s, item) => s + (item.mov ?? 0), 0);
       results.push({
         weapon,
         armors: armor.items,
@@ -224,6 +227,7 @@ export function optimizeEquipment(
         hasSetBonus: armor.hasSetBonus,
         series: armor.series,
         stats,
+        mov,
       });
     }
   }

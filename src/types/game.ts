@@ -51,6 +51,7 @@ export interface EquipmentItem {
   def: number;
   mdef: number;
   luck: number;
+  mov?: number;
   order?: number;
 }
 
