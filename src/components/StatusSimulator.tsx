@@ -142,6 +142,22 @@ function GoldEnhCostBadge({ cfg, label }: { cfg: SimConfig; label?: string }) {
   );
 }
 
+// ── Copy helpers ──────────────────────────────────────────────────────────────
+
+const EQUIP_KEYS: (keyof SimConfig)[] = [
+  "equipWeapon", "enhWeapon", "goldEnhWeapon",
+  "equipHead",   "enhHead",   "goldEnhHead",
+  "equipBody",   "enhBody",   "goldEnhBody",
+  "equipHand",   "enhHand",   "goldEnhHand",
+  "equipShield", "enhShield", "goldEnhShield",
+  "equipFoot",   "enhFoot",   "goldEnhFoot",
+];
+
+const NON_EQUIP_KEYS: (keyof SimConfig)[] = [
+  "acc1", "acc1Level", "acc2", "acc2Level", "acc3", "acc3Level", "acc4", "acc4Level",
+  "petName", "petLevel", "pet2Name", "pet2Level", "pet3Name", "pet3Level",
+];
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function StatusSimulator() {
@@ -167,6 +183,22 @@ export function StatusSimulator() {
   const activeSetField = activeConfig === "A" ? setFieldA : setFieldB;
   const activeReset = activeConfig === "A" ? resetA : resetB;
   const activeReplaceAll = activeConfig === "A" ? replaceAllA : replaceAllB;
+
+  function handleCopy(scope: "all" | "equip" | "nonEquip") {
+    const src = activeConfig === "A" ? cfgA : cfgB;
+    const dst = activeConfig === "A" ? cfgB : cfgA;
+    const dstReplaceAll = activeConfig === "A" ? replaceAllB : replaceAllA;
+    const keys =
+      scope === "all"      ? null :
+      scope === "equip"    ? EQUIP_KEYS :
+                             NON_EQUIP_KEYS;
+    if (keys === null) {
+      dstReplaceAll({ ...src });
+    } else {
+      const patch = Object.fromEntries(keys.map((k) => [k, src[k]])) as Partial<SimConfig>;
+      dstReplaceAll({ ...dst, ...patch });
+    }
+  }
 
   function handleSavePreset() {
     const trimmed = presetName.trim();
@@ -227,20 +259,38 @@ export function StatusSimulator() {
       {/* 左パネル（入力） */}
       <div className="space-y-4">
         {compareMode && (
-          <div className="flex rounded-xl overflow-hidden border border-gray-200">
-            {(["A", "B"] as const).map((id) => (
-              <button
-                key={id}
-                onClick={() => setActiveConfig(id)}
-                className={`flex-1 py-2 text-sm font-semibold transition-colors ${
-                  activeConfig === id
-                    ? id === "A" ? "bg-blue-500 text-white" : "bg-orange-400 text-white"
-                    : "bg-white text-gray-500 hover:bg-gray-50"
-                }`}
-              >
-                {t("configLabel", { id })}
-              </button>
-            ))}
+          <div className="space-y-2">
+            <div className="flex rounded-xl overflow-hidden border border-gray-200">
+              {(["A", "B"] as const).map((id) => (
+                <button
+                  key={id}
+                  onClick={() => setActiveConfig(id)}
+                  className={`flex-1 py-2 text-sm font-semibold transition-colors ${
+                    activeConfig === id
+                      ? id === "A" ? "bg-blue-500 text-white" : "bg-orange-400 text-white"
+                      : "bg-white text-gray-500 hover:bg-gray-50"
+                  }`}
+                >
+                  {t("configLabel", { id })}
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-gray-500">
+              <span className="shrink-0">
+                {activeConfig === "A" ? "A→B:" : "B→A:"}
+              </span>
+              {(["all", "equip", "nonEquip"] as const).map((scope) => (
+                <button
+                  key={scope}
+                  onClick={() => handleCopy(scope)}
+                  className="px-2.5 py-1 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 font-medium transition-colors"
+                >
+                  {scope === "all"      ? "全体コピー" :
+                   scope === "equip"    ? "装備のみ" :
+                                         "装備以外"}
+                </button>
+              ))}
+            </div>
           </div>
         )}
         <SimConfigPanel
