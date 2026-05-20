@@ -28,6 +28,7 @@ export interface EquipOptResult {
   score: number;
   hasSetBonus: boolean;
   series: string | null;
+  stats: CoreStats;
 }
 
 function canEnhance(item: EquipmentItem): boolean {
@@ -74,6 +75,21 @@ function computeTotalScore(
 ): number {
   const all = [weapon, ...armors];
   return all.reduce((s, item, i) => s + slotScore(item, goldLevels[i], weights, setMult), 0);
+}
+
+function computeEquipStats(
+  weapon: EquipmentItem,
+  armors: EquipmentItem[],
+  goldLevels: number[],
+): CoreStats {
+  const all = [weapon, ...armors];
+  const result: CoreStats = { vit: 0, spd: 0, atk: 0, int: 0, def: 0, mdef: 0, luck: 0 };
+  for (let i = 0; i < all.length; i++) {
+    for (const k of STAT_KEYS) {
+      result[k] += computeGoldEnhStat(all[i], k, goldLevels[i]);
+    }
+  }
+  return result;
 }
 
 function computeTotalCost(
@@ -198,6 +214,7 @@ export function optimizeEquipment(
       const setMult = armor.hasSetBonus ? 1.1 : 1.0;
       const score = computeTotalScore(weapon, armor.items, goldLevels, weights, setMult);
       const totalCost = computeTotalCost(weapon, armor.items, goldLevels);
+      const stats = computeEquipStats(weapon, armor.items, goldLevels);
       results.push({
         weapon,
         armors: armor.items,
@@ -206,6 +223,7 @@ export function optimizeEquipment(
         score,
         hasSetBonus: armor.hasSetBonus,
         series: armor.series,
+        stats,
       });
     }
   }

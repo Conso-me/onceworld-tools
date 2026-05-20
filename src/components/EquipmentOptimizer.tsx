@@ -96,6 +96,25 @@ function ResultRow({
               )}
             </div>
           )}
+          {/* ステータス実数値 */}
+          <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5">
+            {(
+              [
+                { key: "mdef" as const, label: "M-DEF", cls: "text-purple-600" },
+                { key: "int"  as const, label: "INT",   cls: "text-blue-600"   },
+                { key: "atk"  as const, label: "ATK",   cls: "text-red-500"    },
+                { key: "luck" as const, label: "LUK",   cls: "text-yellow-600" },
+                { key: "def"  as const, label: "DEF",   cls: "text-green-600"  },
+                { key: "vit"  as const, label: "VIT",   cls: "text-orange-500" },
+                { key: "spd"  as const, label: "SPD",   cls: "text-gray-500"   },
+              ] as const
+            ).map(({ key, label, cls }) => (
+              <span key={key} className="text-[10px] tabular-nums whitespace-nowrap">
+                <span className={`font-semibold ${cls}`}>{label}</span>
+                <span className="text-gray-500 ml-0.5">{result.stats[key].toLocaleString()}</span>
+              </span>
+            ))}
+          </div>
         </div>
       </td>
       {/* G強化配分 */}
