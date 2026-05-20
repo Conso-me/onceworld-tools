@@ -42,7 +42,16 @@ interface Props {
   onApply: (overrides: Partial<SimConfig>, target: "A" | "B") => void;
 }
 
-function fmtG(n: number): string {
+function fmtG(n: number, lang: string): string {
+  if (lang === "ja") {
+    if (n >= 10_000_000_000_000) return `${Math.floor(n / 1_000_000_000_000).toLocaleString()}兆`;
+    if (n >= 1_000_000_000_000) return `${(n / 1_000_000_000_000).toFixed(1)}兆`;
+    if (n >= 10_000_000_000) return `${Math.floor(n / 100_000_000).toLocaleString()}億`;
+    if (n >= 100_000_000) return `${(n / 100_000_000).toFixed(1)}億`;
+    if (n >= 100_000) return `${Math.floor(n / 10_000).toLocaleString()}万`;
+    if (n >= 10_000) return `${(n / 10_000).toFixed(1)}万`;
+    return n.toLocaleString();
+  }
   if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(1)}B`;
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(0)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
@@ -142,7 +151,7 @@ function ResultRow({
       {/* コスト */}
       <td className="px-2 py-2 text-right text-xs tabular-nums whitespace-nowrap">
         {result.totalCost > 0 ? (
-          <span className="text-yellow-700 font-medium">{fmtG(result.totalCost)} G</span>
+          <span className="text-yellow-700 font-medium">{fmtG(result.totalCost, i18n.language)} G</span>
         ) : (
           <span className="text-gray-300">—</span>
         )}
@@ -181,7 +190,7 @@ function ResultRow({
 }
 
 export function EquipmentOptimizer({ onApply }: Props) {
-  const { t } = useTranslation("status");
+  const { t, i18n } = useTranslation("status");
 
   const [unlimited, setUnlimited] = useState(true);
   const [budgetStr, setBudgetStr] = useState("");
@@ -294,7 +303,7 @@ export function EquipmentOptimizer({ onApply }: Props) {
                 <span className="text-sm text-gray-500 shrink-0">G</span>
               </div>
               {budget > 0 && (
-                <p className="text-xs text-gray-400">{fmtG(budget)} G</p>
+                <p className="text-xs text-gray-400">{fmtG(budget, i18n.language)} G</p>
               )}
             </div>
           )}
