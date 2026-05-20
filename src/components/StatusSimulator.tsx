@@ -130,14 +130,26 @@ function CompareTable({ resultA, resultB }: { resultA: ReturnType<typeof calcSta
   );
 }
 
+function fmtG(n: number): string {
+  if (n >= 10_000_000_000_000) return `${Math.floor(n / 1_000_000_000_000).toLocaleString()}兆`;
+  if (n >= 1_000_000_000_000) return `${(n / 1_000_000_000_000).toFixed(1)}兆`;
+  if (n >= 10_000_000_000) return `${Math.floor(n / 100_000_000).toLocaleString()}億`;
+  if (n >= 100_000_000) return `${(n / 100_000_000).toFixed(1)}億`;
+  if (n >= 100_000) return `${Math.floor(n / 10_000).toLocaleString()}万`;
+  if (n >= 10_000) return `${(n / 10_000).toFixed(1)}万`;
+  return n.toLocaleString();
+}
+
 function GoldEnhCostBadge({ cfg, label }: { cfg: SimConfig; label?: string }) {
+  const { i18n } = useTranslation("status");
   const cost = calcGoldEnhCost(cfg);
   if (cost <= 0) return null;
+  const display = i18n.language === "ja" ? `${fmtG(cost)} G` : `${cost.toLocaleString()} G`;
   return (
     <div className="flex items-center gap-2 text-xs text-yellow-700 bg-yellow-50 border border-yellow-200 rounded-lg px-3 py-2">
       {label && <span className="font-medium text-yellow-600">{label}</span>}
       <span>金強化コスト合計</span>
-      <span className="font-mono font-semibold ml-auto">{cost.toLocaleString()} G</span>
+      <span className="font-mono font-semibold ml-auto">{display}</span>
     </div>
   );
 }
