@@ -90,9 +90,9 @@ function computeEquipStats(
   return result;
 }
 
-function maxAffordableG(bSum: number, budget: number): number {
+function maxAffordableG(bSum: number, budget: number, maxGoldEnh: number): number {
   let lo = 0,
-    hi = MAX_GOLD_ENH;
+    hi = maxGoldEnh;
   while (lo < hi) {
     const mid = Math.ceil((lo + hi) / 2);
     if (calcItemGoldCost(bSum, mid) <= budget) lo = mid;
@@ -116,6 +116,7 @@ function optimizeGoldAlloc(
   items: EquipmentItem[],
   weights: StatWeights,
   budget: number,
+  maxGoldEnh: number,
 ): number[] {
   if (budget <= 0) return items.map(() => 0);
 
@@ -138,7 +139,7 @@ function optimizeGoldAlloc(
   for (const i of order) {
     if (remaining <= 0 || efficiencies[i] === 0) continue;
     const bSum = baseStatSum(items[i]);
-    const g = maxAffordableG(bSum, remaining);
+    const g = maxAffordableG(bSum, remaining, maxGoldEnh);
     levels[i] = g;
     remaining -= calcItemGoldCost(bSum, g);
   }
@@ -151,6 +152,7 @@ export function optimizeEquipment(
   weights: StatWeights,
   budget: number,
   includeWeapon = true,
+  maxGoldEnh: number = MAX_GOLD_ENH,
 ): EquipOptResult[] {
   const filter = (items: EquipmentItem[]) => items.filter((i) => !excluded.has(i.name));
 
@@ -215,7 +217,7 @@ export function optimizeEquipment(
     for (const weapon of topWeapons) {
       for (const armor of topArmors) {
         const allItems = [weapon, ...armor.items];
-        const goldLevels = optimizeGoldAlloc(allItems, weights, budget);
+        const goldLevels = optimizeGoldAlloc(allItems, weights, budget, maxGoldEnh);
         const setMult = armor.hasSetBonus ? 1.1 : 1.0;
         const score = computeTotalScore(allItems, goldLevels, weights, setMult);
         const totalCost = computeTotalCost(allItems, goldLevels);
@@ -234,7 +236,7 @@ export function optimizeEquipment(
     }
   } else {
     for (const armor of topArmors) {
-      const goldLevels = optimizeGoldAlloc(armor.items, weights, budget);
+      const goldLevels = optimizeGoldAlloc(armor.items, weights, budget, maxGoldEnh);
       const setMult = armor.hasSetBonus ? 1.1 : 1.0;
       const score = computeTotalScore(armor.items, goldLevels, weights, setMult);
       const totalCost = computeTotalCost(armor.items, goldLevels);

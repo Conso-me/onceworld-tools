@@ -195,6 +195,7 @@ export function EquipmentOptimizer({ onApply }: Props) {
 
   const [unlimited, setUnlimited] = usePersistedState("opt-unlimited", true);
   const [budgetStr, setBudgetStr] = usePersistedState("opt-budget", "");
+  const [maxGoldEnhStr, setMaxGoldEnhStr] = usePersistedState("opt-max-gold-enh", "1000");
   const [weights, setWeights] = usePersistedState<StatWeights>("opt-weights", { ...DEFAULT_WEIGHTS });
   const [excludedArr, setExcludedArr] = usePersistedState<string[]>("opt-excluded", []);
   const excluded = useMemo(() => new Set(excludedArr), [excludedArr]);
@@ -204,6 +205,7 @@ export function EquipmentOptimizer({ onApply }: Props) {
   const [appliedB, setAppliedB] = useState<number | null>(null);
 
   const budget = unlimited ? Infinity : (Number(budgetStr.replace(/,/g, "")) || 0);
+  const maxGoldEnh = Math.min(1000, Math.max(0, Number(maxGoldEnhStr) || 1000));
 
   const allBySlot = useMemo(
     () =>
@@ -222,8 +224,8 @@ export function EquipmentOptimizer({ onApply }: Props) {
   );
 
   const results = useMemo(
-    () => optimizeEquipment(excluded, weights, budget, includeWeapon),
-    [excluded, weights, budget, includeWeapon],
+    () => optimizeEquipment(excluded, weights, budget, includeWeapon, maxGoldEnh),
+    [excluded, weights, budget, includeWeapon, maxGoldEnh],
   );
 
   function toggleExclude(name: string) {
@@ -317,6 +319,23 @@ export function EquipmentOptimizer({ onApply }: Props) {
               )}
             </div>
           )}
+        </div>
+
+        {/* G強化上限 */}
+        <div className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
+          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">G強化上限</h3>
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              min={0}
+              max={1000}
+              value={maxGoldEnhStr}
+              onChange={(e) => setMaxGoldEnhStr(e.target.value)}
+              className={`${inputCls} w-20 text-center`}
+            />
+            <span className="text-sm text-gray-500 shrink-0">/ 1000</span>
+          </div>
+          <p className="text-[10px] text-gray-400">各スロットのG強化の最大値を制限。デフォルト1000。</p>
         </div>
 
         {/* 優先度重み */}
