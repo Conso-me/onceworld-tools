@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { usePersistedState } from "../hooks/usePersistedState";
 import type { SimConfig, EquipmentItem } from "../types/game";
 import { getEquipmentBySlot } from "../data/equipment";
 import {
@@ -26,13 +27,13 @@ const SLOT_CONFIG_KEYS: Record<EquipSlot, {
 };
 
 const WEIGHT_LABELS: { key: keyof StatWeights; label: string }[] = [
-  { key: "mdef", label: "M-DEF" },
-  { key: "int",  label: "INT"   },
-  { key: "atk",  label: "ATK"   },
-  { key: "luck", label: "LUK"   },
-  { key: "def",  label: "DEF"   },
   { key: "vit",  label: "VIT"   },
   { key: "spd",  label: "SPD"   },
+  { key: "atk",  label: "ATK"   },
+  { key: "int",  label: "INT"   },
+  { key: "def",  label: "DEF"   },
+  { key: "mdef", label: "M-DEF" },
+  { key: "luck", label: "LUK"   },
 ];
 
 const inputCls =
@@ -192,12 +193,13 @@ function ResultRow({
 export function EquipmentOptimizer({ onApply }: Props) {
   const { t, i18n } = useTranslation("status");
 
-  const [unlimited, setUnlimited] = useState(true);
-  const [budgetStr, setBudgetStr] = useState("");
-  const [weights, setWeights] = useState<StatWeights>({ ...DEFAULT_WEIGHTS });
-  const [excluded, setExcluded] = useState<Set<string>>(new Set());
+  const [unlimited, setUnlimited] = usePersistedState("opt-unlimited", true);
+  const [budgetStr, setBudgetStr] = usePersistedState("opt-budget", "");
+  const [weights, setWeights] = usePersistedState<StatWeights>("opt-weights", { ...DEFAULT_WEIGHTS });
+  const [excludedArr, setExcludedArr] = usePersistedState<string[]>("opt-excluded", []);
+  const excluded = useMemo(() => new Set(excludedArr), [excludedArr]);
   const [showExclude, setShowExclude] = useState(false);
-  const [includeWeapon, setIncludeWeapon] = useState(true);
+  const [includeWeapon, setIncludeWeapon] = usePersistedState("opt-include-weapon", true);
   const [appliedA, setAppliedA] = useState<number | null>(null);
   const [appliedB, setAppliedB] = useState<number | null>(null);
 
@@ -225,26 +227,20 @@ export function EquipmentOptimizer({ onApply }: Props) {
   );
 
   function toggleExclude(name: string) {
-    setExcluded((prev) => {
-      const next = new Set(prev);
-      if (next.has(name)) next.delete(name);
-      else next.add(name);
-      return next;
-    });
+    setExcludedArr((prev) =>
+      prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name],
+    );
   }
 
   function excludeSlot(slot: EquipSlot) {
-    setExcluded((prev) => {
-      const next = new Set(prev);
-      allBySlot[slot].forEach((item) => next.add(item.name));
-      return next;
+    setExcludedArr((prev) => {
+      const toAdd = allBySlot[slot].map((item) => item.name).filter((n) => !prev.includes(n));
+      return [...prev, ...toAdd];
     });
   }
 
   function excludeAll() {
-    setExcluded(
-      new Set(Object.values(allBySlot).flat().map((item) => item.name)),
-    );
+    setExcludedArr(Object.values(allBySlot).flat().map((item) => item.name));
   }
 
   function handleApply(result: EquipOptResult, target: "A" | "B") {
@@ -383,7 +379,7 @@ export function EquipmentOptimizer({ onApply }: Props) {
                   全除外
                 </button>
                 <button
-                  onClick={() => setExcluded(new Set())}
+                  onClick={() => setExcludedArr([])}
                   className="text-[11px] text-red-400 hover:text-red-600 border border-red-100 rounded px-2 py-0.5 transition-colors"
                 >
                   リセット
