@@ -7,6 +7,24 @@ import statPointsData from "../../docs/data/stat-points.json";
 const STAT_KEYS = ["vit", "spd", "atk", "int", "def", "mdef", "luck"] as const;
 const ARMOR_SLOTS = ["equipHead", "equipBody", "equipHand", "equipShield", "equipFoot"] as const;
 
+const GOLD_COST_FACTOR = 10_000_000;
+const TIER_EXTRA = 10_000_000_000;
+
+function tierSurcharge(g: number): number {
+  const fullTiers = Math.floor(g / 100);
+  const remainder = g % 100;
+  let total = 0;
+  for (let n = 1; n < fullTiers; n++) total += 100 * n * n * TIER_EXTRA;
+  if (fullTiers > 0) total += remainder * fullTiers * fullTiers * TIER_EXTRA;
+  return total;
+}
+
+/** 1装備スロットの金強化コスト（段階コスト込み） */
+export function calcItemGoldCost(baseStatSum: number, g: number): number {
+  if (g <= 0) return 0;
+  return g * baseStatSum * GOLD_COST_FACTOR + tierSurcharge(g);
+}
+
 function zeroStats(): CoreStats {
   return { vit: 0, spd: 0, atk: 0, int: 0, def: 0, mdef: 0, luck: 0 };
 }
@@ -92,8 +110,8 @@ function equipmentStats(cfg: SimConfig): CoreStats {
 }
 
 /**
- * 金強化に必要なゴールド総量
- * 各スロット: goldEnh × 初期ステ合計 × 10,000,000
+ * 金強化に必要なゴールド総量（段階コスト込み）
+ * 各スロット: calcItemGoldCost(初期ステ合計, goldEnh)
  */
 export function calcGoldEnhCost(cfg: SimConfig): number {
   const slots: [string, number][] = [
@@ -110,7 +128,7 @@ export function calcGoldEnhCost(cfg: SimConfig): number {
     const item = getEquipmentByName(name);
     if (!item || item.material === "強化できない") continue;
     const baseSum = STAT_KEYS.reduce((s, k) => s + (item[k] ?? 0), 0);
-    total += goldEnh * baseSum * 10_000_000;
+    total += calcItemGoldCost(baseSum, goldEnh);
   }
   return total;
 }

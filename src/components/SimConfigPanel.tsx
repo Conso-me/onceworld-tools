@@ -462,10 +462,10 @@ function EquipSelector({
           <div className="flex items-center gap-1 sm:shrink-0">
             <span className="text-xs text-yellow-500 font-semibold">G+</span>
             <SmallNumInput
-              value={goldEnhVal} onChange={onGoldEnhChange} min={0} max={100}
+              value={goldEnhVal} onChange={onGoldEnhChange} min={0} max={1000}
               className="flex-1 sm:w-12 border border-yellow-200 rounded-lg px-2 py-1.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-yellow-300"
             />
-            <button onClick={() => onGoldEnhChange(100)} className={maxBtnCls}>MAX</button>
+            <button onClick={() => onGoldEnhChange(1000)} className={maxBtnCls}>MAX</button>
           </div>
         )}
       </div>
@@ -965,7 +965,7 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
   function maxAllEquip() {
     for (const { enhKey, goldEnhKey } of EQUIPMENT_SLOTS) {
       setField(enhKey, 1100);
-      setField(goldEnhKey, 100);
+      setField(goldEnhKey, 1000);
     }
   }
 
