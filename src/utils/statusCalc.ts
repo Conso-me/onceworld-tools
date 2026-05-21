@@ -14,8 +14,9 @@ function tierSurcharge(g: number): number {
   const fullTiers = Math.floor(g / 100);
   const remainder = g % 100;
   let total = 0;
-  for (let n = 1; n < fullTiers; n++) total += 100 * n * n * TIER_EXTRA;
-  if (fullTiers > 0) total += remainder * fullTiers * fullTiers * TIER_EXTRA;
+  // 段階コスト/step: n² + n - 1 倍 × TIER_EXTRA (n=1:100億, n=2:500億, ...)
+  for (let n = 1; n < fullTiers; n++) total += 100 * (n * n + n - 1) * TIER_EXTRA;
+  if (fullTiers > 0) total += remainder * (fullTiers * fullTiers + fullTiers - 1) * TIER_EXTRA;
   return total;
 }
 
