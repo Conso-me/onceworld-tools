@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-05-21",
     changes: [
+    { type: "fix", text: "fix(goldEnh): tier2の段階コストを400億→500億に修正" },
     { type: "improve", text: "fix(optimizer): G強化配分をtier対応greedyに刷新" },
     { type: "fix", text: "feat(optimizer): G強化上限の指定と入力欄の幅修正" },
     { type: "fix", text: "fix(optimizer): excludeSlot/excludeAll の setExcluded 参照漏れを修正" },
