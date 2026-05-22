@@ -205,7 +205,7 @@ export function EquipmentOptimizer({ onApply }: Props) {
   const [appliedB, setAppliedB] = useState<number | null>(null);
 
   const budget = unlimited ? Infinity : (Number(budgetStr.replace(/,/g, "")) || 0);
-  const maxGoldEnh = Math.min(1000, Math.max(0, Number(maxGoldEnhStr) || 1000));
+  const maxGoldEnh = Math.min(300, Math.max(0, Number(maxGoldEnhStr) || 300));
 
   const allBySlot = useMemo(
     () =>
@@ -328,7 +328,7 @@ export function EquipmentOptimizer({ onApply }: Props) {
             <input
               type="number"
               min={0}
-              max={1000}
+              max={300}
               value={maxGoldEnhStr}
               onChange={(e) => setMaxGoldEnhStr(e.target.value)}
               className={`${inputCls} w-20 text-center`}
