@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-05-22",
+    changes: [
+    { type: "fix", text: "fix(goldEnh): G強化上限を300に修正・ステータス計算式を検証" },
+    ],
+  },
+
+  {
     date: "2026-05-21",
     changes: [
     { type: "fix", text: "fix(goldEnh): tier2の段階コストを400億→500億に修正" },
