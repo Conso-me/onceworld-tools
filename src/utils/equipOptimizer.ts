@@ -5,7 +5,7 @@ import { calcItemGoldCost } from "./statusCalc";
 const STAT_KEYS = ["vit", "spd", "atk", "int", "def", "mdef", "luck"] as const;
 const ARMOR_SLOTS = ["頭", "服", "手", "盾", "脚"] as const;
 const MAX_ENH = 1100;
-const MAX_GOLD_ENH = 1000;
+const MAX_GOLD_ENH = 300;
 const GOLD_COST_FACTOR = 10_000_000;
 const GOLD_STAT_PER_G = 10_000;
 const TIER_EXTRA = 10_000_000_000; // G101〜 の段階コスト係数（statusCalc.ts と同値）
