@@ -366,6 +366,63 @@ export const enemyPresetGroups: EnemyPresetGroup[] = [
       { monsterName: "時空竜クロノゼリウス", level: 28000,  location: "雪山【禁域】", locationEn: "Snowmountain [Forbidden]" },
     ],
   },
+  {
+    mapLabel: "魔王城近郊",
+    label: "無名",
+    presets: [
+      { monsterName: "無名", level: 9999999,  location: "草原の奥地",        magicImmune: true },
+      { monsterName: "無名", level: 19999999, location: "ファントム山頂",     magicImmune: true },
+      { monsterName: "無名", level: 29999999, location: "インフェルニア火山3", magicImmune: true },
+    ],
+  },
+  {
+    mapLabel: "魔王城近郊",
+    label: "魔王城近郊",
+    presets: [
+      { monsterName: "クリーチャーローズ", level: 20000000, location: "魔王城近郊" },
+    ],
+  },
+  {
+    mapLabel: "魔王城近郊",
+    label: "魔王城近郊2",
+    presets: [
+      { monsterName: "禁域のラミア",      level: 18000000, location: "魔王城近郊2" },
+      { monsterName: "禁域の巨木",        level: 18000000, location: "魔王城近郊2" },
+      { monsterName: "禁域のアヌビシュ",  level: 18000000, location: "魔王城近郊2" },
+      { monsterName: "禁域のクマヌイ",    level: 18000000, location: "魔王城近郊2" },
+      { monsterName: "禁域のヴァルネシア", level: 18000000, location: "魔王城近郊2" },
+      { monsterName: "禁域のワイバーン",  level: 18000000, location: "魔王城近郊2" },
+    ],
+  },
+  {
+    mapLabel: "魔王城近郊",
+    label: "名もなき坑道",
+    presets: [
+      { monsterName: "キングニワトリ", level: 3000000, location: "名もなき坑道" },
+      { monsterName: "虹ペリカンEXP",  level: 3000000, location: "名もなき坑道・レア出現" },
+    ],
+  },
+  {
+    mapLabel: "魔王城近郊",
+    label: "魔王城庭園",
+    presets: [
+      { monsterName: "ボスゴブリン",      level: 6000000,  location: "魔王城庭園" },
+      { monsterName: "ギガントオーク",    level: 6000000,  location: "魔王城庭園" },
+      { monsterName: "ランプの精霊",      level: 6000000,  location: "魔王城庭園・右上" },
+      { monsterName: "邪黒竜",            level: 6000000,  location: "魔王城庭園・右上" },
+      { monsterName: "ファントムツリー",  level: 6000000,  location: "魔王城庭園・左上" },
+      { monsterName: "スノーモケラ",      level: 6000000,  location: "魔王城庭園・左上" },
+      { monsterName: "ネクロプリンセス",  level: 6000000,  location: "魔王城庭園・奥" },
+      { monsterName: "聖典神セラフィエル", level: 89000000, location: "魔王城庭園・奥" },
+    ],
+  },
+  {
+    mapLabel: "魔王城近郊",
+    label: "溶岩沼",
+    presets: [
+      { monsterName: "バーサクフレイム", level: 50000, location: "溶岩沼" },
+    ],
+  },
 ];
 
 export function formatPresetLabel(preset: EnemyPreset): string {
