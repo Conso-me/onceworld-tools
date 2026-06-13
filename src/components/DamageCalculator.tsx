@@ -109,6 +109,7 @@ export function DamageCalculator({
   const [analysisBook, setAnalysisBook] = usePersistedState("dmg:analysisBook", "");
   const [analysisAnalysisBook, setAnalysisAnalysisBook] = usePersistedState("dmg:analysisAnalysisBook", "");
   const [crystalCube, setCrystalCube] = usePersistedState("dmg:crystalCube", "");
+  const [toughouCube, setToughouCube] = usePersistedState("dmg:toughouCube", "");
   // 物理オーバーキル計算に多段攻撃を含めるか（現状ゲーム内では多段でOKが発生しないためデフォルトOFF）
   const [physOverkillMultiHit, setPhysOverkillMultiHit] = usePersistedState("dmg:physOverkillMultiHit", false);
   // 魔法デバフ: 木魔法→DEF半減、闇魔法→LUK半減
@@ -130,12 +131,15 @@ export function DamageCalculator({
   const analysisBookNum = parseInt(analysisBook) || 0;
   const analysisAnalysisBookNum = parseInt(analysisAnalysisBook) || 0;
   const crystalCubeNum = Math.min(parseInt(crystalCube) || 0, 1000);
+  const toughouCubeNum = Math.min(parseInt(toughouCube) || 0, 1000);
 
   const magicBaseInt = analysisBookNum * (1 + analysisAnalysisBookNum * 0.1);
   const crystalCubeMult = 1 + crystalCubeNum * 0.01;
   // 魔晶立方体は防御計算前に適用（検証済み）
   const crystalCubePreMult  = crystalCubeMult;
   const crystalCubeFinalMult = 1;
+  // 闘晶立方体：計算式未検証、魔晶立方体と同様に防御計算前適用と仮定
+  const toughouCubePreMult = 1 + toughouCubeNum * 0.01;
 
   // 装備設定モード
   const [statMode, setStatMode] = usePersistedState<"manual" | "sim">("dmg:statMode", "manual");
@@ -162,6 +166,7 @@ export function DamageCalculator({
     : myAttackMode;
   const activeCrystalCubePreMult = calcTarget === "pet" ? 1 : crystalCubePreMult;
   const activeCrystalCubeFinalMult = calcTarget === "pet" ? 1 : crystalCubeFinalMult;
+  const activeToughouCubePreMult = calcTarget === "pet" ? 1 : toughouCubePreMult;
   const activeMagicBaseInt = calcTarget === "pet" ? 0 : magicBaseInt;
 
   // プリセット
@@ -189,8 +194,9 @@ export function DamageCalculator({
       analysisBook,
       analysisAnalysisBook,
       crystalCube,
+      toughouCube,
     });
-  }, [presetName, presets, savePreset, myAtk, myInt, myDef, myMdef, mySpd, myVit, myLuck, myElement, myAttackMode, analysisBook, analysisAnalysisBook, crystalCube, t]);
+  }, [presetName, presets, savePreset, myAtk, myInt, myDef, myMdef, mySpd, myVit, myLuck, myElement, myAttackMode, analysisBook, analysisAnalysisBook, crystalCube, toughouCube, t]);
 
   const handleLoadPreset = useCallback(() => {
     const preset = loadPreset(selectedPresetId);
@@ -207,6 +213,7 @@ export function DamageCalculator({
     setAnalysisBook(preset.analysisBook);
     setAnalysisAnalysisBook(preset.analysisAnalysisBook);
     setCrystalCube(preset.crystalCube ?? "");
+    setToughouCube(preset.toughouCube ?? "");
   }, [selectedPresetId, loadPreset, setMyAtk, setMyInt, setMyDef, setMyMdef, setMySpd, setMyVit, setMyLuck, setMyElement, setMyAttackMode, setAnalysisBook, setAnalysisAnalysisBook, setCrystalCube]);
 
   const handleDeletePreset = useCallback(() => {
@@ -287,6 +294,7 @@ export function DamageCalculator({
         if (state.analysisBook !== undefined) setAnalysisBook(state.analysisBook);
         if (state.analysisAnalysisBook !== undefined) setAnalysisAnalysisBook(state.analysisAnalysisBook);
         if (state.crystalCube !== undefined) setCrystalCube(state.crystalCube);
+        if (state.toughouCube !== undefined) setToughouCube(state.toughouCube);
       } else if (state.statMode === "sim" && state.sim) {
         replaceAllSim(expandSimConfig(state.sim));
       }
@@ -480,7 +488,8 @@ export function DamageCalculator({
         effAtk,
         effEnemyDef,
         scaled.scaledMdef,
-        selfToEnemyAffinity
+        selfToEnemyAffinity,
+        activeToughouCubePreMult
       );
     } else if (activeAttackMode === "魔法") {
       // ペット魔法攻撃（INT×1.25、クリなし・多段なし）
@@ -721,6 +730,7 @@ export function DamageCalculator({
       state.analysisBook = analysisBook;
       state.analysisAnalysisBook = analysisAnalysisBook;
       state.crystalCube = crystalCube;
+      state.toughouCube = toughouCube;
     } else {
       state.sim = compactSimConfig(simCfg);
     }
@@ -1077,6 +1087,22 @@ export function DamageCalculator({
                   label={t("crystalCube")}
                   value={crystalCube}
                   onChange={setCrystalCube}
+                  max={1000}
+                  showReset
+                  showMax
+                />
+              </div>
+            </div>
+          )}
+
+          {/* 闘晶立方体（物理攻撃時） */}
+          {myAttackMode === "物理" && (
+            <div className="pt-2 border-t border-gray-100">
+              <div className="grid grid-cols-2 gap-4">
+                <InputField
+                  label={t("toughouCube")}
+                  value={toughouCube}
+                  onChange={setToughouCube}
                   max={1000}
                   showReset
                   showMax

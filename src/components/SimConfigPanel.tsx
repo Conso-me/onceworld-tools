@@ -960,6 +960,7 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
   function maxAllPoints() {
     setField("johaneCount", 1000);
     setField("statusTenshouCount", 1000);
+    setField("superScrollCount", 1000);
   }
 
   function maxAllEquip() {
@@ -1126,6 +1127,8 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
                 onChange={(v) => setField("johanneAltarCount", v)} />
               <NumInput label={t("statusTenshou")} value={cfg.statusTenshouCount} max={1000}
                 onChange={(v) => setField("statusTenshouCount", v)} />
+              <NumInput label={t("superScroll")} value={cfg.superScrollCount} max={1000}
+                onChange={(v) => setField("superScrollCount", v)} />
             </div>
             <div className="grid grid-cols-2 gap-2 text-xs bg-gray-50 rounded-lg px-3 py-1.5">
               <div>{t("availablePoints")}<br /><span className="font-mono font-semibold text-gray-700">{available.toLocaleString()}</span></div>
