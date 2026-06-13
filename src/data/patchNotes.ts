@@ -13,6 +13,19 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-06-14",
+    changes: [
+    { type: "feature", text: "feat: 闘晶立方体・スーパースクロール追加、妖刀ニシキ実装" },
+    ],
+  },
+  {
+    date: "2026-06-13",
+    changes: [
+    { type: "feature", text: "feat: アプデ新モンスター3体・ペットスキル・魔王城近郊プリセット追加" },
+    ],
+  },
+
+  {
     date: "2026-05-22",
     changes: [
     { type: "fix", text: "fix(goldEnh): G強化上限を300に修正・ステータス計算式を検証" },
