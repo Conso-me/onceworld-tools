@@ -43,10 +43,11 @@ export function calcPhysicalDamage(
   atk: number,
   enemyDef: number,
   enemyMdef: number,
-  elementAffinity: number = 1.0
+  elementAffinity: number = 1.0,
+  preMult: number = 1.0
 ): DamageRange {
   const effectiveDef = calcEffectiveDef(enemyDef, enemyMdef, true);
-  const base = Math.max(atk * 1.75 - effectiveDef, 0) * 4 * elementAffinity;
+  const base = Math.max(atk * 1.75 * preMult - effectiveDef, 0) * 4 * elementAffinity;
   return makeDamageRange(base);
 }
 

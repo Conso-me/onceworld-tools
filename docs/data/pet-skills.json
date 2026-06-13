@@ -3394,5 +3394,83 @@
         "value": 7000000
       }
     ]
+  },
+  {
+    "name": "バーサクフレイム",
+    "pattern": 2,
+    "skills": [
+      {
+        "level": 200,
+        "type": "SPD%",
+        "value": 100
+      },
+      {
+        "level": 500,
+        "type": "ATK%",
+        "value": 100
+      },
+      {
+        "level": 800,
+        "type": "LUCK%",
+        "value": 100
+      },
+      {
+        "level": 1200,
+        "type": "最終ATK%",
+        "value": 50
+      }
+    ]
+  },
+  {
+    "name": "無名",
+    "pattern": 2,
+    "skills": [
+      {
+        "level": 200,
+        "type": "最終VIT%",
+        "value": 25
+      },
+      {
+        "level": 500,
+        "type": "最終VIT%",
+        "value": 25
+      },
+      {
+        "level": 800,
+        "type": "最終VIT%",
+        "value": 25
+      },
+      {
+        "level": 1200,
+        "type": "MOV",
+        "value": 10
+      }
+    ]
+  },
+  {
+    "name": "聖典神セラフィエル",
+    "pattern": 2,
+    "skills": [
+      {
+        "level": 200,
+        "type": "INT%",
+        "value": 100
+      },
+      {
+        "level": 500,
+        "type": "ATK%",
+        "value": 100
+      },
+      {
+        "level": 800,
+        "type": "最終INT%",
+        "value": 50
+      },
+      {
+        "level": 1200,
+        "type": "最終ATK%",
+        "value": 50
+      }
+    ]
   }
 ]
