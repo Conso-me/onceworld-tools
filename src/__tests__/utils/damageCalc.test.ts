@@ -120,6 +120,24 @@ describe("calcPhysicalDamage", () => {
     expect(result.isNullified).toBe(false);
     expect(result.avg).toBe(Math.floor(7));
   });
+
+  it("finalMult (闘晶立方体) multiplies after defense subtraction", () => {
+    // ATK=500, DEF=100, MDEF=0 → effectiveDef=100
+    // base_no_cube = (500*1.75 - 100)*4 = (875-100)*4 = 3100
+    // base_with_100_cubes = 3100 * 2.0 = 6200
+    const noCube   = calcPhysicalDamage(500, 100, 0, 1.0, 1.0);
+    const withCube = calcPhysicalDamage(500, 100, 0, 1.0, 2.0);
+    expect(noCube.avg).toBe(3100);
+    expect(withCube.avg).toBe(6200);
+    expect(withCube.avg / noCube.avg).toBeCloseTo(2.0);
+  });
+
+  it("finalMult does NOT help penetrate defense (unlike preMult)", () => {
+    // ATK=250000, effectiveDef=600108 → nullified even with finalMult=2.0
+    // This is confirmed by in-game verification (2026-06-14)
+    const result = calcPhysicalDamage(250000, 500090, 1000180, 1.0, 2.0);
+    expect(result.isNullified).toBe(true);
+  });
 });
 
 // ---------------------------------------------------------------------------

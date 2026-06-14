@@ -37,17 +37,18 @@ export function calcEffectiveDef(
 
 /**
  * 物理/魔弾ダメージ計算（ペット・敵の攻撃）
- * (stat × 1.75 - effectiveDef) × 4 × elementAffinity
+ * (stat × 1.75 - effectiveDef) × 4 × elementAffinity × finalMult
+ * finalMult: 最終ダメージに掛ける倍率（闘晶立方体・検証済み）
  */
 export function calcPhysicalDamage(
   atk: number,
   enemyDef: number,
   enemyMdef: number,
   elementAffinity: number = 1.0,
-  preMult: number = 1.0
+  finalMult: number = 1.0
 ): DamageRange {
   const effectiveDef = calcEffectiveDef(enemyDef, enemyMdef, true);
-  const base = Math.max(atk * 1.75 * preMult - effectiveDef, 0) * 4 * elementAffinity;
+  const base = Math.max(atk * 1.75 - effectiveDef, 0) * 4 * elementAffinity * finalMult;
   return makeDamageRange(base);
 }
 

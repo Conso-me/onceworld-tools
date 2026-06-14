@@ -138,8 +138,8 @@ export function DamageCalculator({
   // 魔晶立方体は防御計算前に適用（検証済み）
   const crystalCubePreMult  = crystalCubeMult;
   const crystalCubeFinalMult = 1;
-  // 闘晶立方体：計算式未検証、魔晶立方体と同様に防御計算前適用と仮定
-  const toughouCubePreMult = 1 + toughouCubeNum * 0.01;
+  // 闘晶立方体は最終ダメージに乗算（検証済み）
+  const toughouCubeFinalMult = 1 + toughouCubeNum * 0.01;
 
   // 装備設定モード
   const [statMode, setStatMode] = usePersistedState<"manual" | "sim">("dmg:statMode", "manual");
@@ -166,7 +166,7 @@ export function DamageCalculator({
     : myAttackMode;
   const activeCrystalCubePreMult = calcTarget === "pet" ? 1 : crystalCubePreMult;
   const activeCrystalCubeFinalMult = calcTarget === "pet" ? 1 : crystalCubeFinalMult;
-  const activeToughouCubePreMult = calcTarget === "pet" ? 1 : toughouCubePreMult;
+  const activeToughouCubeFinalMult = calcTarget === "pet" ? 1 : toughouCubeFinalMult;
   const activeMagicBaseInt = calcTarget === "pet" ? 0 : magicBaseInt;
 
   // プリセット
@@ -489,7 +489,7 @@ export function DamageCalculator({
         effEnemyDef,
         scaled.scaledMdef,
         selfToEnemyAffinity,
-        activeToughouCubePreMult
+        activeToughouCubeFinalMult
       );
     } else if (activeAttackMode === "魔法") {
       // ペット魔法攻撃（INT×1.25、クリなし・多段なし）
