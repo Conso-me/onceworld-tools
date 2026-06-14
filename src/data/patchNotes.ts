@@ -15,6 +15,8 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-06-14",
     changes: [
+    { type: "feature", text: "feat: 暗殺者のカギ爪を装備一覧・計算機に追加" },
+    { type: "fix", text: "fix: 闘晶立方体の計算式を防御前→最終乗算に修正（検証済み）" },
     { type: "feature", text: "feat: 闘晶立方体・スーパースクロール追加、妖刀ニシキ実装" },
     ],
   },
