@@ -172,6 +172,14 @@ export function DamageCalculator({
   const activeAssassinClaw = calcTarget !== "pet" && myAttackMode === "物理" && assassinClaw;
   const activeMagicBaseInt = calcTarget === "pet" ? 0 : magicBaseInt;
 
+  // simモードで暗殺者のカギ爪に変更したらトグルを自動ON（1回だけ。以降はユーザーが自由に切り替え可能）
+  const equippedWeapon = statMode === "sim" ? simCfg.equipWeapon : "";
+  useEffect(() => {
+    if (equippedWeapon === "暗殺者のカギ爪") {
+      setAssassinClaw(true);
+    }
+  }, [equippedWeapon]);
+
   // プリセット
   const [presetName, setPresetName] = useState("");
   const [selectedPresetId, setSelectedPresetId] = useState("");
@@ -603,7 +611,16 @@ export function DamageCalculator({
     const requiredLuck = activeAttackMode === "物理" ? effEnemyLuck : null;
     const luckShortfall = activeAttackMode === "物理" ? Math.max(effEnemyLuck - effLuck, 0) : null;
 
-    return { mode: activeAttackMode as "物理" | "魔法" | "魔弾", dmg, multiHit: effectiveMultiHit, hitsToKill, minStat, targetStats, hitRate, overkillGuaranteed, overkillPossible, overkillStatNeeded, requiredLuck, luckShortfall };
+    // 暗殺者のカギ爪 vs 通常の比較（物理モード時のみ）
+    let clawComparison: { normalAvg: number; clawAvg: number; normalNullified: boolean; clawNullified: boolean } | null = null;
+    if (activeAttackMode === "物理") {
+      const baseEnemyDef = woodMagicEffect ? Math.floor(scaled.scaledDef / 2) : scaled.scaledDef;
+      const normalDmg = calcPhysicalDamage(effAtk, baseEnemyDef, scaled.scaledMdef, selfToEnemyAffinity, activeToughouCubeFinalMult);
+      const clawDmg   = calcPhysicalDamage(effAtk, 0,             scaled.scaledMdef, selfToEnemyAffinity, activeToughouCubeFinalMult * 0.1);
+      clawComparison = { normalAvg: normalDmg.avg, clawAvg: clawDmg.avg, normalNullified: normalDmg.isNullified, clawNullified: clawDmg.isNullified };
+    }
+
+    return { mode: activeAttackMode as "物理" | "魔法" | "魔弾", dmg, multiHit: effectiveMultiHit, hitsToKill, minStat, targetStats, hitRate, overkillGuaranteed, overkillPossible, overkillStatNeeded, requiredLuck, luckShortfall, clawComparison };
   }, [
     scaled,
     effAtk,
@@ -1349,6 +1366,30 @@ export function DamageCalculator({
               </button>
             )}
           </div>
+          {/* カギ爪 vs 通常 比較バッジ（物理モード・モンスター選択時） */}
+          {activeAttackMode === "物理" && offensiveResult?.clawComparison && (() => {
+            const { normalAvg, clawAvg, normalNullified, clawNullified } = offensiveResult.clawComparison;
+            const clawWins = clawAvg > normalAvg;
+            const diff = Math.abs(clawAvg - normalAvg);
+            const bothNullified = normalNullified && clawNullified;
+            return (
+              <div className="mt-2 flex items-center gap-2 text-xs flex-wrap">
+                <span className={`px-2 py-0.5 rounded font-medium border ${normalNullified ? "text-gray-400 border-gray-200 bg-gray-50" : clawWins ? "text-gray-500 border-gray-200 bg-gray-50" : "text-blue-700 border-blue-300 bg-blue-50"}`}>
+                  通常 {normalNullified ? "無効化" : normalAvg.toLocaleString()}
+                </span>
+                <span className="text-gray-300">vs</span>
+                <span className={`px-2 py-0.5 rounded font-medium border ${clawNullified ? "text-gray-400 border-gray-200 bg-gray-50" : clawWins ? "text-orange-700 border-orange-300 bg-orange-50" : "text-gray-500 border-gray-200 bg-gray-50"}`}>
+                  カギ爪 {clawNullified ? "無効化" : clawAvg.toLocaleString()}
+                </span>
+                {!bothNullified && (
+                  <span className={`font-semibold ${clawWins ? "text-orange-600" : "text-blue-600"}`}>
+                    → {clawWins ? "カギ爪" : "通常"} +{diff.toLocaleString()} 有利
+                  </span>
+                )}
+                {bothNullified && <span className="text-gray-400">どちらも無効化（ATK不足）</span>}
+              </div>
+            );
+          })()}
         </div>
       )}
 
