@@ -113,6 +113,8 @@
   "woodMagicDebuffTitle": "Wood magic: enemy DEF halved",
   "darkMagicDebuff": "Dark LUK×½",
   "darkMagicDebuffTitle": "Dark magic: enemy LUK halved",
+  "assassinClaw": "Claw DEF=0・÷10",
+  "assassinClawTitle": "Assassin's Claw: both DEF→0, damage ÷10",
   "magicImmuneDetail": "This enemy is magic immune (damage 0)",
   "magicImmuneDamage0": "Magic Immune (dmg 0)",
   "overkillAchievedLabel": "reached",
