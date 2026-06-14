@@ -195,6 +195,7 @@ export function calcMinIntToHit(
 
 /**
  * N回で倒すために必要なATK
+ * finalMult: 闘晶立方体・暗殺者のカギ爪などの最終ダメージ倍率
  */
 export function calcAtkForKill(
   enemyHP: number,
@@ -202,11 +203,12 @@ export function calcAtkForKill(
   enemyMdef: number,
   elementAffinity: number,
   multiHit: number,
-  targetTurns: number
+  targetTurns: number,
+  finalMult: number = 1.0
 ): number {
   const effectiveDef = calcEffectiveDef(enemyDef, enemyMdef, true);
   const requiredDmgPerTurn = Math.ceil(enemyHP / targetTurns);
-  const requiredBase = requiredDmgPerTurn / 4 / elementAffinity / 0.9 / multiHit;
+  const requiredBase = requiredDmgPerTurn / 4 / elementAffinity / 0.9 / multiHit / finalMult;
   return Math.max(Math.ceil((requiredBase + effectiveDef) / 1.75), 0);
 }
 

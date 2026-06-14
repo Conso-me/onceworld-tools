@@ -1340,5 +1340,22 @@
     "mov": 0,
     "special": "攻撃範囲増（大）\n10体攻撃",
     "order": 780
+  },
+  {
+    "name": "暗殺者のカギ爪",
+    "slot": "武器",
+    "series": null,
+    "material": "強化できない",
+    "vit": 0,
+    "spd": 0,
+    "atk": 1,
+    "int": 0,
+    "def": 0,
+    "mdef": 0,
+    "luck": 0,
+    "mov": 0,
+    "special": "互いのDEFを0として計算\n自身の与ダメ÷10",
+    "order": 790,
+    "nameEn": "Assassin's Claw"
   }
 ]

@@ -113,6 +113,8 @@
   "woodMagicDebuffTitle": "木魔法デバフ：敵のDEFが半減",
   "darkMagicDebuff": "闇魔法 LUK×½",
   "darkMagicDebuffTitle": "闇魔法デバフ：敵のLUKが半減",
+  "assassinClaw": "カギ爪 DEF=0・÷10",
+  "assassinClawTitle": "暗殺者のカギ爪：互いのDEFが0、与ダメ÷10",
   "magicImmuneDetail": "この敵は魔法が無効です（ダメージ 0）",
   "magicImmuneDamage0": "魔法無効（ダメージ 0）",
   "overkillAchievedLabel": "達成",

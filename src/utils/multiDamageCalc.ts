@@ -71,12 +71,14 @@ export function calcOffensiveComparison(
     magicBaseInt: number;
     crystalCubePreMult: number;
     crystalCubeFinalMult: number;
+    toughouCubeFinalMult?: number;
   },
-  enemyDebuffs?: { woodMagicEffect?: boolean; darkMagicEffect?: boolean }
+  enemyDebuffs?: { woodMagicEffect?: boolean; darkMagicEffect?: boolean; assassinClaw?: boolean }
 ): OffensiveComparisonRow[] {
   return entries.map((entry) => {
     const scaled = scaleMonster(entry.monster, entry.level);
-    const effScaledDef = enemyDebuffs?.woodMagicEffect ? Math.floor(scaled.scaledDef / 2) : scaled.scaledDef;
+    const assassinClawActive = enemyDebuffs?.assassinClaw ?? false;
+    const effScaledDef = assassinClawActive ? 0 : (enemyDebuffs?.woodMagicEffect ? Math.floor(scaled.scaledDef / 2) : scaled.scaledDef);
     const effScaledLuck = enemyDebuffs?.darkMagicEffect ? Math.floor(scaled.scaledLuck / 2) : scaled.scaledLuck;
     const affinity = getElementAffinity(playerStats.element, entry.monster.element);
     const multiHit = calcMultiHitCount(playerStats.spd, attackMode === "魔攻");
@@ -126,8 +128,9 @@ export function calcOffensiveComparison(
     }
 
     // 物理/魔弾
+    const physFinalMult = (magicParams.toughouCubeFinalMult ?? 1) * (assassinClawActive ? 0.1 : 1.0);
     const dmg = attackMode === "物理"
-      ? calcPhysicalDamage(playerStats.atk, effScaledDef, scaled.scaledMdef, affinity)
+      ? calcPhysicalDamage(playerStats.atk, effScaledDef, scaled.scaledMdef, affinity, physFinalMult)
       : calcPetMagicDamage(
           playerStats.int,
           effScaledDef,

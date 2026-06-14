@@ -115,6 +115,8 @@ export function DamageCalculator({
   // 魔法デバフ: 木魔法→DEF半減、闇魔法→LUK半減
   const [woodMagicEffect, setWoodMagicEffect] = usePersistedState("dmg:woodMagicEffect", false);
   const [darkMagicEffect, setDarkMagicEffect] = usePersistedState("dmg:darkMagicEffect", false);
+  // 暗殺者のカギ爪：互いのDEFを0・与ダメ÷10（検証前提の仮実装ではなくゲーム説明文に基づく）
+  const [assassinClaw, setAssassinClaw] = usePersistedState("dmg:assassinClaw", false);
 
   // ペット計算モード
   const [calcTarget, setCalcTarget] = usePersistedState<"player" | "pet">("dmg:calcTarget", "player");
@@ -167,6 +169,7 @@ export function DamageCalculator({
   const activeCrystalCubePreMult = calcTarget === "pet" ? 1 : crystalCubePreMult;
   const activeCrystalCubeFinalMult = calcTarget === "pet" ? 1 : crystalCubeFinalMult;
   const activeToughouCubeFinalMult = calcTarget === "pet" ? 1 : toughouCubeFinalMult;
+  const activeAssassinClaw = calcTarget !== "pet" && myAttackMode === "物理" && assassinClaw;
   const activeMagicBaseInt = calcTarget === "pet" ? 0 : magicBaseInt;
 
   // プリセット
@@ -405,8 +408,8 @@ export function DamageCalculator({
   const offensiveResult = useMemo(() => {
     if (!scaled) return null;
 
-    // 魔法デバフ適用後の敵ステータス
-    const effEnemyDef = woodMagicEffect ? Math.floor(scaled.scaledDef / 2) : scaled.scaledDef;
+    // デバフ・暗殺者のカギ爪適用後の敵ステータス
+    const effEnemyDef = activeAssassinClaw ? 0 : (woodMagicEffect ? Math.floor(scaled.scaledDef / 2) : scaled.scaledDef);
     const effEnemyLuck = darkMagicEffect ? Math.floor(scaled.scaledLuck / 2) : scaled.scaledLuck;
 
     const multiHit = calcMultiHitCount(effSpd, activeAttackMode === "魔攻");
@@ -482,6 +485,8 @@ export function DamageCalculator({
       return { mode: "魔攻" as const, spellResults };
     }
 
+    const physFinalMult = activeToughouCubeFinalMult * (activeAssassinClaw ? 0.1 : 1.0);
+
     let dmg;
     if (activeAttackMode === "物理") {
       dmg = calcPhysicalDamage(
@@ -489,7 +494,7 @@ export function DamageCalculator({
         effEnemyDef,
         scaled.scaledMdef,
         selfToEnemyAffinity,
-        activeToughouCubeFinalMult
+        physFinalMult
       );
     } else if (activeAttackMode === "魔法") {
       // ペット魔法攻撃（INT×1.25、クリなし・多段なし）
@@ -584,7 +589,7 @@ export function DamageCalculator({
 
     let overkillStatNeeded: number;
     if (activeAttackMode === "物理") {
-      overkillStatNeeded = calcAtkForKill(scaled.hp * 10, effEnemyDef, scaled.scaledMdef, selfToEnemyAffinity, overkillHitCount, 1);
+      overkillStatNeeded = calcAtkForKill(scaled.hp * 10, effEnemyDef, scaled.scaledMdef, selfToEnemyAffinity, overkillHitCount, 1, physFinalMult);
     } else if (activeAttackMode === "魔法") {
       // ペット魔法: INT×1.25、多段なし
       overkillStatNeeded = calcIntForKill(scaled.hp * 10, effEnemyDef, scaled.scaledMdef, selfToEnemyAffinity, 1.0, 0, 1, 1.0);
@@ -613,6 +618,8 @@ export function DamageCalculator({
     physOverkillMultiHit,
     woodMagicEffect,
     darkMagicEffect,
+    activeAssassinClaw,
+    activeToughouCubeFinalMult,
   ]);
 
   // ===== 被ダメージ計算 =====
@@ -623,6 +630,9 @@ export function DamageCalculator({
     const enemyStat = enemyIsPhysical ? scaled.scaledAtk : scaled.scaledInt;
     if (enemyStat <= 0) return null;
 
+    // 暗殺者のカギ爪装備中は自分のDEFも0
+    const playerDefForCalc = (activeAssassinClaw && enemyIsPhysical) ? 0 : effDef;
+
     // 被ダメ無効化ライン
     const defReq = enemyIsPhysical
       ? calcPhysicalDefenseRequirement(enemyStat)
@@ -631,7 +641,7 @@ export function DamageCalculator({
     // 現在の被ダメ
     const currentDmg = calcDefDamage(
       enemyStat,
-      effDef,
+      playerDefForCalc,
       effMdef,
       enemyIsPhysical,
       enemyToSelfAffinity
@@ -639,7 +649,7 @@ export function DamageCalculator({
 
     const nullified = canNullifyDamage(
       enemyStat,
-      effDef,
+      playerDefForCalc,
       effMdef,
       enemyIsPhysical
     );
@@ -656,7 +666,7 @@ export function DamageCalculator({
         }
       : null;
 
-    const additionalNeeded = calcAdditionalDefNeeded(enemyStat, effDef, effMdef, enemyIsPhysical);
+    const additionalNeeded = calcAdditionalDefNeeded(enemyStat, playerDefForCalc, effMdef, enemyIsPhysical);
 
     return {
       defReq,
@@ -667,8 +677,9 @@ export function DamageCalculator({
       enemyMultiHit,
       hitsToTake,
       additionalNeeded,
+      playerDefForCalc,
     };
-  }, [scaled, effDef, effMdef, enemyToSelfAffinity, effPlayerHp]);
+  }, [scaled, effDef, effMdef, enemyToSelfAffinity, effPlayerHp, activeAssassinClaw]);
 
   // ===== エリア一括比較計算 =====
   const offensiveComparison = useMemo(() => {
@@ -677,10 +688,10 @@ export function DamageCalculator({
       comparisonMonsters,
       { atk: effAtk, int: effInt, spd: effSpd, luck: effLuck, element: effElement },
       activeAttackMode,
-      { magicBaseInt: activeMagicBaseInt, crystalCubePreMult: activeCrystalCubePreMult, crystalCubeFinalMult: activeCrystalCubeFinalMult },
-      { woodMagicEffect, darkMagicEffect }
+      { magicBaseInt: activeMagicBaseInt, crystalCubePreMult: activeCrystalCubePreMult, crystalCubeFinalMult: activeCrystalCubeFinalMult, toughouCubeFinalMult: activeToughouCubeFinalMult },
+      { woodMagicEffect, darkMagicEffect, assassinClaw: activeAssassinClaw }
     );
-  }, [comparisonActive, comparisonMonsters, effAtk, effInt, effSpd, effLuck, effElement, activeAttackMode, activeMagicBaseInt, activeCrystalCubePreMult, activeCrystalCubeFinalMult, woodMagicEffect, darkMagicEffect]);
+  }, [comparisonActive, comparisonMonsters, effAtk, effInt, effSpd, effLuck, effElement, activeAttackMode, activeMagicBaseInt, activeCrystalCubePreMult, activeCrystalCubeFinalMult, activeToughouCubeFinalMult, woodMagicEffect, darkMagicEffect, activeAssassinClaw]);
 
   const defensiveComparison = useMemo(() => {
     if (!comparisonActive || comparisonMonsters.length === 0) return null;
@@ -1256,7 +1267,12 @@ export function DamageCalculator({
             </div>
             <div className="flex flex-col">
               <span className="text-xs text-gray-400">DEF</span>
-              {woodMagicEffect ? (
+              {activeAssassinClaw ? (
+                <span className="text-sm font-semibold text-orange-600">
+                  0
+                  <span className="text-xs font-normal ml-1 line-through text-gray-400">{scaled.scaledDef.toLocaleString()}</span>
+                </span>
+              ) : woodMagicEffect ? (
                 <span className="text-sm font-semibold text-green-600">
                   {Math.floor(scaled.scaledDef / 2).toLocaleString()}
                   <span className="text-xs font-normal ml-1 line-through text-gray-400">{scaled.scaledDef.toLocaleString()}</span>
@@ -1295,8 +1311,8 @@ export function DamageCalculator({
               </span>
             </div>
           </div>
-          {/* 魔法デバフトグル */}
-          <div className="flex gap-2 mt-3 pt-3 border-t border-gray-100">
+          {/* デバフ・武器効果トグル */}
+          <div className="flex gap-2 mt-3 pt-3 border-t border-gray-100 flex-wrap">
             <button
               onClick={() => setWoodMagicEffect(!woodMagicEffect)}
               className={`text-xs px-2 py-1 rounded border transition-colors ${
@@ -1319,6 +1335,19 @@ export function DamageCalculator({
             >
               {t("darkMagicDebuff")}
             </button>
+            {activeAttackMode === "物理" && (
+              <button
+                onClick={() => setAssassinClaw(!assassinClaw)}
+                className={`text-xs px-2 py-1 rounded border transition-colors ${
+                  assassinClaw
+                    ? "bg-orange-100 border-orange-300 text-orange-700 font-medium"
+                    : "bg-gray-50 border-gray-200 text-gray-400"
+                }`}
+                title={t("assassinClawTitle")}
+              >
+                {t("assassinClaw")}
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -1657,7 +1686,7 @@ export function DamageCalculator({
                     </span>
                     <span>
                       {(defensiveResult.enemyIsPhysical
-                        ? effDef
+                        ? defensiveResult.playerDefForCalc
                         : effMdef
                       ).toLocaleString()}{" "}
                       /{" "}
@@ -1669,7 +1698,7 @@ export function DamageCalculator({
                   </div>
                   <ProgressBar
                     current={
-                      defensiveResult.enemyIsPhysical ? effDef : effMdef
+                      defensiveResult.enemyIsPhysical ? defensiveResult.playerDefForCalc : effMdef
                     }
                     target={
                       defensiveResult.enemyIsPhysical
@@ -1686,7 +1715,7 @@ export function DamageCalculator({
                   {
                     label: t("defensePanel.nullifyByOnly", { stat: isPhys ? "DEF" : "M-DEF" }),
                     value: isPhys ? defensiveResult.defReq.defOnly : defensiveResult.defReq.mdefOnly,
-                    current: hasMyDefenseStats ? (isPhys ? effDef : effMdef) : undefined,
+                    current: hasMyDefenseStats ? (isPhys ? defensiveResult.playerDefForCalc : effMdef) : undefined,
                     hintStat: isPhys ? "M-DEF" : "DEF",
                     hintAmount: isPhys
                       ? `+${defensiveResult.additionalNeeded.additionalMdef.toLocaleString()}`
@@ -1695,7 +1724,7 @@ export function DamageCalculator({
                   {
                     label: t("defensePanel.nullifyByOnly", { stat: isPhys ? "M-DEF" : "DEF" }),
                     value: isPhys ? defensiveResult.defReq.mdefOnly : defensiveResult.defReq.defOnly,
-                    current: hasMyDefenseStats ? (isPhys ? effMdef : effDef) : undefined,
+                    current: hasMyDefenseStats ? (isPhys ? effMdef : defensiveResult.playerDefForCalc) : undefined,
                     hintStat: isPhys ? "DEF" : "M-DEF",
                     hintAmount: isPhys
                       ? `+${defensiveResult.additionalNeeded.additionalDef.toLocaleString()}`
