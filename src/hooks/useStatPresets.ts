@@ -23,6 +23,7 @@ export type StatPreset = {
   analysisAnalysisBook: string;
   crystalCube: string;
   toughouCube?: string;
+  devilEye?: string;
 };
 
 function loadFromStorage(): StatPreset[] {

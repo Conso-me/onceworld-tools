@@ -39,17 +39,19 @@ export function calcEffectiveDef(
  * 物理/魔弾ダメージ計算（ペット・敵の攻撃）
  * (stat × 1.75 - effectiveDef) × 4 × elementAffinity × finalMult
  * finalMult: 最終ダメージに掛ける倍率（闘晶立方体・検証済み）
+ * critMult: クリティカル倍率（デフォルト2.5。ゴッドオブデビルアイで増加）
  */
 export function calcPhysicalDamage(
   atk: number,
   enemyDef: number,
   enemyMdef: number,
   elementAffinity: number = 1.0,
-  finalMult: number = 1.0
+  finalMult: number = 1.0,
+  critMult: number = 2.5
 ): DamageRange {
   const effectiveDef = calcEffectiveDef(enemyDef, enemyMdef, true);
   const base = Math.max(atk * 1.75 - effectiveDef, 0) * 4 * elementAffinity * finalMult;
-  return makeDamageRange(base);
+  return makeDamageRange(base, true, critMult);
 }
 
 /**
@@ -94,7 +96,7 @@ export function calcPetMagicDamage(
   return makeDamageRange(base);
 }
 
-function makeDamageRange(base: number, hasCrit = true): DamageRange {
+function makeDamageRange(base: number, hasCrit = true, critMult = 2.5): DamageRange {
   if (base <= 0) {
     return {
       min: 1,
@@ -114,9 +116,9 @@ function makeDamageRange(base: number, hasCrit = true): DamageRange {
     min,
     max,
     avg,
-    critMin: hasCrit ? Math.floor(min * 2.5) : 0,
-    critMax: hasCrit ? Math.floor(max * 2.5) : 0,
-    critAvg: hasCrit ? Math.floor(avg * 2.5) : 0,
+    critMin: hasCrit ? Math.floor(min * critMult) : 0,
+    critMax: hasCrit ? Math.floor(max * critMult) : 0,
+    critAvg: hasCrit ? Math.floor(avg * critMult) : 0,
     isNullified: false,
     hasCrit,
   };

@@ -180,6 +180,7 @@ export interface DamageShareState {
   analysisAnalysisBook?: string;
   crystalCube?: string;
   toughouCube?: string;
+  devilEye?: string;
   sim?: Partial<SimConfig>;
   pet?: Partial<PetDamageConfig>;
   comparisonMonsters?: { name: string; level: number; location: string }[];
