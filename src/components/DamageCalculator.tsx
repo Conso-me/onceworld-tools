@@ -110,6 +110,7 @@ export function DamageCalculator({
   const [analysisAnalysisBook, setAnalysisAnalysisBook] = usePersistedState("dmg:analysisAnalysisBook", "");
   const [crystalCube, setCrystalCube] = usePersistedState("dmg:crystalCube", "");
   const [toughouCube, setToughouCube] = usePersistedState("dmg:toughouCube", "");
+  const [devilEye, setDevilEye] = usePersistedState("dmg:devilEye", "");
   // 物理オーバーキル計算に多段攻撃を含めるか（現状ゲーム内では多段でOKが発生しないためデフォルトOFF）
   const [physOverkillMultiHit, setPhysOverkillMultiHit] = usePersistedState("dmg:physOverkillMultiHit", false);
   // 魔法デバフ: 木魔法→DEF半減、闇魔法→LUK半減
@@ -134,6 +135,7 @@ export function DamageCalculator({
   const analysisAnalysisBookNum = parseInt(analysisAnalysisBook) || 0;
   const crystalCubeNum = Math.min(parseInt(crystalCube) || 0, 1000);
   const toughouCubeNum = Math.min(parseInt(toughouCube) || 0, 1000);
+  const devilEyeNum    = Math.min(parseInt(devilEye)    || 0, 1000);
 
   const magicBaseInt = analysisBookNum * (1 + analysisAnalysisBookNum * 0.1);
   const crystalCubeMult = 1 + crystalCubeNum * 0.01;
@@ -142,6 +144,8 @@ export function DamageCalculator({
   const crystalCubeFinalMult = 1;
   // 闘晶立方体は最終ダメージに乗算（検証済み）
   const toughouCubeFinalMult = 1 + toughouCubeNum * 0.01;
+  // ゴッドオブデビルアイ：クリティカル倍率増加（2.5 × (1 + n×0.003)）
+  const devilEyeCritMult = 2.5 * (1 + devilEyeNum * 0.003);
 
   // 装備設定モード
   const [statMode, setStatMode] = usePersistedState<"manual" | "sim">("dmg:statMode", "manual");
@@ -169,6 +173,7 @@ export function DamageCalculator({
   const activeCrystalCubePreMult = calcTarget === "pet" ? 1 : crystalCubePreMult;
   const activeCrystalCubeFinalMult = calcTarget === "pet" ? 1 : crystalCubeFinalMult;
   const activeToughouCubeFinalMult = calcTarget === "pet" ? 1 : toughouCubeFinalMult;
+  const activeDevilEyeCritMult = calcTarget === "pet" ? 2.5 : devilEyeCritMult;
   const activeAssassinClaw = calcTarget !== "pet" && myAttackMode === "物理" && assassinClaw;
   const activeMagicBaseInt = calcTarget === "pet" ? 0 : magicBaseInt;
 
@@ -206,8 +211,9 @@ export function DamageCalculator({
       analysisAnalysisBook,
       crystalCube,
       toughouCube,
+      devilEye,
     });
-  }, [presetName, presets, savePreset, myAtk, myInt, myDef, myMdef, mySpd, myVit, myLuck, myElement, myAttackMode, analysisBook, analysisAnalysisBook, crystalCube, toughouCube, t]);
+  }, [presetName, presets, savePreset, myAtk, myInt, myDef, myMdef, mySpd, myVit, myLuck, myElement, myAttackMode, analysisBook, analysisAnalysisBook, crystalCube, toughouCube, devilEye, t]);
 
   const handleLoadPreset = useCallback(() => {
     const preset = loadPreset(selectedPresetId);
@@ -225,6 +231,7 @@ export function DamageCalculator({
     setAnalysisAnalysisBook(preset.analysisAnalysisBook);
     setCrystalCube(preset.crystalCube ?? "");
     setToughouCube(preset.toughouCube ?? "");
+    setDevilEye(preset.devilEye ?? "");
   }, [selectedPresetId, loadPreset, setMyAtk, setMyInt, setMyDef, setMyMdef, setMySpd, setMyVit, setMyLuck, setMyElement, setMyAttackMode, setAnalysisBook, setAnalysisAnalysisBook, setCrystalCube]);
 
   const handleDeletePreset = useCallback(() => {
@@ -306,6 +313,7 @@ export function DamageCalculator({
         if (state.analysisAnalysisBook !== undefined) setAnalysisAnalysisBook(state.analysisAnalysisBook);
         if (state.crystalCube !== undefined) setCrystalCube(state.crystalCube);
         if (state.toughouCube !== undefined) setToughouCube(state.toughouCube);
+        if (state.devilEye !== undefined) setDevilEye(state.devilEye);
       } else if (state.statMode === "sim" && state.sim) {
         replaceAllSim(expandSimConfig(state.sim));
       }
@@ -502,7 +510,8 @@ export function DamageCalculator({
         effEnemyDef,
         scaled.scaledMdef,
         selfToEnemyAffinity,
-        physFinalMult
+        physFinalMult,
+        activeDevilEyeCritMult
       );
     } else if (activeAttackMode === "魔法") {
       // ペット魔法攻撃（INT×1.25、クリなし・多段なし）
@@ -637,6 +646,7 @@ export function DamageCalculator({
     darkMagicEffect,
     activeAssassinClaw,
     activeToughouCubeFinalMult,
+    activeDevilEyeCritMult,
   ]);
 
   // ===== 被ダメージ計算 =====
@@ -759,6 +769,7 @@ export function DamageCalculator({
       state.analysisAnalysisBook = analysisAnalysisBook;
       state.crystalCube = crystalCube;
       state.toughouCube = toughouCube;
+      state.devilEye = devilEye;
     } else {
       state.sim = compactSimConfig(simCfg);
     }
@@ -1123,10 +1134,18 @@ export function DamageCalculator({
             </div>
           )}
 
-          {/* 闘晶立方体（物理攻撃時） */}
+          {/* ゴッドオブデビルアイ・闘晶立方体（物理攻撃時） */}
           {myAttackMode === "物理" && (
             <div className="pt-2 border-t border-gray-100">
               <div className="grid grid-cols-2 gap-4">
+                <InputField
+                  label={t("devilEye")}
+                  value={devilEye}
+                  onChange={setDevilEye}
+                  max={1000}
+                  showReset
+                  showMax
+                />
                 <InputField
                   label={t("toughouCube")}
                   value={toughouCube}

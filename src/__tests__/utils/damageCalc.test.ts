@@ -138,6 +138,19 @@ describe("calcPhysicalDamage", () => {
     const result = calcPhysicalDamage(250000, 500090, 1000180, 1.0, 2.0);
     expect(result.isNullified).toBe(true);
   });
+
+  it("critMult (ゴッドオブデビルアイ) overrides default 2.5x", () => {
+    // ATK=100, DEF=0, MDEF=0 → base=700, critMult=10.0 (1000個時)
+    const result = calcPhysicalDamage(100, 0, 0, 1.0, 1.0, 10.0);
+    expect(result.critAvg).toBe(Math.floor(Math.floor(700) * 10.0));
+    expect(result.critMin).toBe(Math.floor(Math.floor(700 * 0.9) * 10.0));
+    expect(result.critMax).toBe(Math.floor(Math.floor(700 * 1.1) * 10.0));
+  });
+
+  it("critMult defaults to 2.5 when not specified", () => {
+    const result = calcPhysicalDamage(100, 0, 0);
+    expect(result.critAvg).toBe(Math.floor(Math.floor(700) * 2.5));
+  });
 });
 
 // ---------------------------------------------------------------------------
