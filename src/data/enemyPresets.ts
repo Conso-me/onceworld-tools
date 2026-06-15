@@ -339,6 +339,16 @@ export const enemyPresetGroups: EnemyPresetGroup[] = [
     ],
   },
   {
+    mapLabel: "天空回廊",
+    mapLabelEn: "Sky Corridor",
+    label: "天空制覇",
+    labelEn: "Sky Conquest",
+    presets: [
+      { monsterName: "麒麟",      level: 100009900, location: "天空制覇", locationEn: "Sky Conquest" },
+      { monsterName: "禁域の巨木", level: 100009900, location: "天空制覇", locationEn: "Sky Conquest" },
+    ],
+  },
+  {
     mapLabel: "アイスリッジ山",
     mapLabelEn: "Ice Ridge Mtn",
     label: "アイスリッジ氷葬",
