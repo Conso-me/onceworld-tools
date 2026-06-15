@@ -70,7 +70,7 @@ export function getAllPetNames(): string[] {
 export type PetStatCategory =
   | "体力" | "攻撃力" | "魔力" | "防御力" | "魔法防御力"
   | "幸運" | "攻撃速度" | "経験値" | "捕獲率" | "ドロップ率"
-  | "MOV" | "HP回復" | "その他";
+  | "MOV" | "HP回復" | "SP回復" | "その他";
 
 /** "/" 区切りの複合スキルタイプも含め、全て対応するカテゴリを返す */
 function skillTypeToCategories(type: string): PetStatCategory[] {
@@ -90,6 +90,7 @@ function skillTypeToCategories(type: string): PetStatCategory[] {
     if (t.includes("ドロップ率")) cats.add("ドロップ率");
     if (t === "MOV") cats.add("MOV");
     if (t === "HP回復") cats.add("HP回復");
+    if (t === "SP回復") cats.add("SP回復");
   }
   if (cats.size === 0) cats.add("その他");
   return [...cats];
@@ -110,6 +111,7 @@ function getCategorySkillTypes(cat: PetStatCategory): { flat: string[]; pct: str
     case "ドロップ率": return { flat: ["ドロップ率"], pct: [],             finalPct: []              };
     case "MOV":        return { flat: ["MOV"],        pct: [],             finalPct: []              };
     case "HP回復":     return { flat: ["HP回復"],     pct: [],             finalPct: []              };
+    case "SP回復":     return { flat: ["SP回復"],     pct: [],             finalPct: []              };
     default:           return { flat: [],             pct: [],             finalPct: []              };
   }
 }
