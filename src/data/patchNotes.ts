@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-06-14",
     changes: [
+    { type: "feature", text: "feat: ゴッドオブデビルアイ追加（クリティカル倍率+0.3%/個）" },
     { type: "feature", text: "feat: カギ爪 自動トグルON・通常vs比較バッジを追加" },
     { type: "feature", text: "feat: 暗殺者のカギ爪を装備一覧・計算機に追加" },
     { type: "fix", text: "fix: 闘晶立方体の計算式を防御前→最終乗算に修正（検証済み）" },
