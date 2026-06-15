@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-06-15",
+    changes: [
+    { type: "feature", text: "feat: 天空制覇（麒麟・禁域の巨木）を敵プリセットに追加" },
+    ],
+  },
+
+  {
     date: "2026-06-14",
     changes: [
     { type: "feature", text: "feat: ゴッドオブデビルアイ追加（クリティカル倍率+0.3%/個）" },
