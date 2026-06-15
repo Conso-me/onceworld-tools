@@ -81,7 +81,7 @@ export type PetSkillType =
   | "DEF" | "DEF%" | "最終DEF%"
   | "M-DEF" | "M-DEF%" | "最終M-DEF%"
   | "LUCK" | "LUCK%" | "最終LUCK%"
-  | "MOV" | "HP回復" | "経験値" | "捕獲率" | "ドロップ率"
+  | "MOV" | "HP回復" | "SP回復" | "経験値" | "捕獲率" | "ドロップ率"
   | "？";
 
 export interface PetSkill {

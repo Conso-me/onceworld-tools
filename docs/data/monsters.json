@@ -2402,5 +2402,22 @@
     "captureRate": 1,
     "exp": 0,
     "gold": 0
+  },
+  {
+    "name": "麒麟",
+    "level": 0,
+    "element": "火",
+    "attackType": "魔法",
+    "vit": 4770,
+    "spd": 440,
+    "atk": 290,
+    "int": 1010,
+    "def": 744,
+    "mdef": 744,
+    "luck": 1010,
+    "mov": 49,
+    "captureRate": 1,
+    "exp": 0,
+    "gold": 0
   }
 ]
