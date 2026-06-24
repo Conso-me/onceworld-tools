@@ -2419,5 +2419,22 @@
     "captureRate": 1,
     "exp": 0,
     "gold": 0
+  },
+  {
+    "name": "ゴールデンフィッシャー",
+    "level": 0,
+    "element": "光",
+    "attackType": "物理",
+    "vit": 690,
+    "spd": 250,
+    "atk": 312,
+    "int": 51,
+    "def": 165,
+    "mdef": 221,
+    "luck": 450,
+    "mov": 26,
+    "captureRate": 0.001,
+    "exp": 42780,
+    "gold": 3000000
   }
 ]

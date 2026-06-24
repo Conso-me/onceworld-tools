@@ -433,6 +433,13 @@ export const enemyPresetGroups: EnemyPresetGroup[] = [
       { monsterName: "バーサクフレイム", level: 50000, location: "溶岩沼" },
     ],
   },
+  {
+    mapLabel: "金策",
+    label: "金策",
+    presets: [
+      { monsterName: "ゴールデンフィッシャー", level: 810000, location: "金策" },
+    ],
+  },
 ];
 
 export function formatPresetLabel(preset: EnemyPreset): string {
