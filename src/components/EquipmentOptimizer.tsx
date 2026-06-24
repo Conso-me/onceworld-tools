@@ -195,7 +195,7 @@ export function EquipmentOptimizer({ onApply }: Props) {
 
   const [unlimited, setUnlimited] = usePersistedState("opt-unlimited", true);
   const [budgetStr, setBudgetStr] = usePersistedState("opt-budget", "");
-  const [maxGoldEnhStr, setMaxGoldEnhStr] = usePersistedState("opt-max-gold-enh", "1000");
+  const [maxGoldEnhStr, setMaxGoldEnhStr] = usePersistedState("opt-max-gold-enh", "300");
   const [weights, setWeights] = usePersistedState<StatWeights>("opt-weights", { ...DEFAULT_WEIGHTS });
   const [excludedArr, setExcludedArr] = usePersistedState<string[]>("opt-excluded", []);
   const excluded = useMemo(() => new Set(excludedArr), [excludedArr]);
