@@ -13,6 +13,14 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-06-24",
+    changes: [
+    { type: "improve", text: "fix: ゴールド強化の上限を300に統一" },
+    { type: "feature", text: "feat: ゴールデンフィッシャーをモンスター・ペットスキル・敵プリセットに追加" },
+    ],
+  },
+
+  {
     date: "2026-06-15",
     changes: [
     { type: "feature", text: "feat: 天空制覇（麒麟・禁域の巨木）を敵プリセットに追加" },
