@@ -3498,5 +3498,31 @@
         "value": 16
       }
     ]
+  },
+  {
+    "name": "ゴールデンフィッシャー",
+    "pattern": 2,
+    "skills": [
+      {
+        "level": 200,
+        "type": "最終LUCK%",
+        "value": 25
+      },
+      {
+        "level": 500,
+        "type": "最終LUCK%",
+        "value": 25
+      },
+      {
+        "level": 800,
+        "type": "最終LUCK%",
+        "value": 25
+      },
+      {
+        "level": 1200,
+        "type": "最終LUCK%",
+        "value": 50
+      }
+    ]
   }
 ]
