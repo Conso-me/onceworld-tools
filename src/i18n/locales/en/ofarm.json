@@ -3,6 +3,7 @@
   "statModeSim": "Equipment",
   "heroElement": "Your element",
   "hint": "Waves switch every 10s. You die if you can't clear the wave's enemies in time or your HP hits 0 (no penalty).",
+  "enemyEffects": "Enemy effects:",
   "waveRange": "Wave {{from}}–{{to}}",
   "notRegistered": "stats not registered",
   "immune": "Immune",

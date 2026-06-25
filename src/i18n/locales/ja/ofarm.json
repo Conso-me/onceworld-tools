@@ -3,6 +3,7 @@
   "statModeSim": "装備設定",
   "heroElement": "自分の属性",
   "hint": "10秒毎にWaveが切替。各Waveの敵を倒しきれない／被弾でHP0になると死亡（ペナルティ無し）。",
+  "enemyEffects": "敵への効果:",
   "waveRange": "Wave {{from}}〜{{to}}",
   "notRegistered": "ステータス未登録",
   "immune": "無効",

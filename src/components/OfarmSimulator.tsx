@@ -88,8 +88,12 @@ export function OfarmSimulator({
   const [attackBuffs, setAttackBuffField] = useSharedAttackBuffs();
   const derivedBuffs = useMemo(() => deriveAttackBuffs(attackBuffs), [attackBuffs]);
 
+  // 敵への効果トグル
   // 暗殺者のカギ爪（物理のみ・互いのDEF=0・与ダメ×0.1）
   const [assassinClaw, setAssassinClaw] = usePersistedState("ofarm:assassinClaw", false);
+  // 木魔法デバフ（敵DEF半減）・闇魔法デバフ（敵LUCK半減）
+  const [woodMagicDef, setWoodMagicDef] = usePersistedState("ofarm:woodMagicDef", false);
+  const [darkMagicLuck, setDarkMagicLuck] = usePersistedState("ofarm:darkMagicLuck", false);
   // 装備設定モードで武器が「暗殺者のカギ爪」なら自動ON（DamageCalculatorと同挙動）
   const equippedWeapon = statMode === "sim" ? simCfg.equipWeapon : "";
   useEffect(() => {
@@ -106,6 +110,8 @@ export function OfarmSimulator({
       crystalCubePreMult: derivedBuffs.crystalCubePreMult,
       toughouCubeFinalMult: derivedBuffs.toughouCubeFinalMult,
       assassinClaw,
+      woodMagicDef,
+      darkMagicLuck,
     };
     if (statMode === "sim") {
       return {
@@ -134,7 +140,7 @@ export function OfarmSimulator({
       element: manualElement,
       ...buffs,
     };
-  }, [statMode, simResult, simCfg.charElement, manual, manualElement, derivedBuffs, assassinClaw]);
+  }, [statMode, simResult, simCfg.charElement, manual, manualElement, derivedBuffs, assassinClaw, woodMagicDef, darkMagicLuck]);
 
   const results = useMemo(() => calcAllOfarmWaves(player), [player]);
 
@@ -206,26 +212,35 @@ export function OfarmSimulator({
           )}
 
           {/* 攻撃バフ（全画面共有・両モード共通。ダメージ計算と同じく末尾に配置） */}
-          <div className="pt-1 border-t border-gray-100 space-y-2">
+          <div className="pt-1 border-t border-gray-100">
             <AttackBuffFields buffs={attackBuffs} setField={setAttackBuffField} />
-            <button
-              type="button"
-              onClick={() => setAssassinClaw(!assassinClaw)}
-              title={i18n.t("damage:assassinClawTitle")}
-              className={`text-xs px-2 py-1 rounded border transition-colors ${
-                assassinClaw
-                  ? "bg-orange-100 border-orange-300 text-orange-700 font-medium"
-                  : "bg-gray-50 border-gray-200 text-gray-400"
-              }`}
-            >
-              {i18n.t("damage:assassinClaw")}
-            </button>
           </div>
         </div>
       </div>
 
       {/* ───── 右カラム: Wave一覧 ───── */}
       <div className="space-y-2">
+        {/* 敵への効果トグル */}
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-xs font-medium text-gray-500 mr-0.5">{t("enemyEffects")}</span>
+          {([
+            { on: assassinClaw, toggle: () => setAssassinClaw(!assassinClaw), label: i18n.t("damage:assassinClaw"), title: i18n.t("damage:assassinClawTitle"), color: "bg-orange-100 border-orange-300 text-orange-700" },
+            { on: woodMagicDef, toggle: () => setWoodMagicDef(!woodMagicDef), label: i18n.t("damage:woodMagicDebuff"), title: i18n.t("damage:woodMagicDebuffTitle"), color: "bg-green-100 border-green-300 text-green-700" },
+            { on: darkMagicLuck, toggle: () => setDarkMagicLuck(!darkMagicLuck), label: i18n.t("damage:darkMagicDebuff"), title: i18n.t("damage:darkMagicDebuffTitle"), color: "bg-purple-100 border-purple-300 text-purple-700" },
+          ] as const).map((b, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={b.toggle}
+              title={b.title}
+              className={`text-xs px-2 py-1 rounded border transition-colors ${
+                b.on ? `${b.color} font-medium` : "bg-gray-50 border-gray-200 text-gray-400"
+              }`}
+            >
+              {b.label}
+            </button>
+          ))}
+        </div>
         <p className="text-xs text-gray-400 px-1">{t("hint")}</p>
         {OFARM_WAVE_GROUPS.map((group) => {
           const waves = results.filter((r) => r.wave.wave >= group.from && r.wave.wave <= group.to);

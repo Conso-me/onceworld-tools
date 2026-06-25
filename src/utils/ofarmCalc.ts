@@ -44,6 +44,10 @@ export interface OfarmPlayerStats {
   toughouCubeFinalMult: number;
   /** 暗殺者のカギ爪装備（物理のみ・互いのDEF=0・与ダメ×0.1） */
   assassinClaw: boolean;
+  /** 木魔法デバフ: 敵DEF半減 */
+  woodMagicDef: boolean;
+  /** 闇魔法デバフ: 敵LUCK半減（命中率に影響） */
+  darkMagicLuck: boolean;
 }
 
 export interface OfarmDurability {
@@ -147,8 +151,11 @@ export function calcOfarmWave(wave: OfarmWave, player: OfarmPlayerStats): OfarmW
   // 自分の属性 → 敵の属性 の相性
   const outgoingAffinity = getElementAffinity(player.element, base.element);
   const multiHit = calcMultiHitCount(player.spd, false);
-  // 暗殺者のカギ爪: 敵DEF=0・最終ダメージ×0.1
-  const physEnemyDef = player.assassinClaw ? 0 : scaled.scaledDef;
+  // 木魔法デバフ: 敵DEF半減 / 闇魔法デバフ: 敵LUCK半減
+  const debuffedDef = player.woodMagicDef ? Math.floor(scaled.scaledDef / 2) : scaled.scaledDef;
+  const enemyLuck = player.darkMagicLuck ? Math.floor(scaled.scaledLuck / 2) : scaled.scaledLuck;
+  // 暗殺者のカギ爪: 敵DEF=0・最終ダメージ×0.1（カギ爪は木魔法より優先）
+  const physEnemyDef = player.assassinClaw ? 0 : debuffedDef;
   const physFinalMult = player.toughouCubeFinalMult * (player.assassinClaw ? 0.1 : 1.0);
   const physDmg = calcPhysicalDamage(
     player.atk,
@@ -160,7 +167,7 @@ export function calcOfarmWave(wave: OfarmWave, player: OfarmPlayerStats): OfarmW
   const physical: OfarmPhysical = {
     damage: physDmg,
     multiHit,
-    hitRate: calcHitRate(player.luck, scaled.scaledLuck),
+    hitRate: calcHitRate(player.luck, enemyLuck),
     hitsToKill: safeHits(scaled.hp, physDmg.isNullified ? 1 : physDmg.min, multiHit),
     minAtk: calcMinAtkToHit(physEnemyDef, scaled.scaledMdef),
     atkFor1Kill: calcAtkForKill(
@@ -183,7 +190,7 @@ export function calcOfarmWave(wave: OfarmWave, player: OfarmPlayerStats): OfarmW
       player.int,
       player.magicBaseInt,
       mult,
-      scaled.scaledDef,
+      debuffedDef,
       scaled.scaledMdef,
       affinity,
     );
