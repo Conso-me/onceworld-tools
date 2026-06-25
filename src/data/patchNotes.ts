@@ -15,6 +15,9 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-06-25",
     changes: [
+    { type: "improve", text: "style: 装備/アクセ/ペット行を共通レイアウトに統一" },
+    { type: "improve", text: "style: 装備サマリーの幅を広げキャラ情報を5列にして折り返し解消" },
+    { type: "feature", text: "feat: 装備サマリーにG強化値と闘晶立方体を追加" },
     { type: "feature", text: "feat: 敵への効果トグルをWave上部に集約し木/闇魔法デバフを追加" },
     { type: "feature", text: "feat: おふぁ～むに暗殺者のカギ爪の特殊計算を追加" },
     { type: "improve", text: "style: おふぁ～むの攻撃バフ入力を装備設定の後ろに移動し配置を統一" },
