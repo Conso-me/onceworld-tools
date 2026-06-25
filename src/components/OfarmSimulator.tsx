@@ -191,15 +191,15 @@ export function OfarmSimulator({
             </div>
           )}
 
-          {/* 攻撃バフ（全画面共有・両モード共通） */}
-          <div className="pt-1 border-t border-gray-100">
-            <AttackBuffFields buffs={attackBuffs} setField={setAttackBuffField} />
-          </div>
-
           {/* 装備設定モード */}
           {statMode === "sim" && (
             <SimConfigPanel cfg={simCfg} setField={setSimField} reset={resetSim} replaceAll={replaceAllSim} />
           )}
+
+          {/* 攻撃バフ（全画面共有・両モード共通。ダメージ計算と同じく末尾に配置） */}
+          <div className="pt-1 border-t border-gray-100">
+            <AttackBuffFields buffs={attackBuffs} setField={setAttackBuffField} />
+          </div>
         </div>
       </div>
 
