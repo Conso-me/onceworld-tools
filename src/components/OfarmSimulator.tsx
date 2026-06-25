@@ -204,25 +204,43 @@ export function OfarmSimulator() {
               </button>
               {open && (
                 <div className="overflow-x-auto">
-                  <table className="w-full text-sm border-collapse table-fixed min-w-[720px]">
+                  <table className="w-full text-sm border-collapse table-fixed min-w-[860px]">
                     <colgroup>
-                      <col className="w-[44px]" />
-                      <col className="w-[30%]" />
-                      <col className="w-[15%]" />
-                      <col className="w-[16%]" />
-                      <col className="w-[16%]" />
-                      <col className="w-[20%]" />
+                      <col className="w-[40px]" />
+                      <col className="w-[180px]" />
+                      <col className="w-[88px]" />
+                      <col className="w-[96px]" />
+                      <col className="w-[96px]" />
+                      <col className="w-[60px]" />
+                      <col className="w-[60px]" />
+                      <col className="w-[60px]" />
+                      <col className="w-[60px]" />
+                      <col className="w-[60px]" />
                     </colgroup>
                     <thead>
                       <tr className="bg-gray-50 text-xs text-gray-500 border-b border-gray-200">
-                        <th className="px-2 py-2 text-left font-medium">{t("col.wave")}</th>
-                        <th className="px-2 py-2 text-left font-medium">{t("col.monster")}</th>
-                        <th className="px-2 py-2 text-right font-medium whitespace-nowrap">{t("col.lvhp")}</th>
-                        <th className="px-2 py-2 text-center font-medium">{t("col.durability")}</th>
-                        <th className="px-2 py-2 text-center font-medium border-l-2 border-l-gray-200">
+                        <th rowSpan={2} className="px-2 py-2 text-left font-medium">{t("col.wave")}</th>
+                        <th rowSpan={2} className="px-2 py-2 text-left font-medium">{t("col.monster")}</th>
+                        <th rowSpan={2} className="px-2 py-2 text-right font-medium whitespace-nowrap">{t("col.lvhp")}</th>
+                        <th rowSpan={2} className="px-2 py-2 text-center font-medium">{t("col.durability")}</th>
+                        <th rowSpan={2} className="px-2 py-2 text-center font-medium border-l-2 border-l-gray-200">
                           {t("col.physical")}
                         </th>
-                        <th className="px-2 py-2 text-center font-medium">{t("col.magic")}</th>
+                        <th colSpan={5} className="px-2 py-1 text-center font-medium border-l-2 border-l-gray-200">
+                          {t("col.magic")}
+                        </th>
+                      </tr>
+                      <tr className="bg-gray-50 text-xs border-b border-gray-200">
+                        {ELEMENTS.map((el, i) => (
+                          <th
+                            key={el}
+                            className={`px-1 py-1 text-center font-bold ${elementText[el]} ${
+                              i === 0 ? "border-l-2 border-l-gray-200" : ""
+                            }`}
+                          >
+                            {t(`game:element.${el}`)}
+                          </th>
+                        ))}
                       </tr>
                     </thead>
                     <tbody>
@@ -267,7 +285,7 @@ function WaveRow({
     return (
       <tr className="border-b border-gray-100 text-sm">
         <td className="px-2 py-1.5 font-semibold text-gray-700">W{r.wave.wave}</td>
-        <td className="px-2 py-1.5 text-gray-400" colSpan={5}>
+        <td className="px-2 py-1.5 text-gray-400" colSpan={9}>
           {r.monsterName} — {t("notRegistered")}
         </td>
       </tr>
@@ -339,20 +357,20 @@ function WaveRow({
         )}
       </td>
 
-      {/* 魔法（各属性） */}
-      <td className="px-2 py-1.5 text-center">
-        <div className="flex flex-wrap gap-x-2 gap-y-0.5 justify-center text-xs">
-          {r.magic.map((m) => {
-            const best = isFinite(bestMagic.hitsToKill) && m.hitsToKill === bestMagic.hitsToKill;
-            return (
-              <span key={m.element} className={`${elementText[m.element]} ${best ? "font-bold" : "opacity-70"}`}>
-                {t(`game:element.${m.element}`)}
-                {isFinite(m.hitsToKill) ? formatHitCount(m.hitsToKill, lang) : "✗"}
-              </span>
-            );
-          })}
-        </div>
-      </td>
+      {/* 魔法（各属性: 1列ずつ） */}
+      {r.magic.map((m, i) => {
+        const best = isFinite(bestMagic.hitsToKill) && m.hitsToKill === bestMagic.hitsToKill;
+        return (
+          <td
+            key={m.element}
+            className={`px-1 py-1.5 text-center text-xs tabular-nums ${elementText[m.element]} ${
+              best ? "font-bold" : "opacity-70"
+            } ${i === 0 ? "border-l-2 border-l-gray-200" : ""}`}
+          >
+            {isFinite(m.hitsToKill) ? formatHitCount(m.hitsToKill, lang) : "✗"}
+          </td>
+        );
+      })}
     </tr>
   );
 }
