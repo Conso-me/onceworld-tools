@@ -14,6 +14,9 @@
   "cantKill": "削れない",
   "needAtk": "要ATK {{n}}",
   "hit": "命中",
+  "legendSafe": "被ダメ無効",
+  "legendDanger": "危険（耐久薄 / 倒せない）",
+  "legendMagic": "魔法列: 属性ごとの確殺回数（太字=最良）",
   "col": {
     "wave": "Wave",
     "monster": "モンスター",

@@ -14,6 +14,9 @@
   "cantKill": "Can't kill",
   "needAtk": "Need ATK {{n}}",
   "hit": "Hit",
+  "legendSafe": "Damage nullified",
+  "legendDanger": "Risky (low defense / can't kill)",
+  "legendMagic": "Magic: hits-to-kill per element (bold = best)",
   "col": {
     "wave": "Wave",
     "monster": "Monster",

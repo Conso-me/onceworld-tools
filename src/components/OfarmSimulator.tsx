@@ -15,7 +15,8 @@ import {
 import { OFARM_WAVE_GROUPS } from "../data/ofarmWaves";
 import type { Element } from "../types/game";
 
-const elementBadge: Record<Element, string> = {
+/** 自属性ボタン用の小バッジ色 */
+const elementBtn: Record<Element, string> = {
   火: "bg-red-100 text-red-600 border-red-200",
   水: "bg-blue-100 text-blue-600 border-blue-200",
   木: "bg-green-100 text-green-600 border-green-200",
@@ -23,22 +24,28 @@ const elementBadge: Record<Element, string> = {
   闇: "bg-purple-100 text-purple-600 border-purple-200",
 };
 
-const elementBtn: Record<Element, string> = elementBadge;
+/** 属性のテキスト色（魔法列・モンスター属性ラベル用） */
+const elementText: Record<Element, string> = {
+  火: "text-red-600",
+  水: "text-blue-600",
+  木: "text-green-600",
+  光: "text-yellow-700",
+  闇: "text-purple-600",
+};
 
-/** 確殺回数を回数バッジの色クラスに変換 */
-function killBadgeClass(hits: number): string {
-  if (!isFinite(hits)) return "bg-gray-100 text-gray-400 border-gray-200";
-  if (hits <= 2) return "bg-emerald-100 text-emerald-700 border-emerald-200";
-  if (hits <= 5) return "bg-amber-100 text-amber-700 border-amber-200";
-  return "bg-rose-100 text-rose-600 border-rose-200";
+/** 確殺回数 → テキスト色 */
+function killTextClass(hits: number): string {
+  if (!isFinite(hits)) return "text-rose-500";
+  if (hits <= 2) return "text-emerald-600";
+  if (hits <= 5) return "text-amber-600";
+  return "text-rose-500";
 }
 
-/** 耐えられる回数を色クラスに変換 */
-function survivalClass(hits: number): string {
-  if (!isFinite(hits)) return "bg-emerald-100 text-emerald-700 border-emerald-200";
-  if (hits >= 10) return "bg-emerald-100 text-emerald-700 border-emerald-200";
-  if (hits >= 3) return "bg-amber-100 text-amber-700 border-amber-200";
-  return "bg-rose-100 text-rose-600 border-rose-200";
+/** 耐えられる回数 → テキスト色 */
+function survivalTextClass(hits: number): string {
+  if (!isFinite(hits) || hits >= 10) return "text-emerald-600";
+  if (hits >= 3) return "text-amber-600";
+  return "text-rose-500";
 }
 
 const MANUAL_DEFAULTS = {
@@ -105,22 +112,21 @@ export function OfarmSimulator() {
     g2: true,
     g3: true,
   });
-  const toggleGroup = (id: string) =>
-    setOpenGroups((prev) => ({ ...prev, [id]: !prev[id] }));
+  const toggleGroup = (id: string) => setOpenGroups((prev) => ({ ...prev, [id]: !prev[id] }));
 
   return (
-    <div className="lg:grid lg:grid-cols-[minmax(340px,400px)_1fr] lg:gap-2 lg:items-start">
-      {/* 左パネル（入力） */}
-      <div className="space-y-3 lg:sticky lg:top-[88px]">
-        <div className="bg-card rounded-3xl shadow-lg shadow-gray-200/50 p-5 lg:p-4 space-y-4 lg:space-y-3">
+    <div className="max-w-lg mx-auto space-y-6 lg:max-w-none lg:space-y-0 lg:grid lg:grid-cols-[minmax(340px,400px)_1fr] lg:gap-2 lg:items-start">
+      {/* ───── 左カラム: 入力パネル ───── */}
+      <div className="space-y-6 lg:space-y-2">
+        <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-5 lg:space-y-3">
           {/* 手動 / 装備設定 トグル */}
-          <div className="flex rounded-lg overflow-hidden border border-line text-xs">
+          <div className="flex rounded-lg overflow-hidden border border-gray-200 text-xs">
             {(["manual", "sim"] as const).map((mode) => (
               <button
                 key={mode}
                 onClick={() => setStatMode(mode)}
                 className={`flex-1 py-2 lg:py-1.5 font-medium transition-colors ${
-                  statMode === mode ? "bg-blue-500 text-white" : "bg-card text-gray-500 hover:bg-gray-50"
+                  statMode === mode ? "bg-blue-500 text-white" : "bg-white text-gray-500 hover:bg-gray-50"
                 }`}
               >
                 {mode === "manual" ? t("statModeManual") : t("statModeSim")}
@@ -130,19 +136,16 @@ export function OfarmSimulator() {
 
           {/* 自属性 */}
           <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-gray-600">{t("heroElement")}</label>
+            <label className="block text-sm lg:text-xs font-medium text-gray-600">{t("heroElement")}</label>
             <div className="flex gap-1.5">
               {ELEMENTS.map((el) => {
-                const active =
-                  statMode === "sim" ? simCfg.charElement === el : manualElement === el;
+                const active = statMode === "sim" ? simCfg.charElement === el : manualElement === el;
                 return (
                   <button
                     key={el}
-                    onClick={() =>
-                      statMode === "sim" ? setSimField("charElement", el) : setManualElement(el)
-                    }
+                    onClick={() => (statMode === "sim" ? setSimField("charElement", el) : setManualElement(el))}
                     className={`flex-1 py-2.5 lg:py-1.5 rounded-lg text-xs font-medium border transition-all ${
-                      active ? elementBtn[el] : "bg-gray-50 text-gray-400 border-line"
+                      active ? elementBtn[el] : "bg-gray-50 text-gray-400 border-gray-200"
                     }`}
                   >
                     {t(`game:element.${el}`)}
@@ -166,59 +169,52 @@ export function OfarmSimulator() {
           )}
 
           {/* 解析書（魔法計算用・両モード共通） */}
-          <div className="pt-1 border-t border-line">
-            <InputField
-              label={t("analysisBook")}
-              value={manual.analysisBook}
-              onChange={(v) => setManualField("analysisBook", v)}
-              max={1000}
-              showReset
-              showMax
-            />
-          </div>
+          <InputField
+            label={t("analysisBook")}
+            value={manual.analysisBook}
+            onChange={(v) => setManualField("analysisBook", v)}
+            max={1000}
+            showReset
+            showMax
+          />
 
           {/* 装備設定モード */}
           {statMode === "sim" && (
-            <SimConfigPanel
-              cfg={simCfg}
-              setField={setSimField}
-              reset={resetSim}
-              replaceAll={replaceAllSim}
-            />
+            <SimConfigPanel cfg={simCfg} setField={setSimField} reset={resetSim} replaceAll={replaceAllSim} />
           )}
         </div>
       </div>
 
-      {/* 右パネル（Wave一覧） */}
-      <div className="mt-4 lg:mt-0 space-y-2">
-        <p className="text-xs text-muted px-1">{t("hint")}</p>
+      {/* ───── 右カラム: Wave一覧 ───── */}
+      <div className="space-y-2">
+        <p className="text-xs text-gray-400 px-1">{t("hint")}</p>
         {OFARM_WAVE_GROUPS.map((group) => {
-          const waves = results.filter(
-            (r) => r.wave.wave >= group.from && r.wave.wave <= group.to,
-          );
+          const waves = results.filter((r) => r.wave.wave >= group.from && r.wave.wave <= group.to);
           const open = openGroups[group.id] ?? true;
           return (
-            <div key={group.id} className="bg-card rounded-2xl shadow-sm border border-line overflow-hidden">
+            <div key={group.id} className="bg-white rounded-2xl shadow shadow-gray-200/50 overflow-hidden">
               <button
                 onClick={() => toggleGroup(group.id)}
-                className="w-full flex items-center justify-between px-4 py-2.5 text-sm font-semibold text-ink hover:bg-gray-50 transition-colors"
+                className="w-full flex items-center justify-between px-3 py-2 bg-gray-50 border-b border-gray-200 hover:bg-gray-100 transition-colors"
               >
-                <span>
+                <span className="text-sm font-semibold text-gray-700">
                   {t("waveRange", { from: group.from, to: group.to })}
                 </span>
-                <span className="text-muted">{open ? "▼" : "▶"}</span>
+                <span className="text-gray-400 text-xs">{open ? "▼" : "▶"}</span>
               </button>
               {open && (
                 <div className="overflow-x-auto">
-                  <table className="w-full text-xs border-t border-line">
+                  <table className="w-full text-sm border-collapse">
                     <thead>
-                      <tr className="text-muted bg-field/40">
-                        <th className="px-2 py-1.5 text-left font-medium">{t("col.wave")}</th>
-                        <th className="px-2 py-1.5 text-left font-medium">{t("col.monster")}</th>
-                        <th className="px-2 py-1.5 text-right font-medium">{t("col.lvhp")}</th>
-                        <th className="px-2 py-1.5 text-center font-medium">{t("col.durability")}</th>
-                        <th className="px-2 py-1.5 text-center font-medium">{t("col.physical")}</th>
-                        <th className="px-2 py-1.5 text-center font-medium">{t("col.magic")}</th>
+                      <tr className="bg-gray-50 text-xs text-gray-500 border-b border-gray-200">
+                        <th className="px-2 py-2 text-left font-medium">{t("col.wave")}</th>
+                        <th className="px-2 py-2 text-left font-medium">{t("col.monster")}</th>
+                        <th className="px-2 py-2 text-right font-medium whitespace-nowrap">{t("col.lvhp")}</th>
+                        <th className="px-2 py-2 text-center font-medium">{t("col.durability")}</th>
+                        <th className="px-2 py-2 text-center font-medium border-l-2 border-l-gray-200">
+                          {t("col.physical")}
+                        </th>
+                        <th className="px-2 py-2 text-center font-medium">{t("col.magic")}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -232,6 +228,19 @@ export function OfarmSimulator() {
             </div>
           );
         })}
+
+        {/* 凡例 */}
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-400 px-2">
+          <span className="flex items-center gap-1">
+            <span className="w-3 h-3 rounded-sm bg-green-100 border border-green-200 inline-block" />
+            {t("legendSafe")}
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-3 h-3 rounded-sm bg-red-100 border border-red-200 inline-block" />
+            {t("legendDanger")}
+          </span>
+          <span className="ml-auto">{t("legendMagic")}</span>
+        </div>
       </div>
     </div>
   );
@@ -248,9 +257,9 @@ function WaveRow({
 }) {
   if (!r.found) {
     return (
-      <tr className="border-t border-line">
-        <td className="px-2 py-2 font-semibold text-ink">W{r.wave.wave}</td>
-        <td className="px-2 py-2 text-muted" colSpan={5}>
+      <tr className="border-b border-gray-100 text-sm">
+        <td className="px-2 py-1.5 font-semibold text-gray-700">W{r.wave.wave}</td>
+        <td className="px-2 py-1.5 text-gray-400" colSpan={5}>
           {r.monsterName} — {t("notRegistered")}
         </td>
       </tr>
@@ -259,71 +268,78 @@ function WaveRow({
 
   const dur = r.durability!;
   const phys = r.physical!;
-  // 最良属性（最小確殺回数）
   const bestMagic = r.magic.reduce((a, b) => (b.hitsToKill < a.hitsToKill ? b : a));
+  const canKillAny = isFinite(phys.hitsToKill) || isFinite(bestMagic.hitsToKill);
+
+  // 行背景: 無効=緑 / 危険(耐久薄い or 倒せない)=赤 / それ以外=白
+  const dangerous = (!dur.nullified && dur.hitsSurvivable < 3) || !canKillAny;
+  const rowBg = dur.nullified
+    ? "bg-green-50 border-green-100"
+    : dangerous
+    ? "bg-red-100 border-red-200"
+    : "bg-white border-gray-100";
 
   return (
-    <tr className="border-t border-line align-middle">
+    <tr className={`border-b ${rowBg} text-sm`}>
       {/* Wave */}
-      <td className="px-2 py-2 whitespace-nowrap font-semibold text-ink">W{r.wave.wave}</td>
+      <td className="px-2 py-1.5 font-semibold text-gray-700 whitespace-nowrap">W{r.wave.wave}</td>
 
       {/* モンスター */}
-      <td className="px-2 py-2">
-        <div className="flex items-center gap-1.5">
-          <span className={`px-1 rounded border text-[10px] ${elementBadge[r.element]}`}>
-            {t(`game:element.${r.element}`)}
-          </span>
-          <span className="font-medium text-ink">{r.monsterName}</span>
-          <span className="text-muted">×{r.wave.count ?? "?"}</span>
-        </div>
+      <td className="px-2 py-1.5 whitespace-nowrap">
+        <span className={`${elementText[r.element]} font-bold mr-1`}>{t(`game:element.${r.element}`)}</span>
+        <span className="font-medium text-gray-800">{r.monsterName}</span>
+        <span className="text-gray-400 ml-1">×{r.wave.count ?? "?"}</span>
       </td>
 
       {/* Lv / HP */}
-      <td className="px-2 py-2 text-right whitespace-nowrap text-muted">
-        <div>Lv {formatHitCount(r.level, lang)}</div>
-        <div className="text-ink font-medium">HP {formatHitCount(r.hp, lang)}</div>
+      <td className="px-2 py-1.5 text-right whitespace-nowrap tabular-nums text-xs">
+        <div className="text-gray-400">Lv {formatHitCount(r.level, lang)}</div>
+        <div className="text-gray-700 font-medium">HP {formatHitCount(r.hp, lang)}</div>
       </td>
 
       {/* 耐久 */}
-      <td className="px-2 py-2 text-center whitespace-nowrap">
-        <span className={`inline-block px-2 py-0.5 rounded-full border font-semibold ${survivalClass(dur.hitsSurvivable)}`}>
-          {dur.nullified ? t("immune") : t("survive", { n: formatHitCount(dur.hitsSurvivable, lang) })}
-        </span>
-        <div className="text-[10px] text-muted mt-0.5">
-          {dur.nullified
-            ? `${dur.isPhysical ? t("phys") : t("mag")} 1〜9`
-            : `${dur.isPhysical ? t("phys") : t("mag")} ${formatHitCount(dur.min, lang)}〜${formatHitCount(dur.max, lang)}`}
+      <td className="px-2 py-1.5 text-center whitespace-nowrap">
+        {dur.nullified ? (
+          <span className="text-emerald-600 font-bold">✓ {t("immune")}</span>
+        ) : (
+          <span className={`font-semibold ${survivalTextClass(dur.hitsSurvivable)}`}>
+            {t("survive", { n: formatHitCount(dur.hitsSurvivable, lang) })}
+          </span>
+        )}
+        <div className="text-[11px] text-gray-400 mt-0.5">
+          {dur.isPhysical ? t("phys") : t("mag")}{" "}
+          {dur.nullified ? "1〜9" : `${formatHitCount(dur.min, lang)}〜${formatHitCount(dur.max, lang)}`}
         </div>
       </td>
 
       {/* 物理 */}
-      <td className="px-2 py-2 text-center whitespace-nowrap">
-        <span className={`inline-block px-2 py-0.5 rounded-full border font-semibold ${killBadgeClass(phys.hitsToKill)}`}>
-          {isFinite(phys.hitsToKill) ? t("killHits", { n: formatHitCount(phys.hitsToKill, lang) }) : t("cantKill")}
-        </span>
-        <div className="text-[10px] text-muted mt-0.5">
-          {t("hit")} {phys.hitRate}% · ×{phys.multiHit}
-        </div>
-        {!isFinite(phys.hitsToKill) && (
-          <div className="text-[10px] text-rose-500">{t("needAtk", { n: formatHitCount(phys.minAtk, lang) })}</div>
+      <td className="px-2 py-1.5 text-center whitespace-nowrap border-l-2 border-l-gray-200">
+        {isFinite(phys.hitsToKill) ? (
+          <>
+            <span className={`font-semibold ${killTextClass(phys.hitsToKill)}`}>
+              {t("killHits", { n: formatHitCount(phys.hitsToKill, lang) })}
+            </span>
+            <div className="text-[11px] text-gray-400 mt-0.5">
+              {t("hit")} {phys.hitRate}% · ×{phys.multiHit}
+            </div>
+          </>
+        ) : (
+          <>
+            <span className="text-rose-500 font-bold">✗</span>
+            <div className="text-[11px] text-rose-400 mt-0.5">{t("needAtk", { n: formatHitCount(phys.minAtk, lang) })}</div>
+          </>
         )}
       </td>
 
       {/* 魔法（各属性） */}
-      <td className="px-2 py-2">
-        <div className="flex flex-wrap gap-1 justify-center">
+      <td className="px-2 py-1.5 text-center">
+        <div className="flex flex-wrap gap-x-2 gap-y-0.5 justify-center text-xs">
           {r.magic.map((m) => {
-            const isBest = isFinite(bestMagic.hitsToKill) && m.hitsToKill === bestMagic.hitsToKill;
+            const best = isFinite(bestMagic.hitsToKill) && m.hitsToKill === bestMagic.hitsToKill;
             return (
-              <span
-                key={m.element}
-                className={`px-1 rounded border text-[10px] leading-tight ${elementBadge[m.element]} ${
-                  isBest ? "ring-1 ring-offset-0 ring-current font-bold" : "opacity-80"
-                }`}
-                title={t(`game:element.${m.element}`)}
-              >
+              <span key={m.element} className={`${elementText[m.element]} ${best ? "font-bold" : "opacity-70"}`}>
                 {t(`game:element.${m.element}`)}
-                {isFinite(m.hitsToKill) ? formatHitCount(m.hitsToKill, lang) : "×"}
+                {isFinite(m.hitsToKill) ? formatHitCount(m.hitsToKill, lang) : "✗"}
               </span>
             );
           })}
