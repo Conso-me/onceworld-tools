@@ -1,0 +1,28 @@
+{
+  "statModeManual": "Manual",
+  "statModeSim": "Equipment",
+  "heroElement": "Your element",
+  "hint": "Waves switch every 10s. You die if you can't clear the wave's enemies in time or your HP hits 0 (no penalty).",
+  "enemyEffects": "Enemy effects:",
+  "waveRange": "Wave {{from}}–{{to}}",
+  "notRegistered": "stats not registered",
+  "immune": "Immune",
+  "survive": "{{n}} hits",
+  "phys": "P",
+  "mag": "M",
+  "needAtk": "Need ATK {{n}}",
+  "hit": "Hit",
+  "overLimit": "100+",
+  "legendSafe": "Damage nullified",
+  "legendDanger": "Risky (low defense / can't kill)",
+  "legendOverLimit": "100+ = can't finish within 10s",
+  "legendMagic": "Magic: hits-to-kill per element (bold = best)",
+  "col": {
+    "wave": "Wave",
+    "monster": "Monster",
+    "lvhp": "Lv / HP",
+    "durability": "Defense",
+    "physical": "Phys",
+    "magic": "Magic"
+  }
+}

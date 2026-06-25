@@ -8,6 +8,7 @@ import { SkyCorridorCalculator } from "./components/SkyCorridorCalculator";
 import { MonsterEditor } from "./components/MonsterEditor";
 import { PetSimulator } from "./components/PetSimulator";
 import { PetBattleSimulator } from "./components/PetBattleSimulator";
+import { OfarmSimulator } from "./components/OfarmSimulator";
 import { TabNav, type Tab } from "./components/ui/TabNav";
 import { PatchNotesModal } from "./components/PatchNotesModal";
 import { EquipmentSummaryModal } from "./components/ui/EquipmentSummaryModal";
@@ -20,9 +21,10 @@ function App() {
     { id: "damage", label: t("tabs.damage"), shortLabel: t("tabs.damageShort"), icon: "⚔" },
     { id: "skyCorridor", label: t("tabs.skyCorridor"), shortLabel: t("tabs.skyCorridorShort"), icon: "☁" },
     { id: "status", label: t("tabs.status"), shortLabel: t("tabs.statusShort"), icon: "✦" },
-    { id: "petbattle", label: t("tabs.petbattle"), shortLabel: t("tabs.petbattleShort"), icon: "⚡" },
+    { id: "ofarm", label: t("tabs.ofarm"), shortLabel: t("tabs.ofarmShort"), icon: "🌾" },
     { id: "arena", label: t("tabs.arena"), icon: "🏟", overflow: true },
     { id: "pet", label: t("tabs.pet"), shortLabel: t("tabs.petShort"), icon: "🐾", overflow: true },
+    { id: "petbattle", label: t("tabs.petbattle"), shortLabel: t("tabs.petbattleShort"), icon: "⚡", overflow: true },
     { id: "farm", label: t("tabs.farm"), shortLabel: t("tabs.farmShort"), icon: "♻", overflow: true },
     { id: "monsters", label: t("tabs.monsters"), shortLabel: t("tabs.monstersShort"), icon: "📋", overflow: true },
   ];
@@ -187,6 +189,9 @@ function App() {
         </div>
         <div className={activeTab === "petbattle" ? "" : "hidden"}>
           <PetBattleSimulator />
+        </div>
+        <div className={activeTab === "ofarm" ? "" : "hidden"}>
+          <OfarmSimulator onNavigateToDamage={handleNavigateToDamage} />
         </div>
         <div className={activeTab === "skyCorridor" ? "" : "hidden"}>
           <SkyCorridorCalculator onNavigateToDamage={handleNavigateToDamage} />

@@ -1,0 +1,28 @@
+{
+  "statModeManual": "手動入力",
+  "statModeSim": "装備設定",
+  "heroElement": "自分の属性",
+  "hint": "10秒毎にWaveが切替。各Waveの敵を倒しきれない／被弾でHP0になると死亡（ペナルティ無し）。",
+  "enemyEffects": "敵への効果:",
+  "waveRange": "Wave {{from}}〜{{to}}",
+  "notRegistered": "ステータス未登録",
+  "immune": "無効",
+  "survive": "{{n}}回耐",
+  "phys": "物",
+  "mag": "魔",
+  "needAtk": "要ATK {{n}}",
+  "hit": "命中",
+  "overLimit": "100↑",
+  "legendSafe": "被ダメ無効",
+  "legendDanger": "危険（耐久薄 / 倒せない）",
+  "legendOverLimit": "100↑ = 10秒で倒しきれない",
+  "legendMagic": "魔法は属性ごとの確殺回数（太字=最良）",
+  "col": {
+    "wave": "Wave",
+    "monster": "モンスター",
+    "lvhp": "Lv / HP",
+    "durability": "耐久",
+    "physical": "物理確",
+    "magic": "魔法確"
+  }
+}
