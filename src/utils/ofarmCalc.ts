@@ -42,6 +42,8 @@ export interface OfarmPlayerStats {
   crystalCubePreMult: number;
   /** 闘晶立方体: 物理最終ダメージ倍率 */
   toughouCubeFinalMult: number;
+  /** 暗殺者のカギ爪装備（物理のみ・互いのDEF=0・与ダメ×0.1） */
+  assassinClaw: boolean;
 }
 
 export interface OfarmDurability {
@@ -123,14 +125,16 @@ export function calcOfarmWave(wave: OfarmWave, player: OfarmPlayerStats): OfarmW
   // 敵の属性 → 自分の属性 の相性
   const incomingAffinity = getElementAffinity(base.element, player.element);
   const attackerStat = enemyAttackIsPhysical ? scaled.scaledAtk : scaled.scaledInt;
+  // 暗殺者のカギ爪装備中は物理被弾に対し自分のDEFも0になる
+  const defForIncoming = player.assassinClaw && enemyAttackIsPhysical ? 0 : player.def;
   const incoming = calcDamage(
     attackerStat,
-    player.def,
+    defForIncoming,
     player.mdef,
     enemyAttackIsPhysical,
     incomingAffinity,
   );
-  const nullified = canNullifyDamage(attackerStat, player.def, player.mdef, enemyAttackIsPhysical);
+  const nullified = canNullifyDamage(attackerStat, defForIncoming, player.mdef, enemyAttackIsPhysical);
   const durability: OfarmDurability = {
     isPhysical: enemyAttackIsPhysical,
     min: incoming.min,
@@ -143,27 +147,30 @@ export function calcOfarmWave(wave: OfarmWave, player: OfarmPlayerStats): OfarmW
   // 自分の属性 → 敵の属性 の相性
   const outgoingAffinity = getElementAffinity(player.element, base.element);
   const multiHit = calcMultiHitCount(player.spd, false);
+  // 暗殺者のカギ爪: 敵DEF=0・最終ダメージ×0.1
+  const physEnemyDef = player.assassinClaw ? 0 : scaled.scaledDef;
+  const physFinalMult = player.toughouCubeFinalMult * (player.assassinClaw ? 0.1 : 1.0);
   const physDmg = calcPhysicalDamage(
     player.atk,
-    scaled.scaledDef,
+    physEnemyDef,
     scaled.scaledMdef,
     outgoingAffinity,
-    player.toughouCubeFinalMult,
+    physFinalMult,
   );
   const physical: OfarmPhysical = {
     damage: physDmg,
     multiHit,
     hitRate: calcHitRate(player.luck, scaled.scaledLuck),
     hitsToKill: safeHits(scaled.hp, physDmg.isNullified ? 1 : physDmg.min, multiHit),
-    minAtk: calcMinAtkToHit(scaled.scaledDef, scaled.scaledMdef),
+    minAtk: calcMinAtkToHit(physEnemyDef, scaled.scaledMdef),
     atkFor1Kill: calcAtkForKill(
       scaled.hp,
-      scaled.scaledDef,
+      physEnemyDef,
       scaled.scaledMdef,
       outgoingAffinity,
       multiHit,
       1,
-      player.toughouCubeFinalMult,
+      physFinalMult,
     ),
   };
 

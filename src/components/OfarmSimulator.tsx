@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { usePersistedState } from "../hooks/usePersistedState";
 import { useSharedSimConfig } from "../hooks/useSharedSimConfig";
@@ -88,6 +88,14 @@ export function OfarmSimulator({
   const [attackBuffs, setAttackBuffField] = useSharedAttackBuffs();
   const derivedBuffs = useMemo(() => deriveAttackBuffs(attackBuffs), [attackBuffs]);
 
+  // 暗殺者のカギ爪（物理のみ・互いのDEF=0・与ダメ×0.1）
+  const [assassinClaw, setAssassinClaw] = usePersistedState("ofarm:assassinClaw", false);
+  // 装備設定モードで武器が「暗殺者のカギ爪」なら自動ON（DamageCalculatorと同挙動）
+  const equippedWeapon = statMode === "sim" ? simCfg.equipWeapon : "";
+  useEffect(() => {
+    if (equippedWeapon === "暗殺者のカギ爪") setAssassinClaw(true);
+  }, [equippedWeapon, setAssassinClaw]);
+
   const setManualField = (field: keyof typeof MANUAL_DEFAULTS, value: string) =>
     setManual((prev) => ({ ...prev, [field]: value }));
 
@@ -97,6 +105,7 @@ export function OfarmSimulator({
       magicBaseInt: derivedBuffs.magicBaseInt,
       crystalCubePreMult: derivedBuffs.crystalCubePreMult,
       toughouCubeFinalMult: derivedBuffs.toughouCubeFinalMult,
+      assassinClaw,
     };
     if (statMode === "sim") {
       return {
@@ -125,7 +134,7 @@ export function OfarmSimulator({
       element: manualElement,
       ...buffs,
     };
-  }, [statMode, simResult, simCfg.charElement, manual, manualElement, derivedBuffs]);
+  }, [statMode, simResult, simCfg.charElement, manual, manualElement, derivedBuffs, assassinClaw]);
 
   const results = useMemo(() => calcAllOfarmWaves(player), [player]);
 
@@ -197,8 +206,20 @@ export function OfarmSimulator({
           )}
 
           {/* 攻撃バフ（全画面共有・両モード共通。ダメージ計算と同じく末尾に配置） */}
-          <div className="pt-1 border-t border-gray-100">
+          <div className="pt-1 border-t border-gray-100 space-y-2">
             <AttackBuffFields buffs={attackBuffs} setField={setAttackBuffField} />
+            <button
+              type="button"
+              onClick={() => setAssassinClaw(!assassinClaw)}
+              title={i18n.t("damage:assassinClawTitle")}
+              className={`text-xs px-2 py-1 rounded border transition-colors ${
+                assassinClaw
+                  ? "bg-orange-100 border-orange-300 text-orange-700 font-medium"
+                  : "bg-gray-50 border-gray-200 text-gray-400"
+              }`}
+            >
+              {i18n.t("damage:assassinClaw")}
+            </button>
           </div>
         </div>
       </div>
