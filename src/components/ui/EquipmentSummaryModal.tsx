@@ -189,7 +189,7 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[85vh] flex flex-col"
+        className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[85vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-200 shrink-0">
@@ -217,7 +217,7 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
         <div className="overflow-y-auto flex-1 px-4 py-3 space-y-3">
           <div>
             <SectionHeader>{t("common:characterInfo")}</SectionHeader>
-            <div className="grid grid-cols-4 gap-x-2 gap-y-1">
+            <div className="grid grid-cols-5 gap-x-2 gap-y-1">
               <div className="flex flex-col items-center bg-gray-50 rounded-lg px-2 py-1">
                 <span className="text-xs text-gray-400">{t("status:level")}</span>
                 <span className="text-xs font-semibold text-gray-700">{fmt(cfg.charLevel)}</span>
