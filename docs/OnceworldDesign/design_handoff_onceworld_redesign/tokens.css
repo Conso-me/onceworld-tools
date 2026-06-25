@@ -1,0 +1,113 @@
+/* ============================================================
+   OnceWorld Tools — デザイントークン (A/Bテーマ)
+   ルート要素 (例: <html> または アプリのルート div) に
+   data-theme="a" | "b" を付けて切り替える。
+   ============================================================ */
+
+/* ---------- Theme A: Clarity (ミニマル・ライト) ---------- */
+[data-theme="a"] {
+  /* surfaces */
+  --bg: #faf9f7;
+  --card: #ffffff;
+  --field-bg: #faf9f7;          /* 入力欄・セグメントの背景 */
+
+  /* text */
+  --ink: #1f1d18;
+  --muted: #8d877b;
+
+  /* lines & accents */
+  --line: #e9e5dd;
+  --accent: #3d63dd;            /* UIアクセント (1色のみ) */
+  --accent-soft: #eef1fc;       /* アクセントの淡背景 */
+  --accent-ink: #ffffff;        /* アクセント上の文字色 */
+  --warn: #c2410c;              /* 不足・警告情報専用 */
+
+  /* shape */
+  --radius: 12px;               /* カード */
+  --radius-s: 8px;              /* ボタン・入力欄 */
+
+  /* type */
+  --font-body: 'Zen Kaku Gothic New', sans-serif;
+  --font-head: 'Zen Kaku Gothic New', sans-serif;
+  --head-ls: 0;
+
+  /* 属性色 (アイコン・チップ専用。面では使わない) */
+  --fire: #d65441;
+  --water: #3b82c4;
+  --wood: #4d9e62;
+  --light: #d9a428;
+  --dark: #7b5fc0;
+}
+
+/* ---------- Theme B: Grimoire (ファンタジー・羊皮紙) ---------- */
+[data-theme="b"] {
+  --bg: #f1e9d8;
+  --card: #faf5e9;
+  --field-bg: #f1e9d8;
+
+  --ink: #3b3022;
+  --muted: #8c7f68;
+
+  --line: #d9cdaf;
+  --accent: #a98736;            /* 金 */
+  --accent-soft: #f0e6cc;
+  --accent-ink: #faf5e9;
+  --warn: #9a4a22;
+
+  --radius: 2px;
+  --radius-s: 2px;
+
+  --font-body: 'Zen Kaku Gothic New', sans-serif;
+  --font-head: 'Shippori Mincho', serif;
+  --head-ls: 0.06em;
+
+  --fire: #b4452f;
+  --water: #2f6b9e;
+  --wood: #3f7d4e;
+  --light: #b78a1f;
+  --dark: #6b4fa0;
+}
+
+/* Theme B の背景テクスチャ (極薄の横縞) — bg を塗る要素に適用 */
+[data-theme="b"] .themed-bg {
+  background:
+    repeating-linear-gradient(0deg,
+      rgba(169, 135, 54, 0.03) 0px,
+      rgba(169, 135, 54, 0.03) 1px,
+      transparent 1px,
+      transparent 7px),
+    var(--bg);
+}
+
+/* Theme B のカード額縁 (二重枠) */
+[data-theme="b"] .themed-card {
+  border: 1px solid var(--accent);
+  box-shadow:
+    inset 0 0 0 3px var(--card),
+    inset 0 0 0 4px var(--line);
+  padding: 4px; /* 額縁の内側余白 */
+}
+
+/* ---------- 共通ルール ---------- */
+/*
+  タイプスケール (px): 9 / 10 / 11 / 12 / 13 / 14 / 16 / 18 / 19 / 22
+    9-10  … 統計キー・補足 (700, letter-spacing 0.12em)
+    11-12 … 補助テキスト・チップ・ラベル
+    13-14 … 本文・カードタイトル (700)
+    16    … ダメージレンジ (700, tabular)
+    18    … モンスター名 (700, 見出しフォント)
+    19-22 … 結論数値 (700)
+
+  スペーシング: 4px 刻み。カード内 padding 14-16px、カード間 gap 16px。
+  数値は必ず font-variant-numeric: tabular-nums。
+
+  ブレークポイント:
+    1200px … ヘッダーのユーティリティリンクを非表示 (テーマスイッチ優先)
+    1100px … 3カラム → 2カラム (与ダメージは全幅へ)
+     900px … ナビの padding/フォント圧縮
+     760px … 1カラム + 下部固定サマリー + ナビ非表示
+     540px … スキル行を折り返し
+
+  テーマ切替トランジション: background / color / border-color 0.2-0.3s。
+  prefers-reduced-motion: reduce では無効化すること。
+*/

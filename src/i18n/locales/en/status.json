@@ -48,6 +48,7 @@
   "analysisBook": "Analysis Book",
   "analysisAnalysisBook": "Analysis of Analysis Book",
   "crystalCube": "Magic Crystal Cube",
+  "toughouCube": "Physical Crystal Cube",
   "registered": "Saved ({{count}})",
   "overwritePresetConfirm": "Overwrite preset \"{{name}}\"?",
   "overwriteBuildPresetConfirm": "Overwrite build preset \"{{name}}\"?",

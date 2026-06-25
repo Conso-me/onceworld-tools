@@ -48,6 +48,7 @@
   "analysisBook": "魔法解析書",
   "analysisAnalysisBook": "解析書の解析書",
   "crystalCube": "魔晶立方体",
+  "toughouCube": "闘晶立方体",
   "registered": "登録済み ({{count}}件)",
   "overwritePresetConfirm": "プリセット「{{name}}」を上書きしますか？",
   "overwriteBuildPresetConfirm": "ビルドプリセット「{{name}}」を上書きしますか？",
