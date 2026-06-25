@@ -36,8 +36,12 @@ export interface OfarmPlayerStats {
   luck: number;
   hp: number;
   element: Element;
-  /** 魔法計算用の解析書（INT加算） */
-  analysisBook: number;
+  /** 魔法計算用の解析書INT加算（解析書の解析書込み） */
+  magicBaseInt: number;
+  /** 魔晶立方体: 防御計算前倍率 */
+  crystalCubePreMult: number;
+  /** 闘晶立方体: 物理最終ダメージ倍率 */
+  toughouCubeFinalMult: number;
 }
 
 export interface OfarmDurability {
@@ -139,23 +143,38 @@ export function calcOfarmWave(wave: OfarmWave, player: OfarmPlayerStats): OfarmW
   // 自分の属性 → 敵の属性 の相性
   const outgoingAffinity = getElementAffinity(player.element, base.element);
   const multiHit = calcMultiHitCount(player.spd, false);
-  const physDmg = calcPhysicalDamage(player.atk, scaled.scaledDef, scaled.scaledMdef, outgoingAffinity);
+  const physDmg = calcPhysicalDamage(
+    player.atk,
+    scaled.scaledDef,
+    scaled.scaledMdef,
+    outgoingAffinity,
+    player.toughouCubeFinalMult,
+  );
   const physical: OfarmPhysical = {
     damage: physDmg,
     multiHit,
     hitRate: calcHitRate(player.luck, scaled.scaledLuck),
     hitsToKill: safeHits(scaled.hp, physDmg.isNullified ? 1 : physDmg.min, multiHit),
     minAtk: calcMinAtkToHit(scaled.scaledDef, scaled.scaledMdef),
-    atkFor1Kill: calcAtkForKill(scaled.hp, scaled.scaledDef, scaled.scaledMdef, outgoingAffinity, multiHit, 1),
+    atkFor1Kill: calcAtkForKill(
+      scaled.hp,
+      scaled.scaledDef,
+      scaled.scaledMdef,
+      outgoingAffinity,
+      multiHit,
+      1,
+      player.toughouCubeFinalMult,
+    ),
   };
 
   // ─── 魔法攻撃（各属性、自分→敵）──────────────────────────────────
   const magic: OfarmMagicEntry[] = ELEMENTS.map((el) => {
     const affinity = getElementAffinity(el, base.element);
-    const mult = getMagicMultiplier(el);
+    // 魔晶立方体は防御計算前（魔法倍率側）に適用
+    const mult = getMagicMultiplier(el) * player.crystalCubePreMult;
     const dmg = calcPlayerMagicDamage(
       player.int,
-      player.analysisBook,
+      player.magicBaseInt,
       mult,
       scaled.scaledDef,
       scaled.scaledMdef,

@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { MonsterBase, Element } from "../types/game";
 import { usePersistedState, usePersistedGroup } from "../hooks/usePersistedState";
 import { useSharedSimConfig } from "../hooks/useSharedSimConfig";
+import { useSharedAttackBuffs } from "../hooks/useSharedAttackBuffs";
 import { PetConfigPanel } from "./damage/PetConfigPanel";
 import { calcPetStats, DEFAULT_PET_DAMAGE_CONFIG } from "../utils/petStatCalc";
 import type { PetDamageConfig } from "../types/game";
@@ -106,11 +107,14 @@ export function DamageCalculator({
   const [myLuck, setMyLuck] = usePersistedState("dmg:luck", "");
   const [myElement, setMyElement] = usePersistedState<Element>("dmg:element", "火");
   const [myAttackMode, setMyAttackMode] = usePersistedState<PlayerAttackMode>("dmg:attackMode", "物理");
-  const [analysisBook, setAnalysisBook] = usePersistedState("dmg:analysisBook", "");
-  const [analysisAnalysisBook, setAnalysisAnalysisBook] = usePersistedState("dmg:analysisAnalysisBook", "");
-  const [crystalCube, setCrystalCube] = usePersistedState("dmg:crystalCube", "");
-  const [toughouCube, setToughouCube] = usePersistedState("dmg:toughouCube", "");
-  const [devilEye, setDevilEye] = usePersistedState("dmg:devilEye", "");
+  // 攻撃バフは全画面共有ストア（useSharedAttackBuffs）から取得・更新する
+  const [attackBuffs, setAttackBuffField] = useSharedAttackBuffs();
+  const { analysisBook, analysisAnalysisBook, crystalCube, toughouCube, devilEye } = attackBuffs;
+  const setAnalysisBook = useCallback((v: string) => setAttackBuffField("analysisBook", v), [setAttackBuffField]);
+  const setAnalysisAnalysisBook = useCallback((v: string) => setAttackBuffField("analysisAnalysisBook", v), [setAttackBuffField]);
+  const setCrystalCube = useCallback((v: string) => setAttackBuffField("crystalCube", v), [setAttackBuffField]);
+  const setToughouCube = useCallback((v: string) => setAttackBuffField("toughouCube", v), [setAttackBuffField]);
+  const setDevilEye = useCallback((v: string) => setAttackBuffField("devilEye", v), [setAttackBuffField]);
   // 物理オーバーキル計算に多段攻撃を含めるか（現状ゲーム内では多段でOKが発生しないためデフォルトOFF）
   const [physOverkillMultiHit, setPhysOverkillMultiHit] = usePersistedState("dmg:physOverkillMultiHit", false);
   // 魔法デバフ: 木魔法→DEF半減、闇魔法→LUK半減

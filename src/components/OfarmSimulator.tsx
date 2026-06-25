@@ -2,9 +2,12 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { usePersistedState } from "../hooks/usePersistedState";
 import { useSharedSimConfig } from "../hooks/useSharedSimConfig";
+import { useSharedAttackBuffs } from "../hooks/useSharedAttackBuffs";
+import { deriveAttackBuffs } from "../utils/attackBuffs";
 import { calcStatus } from "../utils/statusCalc";
 import { InputField } from "./ui/InputField";
 import { SimConfigPanel } from "./SimConfigPanel";
+import { AttackBuffFields } from "./damage/AttackBuffFields";
 import { formatHitCount } from "../utils/formatNumber";
 import {
   calcAllOfarmWaves,
@@ -65,7 +68,6 @@ const MANUAL_DEFAULTS = {
   spd: "",
   vit: "",
   luck: "",
-  analysisBook: "",
 };
 
 export function OfarmSimulator({
@@ -83,11 +85,19 @@ export function OfarmSimulator({
   const [simCfg, setSimField, resetSim, replaceAllSim] = useSharedSimConfig();
   const simResult = useMemo(() => calcStatus(simCfg), [simCfg]);
 
+  const [attackBuffs, setAttackBuffField] = useSharedAttackBuffs();
+  const derivedBuffs = useMemo(() => deriveAttackBuffs(attackBuffs), [attackBuffs]);
+
   const setManualField = (field: keyof typeof MANUAL_DEFAULTS, value: string) =>
     setManual((prev) => ({ ...prev, [field]: value }));
 
   // 実効プレイヤーステータス
   const player: OfarmPlayerStats = useMemo(() => {
+    const buffs = {
+      magicBaseInt: derivedBuffs.magicBaseInt,
+      crystalCubePreMult: derivedBuffs.crystalCubePreMult,
+      toughouCubeFinalMult: derivedBuffs.toughouCubeFinalMult,
+    };
     if (statMode === "sim") {
       return {
         atk: simResult.final.atk,
@@ -99,7 +109,7 @@ export function OfarmSimulator({
         luck: simResult.final.luck,
         hp: simResult.hp,
         element: simCfg.charElement,
-        analysisBook: parseInt(manual.analysisBook) || 0,
+        ...buffs,
       };
     }
     const vit = parseInt(manual.vit) || 0;
@@ -113,9 +123,9 @@ export function OfarmSimulator({
       luck: parseInt(manual.luck) || 0,
       hp: vit > 0 ? vit * 18 + 100 : 0,
       element: manualElement,
-      analysisBook: parseInt(manual.analysisBook) || 0,
+      ...buffs,
     };
-  }, [statMode, simResult, simCfg.charElement, manual, manualElement]);
+  }, [statMode, simResult, simCfg.charElement, manual, manualElement, derivedBuffs]);
 
   const results = useMemo(() => calcAllOfarmWaves(player), [player]);
 
@@ -181,15 +191,10 @@ export function OfarmSimulator({
             </div>
           )}
 
-          {/* 解析書（魔法計算用・両モード共通） */}
-          <InputField
-            label={t("analysisBook")}
-            value={manual.analysisBook}
-            onChange={(v) => setManualField("analysisBook", v)}
-            max={1000}
-            showReset
-            showMax
-          />
+          {/* 攻撃バフ（全画面共有・両モード共通） */}
+          <div className="pt-1 border-t border-gray-100">
+            <AttackBuffFields buffs={attackBuffs} setField={setAttackBuffField} />
+          </div>
 
           {/* 装備設定モード */}
           {statMode === "sim" && (

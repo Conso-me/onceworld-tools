@@ -2,7 +2,6 @@
   "statModeManual": "Manual",
   "statModeSim": "Equipment",
   "heroElement": "Your element",
-  "analysisBook": "Analysis Book",
   "hint": "Waves switch every 10s. You die if you can't clear the wave's enemies in time or your HP hits 0 (no penalty).",
   "waveRange": "Wave {{from}}–{{to}}",
   "notRegistered": "stats not registered",

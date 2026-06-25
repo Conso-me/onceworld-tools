@@ -131,5 +131,8 @@
   "autoSpell": "自動",
   "requiredLuck": "必要LUCK",
   "bestSpell": "（最良）",
-  "nullifyHeader": "無効化"
+  "nullifyHeader": "無効化",
+  "attackBuffsTitle": "攻撃バフ",
+  "physicalBuffs": "物理",
+  "magicBuffs": "魔法"
 }

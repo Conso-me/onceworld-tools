@@ -131,5 +131,8 @@
   "autoSpell": "Auto",
   "requiredLuck": "Req. LUCK",
   "bestSpell": "(Best)",
-  "nullifyHeader": "Nullify"
+  "nullifyHeader": "Nullify",
+  "attackBuffsTitle": "Attack Buffs",
+  "physicalBuffs": "Physical",
+  "magicBuffs": "Magic"
 }
