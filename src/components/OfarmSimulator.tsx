@@ -33,12 +33,21 @@ const elementText: Record<Element, string> = {
   闇: "text-purple-600",
 };
 
-/** 確殺回数 → テキスト色 */
+/** Wave制限時間(10秒)内に殴れる現実的な上限回数。これを超えると倒しきれない扱い */
+const TIME_LIMIT_HITS = 100;
+
+/** 確殺回数 → 表示テキストと時間内可否 */
+function killCell(hits: number, lang: string, overLimitLabel: string): { text: string; viable: boolean } {
+  if (!isFinite(hits)) return { text: "✗", viable: false };
+  if (hits > TIME_LIMIT_HITS) return { text: overLimitLabel, viable: false };
+  return { text: formatHitCount(hits, lang), viable: true };
+}
+
+/** 確殺回数 → テキスト色（時間内に倒せる前提） */
 function killTextClass(hits: number): string {
-  if (!isFinite(hits)) return "text-rose-500";
   if (hits <= 2) return "text-emerald-600";
-  if (hits <= 5) return "text-amber-600";
-  return "text-rose-500";
+  if (hits <= 20) return "text-amber-600";
+  return "text-orange-600";
 }
 
 /** 耐えられる回数 → テキスト色 */
@@ -265,6 +274,7 @@ export function OfarmSimulator() {
             <span className="w-3 h-3 rounded-sm bg-red-100 border border-red-200 inline-block" />
             {t("legendDanger")}
           </span>
+          <span>{t("legendOverLimit")}</span>
           <span className="ml-auto">{t("legendMagic")}</span>
         </div>
       </div>
@@ -294,11 +304,15 @@ function WaveRow({
 
   const dur = r.durability!;
   const phys = r.physical!;
-  const bestMagic = r.magic.reduce((a, b) => (b.hitsToKill < a.hitsToKill ? b : a));
-  const canKillAny = isFinite(phys.hitsToKill) || isFinite(bestMagic.hitsToKill);
+  const overLimitLabel = t("overLimit");
+  const physCell = killCell(phys.hitsToKill, lang, overLimitLabel);
+  const magicCells = r.magic.map((m) => ({ ...m, ...killCell(m.hitsToKill, lang, overLimitLabel) }));
+  const bestMagicHits = Math.min(...r.magic.map((m) => m.hitsToKill));
+  // 時間内(100回以内)に倒せる手段が1つでもあるか
+  const canClearInTime = physCell.viable || magicCells.some((m) => m.viable);
 
-  // 行背景: 無効=緑 / 危険(耐久薄い or 倒せない)=赤 / それ以外=白
-  const dangerous = (!dur.nullified && dur.hitsSurvivable < 3) || !canKillAny;
+  // 行背景: 無効=緑 / 危険(耐久薄い or 時間内に倒せない)=赤 / それ以外=白
+  const dangerous = (!dur.nullified && dur.hitsSurvivable < 3) || !canClearInTime;
   const rowBg = dur.nullified
     ? "bg-green-50 border-green-100"
     : dangerous
@@ -338,36 +352,34 @@ function WaveRow({
         </div>
       </td>
 
-      {/* 物理 */}
-      <td className="px-2 py-1.5 text-center whitespace-nowrap border-l-2 border-l-gray-200">
-        {isFinite(phys.hitsToKill) ? (
-          <>
-            <span className={`font-semibold ${killTextClass(phys.hitsToKill)}`}>
-              {t("killHits", { n: formatHitCount(phys.hitsToKill, lang) })}
-            </span>
-            <div className="text-[11px] text-gray-400 mt-0.5">
-              {t("hit")} {phys.hitRate}% · ×{phys.multiHit}
-            </div>
-          </>
-        ) : (
-          <>
-            <span className="text-rose-500 font-bold">✗</span>
-            <div className="text-[11px] text-rose-400 mt-0.5">{t("needAtk", { n: formatHitCount(phys.minAtk, lang) })}</div>
-          </>
-        )}
+      {/* 物理確殺回数（回数のみ） */}
+      <td
+        className={`px-2 py-1.5 text-center whitespace-nowrap tabular-nums border-l-2 border-l-gray-200 ${
+          physCell.viable ? "" : "bg-rose-100"
+        }`}
+      >
+        <span
+          className={`font-semibold ${physCell.viable ? killTextClass(phys.hitsToKill) : "text-rose-500"}`}
+        >
+          {physCell.text}
+        </span>
       </td>
 
-      {/* 魔法（各属性: 1列ずつ） */}
-      {r.magic.map((m, i) => {
-        const best = isFinite(bestMagic.hitsToKill) && m.hitsToKill === bestMagic.hitsToKill;
+      {/* 魔法確殺回数（各属性: 1列ずつ・回数のみ） */}
+      {magicCells.map((m, i) => {
+        const best = m.viable && m.hitsToKill === bestMagicHits;
         return (
           <td
             key={m.element}
-            className={`px-1 py-1.5 text-center text-xs tabular-nums ${elementText[m.element]} ${
-              best ? "font-bold" : "opacity-70"
-            } ${i === 0 ? "border-l-2 border-l-gray-200" : ""}`}
+            className={`px-1 py-1.5 text-center text-xs tabular-nums ${
+              i === 0 ? "border-l-2 border-l-gray-200" : ""
+            } ${
+              m.viable
+                ? `${elementText[m.element]} ${best ? "font-bold" : "opacity-70"}`
+                : "text-rose-500 bg-rose-100"
+            }`}
           >
-            {isFinite(m.hitsToKill) ? formatHitCount(m.hitsToKill, lang) : "✗"}
+            {m.text}
           </td>
         );
       })}

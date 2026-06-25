@@ -10,19 +10,19 @@
   "survive": "{{n}} hits",
   "phys": "P",
   "mag": "M",
-  "killHits": "{{n}} hits",
-  "cantKill": "Can't kill",
   "needAtk": "Need ATK {{n}}",
   "hit": "Hit",
+  "overLimit": "100+",
   "legendSafe": "Damage nullified",
   "legendDanger": "Risky (low defense / can't kill)",
+  "legendOverLimit": "100+ = can't finish within 10s",
   "legendMagic": "Magic: hits-to-kill per element (bold = best)",
   "col": {
     "wave": "Wave",
     "monster": "Monster",
     "lvhp": "Lv / HP",
     "durability": "Defense",
-    "physical": "Physical",
-    "magic": "Magic"
+    "physical": "Physical kills",
+    "magic": "Magic kills"
   }
 }

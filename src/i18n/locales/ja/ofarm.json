@@ -10,19 +10,19 @@
   "survive": "{{n}}回耐",
   "phys": "物",
   "mag": "魔",
-  "killHits": "{{n}}回確殺",
-  "cantKill": "削れない",
   "needAtk": "要ATK {{n}}",
   "hit": "命中",
+  "overLimit": "100↑",
   "legendSafe": "被ダメ無効",
   "legendDanger": "危険（耐久薄 / 倒せない）",
-  "legendMagic": "魔法列: 属性ごとの確殺回数（太字=最良）",
+  "legendOverLimit": "100↑ = 10秒で倒しきれない",
+  "legendMagic": "魔法は属性ごとの確殺回数（太字=最良）",
   "col": {
     "wave": "Wave",
     "monster": "モンスター",
     "lvhp": "Lv / HP",
     "durability": "耐久",
-    "physical": "物理",
-    "magic": "魔法"
+    "physical": "物理確殺回数",
+    "magic": "魔法確殺回数"
   }
 }
