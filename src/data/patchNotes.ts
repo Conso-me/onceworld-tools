@@ -13,6 +13,23 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-06-25",
+    changes: [
+    { type: "feature", text: "feat: 敵への効果トグルをWave上部に集約し木/闇魔法デバフを追加" },
+    { type: "feature", text: "feat: おふぁ～むに暗殺者のカギ爪の特殊計算を追加" },
+    { type: "improve", text: "style: おふぁ～むの攻撃バフ入力を装備設定の後ろに移動し配置を統一" },
+    { type: "improve", text: "feat: 攻撃バフ(デビルアイ等)を全画面共有ストア化しおふぁ～むでも入力可能に" },
+    { type: "improve", text: "feat: モンスター名クリックでダメージ計算へ遷移＋確殺列の幅を縮小" },
+    { type: "improve", text: "style: 確殺回数ヘッダーを「物理確」「魔法確」に短縮" },
+    { type: "improve", text: "feat: 確殺回数を回数のみ表示にし10秒制限(100回超)を可視化" },
+    { type: "improve", text: "fix: 魔法を5列に分割し属性ごとの確殺回数を固定位置に揃える" },
+    { type: "improve", text: "fix: おふぁ～むテーブルの列幅を固定しレイアウトのブレを解消" },
+    { type: "improve", text: "style: おふぁ～むの枠を減らし天空回廊の被ダメシミュ風に再構成" },
+    { type: "feature", text: "feat: おふぁ～むWaveシミュレーターを追加" },
+    ],
+  },
+
+  {
     date: "2026-06-24",
     changes: [
     { type: "improve", text: "fix: ゴールド強化の上限を300に統一" },
