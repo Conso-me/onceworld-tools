@@ -17,6 +17,26 @@ function fmt(n: number) {
   return n.toLocaleString();
 }
 
+/** 左50%にラベル+名前、右50%に補足情報（左寄せ）を並べる共通行 */
+function SummaryRow({ label, name, info }: {
+  label: React.ReactNode;
+  name: string;
+  info?: React.ReactNode;
+}) {
+  return (
+    <div className="grid grid-cols-2 gap-2 text-xs items-baseline">
+      <div className="flex items-baseline gap-2 min-w-0">
+        <span className="text-gray-400 w-8 shrink-0">{label}</span>
+        {name
+          ? <span className="text-gray-800 font-medium truncate">{name}</span>
+          : <span className="text-gray-300">-</span>
+        }
+      </div>
+      <div className="flex items-baseline gap-2">{name ? info : null}</div>
+    </div>
+  );
+}
+
 function ItemRow({ label, name, enh, goldEnh, canEnhance }: {
   label: string;
   name: string;
@@ -26,21 +46,18 @@ function ItemRow({ label, name, enh, goldEnh, canEnhance }: {
 }) {
   const showEnh = (canEnhance ?? true);
   return (
-    <div className="flex items-baseline text-xs gap-2">
-      <span className="text-gray-400 w-8 shrink-0">{label}</span>
-      {name
-        ? <>
-            <span className="text-gray-800 font-medium flex-1 min-w-0 truncate">{name}</span>
-            {enh !== undefined && showEnh && (
-              <span className="text-gray-400 shrink-0">+{enh}</span>
-            )}
-            {goldEnh !== undefined && goldEnh > 0 && showEnh && (
-              <span className="text-yellow-500 font-semibold shrink-0">G+{goldEnh}</span>
-            )}
-          </>
-        : <span className="text-gray-300 flex-1">-</span>
-      }
-    </div>
+    <SummaryRow
+      label={label}
+      name={name}
+      info={enh !== undefined && showEnh && (
+        <>
+          <span className="text-gray-400">+{enh}</span>
+          {goldEnh !== undefined && goldEnh > 0 && (
+            <span className="text-yellow-500 font-semibold">G+{goldEnh}</span>
+          )}
+        </>
+      )}
+    />
   );
 }
 
@@ -243,7 +260,7 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
 
           <div>
             <SectionHeader>{t("status:equipment")}</SectionHeader>
-            <div className="space-y-1 max-w-[75%]">
+            <div className="space-y-1">
               <ItemRow label={slotLabel("武器")} name={displayName(cfg.equipWeapon, weaponItem?.nameEn)} enh={cfg.enhWeapon} goldEnh={cfg.goldEnhWeapon} canEnhance={weaponCanEnh} />
               {armorSlots.map(({ slot, name, enh, goldEnh, item }) => (
                 <ItemRow
@@ -265,36 +282,28 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
 
           <div>
             <SectionHeader>{t("status:accessory")}</SectionHeader>
-            <div className="space-y-1 max-w-[60%]">
+            <div className="space-y-1">
               {accSlots.map((s, i) => (
-                <div key={i} className="flex items-baseline gap-2 text-xs">
-                  <span className="text-gray-400 w-8 shrink-0">{i + 1}</span>
-                  {s.name
-                    ? <>
-                        <span className="text-gray-800 font-medium flex-1 min-w-0 truncate">{displayName(s.name, getAccessoryByName(s.name)?.nameEn)}</span>
-                        <span className="text-gray-400 shrink-0">Lv.{s.level}</span>
-                      </>
-                    : <span className="text-gray-300 flex-1">-</span>
-                  }
-                </div>
+                <SummaryRow
+                  key={i}
+                  label={i + 1}
+                  name={s.name ? displayName(s.name, getAccessoryByName(s.name)?.nameEn) : ""}
+                  info={<span className="text-gray-400">Lv.{s.level}</span>}
+                />
               ))}
             </div>
           </div>
 
           <div>
             <SectionHeader>{t("status:pet")}</SectionHeader>
-            <div className="space-y-1 max-w-[60%]">
+            <div className="space-y-1">
               {petSlots.map((s, i) => (
-                <div key={i} className="flex items-baseline gap-2 text-xs">
-                  <span className="text-gray-400 w-8 shrink-0">{i + 1}</span>
-                  {s.name
-                    ? <>
-                        <span className="text-gray-800 font-medium flex-1 min-w-0 truncate">{displayName(s.name, getPetNameEn(s.name))}</span>
-                        <span className="text-gray-400 shrink-0">Lv.{s.level}</span>
-                      </>
-                    : <span className="text-gray-300 flex-1">-</span>
-                  }
-                </div>
+                <SummaryRow
+                  key={i}
+                  label={i + 1}
+                  name={s.name ? displayName(s.name, getPetNameEn(s.name)) : ""}
+                  info={<span className="text-gray-400">Lv.{s.level}</span>}
+                />
               ))}
             </div>
           </div>
