@@ -1,0 +1,25 @@
+{
+  "statModeManual": "手動入力",
+  "statModeSim": "装備設定",
+  "heroElement": "自分の属性",
+  "analysisBook": "解析書",
+  "hint": "10秒毎にWaveが切替。各Waveの敵を倒しきれない／被弾でHP0になると死亡（ペナルティ無し）。",
+  "waveRange": "Wave {{from}}〜{{to}}",
+  "notRegistered": "ステータス未登録",
+  "immune": "無効",
+  "survive": "{{n}}回耐",
+  "phys": "物",
+  "mag": "魔",
+  "killHits": "{{n}}回確殺",
+  "cantKill": "削れない",
+  "needAtk": "要ATK {{n}}",
+  "hit": "命中",
+  "col": {
+    "wave": "Wave",
+    "monster": "モンスター",
+    "lvhp": "Lv / HP",
+    "durability": "耐久",
+    "physical": "物理",
+    "magic": "魔法"
+  }
+}

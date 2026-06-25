@@ -1,0 +1,25 @@
+{
+  "statModeManual": "Manual",
+  "statModeSim": "Equipment",
+  "heroElement": "Your element",
+  "analysisBook": "Analysis Book",
+  "hint": "Waves switch every 10s. You die if you can't clear the wave's enemies in time or your HP hits 0 (no penalty).",
+  "waveRange": "Wave {{from}}–{{to}}",
+  "notRegistered": "stats not registered",
+  "immune": "Immune",
+  "survive": "{{n}} hits",
+  "phys": "P",
+  "mag": "M",
+  "killHits": "{{n}} hits",
+  "cantKill": "Can't kill",
+  "needAtk": "Need ATK {{n}}",
+  "hit": "Hit",
+  "col": {
+    "wave": "Wave",
+    "monster": "Monster",
+    "lvhp": "Lv / HP",
+    "durability": "Defense",
+    "physical": "Physical",
+    "magic": "Magic"
+  }
+}

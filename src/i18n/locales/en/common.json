@@ -17,7 +17,9 @@
     "petbattle": "Pet Battle",
     "petbattleShort": "Battle",
     "skyCorridor": "Sky Corridor",
-    "skyCorridorShort": "Sky Cor."
+    "skyCorridorShort": "Sky Cor.",
+    "ofarm": "Ofarm",
+    "ofarmShort": "Ofarm"
   },
   "preparing": "Coming Soon",
   "add": "Add",

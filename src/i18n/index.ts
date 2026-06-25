@@ -12,6 +12,7 @@ import jaMonsters from "./locales/ja/monsters.json";
 import jaPetBattle from "./locales/ja/petbattle.json";
 import jaPet from "./locales/ja/pet.json";
 import jaSkyCorridor from "./locales/ja/skyCorridor.json";
+import jaOfarm from "./locales/ja/ofarm.json";
 
 import enCommon from "./locales/en/common.json";
 import enGame from "./locales/en/game.json";
@@ -23,6 +24,7 @@ import enMonsters from "./locales/en/monsters.json";
 import enPetBattle from "./locales/en/petbattle.json";
 import enPet from "./locales/en/pet.json";
 import enSkyCorridor from "./locales/en/skyCorridor.json";
+import enOfarm from "./locales/en/ofarm.json";
 
 i18n
   .use(LanguageDetector)
@@ -40,6 +42,7 @@ i18n
         petbattle: jaPetBattle,
         pet: jaPet,
         skyCorridor: jaSkyCorridor,
+        ofarm: jaOfarm,
       },
       en: {
         common: enCommon,
@@ -52,6 +55,7 @@ i18n
         petbattle: enPetBattle,
         pet: enPet,
         skyCorridor: enSkyCorridor,
+        ofarm: enOfarm,
       },
     },
     fallbackLng: "ja",
