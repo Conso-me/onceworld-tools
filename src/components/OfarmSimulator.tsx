@@ -68,7 +68,11 @@ const MANUAL_DEFAULTS = {
   analysisBook: "",
 };
 
-export function OfarmSimulator() {
+export function OfarmSimulator({
+  onNavigateToDamage,
+}: {
+  onNavigateToDamage?: (monsterName: string, level: number) => void;
+}) {
   const { t, i18n } = useTranslation("ofarm");
   const lang = i18n.language;
 
@@ -213,18 +217,18 @@ export function OfarmSimulator() {
               </button>
               {open && (
                 <div className="overflow-x-auto">
-                  <table className="w-full text-sm border-collapse table-fixed min-w-[860px]">
+                  <table className="w-full text-sm border-collapse table-fixed min-w-[740px]">
                     <colgroup>
                       <col className="w-[40px]" />
                       <col className="w-[180px]" />
                       <col className="w-[88px]" />
                       <col className="w-[96px]" />
-                      <col className="w-[96px]" />
-                      <col className="w-[60px]" />
-                      <col className="w-[60px]" />
-                      <col className="w-[60px]" />
-                      <col className="w-[60px]" />
-                      <col className="w-[60px]" />
+                      <col className="w-[64px]" />
+                      <col className="w-[52px]" />
+                      <col className="w-[52px]" />
+                      <col className="w-[52px]" />
+                      <col className="w-[52px]" />
+                      <col className="w-[52px]" />
                     </colgroup>
                     <thead>
                       <tr className="bg-gray-50 text-xs text-gray-500 border-b border-gray-200">
@@ -254,7 +258,7 @@ export function OfarmSimulator() {
                     </thead>
                     <tbody>
                       {waves.map((r) => (
-                        <WaveRow key={r.wave.wave} r={r} lang={lang} t={t} />
+                        <WaveRow key={r.wave.wave} r={r} lang={lang} t={t} onMonsterClick={onNavigateToDamage} />
                       ))}
                     </tbody>
                   </table>
@@ -286,10 +290,12 @@ function WaveRow({
   r,
   lang,
   t,
+  onMonsterClick,
 }: {
   r: OfarmWaveResult;
   lang: string;
   t: ReturnType<typeof useTranslation>["t"];
+  onMonsterClick?: (monsterName: string, level: number) => void;
 }) {
   if (!r.found) {
     return (
@@ -327,7 +333,17 @@ function WaveRow({
       {/* モンスター */}
       <td className="px-2 py-1.5 leading-tight">
         <span className={`${elementText[r.element]} font-bold mr-1`}>{t(`game:element.${r.element}`)}</span>
-        <span className="font-medium text-gray-800 break-words">{r.monsterName}</span>
+        {r.found && onMonsterClick ? (
+          <button
+            type="button"
+            onClick={() => onMonsterClick(r.monsterName, r.level)}
+            className="font-medium text-indigo-600 hover:underline break-words text-left"
+          >
+            {r.monsterName}
+          </button>
+        ) : (
+          <span className="font-medium text-gray-800 break-words">{r.monsterName}</span>
+        )}
         <span className="text-gray-400 ml-1">×{r.wave.count ?? "?"}</span>
       </td>
 

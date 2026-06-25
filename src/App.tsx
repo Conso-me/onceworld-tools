@@ -191,7 +191,7 @@ function App() {
           <PetBattleSimulator />
         </div>
         <div className={activeTab === "ofarm" ? "" : "hidden"}>
-          <OfarmSimulator />
+          <OfarmSimulator onNavigateToDamage={handleNavigateToDamage} />
         </div>
         <div className={activeTab === "skyCorridor" ? "" : "hidden"}>
           <SkyCorridorCalculator onNavigateToDamage={handleNavigateToDamage} />
