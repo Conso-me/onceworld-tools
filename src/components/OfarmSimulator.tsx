@@ -204,7 +204,15 @@ export function OfarmSimulator() {
               </button>
               {open && (
                 <div className="overflow-x-auto">
-                  <table className="w-full text-sm border-collapse">
+                  <table className="w-full text-sm border-collapse table-fixed min-w-[720px]">
+                    <colgroup>
+                      <col className="w-[44px]" />
+                      <col className="w-[30%]" />
+                      <col className="w-[15%]" />
+                      <col className="w-[16%]" />
+                      <col className="w-[16%]" />
+                      <col className="w-[20%]" />
+                    </colgroup>
                     <thead>
                       <tr className="bg-gray-50 text-xs text-gray-500 border-b border-gray-200">
                         <th className="px-2 py-2 text-left font-medium">{t("col.wave")}</th>
@@ -285,9 +293,9 @@ function WaveRow({
       <td className="px-2 py-1.5 font-semibold text-gray-700 whitespace-nowrap">W{r.wave.wave}</td>
 
       {/* モンスター */}
-      <td className="px-2 py-1.5 whitespace-nowrap">
+      <td className="px-2 py-1.5 leading-tight">
         <span className={`${elementText[r.element]} font-bold mr-1`}>{t(`game:element.${r.element}`)}</span>
-        <span className="font-medium text-gray-800">{r.monsterName}</span>
+        <span className="font-medium text-gray-800 break-words">{r.monsterName}</span>
         <span className="text-gray-400 ml-1">×{r.wave.count ?? "?"}</span>
       </td>
 
