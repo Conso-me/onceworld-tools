@@ -63,7 +63,7 @@ export function TabNav({
   const isOverflowActive = overflowTabs.some((t) => t.id === activeTab);
 
   return (
-    <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
+    <div className="flex gap-1 bg-field rounded-xl p-1">
       {mainTabs.map((tab) => (
         <button
           key={tab.id}
@@ -71,17 +71,17 @@ export function TabNav({
           disabled={tab.disabled}
           className={`flex-1 px-1 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
             activeTab === tab.id
-              ? "bg-white text-gray-800 shadow-sm"
+              ? "bg-card text-ink shadow-sm"
               : tab.disabled
-                ? "text-gray-300 cursor-not-allowed"
-                : "text-gray-500 hover:text-gray-700"
+                ? "text-muted/50 cursor-not-allowed"
+                : "text-muted hover:text-ink"
           }`}
         >
           {tab.icon && <span className="mr-1">{tab.icon}</span>}
           <span className="sm:hidden">{tab.shortLabel ?? tab.label}</span>
           <span className="hidden sm:inline">{tab.label}</span>
           {tab.disabled && (
-            <span className="ml-1 text-xs text-gray-300">{t("preparing")}</span>
+            <span className="ml-1 text-xs text-muted/50">{t("preparing")}</span>
           )}
         </button>
       ))}
@@ -92,10 +92,10 @@ export function TabNav({
             onClick={(e) => { e.stopPropagation(); setDropdownOpen((v) => !v); }}
             className={`px-2 sm:px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
               isOverflowActive
-                ? "bg-white text-gray-800 shadow-sm"
+                ? "bg-card text-ink shadow-sm"
                 : dropdownOpen
-                  ? "bg-white/70 text-gray-700"
-                  : "text-gray-500 hover:text-gray-700"
+                  ? "bg-card/70 text-ink"
+                  : "text-muted hover:text-ink"
             }`}
           >
             {isOverflowActive
@@ -113,7 +113,7 @@ export function TabNav({
           </button>
 
           {dropdownOpen && (
-            <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-30 py-1 min-w-[140px]">
+            <div className="absolute right-0 top-full mt-1 bg-card border border-line rounded-xl shadow-lg z-30 py-1 min-w-[140px]">
               {overflowTabs.map((tab) => (
                 <button
                   key={tab.id}
@@ -121,16 +121,16 @@ export function TabNav({
                   disabled={tab.disabled}
                   className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
                     activeTab === tab.id
-                      ? "text-gray-800 font-semibold bg-gray-50"
+                      ? "text-ink font-semibold bg-field"
                       : tab.disabled
-                        ? "text-gray-300 cursor-not-allowed"
-                        : "text-gray-600 hover:bg-gray-50"
+                        ? "text-muted/50 cursor-not-allowed"
+                        : "text-muted hover:bg-field"
                   }`}
                 >
                   {tab.icon && <span className="mr-1.5">{tab.icon}</span>}
                   {tab.label}
                   {tab.disabled && (
-                    <span className="ml-1 text-xs text-gray-300">{t("preparing")}</span>
+                    <span className="ml-1 text-xs text-muted/50">{t("preparing")}</span>
                   )}
                 </button>
               ))}

@@ -818,13 +818,13 @@ export function DamageCalculator({
     <div className="max-w-lg mx-auto space-y-6 lg:max-w-none lg:space-y-0 lg:grid lg:grid-cols-[minmax(340px,400px)_1fr] lg:gap-2 lg:items-start">
       {/* Column 1: 入力パネル */}
       <div className="space-y-6 lg:space-y-2">
-      <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-6 lg:space-y-3">
+      <div className="bg-card rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-6 lg:space-y-3">
         {/* 敵プリセット */}
         <div className="space-y-1.5">
           <label className="block text-xs font-medium text-gray-500">{t("enemyPreset")}</label>
           <button
             onClick={() => setEnemyModalOpen(true)}
-            className="w-full flex items-center justify-between px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm text-left hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+            className="w-full flex items-center justify-between px-3 py-2 rounded-xl border border-line bg-card text-sm text-left hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-accent transition-colors"
           >
             <span className={selectedPresetLabel ? "text-gray-800 truncate" : "text-gray-400"}>
               {selectedPresetLabel ?? t("common:selectPreset")}
@@ -862,7 +862,7 @@ export function DamageCalculator({
               onClick={handleAddToComparison}
               disabled={comparisonKeys.has(presetKey({ monsterName: selectedMonster.name, level: monsterLevel, location: "" }))}
               title={t("addToComparison")}
-              className="flex-shrink-0 mb-0.5 w-8 h-8 flex items-center justify-center rounded-lg border border-indigo-300 text-indigo-500 hover:bg-indigo-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="flex-shrink-0 mb-0.5 w-8 h-8 flex items-center justify-center rounded-lg border border-accent text-accent hover:bg-accent-soft disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -882,7 +882,7 @@ export function DamageCalculator({
                 {comparisonMonsters.length >= 2 && (
                   <button
                     onClick={() => setComparisonActive(true)}
-                    className="text-xs px-2 py-0.5 rounded-md bg-indigo-100 text-indigo-600 font-medium hover:bg-indigo-200 transition-colors"
+                    className="text-xs px-2 py-0.5 rounded-md bg-accent-soft text-accent font-medium hover:bg-accent-soft transition-colors"
                   >
                     {t("showComparison")}
                   </button>
@@ -918,7 +918,7 @@ export function DamageCalculator({
           </div>
         )}
 
-        <div className="border-t border-gray-100" />
+        <div className="border-t border-line" />
 
         {/* 自分のステータス */}
         <div className="space-y-4 lg:space-y-2">
@@ -955,7 +955,7 @@ export function DamageCalculator({
               {statMode === "manual" && (
                 <button
                   onClick={() => setPresetModalOpen(true)}
-                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-100 border border-gray-200 text-xs text-gray-600 hover:bg-gray-200 transition-colors"
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-100 border border-line text-xs text-gray-600 hover:bg-gray-200 transition-colors"
                 >
                   <span>
                     {selectedPresetId
@@ -986,7 +986,7 @@ export function DamageCalculator({
           <div className={myStatusOpen ? "" : "hidden lg:block"}>
 
           {/* 主人公 / ペット 切り替えタブ */}
-          <div className="flex rounded-lg overflow-hidden border border-gray-200 text-xs mb-3 lg:mb-2">
+          <div className="flex rounded-lg overflow-hidden border border-line text-xs mb-3 lg:mb-2">
             {(["player", "pet"] as const).map((target) => (
               <button
                 key={target}
@@ -994,7 +994,7 @@ export function DamageCalculator({
                 className={`flex-1 py-2 lg:py-1.5 font-medium transition-colors ${
                   calcTarget === target
                     ? "bg-blue-500 text-white"
-                    : "bg-white text-gray-500 hover:bg-gray-50"
+                    : "bg-card text-gray-500 hover:bg-gray-50"
                 }`}
               >
                 {target === "player" ? t("playerTab") : t("petTab")}
@@ -1005,7 +1005,7 @@ export function DamageCalculator({
           {calcTarget === "player" ? (
             <>
           {/* 手動入力 / 装備設定 トグル */}
-          <div className="flex rounded-lg overflow-hidden border border-gray-200 text-xs">
+          <div className="flex rounded-lg overflow-hidden border border-line text-xs">
             {(["manual", "sim"] as const).map((mode) => (
               <button
                 key={mode}
@@ -1013,7 +1013,7 @@ export function DamageCalculator({
                 className={`flex-1 py-2 lg:py-1.5 font-medium transition-colors ${
                   statMode === mode
                     ? "bg-blue-500 text-white"
-                    : "bg-white text-gray-500 hover:bg-gray-50"
+                    : "bg-card text-gray-500 hover:bg-gray-50"
                 }`}
               >
                 {mode === "manual" ? t("statModeManual") : t("statModeSim")}
@@ -1036,7 +1036,7 @@ export function DamageCalculator({
                       className={`flex-1 py-2.5 lg:py-1.5 rounded-lg text-xs font-medium border transition-all ${
                         myElement === el
                           ? elementColors[el]
-                          : "bg-gray-50 text-gray-400 border-gray-200"
+                          : "bg-gray-50 text-gray-400 border-line"
                       }`}
                     >
                       {t(`game:element.${el}`)}
@@ -1056,8 +1056,8 @@ export function DamageCalculator({
                     onClick={() => setMyAttackMode(mode.value)}
                     className={`flex-1 py-2.5 lg:py-1.5 rounded-lg text-xs font-medium border transition-all ${
                       myAttackMode === mode.value
-                        ? "bg-indigo-100 text-indigo-600 border-indigo-200"
-                        : "bg-gray-50 text-gray-400 border-gray-200"
+                        ? "bg-accent-soft text-accent border-line"
+                        : "bg-gray-50 text-gray-400 border-line"
                     }`}
                   >
                     {mode.label}
@@ -1098,7 +1098,7 @@ export function DamageCalculator({
 
           {/* 魔法設定（魔攻モード: 解析書） */}
           {myAttackMode === "魔攻" && (
-            <div className="grid grid-cols-2 gap-4 pt-2 border-t border-gray-100">
+            <div className="grid grid-cols-2 gap-4 pt-2 border-t border-line">
               <InputField
                 label={t("analysisBook")}
                 value={analysisBook}
@@ -1120,7 +1120,7 @@ export function DamageCalculator({
 
           {/* 魔晶立方体（魔攻・魔弾共通） */}
           {(myAttackMode === "魔攻" || myAttackMode === "魔弾") && (
-            <div className="pt-2 border-t border-gray-100">
+            <div className="pt-2 border-t border-line">
               <div className="grid grid-cols-2 gap-4">
                 <InputField
                   label={t("crystalCube")}
@@ -1136,7 +1136,7 @@ export function DamageCalculator({
 
           {/* ゴッドオブデビルアイ・闘晶立方体（物理攻撃時） */}
           {myAttackMode === "物理" && (
-            <div className="pt-2 border-t border-gray-100">
+            <div className="pt-2 border-t border-line">
               <div className="grid grid-cols-2 gap-4">
                 <InputField
                   label={t("devilEye")}
@@ -1227,7 +1227,7 @@ export function DamageCalculator({
                 onClick={() => setComparisonTab(tab)}
                 className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
                   comparisonTab === tab
-                    ? "bg-white text-gray-700 shadow-sm"
+                    ? "bg-card text-gray-700 shadow-sm"
                     : "text-gray-400 hover:text-gray-500"
                 }`}
               >
@@ -1276,12 +1276,12 @@ export function DamageCalculator({
 
       {/* 敵ステータス */}
       {scaled && (
-        <div className="bg-white rounded-2xl shadow shadow-gray-200/50 p-4">
+        <div className="bg-card rounded-2xl shadow shadow-gray-200/50 p-4">
           <div className="flex items-center gap-2 flex-wrap mb-3">
             <span className="font-bold text-base text-gray-800">{scaled.name}</span>
             <span className="text-sm bg-gray-100 text-gray-600 px-2 py-0.5 rounded-lg font-medium">Lv{monsterLevel.toLocaleString()}</span>
             <span className={`text-sm px-2 py-0.5 rounded-lg border font-medium ${elementColors[scaled.element]}`}>{t(`game:element.${scaled.element}`)}</span>
-            <span className="text-sm bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-lg font-medium">{t(`game:attackType.${scaled.attackType}`)}</span>
+            <span className="text-sm bg-accent-soft text-accent px-2 py-0.5 rounded-lg font-medium">{t(`game:attackType.${scaled.attackType}`)}</span>
             {scaled.magicImmune && (
               <span className="text-sm px-2 py-0.5 rounded-lg font-bold bg-purple-100 text-purple-600 border border-purple-200">{t("magicImmune")}</span>
             )}
@@ -1348,13 +1348,13 @@ export function DamageCalculator({
             </div>
           </div>
           {/* デバフ・武器効果トグル */}
-          <div className="flex gap-2 mt-3 pt-3 border-t border-gray-100 flex-wrap">
+          <div className="flex gap-2 mt-3 pt-3 border-t border-line flex-wrap">
             <button
               onClick={() => setWoodMagicEffect(!woodMagicEffect)}
               className={`text-xs px-2 py-1 rounded border transition-colors ${
                 woodMagicEffect
                   ? "bg-green-100 border-green-300 text-green-700 font-medium"
-                  : "bg-gray-50 border-gray-200 text-gray-400"
+                  : "bg-gray-50 border-line text-gray-400"
               }`}
               title={t("woodMagicDebuffTitle")}
             >
@@ -1365,7 +1365,7 @@ export function DamageCalculator({
               className={`text-xs px-2 py-1 rounded border transition-colors ${
                 darkMagicEffect
                   ? "bg-purple-100 border-purple-300 text-purple-700 font-medium"
-                  : "bg-gray-50 border-gray-200 text-gray-400"
+                  : "bg-gray-50 border-line text-gray-400"
               }`}
               title={t("darkMagicDebuffTitle")}
             >
@@ -1377,7 +1377,7 @@ export function DamageCalculator({
                 className={`text-xs px-2 py-1 rounded border transition-colors ${
                   assassinClaw
                     ? "bg-orange-100 border-orange-300 text-orange-700 font-medium"
-                    : "bg-gray-50 border-gray-200 text-gray-400"
+                    : "bg-gray-50 border-line text-gray-400"
                 }`}
                 title={t("assassinClawTitle")}
               >
@@ -1393,11 +1393,11 @@ export function DamageCalculator({
             const bothNullified = normalNullified && clawNullified;
             return (
               <div className="mt-2 flex items-center gap-2 text-xs flex-wrap">
-                <span className={`px-2 py-0.5 rounded font-medium border ${normalNullified ? "text-gray-400 border-gray-200 bg-gray-50" : clawWins ? "text-gray-500 border-gray-200 bg-gray-50" : "text-blue-700 border-blue-300 bg-blue-50"}`}>
+                <span className={`px-2 py-0.5 rounded font-medium border ${normalNullified ? "text-gray-400 border-line bg-gray-50" : clawWins ? "text-gray-500 border-line bg-gray-50" : "text-blue-700 border-blue-300 bg-blue-50"}`}>
                   通常 {normalNullified ? "無効化" : normalAvg.toLocaleString()}
                 </span>
                 <span className="text-gray-300">vs</span>
-                <span className={`px-2 py-0.5 rounded font-medium border ${clawNullified ? "text-gray-400 border-gray-200 bg-gray-50" : clawWins ? "text-orange-700 border-orange-300 bg-orange-50" : "text-gray-500 border-gray-200 bg-gray-50"}`}>
+                <span className={`px-2 py-0.5 rounded font-medium border ${clawNullified ? "text-gray-400 border-line bg-gray-50" : clawWins ? "text-orange-700 border-orange-300 bg-orange-50" : "text-gray-500 border-line bg-gray-50"}`}>
                   カギ爪 {clawNullified ? "無効化" : clawAvg.toLocaleString()}
                 </span>
                 {!bothNullified && (
@@ -1431,7 +1431,7 @@ export function DamageCalculator({
                 accent="green"
               >
                 {/* 属性アフィニティ表示 */}
-                <div className="flex items-center gap-1.5 text-xs mb-2 pb-2 border-b border-gray-100">
+                <div className="flex items-center gap-1.5 text-xs mb-2 pb-2 border-b border-line">
                   <span className={`px-1.5 py-0.5 rounded border font-medium ${elementColors[effElement]}`}>{t(`game:element.${effElement}`)}</span>
                   <span className="text-gray-400">→</span>
                   <span className={`px-1.5 py-0.5 rounded border font-medium ${elementColors[scaled!.element]}`}>{t(`game:element.${scaled!.element}`)}</span>
@@ -1450,7 +1450,7 @@ export function DamageCalculator({
                     {offensiveResult.spellResults.map(({ spell, dmg, totalMin, totalMax, hitsToKill, overkillGuaranteed, overkillPossible, overkillStatNeeded, overkillCubesNeeded }) => {
                       const effectivelyNullified = dmg.isNullified || !!scaled!.magicImmune;
                       return (
-                      <div key={spell.name} className="col-span-4 grid grid-cols-subgrid bg-white/60 rounded-lg py-1.5">
+                      <div key={spell.name} className="col-span-4 grid grid-cols-subgrid bg-card/60 rounded-lg py-1.5">
                         <div className="col-span-4 flex items-center gap-1 mb-1 px-2">
                           <span className={`text-xs px-1 py-0.5 rounded border font-medium ${elementColors[spell.element]}`}>{t(`game:element.${spell.element}`)}</span>
                           <span className="text-sm font-medium text-gray-700">{spell.name}</span>
@@ -1535,7 +1535,7 @@ export function DamageCalculator({
                 <div className="space-y-2">
                   {hasMyOffenseStats && (
                     <>
-                      <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
+                      <div className="flex items-center justify-between py-2 px-3 bg-card/60 rounded-lg">
                         <span className="text-sm text-gray-500">{t("damage")}</span>
                         {offensiveResult.dmg.isNullified ? (
                           <span className="text-sm text-gray-400">
@@ -1549,7 +1549,7 @@ export function DamageCalculator({
                         )}
                       </div>
                       {!offensiveResult.dmg.isNullified && offensiveResult.dmg.hasCrit && (
-                        <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
+                        <div className="flex items-center justify-between py-2 px-3 bg-card/60 rounded-lg">
                           <span className="text-sm text-gray-500">
                             {t("critical")}
                           </span>
@@ -1559,13 +1559,13 @@ export function DamageCalculator({
                           </span>
                         </div>
                       )}
-                      <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
+                      <div className="flex items-center justify-between py-2 px-3 bg-card/60 rounded-lg">
                         <span className="text-sm text-gray-500">{t("multiHit")}</span>
                         <span className="font-bold text-gray-700">
                           {offensiveResult.multiHit}{t("common:times")}
                         </span>
                       </div>
-                      <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
+                      <div className="flex items-center justify-between py-2 px-3 bg-card/60 rounded-lg">
                         <span className="text-sm text-gray-500">
                           {t("hitsToKill")}
                         </span>
@@ -1590,7 +1590,7 @@ export function DamageCalculator({
                                   className={`text-xs px-1.5 py-0.5 rounded border transition-colors ${
                                     physOverkillMultiHit
                                       ? "bg-orange-100 border-orange-300 text-orange-600"
-                                      : "bg-gray-100 border-gray-300 text-gray-500"
+                                      : "bg-field border-line text-muted"
                                   }`}
                                   title={t("multiHitOn")}
                                 >
@@ -1624,7 +1624,7 @@ export function DamageCalculator({
                         );
                       })()}
                       {offensiveResult.hitRate !== null && (
-                        <div className="py-2 px-3 bg-white/60 rounded-lg">
+                        <div className="py-2 px-3 bg-card/60 rounded-lg">
                           <div className="flex items-center justify-between">
                             <span className="text-sm text-gray-500">{t("hitRate")}</span>
                             <span className={`font-bold ${offensiveResult.hitRate >= 80 ? "text-green-600" : offensiveResult.hitRate < 20 ? "text-red-500" : "text-yellow-600"}`}>
@@ -1674,7 +1674,7 @@ export function DamageCalculator({
             </>
           )}
         </>) : (
-          <div className="bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 p-8 text-center">
+          <div className="bg-gray-50 rounded-3xl border-2 border-dashed border-line p-8 text-center">
             <p className="text-sm text-gray-400">{t("selectMonsterOffense")}</p>
           </div>
         )}
@@ -1691,7 +1691,7 @@ export function DamageCalculator({
                   onClick={() => setDefPanelTab(tab)}
                   className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
                     defPanelTab === tab
-                      ? "bg-white text-gray-700 shadow-sm"
+                      ? "bg-card text-gray-700 shadow-sm"
                       : "text-gray-400 hover:text-gray-600"
                   }`}
                 >
@@ -1709,7 +1709,7 @@ export function DamageCalculator({
           <StatCard title={t("minINTBySpell")} accent="purple">
             <div className="space-y-1.5">
               {offensiveResult.spellResults.map(({ spell, minStat, targetStats }) => (
-                <div key={spell.name} className="py-1.5 px-2 bg-white/60 rounded-lg">
+                <div key={spell.name} className="py-1.5 px-2 bg-card/60 rounded-lg">
                   <div className="flex items-center gap-1 mb-0.5">
                     <span className={`text-xs px-1 py-0.5 rounded border font-medium ${elementColors[spell.element]}`}>{t(`game:element.${spell.element}`)}</span>
                     <span className="text-xs font-medium text-gray-700">{spell.name}</span>
@@ -1798,7 +1798,7 @@ export function DamageCalculator({
                       const remaining = current !== undefined ? value - current : undefined;
                       const achieved = remaining !== undefined && remaining <= 0;
                       return (
-                        <div key={label} className="col-span-4 grid grid-cols-subgrid items-center bg-white/60 rounded-lg py-2 px-3">
+                        <div key={label} className="col-span-4 grid grid-cols-subgrid items-center bg-card/60 rounded-lg py-2 px-3">
                           <span className="text-sm text-gray-500">{label}</span>
                           <span className="text-lg font-bold text-orange-600 text-right tabular-nums">
                             {value.toLocaleString()}
@@ -1834,7 +1834,7 @@ export function DamageCalculator({
 
           {/* 現在の被ダメージ */}
           {hasMyDefenseStats && (
-            <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 p-3 space-y-2">
+            <div className="bg-card rounded-2xl shadow-lg shadow-gray-200/50 p-3 space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">{t("defensePanel.currentDamage")}</span>
                 {defensiveResult.nullified ? (
@@ -1869,7 +1869,7 @@ export function DamageCalculator({
                 const isDanger = worst <= 1;
                 const isInstantDeath = best === 0;
                 return (
-                  <div className={`flex items-center justify-between py-2 px-3 rounded-lg border ${isDanger ? "bg-red-100 border-red-400 animate-pulse" : "bg-white/60 border-gray-100"}`}>
+                  <div className={`flex items-center justify-between py-2 px-3 rounded-lg border ${isDanger ? "bg-red-100 border-red-400 animate-pulse" : "bg-card/60 border-line"}`}>
                     <div className={`flex items-center gap-2 ${isDanger ? "text-red-700" : "text-gray-600"}`}>
                       <span className="text-sm font-medium">{isDanger && "💀 "}{t("defensePanel.survivableHits")}</span>
                       {isInstantDeath && <span className="text-xs font-bold text-red-600">{t("defensePanel.oneHitKill")}</span>}
@@ -1884,7 +1884,7 @@ export function DamageCalculator({
           )}
         </>) : (
           (activeAttackMode !== "魔攻" || defPanelTab === "被ダメ") && (
-            <div className="bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 p-8 text-center">
+            <div className="bg-gray-50 rounded-3xl border-2 border-dashed border-line p-8 text-center">
               <p className="text-sm text-gray-400">{t("selectMonsterDefense")}</p>
             </div>
           )
@@ -1902,7 +1902,7 @@ export function DamageCalculator({
           onClick={() => setPresetModalOpen(false)}
         >
           <div
-            className="bg-white rounded-2xl shadow-xl p-5 w-80 space-y-4"
+            className="bg-card rounded-2xl shadow-xl p-5 w-80 space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
@@ -1924,7 +1924,7 @@ export function DamageCalculator({
                 <select
                   value={selectedPresetId}
                   onChange={(e) => setSelectedPresetId(e.target.value)}
-                  className="flex-1 min-w-0 text-sm rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-gray-700"
+                  className="flex-1 min-w-0 text-sm rounded-lg border border-line bg-card px-2 py-1.5 text-gray-700"
                 >
                   <option value="">{t("common:select")}</option>
                   {presets.map((p) => (
@@ -1934,7 +1934,7 @@ export function DamageCalculator({
                 <button
                   onClick={() => { handleLoadPreset(); setPresetModalOpen(false); }}
                   disabled={!selectedPresetId}
-                  className="px-3 py-1.5 text-xs rounded-lg bg-indigo-100 text-indigo-600 font-medium disabled:opacity-40 hover:bg-indigo-200 transition-colors"
+                  className="px-3 py-1.5 text-xs rounded-lg bg-accent-soft text-accent font-medium disabled:opacity-40 hover:bg-accent-soft transition-colors"
                 >
                   {t("common:load")}
                 </button>
@@ -1957,7 +1957,7 @@ export function DamageCalculator({
                   value={presetName}
                   onChange={(e) => setPresetName(e.target.value)}
                   placeholder={t("common:presetNamePlaceholder")}
-                  className="flex-1 min-w-0 text-sm rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-gray-700 placeholder-gray-300"
+                  className="flex-1 min-w-0 text-sm rounded-lg border border-line bg-card px-2 py-1.5 text-gray-700 placeholder-gray-300"
                 />
                 <button
                   onClick={handleSavePreset}
