@@ -22,7 +22,7 @@
     "monster": "Monster",
     "lvhp": "Lv / HP",
     "durability": "Defense",
-    "physical": "Physical kills",
-    "magic": "Magic kills"
+    "physical": "Phys",
+    "magic": "Magic"
   }
 }

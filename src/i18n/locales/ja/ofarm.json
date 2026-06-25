@@ -22,7 +22,7 @@
     "monster": "モンスター",
     "lvhp": "Lv / HP",
     "durability": "耐久",
-    "physical": "物理確殺回数",
-    "magic": "魔法確殺回数"
+    "physical": "物理確",
+    "magic": "魔法確"
   }
 }
