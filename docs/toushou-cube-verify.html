@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>闘晶立方体 計算式検証ツール</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #1e1e2e; font-family: "Segoe UI", sans-serif; display: flex; justify-content: center; padding: 32px 16px; }
+  .container { width: 800px; display: flex; flex-direction: column; gap: 20px; }
+  h1 { color: #e2e8f0; font-size: 20px; margin: 0 0 4px; }
+  .sub { color: #94a3b8; font-size: 13px; margin: 0; }
+  .card { background: #2a2a3e; border-radius: 12px; padding: 20px 24px; }
+  .card h2 { color: #a5b4fc; font-size: 14px; font-weight: 600; margin: 0 0 16px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  label { color: #94a3b8; font-size: 12px; display: block; margin-bottom: 4px; }
+  input[type=number] {
+    width: 100%; background: #1a1a2e; border: 1px solid #3a3a5e; border-radius: 6px;
+    color: #e2e8f0; font-size: 14px; padding: 8px 10px; outline: none;
+  }
+  input[type=number]:focus { border-color: #6366f1; }
+  .formula-box {
+    background: #1a1a2e; border-radius: 8px; padding: 12px 16px;
+    font-family: monospace; font-size: 13px; color: #a5b4fc; line-height: 1.9;
+  }
+  .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .model { border-radius: 8px; padding: 14px 16px; }
+  .model.pre-def { background: #1e2a1e; border: 1px solid #4ade80; }
+  .model.final-mult { background: #1e1e2e; border: 1px solid #60a5fa; }
+  .model h3 { font-size: 13px; margin: 0 0 10px; }
+  .model.pre-def h3 { color: #4ade80; }
+  .model.final-mult h3 { color: #60a5fa; }
+  .damage-row { display: flex; justify-content: space-between; align-items: center; margin: 4px 0; }
+  .damage-label { color: #94a3b8; font-size: 12px; }
+  .damage-value { color: #e2e8f0; font-size: 16px; font-weight: 700; font-family: monospace; }
+  .damage-range { color: #64748b; font-size: 11px; font-family: monospace; }
+  .diff-box {
+    background: #2d1f3d; border: 1px solid #7c3aed; border-radius: 8px;
+    padding: 12px 16px; margin-top: 12px;
+  }
+  .diff-box .label { color: #a78bfa; font-size: 12px; }
+  .diff-box .value { color: #e2e8f0; font-size: 18px; font-weight: 700; font-family: monospace; margin: 4px 0 0; }
+  .verdict { border-radius: 8px; padding: 14px 16px; margin-top: 12px; text-align: center; font-size: 14px; font-weight: 600; }
+  .verdict.pre { background: #14532d; color: #86efac; border: 1px solid #4ade80; }
+  .verdict.final { background: #1e3a5f; color: #93c5fd; border: 1px solid #60a5fa; }
+  .verdict.ambiguous { background: #3d2a00; color: #fde68a; border: 1px solid #f59e0b; }
+  .verdict.neutral { background: #1a1a2e; color: #64748b; border: 1px solid #334155; }
+  .obs-section { margin-top: 12px; padding-top: 12px; border-top: 1px solid #334155; }
+  .obs-section h3 { color: #94a3b8; font-size: 12px; margin: 0 0 10px; }
+  .strategy { background: #1a1a2e; border-radius: 8px; padding: 14px 16px; }
+  .strategy p { color: #94a3b8; font-size: 13px; margin: 0 0 8px; line-height: 1.6; }
+  .strategy .highlight { color: #fde68a; font-weight: 600; }
+  .badge { display: inline-block; background: #312e81; color: #a5b4fc; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; letter-spacing: 0.05em; vertical-align: middle; margin-left: 4px; }
+  .sep { height: 1px; background: #334155; margin: 12px 0; }
+  .ratio-bar { height: 6px; border-radius: 3px; background: #334155; margin: 8px 0; overflow: hidden; }
+  .ratio-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div>
+    <h1>闘晶立方体 計算式検証ツール</h1>
+    <p class="sub">物理ダメージ+1%/個 — 防御前適用 vs 最終乗算 を実測で判別する</p>
+  </div>
+
+  <!-- パラメータ入力 -->
+  <div class="card">
+    <h2>パラメータ</h2>
+    <div class="grid">
+      <div>
+        <label>自分の ATK</label>
+        <input type="number" id="atk" value="3000" min="1" oninput="recalc()">
+      </div>
+      <div>
+        <label>闘晶立方体の個数</label>
+        <input type="number" id="cubes" value="10" min="0" max="100" oninput="recalc()">
+      </div>
+    </div>
+    <div class="grid3" style="margin-top:12px">
+      <div>
+        <label>敵の DEF</label>
+        <input type="number" id="def" value="1000" min="0" oninput="recalc()">
+      </div>
+      <div>
+        <label>敵の M-DEF</label>
+        <input type="number" id="mdef" value="500" min="0" oninput="recalc()">
+      </div>
+      <div>
+        <label>属性相性</label>
+        <input type="number" id="elem" value="1.0" min="0.1" step="0.1" oninput="recalc()">
+      </div>
+    </div>
+  </div>
+
+  <!-- 計算式表示 -->
+  <div class="card">
+    <h2>計算式</h2>
+    <div class="formula-box" id="formula-box">
+      <!-- JS で生成 -->
+    </div>
+  </div>
+
+  <!-- 2仮説の予測ダメージ -->
+  <div class="card">
+    <h2>仮説別 予測ダメージ</h2>
+    <div class="result-grid">
+      <div class="model pre-def">
+        <h3>仮説A: 防御計算前適用 <span class="badge">魔晶と同型</span></h3>
+        <div class="damage-row">
+          <span class="damage-label">立方体なし</span>
+          <div>
+            <span class="damage-value" id="pre-base-avg">—</span>
+            <div class="damage-range" id="pre-base-range"></div>
+          </div>
+        </div>
+        <div class="damage-row">
+          <span class="damage-label">立方体あり</span>
+          <div>
+            <span class="damage-value" id="pre-cube-avg">—</span>
+            <div class="damage-range" id="pre-cube-range"></div>
+          </div>
+        </div>
+        <div class="sep"></div>
+        <div class="damage-label">倍率比 (あり÷なし)</div>
+        <div class="ratio-bar"><div class="ratio-fill" id="pre-bar" style="background:#4ade80"></div></div>
+        <div style="font-family:monospace;font-size:13px;color:#4ade80" id="pre-ratio">—</div>
+      </div>
+
+      <div class="model final-mult">
+        <h3>仮説B: 最終ダメージに乗算</h3>
+        <div class="damage-row">
+          <span class="damage-label">立方体なし</span>
+          <div>
+            <span class="damage-value" id="fin-base-avg">—</span>
+            <div class="damage-range" id="fin-base-range"></div>
+          </div>
+        </div>
+        <div class="damage-row">
+          <span class="damage-label">立方体あり</span>
+          <div>
+            <span class="damage-value" id="fin-cube-avg">—</span>
+            <div class="damage-range" id="fin-cube-range"></div>
+          </div>
+        </div>
+        <div class="sep"></div>
+        <div class="damage-label">倍率比 (あり÷なし)</div>
+        <div class="ratio-bar"><div class="ratio-fill" id="fin-bar" style="background:#60a5fa"></div></div>
+        <div style="font-family:monospace;font-size:13px;color:#60a5fa" id="fin-ratio">—</div>
+      </div>
+    </div>
+
+    <div class="diff-box">
+      <div class="label">仮説A – 仮説B の avg 差（この値以上なら判別可能）</div>
+      <div class="value" id="hyp-diff">—</div>
+    </div>
+  </div>
+
+  <!-- 判別戦略 -->
+  <div class="card">
+    <h2>判別戦略</h2>
+    <div class="strategy">
+      <p>
+        <span class="highlight">ステップ1：</span>
+        立方体を<strong>0個</strong>にしてダメージを数回記録（min / max を確認）
+      </p>
+      <p>
+        <span class="highlight">ステップ2：</span>
+        立方体を<strong id="cube-count-hint">N個</strong>装備して同じ敵に同じ攻撃、ダメージを記録
+      </p>
+      <p>
+        <span class="highlight">ステップ3：</span>
+        下の「実測値入力」に入力すると仮説A/Bとの一致を判定します
+      </p>
+      <p id="strategy-hint" style="color:#f59e0b">
+        <!-- JS で判別しやすさを表示 -->
+      </p>
+    </div>
+  </div>
+
+  <!-- 実測値判定 -->
+  <div class="card">
+    <h2>実測値入力 → 仮説判定</h2>
+    <div class="grid">
+      <div>
+        <label>実測ダメージ（立方体なし） avg か観測値</label>
+        <input type="number" id="obs-base" placeholder="例: 14000" min="1" oninput="judge()">
+      </div>
+      <div>
+        <label>実測ダメージ（立方体あり） avg か観測値</label>
+        <input type="number" id="obs-cube" placeholder="例: 15820" min="1" oninput="judge()">
+      </div>
+    </div>
+    <div id="verdict" class="verdict neutral" style="margin-top:12px">
+      実測値を入力してください
+    </div>
+    <div id="verdict-detail" style="margin-top:8px;font-size:12px;color:#94a3b8;font-family:monospace;line-height:1.8"></div>
+  </div>
+
+</div>
+
+<script>
+function calcEffectiveDef(def, mdef, isPhysical) {
+  if (isPhysical) return def + Math.floor(mdef / 10);
+  return mdef + Math.ceil(def / 10);
+}
+
+function calcRange(base) {
+  if (base <= 0) return { avg: '1〜9', min: 1, max: 9, avgNum: 5 };
+  const min = Math.floor(base * 0.9);
+  const max = Math.floor(base * 1.1);
+  const avg = Math.floor(base);
+  return { avg: avg.toLocaleString(), min, max, avgNum: avg,
+           range: `${min.toLocaleString()} 〜 ${max.toLocaleString()}` };
+}
+
+function recalc() {
+  const atk   = parseFloat(document.getElementById('atk').value)   || 0;
+  const cubes = parseFloat(document.getElementById('cubes').value)  || 0;
+  const def   = parseFloat(document.getElementById('def').value)    || 0;
+  const mdef  = parseFloat(document.getElementById('mdef').value)   || 0;
+  const elem  = parseFloat(document.getElementById('elem').value)   || 1.0;
+
+  const eDef = calcEffectiveDef(def, mdef, true);
+  const cubeMult = 1 + cubes * 0.01;
+
+  // 仮説A: 防御前 (atk × 1.75 × cubeMult − eDef) × 4 × elem
+  const preBase = Math.max(atk * 1.75 - eDef, 0) * 4 * elem;
+  const preCube = Math.max(atk * 1.75 * cubeMult - eDef, 0) * 4 * elem;
+
+  // 仮説B: 最終乗算 (atk × 1.75 − eDef) × 4 × elem × cubeMult
+  const finBase = preBase;
+  const finCube = preBase * cubeMult;
+
+  const preBaseR = calcRange(preBase);
+  const preCubeR = calcRange(preCube);
+  const finCubeR = calcRange(finCube);
+
+  // 式表示
+  document.getElementById('formula-box').innerHTML = `
+有効防御 (物理) = DEF + floor(MDEF/10) = ${def} + ${Math.floor(mdef/10)} = <b style="color:#e2e8f0">${eDef}</b><br>
+立方体倍率 = 1 + ${cubes} × 0.01 = <b style="color:#e2e8f0">${cubeMult.toFixed(2)}</b><br><br>
+<span style="color:#4ade80">仮説A (防御前)</span>: (ATK × 1.75 × <b>${cubeMult.toFixed(2)}</b> − ${eDef}) × 4 × ${elem.toFixed(1)}<br>
+<span style="color:#60a5fa">仮説B (最終型)</span>: (ATK × 1.75 − ${eDef}) × 4 × ${elem.toFixed(1)} × <b>${cubeMult.toFixed(2)}</b>
+  `;
+
+  // 結果セット
+  set('pre-base-avg', preBaseR.avg);
+  set('pre-base-range', preBaseR.range ?? '');
+  set('pre-cube-avg', preCubeR.avg);
+  set('pre-cube-range', preCubeR.range ?? '');
+  set('fin-base-avg', preBaseR.avg); // 同じ
+  set('fin-base-range', preBaseR.range ?? '');
+  set('fin-cube-avg', finCubeR.avg);
+  set('fin-cube-range', finCubeR.range ?? '');
+
+  // 倍率比
+  const preRatio = preBase > 0 ? (preCube / preBase) : cubeMult;
+  const finRatio = cubeMult; // 常に cubeMult
+
+  set('pre-ratio', `× ${preRatio.toFixed(4)} (vs cube_mult=${cubeMult.toFixed(4)})`);
+  set('fin-ratio', `× ${finRatio.toFixed(4)} (= cube_mult, 常に一定)`);
+
+  // バー
+  const maxRatio = Math.max(preRatio, finRatio, 1.0) * 1.1;
+  document.getElementById('pre-bar').style.width = `${Math.min(100, (preRatio / maxRatio) * 100)}%`;
+  document.getElementById('fin-bar').style.width = `${Math.min(100, (finRatio / maxRatio) * 100)}%`;
+
+  // 仮説差
+  const diff = Math.abs(preCubeR.avgNum - finCubeR.avgNum);
+  set('hyp-diff', `${diff.toLocaleString()} ダメージ`);
+
+  // 判別しやすさのヒント
+  set('cube-count-hint', `${cubes}個`);
+  const hint = diff < 50
+    ? `⚠️ 現在の設定では仮説差が ${diff} ダメージしかなく判別が難しいです。立方体を増やすか、DEFが高い敵（高レベル）を選んでください。`
+    : diff < 300
+    ? `⚠️ 仮説差 ${diff} ダメージ。判別可能ですが、ブレ幅（±10%）に注意。複数回計測して avg を取ることを推奨。`
+    : `✅ 仮説差 ${diff} ダメージ — 十分判別できます。`;
+  set('strategy-hint', hint);
+
+  judge();
+}
+
+function judge() {
+  const obsBase = parseFloat(document.getElementById('obs-base').value);
+  const obsCube = parseFloat(document.getElementById('obs-cube').value);
+  if (!obsBase || !obsCube) {
+    document.getElementById('verdict').className = 'verdict neutral';
+    document.getElementById('verdict').textContent = '実測値を入力してください';
+    set('verdict-detail', '');
+    return;
+  }
+
+  const atk   = parseFloat(document.getElementById('atk').value)   || 0;
+  const cubes = parseFloat(document.getElementById('cubes').value)  || 0;
+  const def   = parseFloat(document.getElementById('def').value)    || 0;
+  const mdef  = parseFloat(document.getElementById('mdef').value)   || 0;
+  const elem  = parseFloat(document.getElementById('elem').value)   || 1.0;
+
+  const eDef = calcEffectiveDef(def, mdef, true);
+  const cubeMult = 1 + cubes * 0.01;
+
+  const preBase = Math.max(atk * 1.75 - eDef, 0) * 4 * elem;
+  const preCube = Math.max(atk * 1.75 * cubeMult - eDef, 0) * 4 * elem;
+  const finCube = preBase * cubeMult;
+
+  // 実測比率
+  const obsRatio = obsCube / obsBase;
+
+  // 各仮説の予測比率
+  const preRatio = preBase > 0 ? preCube / preBase : cubeMult;
+  const finRatio = cubeMult;
+
+  const diffToPre = Math.abs(obsRatio - preRatio);
+  const diffToFin = Math.abs(obsRatio - finRatio);
+
+  // 許容誤差（ランダム乱数ブレを考慮）
+  const tol = 0.025;
+
+  let cls, text;
+  if (diffToPre < diffToFin && diffToPre < tol) {
+    cls = 'pre'; text = '✅ 仮説A（防御計算前適用）に一致 — 魔晶立方体と同型の可能性が高い';
+  } else if (diffToFin < diffToPre && diffToFin < tol) {
+    cls = 'final'; text = '✅ 仮説B（最終ダメージ乗算）に一致';
+  } else if (diffToPre < tol && diffToFin < tol) {
+    cls = 'ambiguous'; text = '⚠️ 両仮説に近い — 立方体数を増やして再計測してください';
+  } else if (diffToPre < diffToFin) {
+    cls = 'pre'; text = `📊 仮説A に近い（ΔA=${diffToPre.toFixed(4)} vs ΔB=${diffToFin.toFixed(4)}）— 複数回計測を推奨`;
+  } else {
+    cls = 'final'; text = `📊 仮説B に近い（ΔA=${diffToPre.toFixed(4)} vs ΔB=${diffToFin.toFixed(4)}）— 複数回計測を推奨`;
+  }
+
+  document.getElementById('verdict').className = `verdict ${cls}`;
+  document.getElementById('verdict').textContent = text;
+
+  set('verdict-detail',
+    `実測倍率: ${obsRatio.toFixed(4)}\n` +
+    `仮説A 予測倍率: ${preRatio.toFixed(4)}  (差: ${diffToPre.toFixed(4)})\n` +
+    `仮説B 予測倍率: ${finRatio.toFixed(4)}  (差: ${diffToFin.toFixed(4)})\n` +
+    `\n実測 avg (なし): ${obsBase.toLocaleString()}  予測 avg: ${Math.floor(preBase).toLocaleString()}\n` +
+    `実測 avg (あり): ${obsCube.toLocaleString()}  仮説A: ${Math.floor(preCube).toLocaleString()}  仮説B: ${Math.floor(finCube).toLocaleString()}`
+  );
+}
+
+function set(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
+// 初期計算
+recalc();
+</script>
+</body>
+</html>

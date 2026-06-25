@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useSharedSimConfig } from "../../hooks/useSharedSimConfig";
-import { usePersistedState } from "../../hooks/usePersistedState";
+import { useSharedAttackBuffs } from "../../hooks/useSharedAttackBuffs";
 import { calcStatus } from "../../utils/statusCalc";
 import { getEquipmentByName } from "../../data/equipment";
 import { getAccessoryByName } from "../../data/accessories";
@@ -17,20 +17,25 @@ function fmt(n: number) {
   return n.toLocaleString();
 }
 
-function ItemRow({ label, name, enh, canEnhance }: {
+function ItemRow({ label, name, enh, goldEnh, canEnhance }: {
   label: string;
   name: string;
   enh?: number;
+  goldEnh?: number;
   canEnhance?: boolean;
 }) {
+  const showEnh = (canEnhance ?? true);
   return (
     <div className="flex items-baseline text-xs gap-2">
       <span className="text-gray-400 w-8 shrink-0">{label}</span>
       {name
         ? <>
             <span className="text-gray-800 font-medium flex-1 min-w-0 truncate">{name}</span>
-            {enh !== undefined && (canEnhance ?? true) && (
+            {enh !== undefined && showEnh && (
               <span className="text-gray-400 shrink-0">+{enh}</span>
+            )}
+            {goldEnh !== undefined && goldEnh > 0 && showEnh && (
+              <span className="text-yellow-500 font-semibold shrink-0">G+{goldEnh}</span>
             )}
           </>
         : <span className="text-gray-300 flex-1">-</span>
@@ -52,9 +57,10 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
   const isEn = i18n.language === "en";
   const displayName = (jaName: string, nameEn?: string) => (isEn ? (nameEn ?? jaName) : jaName);
   const [cfg] = useSharedSimConfig();
+  const [attackBuffs] = useSharedAttackBuffs();
   const [copied, setCopied] = useState(false);
-  const [crystalCubeRaw] = usePersistedState("dmg:crystalCube", "");
-  const crystalCubeNum = Math.min(parseInt(crystalCubeRaw) || 0, 1000);
+  const crystalCubeNum = Math.min(parseInt(attackBuffs.crystalCube) || 0, 1000);
+  const toughouCubeNum = Math.min(parseInt(attackBuffs.toughouCube) || 0, 1000);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -74,11 +80,11 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
   const noneText = t("common:none");
 
   const armorSlots = [
-    { slot: "頭", name: cfg.equipHead,   enh: cfg.enhHead,   item: cfg.equipHead   ? getEquipmentByName(cfg.equipHead)   : undefined },
-    { slot: "服", name: cfg.equipBody,   enh: cfg.enhBody,   item: cfg.equipBody   ? getEquipmentByName(cfg.equipBody)   : undefined },
-    { slot: "手", name: cfg.equipHand,   enh: cfg.enhHand,   item: cfg.equipHand   ? getEquipmentByName(cfg.equipHand)   : undefined },
-    { slot: "盾", name: cfg.equipShield, enh: cfg.enhShield, item: cfg.equipShield ? getEquipmentByName(cfg.equipShield) : undefined },
-    { slot: "脚", name: cfg.equipFoot,   enh: cfg.enhFoot,   item: cfg.equipFoot   ? getEquipmentByName(cfg.equipFoot)   : undefined },
+    { slot: "頭", name: cfg.equipHead,   enh: cfg.enhHead,   goldEnh: cfg.goldEnhHead,   item: cfg.equipHead   ? getEquipmentByName(cfg.equipHead)   : undefined },
+    { slot: "服", name: cfg.equipBody,   enh: cfg.enhBody,   goldEnh: cfg.goldEnhBody,   item: cfg.equipBody   ? getEquipmentByName(cfg.equipBody)   : undefined },
+    { slot: "手", name: cfg.equipHand,   enh: cfg.enhHand,   goldEnh: cfg.goldEnhHand,   item: cfg.equipHand   ? getEquipmentByName(cfg.equipHand)   : undefined },
+    { slot: "盾", name: cfg.equipShield, enh: cfg.enhShield, goldEnh: cfg.goldEnhShield, item: cfg.equipShield ? getEquipmentByName(cfg.equipShield) : undefined },
+    { slot: "脚", name: cfg.equipFoot,   enh: cfg.enhFoot,   goldEnh: cfg.goldEnhFoot,   item: cfg.equipFoot   ? getEquipmentByName(cfg.equipFoot)   : undefined },
   ] as const;
 
   const accSlots = [
@@ -104,13 +110,16 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
       `  ${t("common:destiny")}: ${cfg.reinCount}`,
       `  ${t("status:element")}: ${cfg.charElement}`,
       `  ${t("status:crystalCube")}: ${crystalCubeNum.toLocaleString()}${t("common:units")}`,
+      `  ${t("status:toughouCube")}: ${toughouCubeNum.toLocaleString()}${t("common:units")}`,
       "",
       `【${t("status:equipment")}】`,
     ];
-    lines.push(`  ${slotLabel("武器")}: ${cfg.equipWeapon || noneText}${cfg.equipWeapon && weaponCanEnh ? ` +${cfg.enhWeapon}` : ""}`);
-    for (const { slot, name, enh, item } of armorSlots) {
+    const enhText = (enh: number, goldEnh: number, canEnh: boolean) =>
+      canEnh ? ` +${enh}${goldEnh > 0 ? ` G+${goldEnh}` : ""}` : "";
+    lines.push(`  ${slotLabel("武器")}: ${cfg.equipWeapon || noneText}${cfg.equipWeapon ? enhText(cfg.enhWeapon, cfg.goldEnhWeapon, weaponCanEnh) : ""}`);
+    for (const { slot, name, enh, goldEnh, item } of armorSlots) {
       const canEnh = item ? item.material !== "強化できない" : true;
-      lines.push(`  ${slotLabel(slot)}: ${name || noneText}${name && canEnh ? ` +${enh}` : ""}`);
+      lines.push(`  ${slotLabel(slot)}: ${name || noneText}${name ? enhText(enh, goldEnh, canEnh) : ""}`);
     }
     if (setBonus) lines.push(`  ★${t("common:setBonus")}: ${setBonusSeries}`);
 
@@ -162,7 +171,7 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
     ])) lines.push(l);
 
     return lines.join("\n");
-  }, [t, cfg, crystalCubeNum, weaponCanEnh, armorSlots, accSlots, petSlots, setBonus, setBonusSeries, allocTotal, final, hp, noneText]);
+  }, [t, cfg, crystalCubeNum, toughouCubeNum, weaponCanEnh, armorSlots, accSlots, petSlots, setBonus, setBonusSeries, allocTotal, final, hp, noneText]);
 
   const handleCopy = useCallback(async () => {
     try {
@@ -225,19 +234,24 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
                 <span className="text-xs text-gray-400">{t("status:crystalCube")}</span>
                 <span className="text-xs font-semibold text-gray-700">{fmt(crystalCubeNum)}{t("common:units")}</span>
               </div>
+              <div className="flex flex-col items-center bg-gray-50 rounded-lg px-2 py-1">
+                <span className="text-xs text-gray-400">{t("status:toughouCube")}</span>
+                <span className="text-xs font-semibold text-gray-700">{fmt(toughouCubeNum)}{t("common:units")}</span>
+              </div>
             </div>
           </div>
 
           <div>
             <SectionHeader>{t("status:equipment")}</SectionHeader>
-            <div className="space-y-1 max-w-[60%]">
-              <ItemRow label={slotLabel("武器")} name={displayName(cfg.equipWeapon, weaponItem?.nameEn)} enh={cfg.enhWeapon} canEnhance={weaponCanEnh} />
-              {armorSlots.map(({ slot, name, enh, item }) => (
+            <div className="space-y-1 max-w-[75%]">
+              <ItemRow label={slotLabel("武器")} name={displayName(cfg.equipWeapon, weaponItem?.nameEn)} enh={cfg.enhWeapon} goldEnh={cfg.goldEnhWeapon} canEnhance={weaponCanEnh} />
+              {armorSlots.map(({ slot, name, enh, goldEnh, item }) => (
                 <ItemRow
                   key={slot}
                   label={slotLabel(slot)}
                   name={displayName(name, item?.nameEn)}
                   enh={enh}
+                  goldEnh={goldEnh}
                   canEnhance={item ? item.material !== "強化できない" : true}
                 />
               ))}
