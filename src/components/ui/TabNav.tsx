@@ -31,24 +31,15 @@ export function TabNav({
     const found = allTabs.find((t) => t.id === hash && !t.disabled);
     return found ? found.id : allTabs[0].id;
   });
-  // 直前に開いていたタブ（「戻る」用）
-  const [prevTab, setPrevTab] = useState<string | null>(null);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const navRef = useRef<HTMLDivElement>(null);
-
-  const goToTab = (tabId: string) => {
-    setActiveTab((cur) => {
-      if (cur !== tabId) setPrevTab(cur);
-      return tabId;
-    });
-  };
 
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.slice(1);
       const found = allTabs.find((t) => t.id === hash && !t.disabled);
       if (found) {
-        goToTab(found.id);
+        setActiveTab(found.id);
         onTabChange(found.id);
       }
     };
@@ -70,31 +61,14 @@ export function TabNav({
 
   const selectTab = (tab: Tab) => {
     if (tab.disabled) return;
-    goToTab(tab.id);
+    setActiveTab(tab.id);
     window.location.hash = tab.id;
     onTabChange(tab.id);
     setOpenGroup(null);
   };
 
-  const prev = prevTab ? allTabs.find((t) => t.id === prevTab && !t.disabled) : null;
-  const showBack = prev && prev.id !== activeTab;
-
   return (
     <div ref={navRef} className="flex gap-1 bg-gray-100 rounded-xl p-1">
-      {/* 前のタブに戻る */}
-      {showBack && (
-        <button
-          onClick={() => prev && selectTab(prev)}
-          title={`${prev!.label} に戻る`}
-          className="shrink-0 flex items-center px-1.5 sm:px-2.5 py-2 rounded-lg text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-white/70 transition-all whitespace-nowrap"
-        >
-          <span className="text-base leading-none">↩</span>
-          <span className="hidden sm:inline ml-1 max-w-[7rem] truncate">
-            {prev!.label}
-          </span>
-        </button>
-      )}
-
       {groups.map((group) => {
         const isActiveGroup = group.tabs.some((t) => t.id === activeTab);
         const isOpen = openGroup === group.id;
