@@ -71,7 +71,7 @@ export function TabNav({
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, [allTabs, onTabChange]);
 
-  // 外側クリックで閉じる（タッチ端末向け）
+  // 外側クリックで閉じる
   useEffect(() => {
     if (!openGroup) return;
     function handleClick(e: MouseEvent) {
@@ -92,7 +92,7 @@ export function TabNav({
     setOpenGroup(null);
   };
 
-  // グループ本体クリック時に開き直すタブ（記憶 → 無効なら先頭の有効タブ）
+  // グループの右半分／クリック時に開くタブ（記憶 → 無効なら先頭の有効タブ）
   const resolveGroupTab = (group: TabGroup): Tab => {
     const remembered = group.tabs.find(
       (t) => t.id === lastByGroup[group.id] && !t.disabled,
@@ -101,11 +101,7 @@ export function TabNav({
   };
 
   return (
-    <div
-      ref={navRef}
-      className="flex gap-1 bg-gray-100 rounded-xl p-1"
-      onMouseLeave={() => setOpenGroup(null)}
-    >
+    <div ref={navRef} className="flex gap-1 bg-gray-100 rounded-xl p-1">
       {groups.map((group) => {
         const isActiveGroup = group.tabs.some((t) => t.id === activeTab);
         const isOpen = openGroup === group.id;
@@ -117,7 +113,6 @@ export function TabNav({
             <button
               key={group.id}
               onClick={() => selectTab(single)}
-              onMouseEnter={() => setOpenGroup(null)}
               disabled={single.disabled}
               className={`flex-1 px-1 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                 activeTab === single.id
@@ -127,53 +122,79 @@ export function TabNav({
                     : "text-gray-500 hover:text-gray-700"
               }`}
             >
-              {single.icon && <span className="mr-1">{single.icon}</span>}
+              {single.icon && <span className="hidden sm:inline sm:mr-1">{single.icon}</span>}
               <span className="sm:hidden">{single.shortLabel ?? single.label}</span>
               <span className="hidden sm:inline">{single.label}</span>
             </button>
           );
         }
 
+        const lastTab = resolveGroupTab(group);
+        const textColor = isActiveGroup ? "text-gray-800" : "text-gray-500";
+
         return (
-          <div
-            key={group.id}
-            className="relative flex-1"
-            onMouseEnter={() => setOpenGroup(group.id)}
-          >
-            {/* ラベル部: 最後に開いていたタブへ直行 */}
-            <button
-              onClick={() => selectTab(resolveGroupTab(group), group.id)}
-              className={`w-full pl-1 pr-6 sm:pl-4 sm:pr-7 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex items-center justify-center ${
+          <div key={group.id} className="relative flex-1">
+            <div
+              className={`flex items-stretch rounded-lg overflow-hidden transition-all ${
                 isActiveGroup
-                  ? "bg-white text-gray-800 shadow-sm"
+                  ? "bg-white shadow-sm"
                   : isOpen
-                    ? "bg-white/70 text-gray-700"
-                    : "text-gray-500 hover:text-gray-700"
+                    ? "bg-white/70"
+                    : ""
               }`}
             >
-              {group.icon && <span className="mr-1">{group.icon}</span>}
-              <span>{group.label}</span>
-            </button>
-            {/* ▾ : ドロップダウン開閉（タッチ端末で切替用） */}
-            <button
-              aria-label={`${group.label} を展開`}
-              onClick={(e) => {
-                e.stopPropagation();
-                // ホバー(onMouseEnter)で開いた直後にトグルで閉じる競合や、
-                // タッチ端末の擬似hoverを避けるため「開く」方向のみに固定。
-                // 閉じるのは外側クリック / タブ選択 / マウス離脱で行う。
-                setOpenGroup(group.id);
-              }}
-              className={`absolute right-0 top-1/2 -translate-y-1/2 h-full px-1.5 sm:px-2 flex items-center rounded-r-lg transition-colors ${
-                isActiveGroup ? "text-gray-500" : "text-gray-400 hover:text-gray-600"
-              }`}
-            >
-              <span
-                className={`text-[0.65em] opacity-70 transition-transform ${isOpen ? "rotate-180" : ""}`}
+              {/* 左: カテゴリ → 一覧を開く（PCのみ） */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpenGroup((v) => (v === group.id ? null : group.id));
+                }}
+                className={`hidden sm:flex items-center justify-center pl-3 pr-2 py-2 text-sm font-medium transition-colors whitespace-nowrap ${textColor} ${
+                  isActiveGroup ? "" : "hover:text-gray-700"
+                }`}
               >
-                ▾
-              </span>
-            </button>
+                {group.icon && <span className="mr-1">{group.icon}</span>}
+                <span>{group.label}</span>
+                <span
+                  className={`ml-0.5 text-[0.65em] opacity-60 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                >
+                  ▾
+                </span>
+              </button>
+
+              {/* 区切り（PCのみ） */}
+              <span className="hidden sm:block w-px my-2 bg-gray-300/70" />
+
+              {/* 右: 最後に開いたタブ → 1クリックで直行 */}
+              <button
+                onClick={() => selectTab(lastTab, group.id)}
+                disabled={lastTab.disabled}
+                title={lastTab.label}
+                className={`flex-1 flex items-center justify-center pl-1 pr-4 sm:px-2 py-2 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${textColor} ${
+                  isActiveGroup ? "" : "hover:text-gray-700"
+                }`}
+              >
+                {lastTab.icon && <span className="mr-1">{lastTab.icon}</span>}
+                <span className="sm:hidden">{lastTab.shortLabel ?? lastTab.label}</span>
+                <span className="hidden sm:inline">{lastTab.label}</span>
+              </button>
+
+              {/* ▾: モバイルでの一覧展開（PCは左ボタンの▾を使う） */}
+              <button
+                aria-label={`${group.label} を展開`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpenGroup((v) => (v === group.id ? null : group.id));
+                }}
+                className={`sm:hidden absolute right-0 top-0 h-full px-1.5 flex items-center ${textColor}`}
+              >
+                <span
+                  className={`text-[0.65em] opacity-60 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                >
+                  ▾
+                </span>
+              </button>
+            </div>
 
             {isOpen && (
               <div className="absolute left-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-30 py-1 min-w-[160px]">
