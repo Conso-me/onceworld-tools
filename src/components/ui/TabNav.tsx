@@ -16,8 +16,6 @@ export interface TabGroup {
   tabs: Tab[];
 }
 
-const LAST_KEY = (groupId: string) => `ow-nav-last-${groupId}`;
-
 export function TabNav({
   groups,
   onTabChange,
@@ -33,27 +31,16 @@ export function TabNav({
     const found = allTabs.find((t) => t.id === hash && !t.disabled);
     return found ? found.id : allTabs[0].id;
   });
+  // 直前に開いていたタブ（「戻る」用）
+  const [prevTab, setPrevTab] = useState<string | null>(null);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
-  // グループごとに最後に開いていたタブを記憶（localStorage に永続化）
-  const [lastByGroup, setLastByGroup] = useState<Record<string, string>>(() => {
-    const init: Record<string, string> = {};
-    for (const g of groups) {
-      const stored = localStorage.getItem(LAST_KEY(g.id));
-      const valid = stored && g.tabs.some((t) => t.id === stored && !t.disabled);
-      init[g.id] = valid ? stored! : g.tabs[0].id;
-      if (g.tabs.some((t) => t.id === activeTab)) init[g.id] = activeTab;
-    }
-    return init;
-  });
   const navRef = useRef<HTMLDivElement>(null);
 
-  const rememberGroupTab = (groupId: string, tabId: string) => {
-    setLastByGroup((prev) => ({ ...prev, [groupId]: tabId }));
-    try {
-      localStorage.setItem(LAST_KEY(groupId), tabId);
-    } catch {
-      /* ignore */
-    }
+  const goToTab = (tabId: string) => {
+    setActiveTab((cur) => {
+      if (cur !== tabId) setPrevTab(cur);
+      return tabId;
+    });
   };
 
   useEffect(() => {
@@ -61,10 +48,8 @@ export function TabNav({
       const hash = window.location.hash.slice(1);
       const found = allTabs.find((t) => t.id === hash && !t.disabled);
       if (found) {
-        setActiveTab(found.id);
+        goToTab(found.id);
         onTabChange(found.id);
-        const g = groups.find((g) => g.tabs.some((t) => t.id === found.id));
-        if (g && g.tabs.length > 1) rememberGroupTab(g.id, found.id);
       }
     };
     window.addEventListener("hashchange", handleHashChange);
@@ -83,25 +68,33 @@ export function TabNav({
     return () => document.removeEventListener("click", handleClick);
   }, [openGroup]);
 
-  const selectTab = (tab: Tab, groupId?: string) => {
+  const selectTab = (tab: Tab) => {
     if (tab.disabled) return;
-    setActiveTab(tab.id);
+    goToTab(tab.id);
     window.location.hash = tab.id;
     onTabChange(tab.id);
-    if (groupId) rememberGroupTab(groupId, tab.id);
     setOpenGroup(null);
   };
 
-  // グループの右半分／クリック時に開くタブ（記憶 → 無効なら先頭の有効タブ）
-  const resolveGroupTab = (group: TabGroup): Tab => {
-    const remembered = group.tabs.find(
-      (t) => t.id === lastByGroup[group.id] && !t.disabled,
-    );
-    return remembered ?? group.tabs.find((t) => !t.disabled) ?? group.tabs[0];
-  };
+  const prev = prevTab ? allTabs.find((t) => t.id === prevTab && !t.disabled) : null;
+  const showBack = prev && prev.id !== activeTab;
 
   return (
     <div ref={navRef} className="flex gap-1 bg-gray-100 rounded-xl p-1">
+      {/* 前のタブに戻る */}
+      {showBack && (
+        <button
+          onClick={() => prev && selectTab(prev)}
+          title={`${prev!.label} に戻る`}
+          className="shrink-0 flex items-center px-1.5 sm:px-2.5 py-2 rounded-lg text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-white/70 transition-all whitespace-nowrap"
+        >
+          <span className="text-base leading-none">↩</span>
+          <span className="hidden sm:inline ml-1 max-w-[7rem] truncate">
+            {prev!.label}
+          </span>
+        </button>
+      )}
+
       {groups.map((group) => {
         const isActiveGroup = group.tabs.some((t) => t.id === activeTab);
         const isOpen = openGroup === group.id;
@@ -122,86 +115,43 @@ export function TabNav({
                     : "text-gray-500 hover:text-gray-700"
               }`}
             >
-              {single.icon && <span className="hidden sm:inline sm:mr-1">{single.icon}</span>}
+              {single.icon && <span className="mr-1">{single.icon}</span>}
               <span className="sm:hidden">{single.shortLabel ?? single.label}</span>
               <span className="hidden sm:inline">{single.label}</span>
             </button>
           );
         }
 
-        const lastTab = resolveGroupTab(group);
-        const textColor = isActiveGroup ? "text-gray-800" : "text-gray-500";
-
         return (
           <div key={group.id} className="relative flex-1">
-            <div
-              className={`flex items-stretch rounded-lg overflow-hidden transition-all ${
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpenGroup((v) => (v === group.id ? null : group.id));
+              }}
+              className={`w-full px-1 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex items-center justify-center ${
                 isActiveGroup
-                  ? "bg-white shadow-sm"
+                  ? "bg-white text-gray-800 shadow-sm"
                   : isOpen
-                    ? "bg-white/70"
-                    : ""
+                    ? "bg-white/70 text-gray-700"
+                    : "text-gray-500 hover:text-gray-700"
               }`}
             >
-              {/* 左: カテゴリ → 一覧を開く（PCのみ） */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setOpenGroup((v) => (v === group.id ? null : group.id));
-                }}
-                className={`hidden sm:flex items-center justify-center pl-3 pr-2 py-2 text-sm font-medium transition-colors whitespace-nowrap ${textColor} ${
-                  isActiveGroup ? "" : "hover:text-gray-700"
-                }`}
+              {group.icon && <span className="sm:mr-1">{group.icon}</span>}
+              <span className="hidden sm:inline">{group.label}</span>
+              <span
+                className={`ml-0.5 text-[0.65em] opacity-60 transition-transform ${isOpen ? "rotate-180" : ""}`}
               >
-                {group.icon && <span className="mr-1">{group.icon}</span>}
-                <span>{group.label}</span>
-                <span
-                  className={`ml-0.5 text-[0.65em] opacity-60 transition-transform ${isOpen ? "rotate-180" : ""}`}
-                >
-                  ▾
-                </span>
-              </button>
-
-              {/* 区切り（PCのみ） */}
-              <span className="hidden sm:block w-px my-2 bg-gray-300/70" />
-
-              {/* 右: 最後に開いたタブ → 1クリックで直行 */}
-              <button
-                onClick={() => selectTab(lastTab, group.id)}
-                disabled={lastTab.disabled}
-                title={lastTab.label}
-                className={`flex-1 flex items-center justify-center pl-1 pr-4 sm:px-2 py-2 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${textColor} ${
-                  isActiveGroup ? "" : "hover:text-gray-700"
-                }`}
-              >
-                {lastTab.icon && <span className="mr-1">{lastTab.icon}</span>}
-                <span className="sm:hidden">{lastTab.shortLabel ?? lastTab.label}</span>
-                <span className="hidden sm:inline">{lastTab.label}</span>
-              </button>
-
-              {/* ▾: モバイルでの一覧展開（PCは左ボタンの▾を使う） */}
-              <button
-                aria-label={`${group.label} を展開`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setOpenGroup((v) => (v === group.id ? null : group.id));
-                }}
-                className={`sm:hidden absolute right-0 top-0 h-full px-1.5 flex items-center ${textColor}`}
-              >
-                <span
-                  className={`text-[0.65em] opacity-60 transition-transform ${isOpen ? "rotate-180" : ""}`}
-                >
-                  ▾
-                </span>
-              </button>
-            </div>
+                ▾
+              </span>
+            </button>
 
             {isOpen && (
               <div className="absolute left-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-30 py-1 min-w-[160px]">
                 {group.tabs.map((tab) => (
                   <button
                     key={tab.id}
-                    onClick={() => selectTab(tab, group.id)}
+                    onClick={() => selectTab(tab)}
                     disabled={tab.disabled}
                     className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
                       activeTab === tab.id
