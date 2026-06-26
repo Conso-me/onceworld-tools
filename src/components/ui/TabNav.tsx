@@ -68,7 +68,11 @@ export function TabNav({
   };
 
   return (
-    <div ref={navRef} className="flex gap-1 bg-gray-100 rounded-xl p-1">
+    <div
+      ref={navRef}
+      className="flex gap-1 bg-gray-100 rounded-xl p-1"
+      onMouseLeave={() => setOpenGroup(null)}
+    >
       {groups.map((group) => {
         const isActiveGroup = group.tabs.some((t) => t.id === activeTab);
         const isOpen = openGroup === group.id;
@@ -80,6 +84,7 @@ export function TabNav({
             <button
               key={group.id}
               onClick={() => selectTab(single)}
+              onMouseEnter={() => setOpenGroup(null)}
               disabled={single.disabled}
               className={`flex-1 px-1 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                 activeTab === single.id
@@ -97,11 +102,17 @@ export function TabNav({
         }
 
         return (
-          <div key={group.id} className="relative flex-1">
+          <div
+            key={group.id}
+            className="relative flex-1"
+            onMouseEnter={() => setOpenGroup(group.id)}
+          >
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                setOpenGroup((v) => (v === group.id ? null : group.id));
+                // ホバーで開いた直後にトグルで閉じる競合や、タッチ端末の
+                // 擬似hoverで閉じてしまうのを避けるため「開く」方向に固定。
+                setOpenGroup(group.id);
               }}
               className={`w-full px-1 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex items-center justify-center ${
                 isActiveGroup
