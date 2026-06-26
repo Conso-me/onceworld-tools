@@ -13,6 +13,14 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-06-26",
+    changes: [
+    { type: "feature", text: "feat: 粉の上限を可変入力化しMAX/リセットボタンを追加" },
+    { type: "improve", text: "feat: ペット粉の割り振り上限を100→1100に拡張" },
+    ],
+  },
+
+  {
     date: "2026-06-25",
     changes: [
     { type: "improve", text: "style: 装備/アクセ/ペット行を共通レイアウトに統一" },
