@@ -16,6 +16,8 @@ export interface TabGroup {
   tabs: Tab[];
 }
 
+const LAST_KEY = (groupId: string) => `ow-nav-last-${groupId}`;
+
 export function TabNav({
   groups,
   onTabChange,
@@ -32,7 +34,27 @@ export function TabNav({
     return found ? found.id : allTabs[0].id;
   });
   const [openGroup, setOpenGroup] = useState<string | null>(null);
+  // グループごとに最後に開いていたタブを記憶（localStorage に永続化）
+  const [lastByGroup, setLastByGroup] = useState<Record<string, string>>(() => {
+    const init: Record<string, string> = {};
+    for (const g of groups) {
+      const stored = localStorage.getItem(LAST_KEY(g.id));
+      const valid = stored && g.tabs.some((t) => t.id === stored && !t.disabled);
+      init[g.id] = valid ? stored! : g.tabs[0].id;
+      if (g.tabs.some((t) => t.id === activeTab)) init[g.id] = activeTab;
+    }
+    return init;
+  });
   const navRef = useRef<HTMLDivElement>(null);
+
+  const rememberGroupTab = (groupId: string, tabId: string) => {
+    setLastByGroup((prev) => ({ ...prev, [groupId]: tabId }));
+    try {
+      localStorage.setItem(LAST_KEY(groupId), tabId);
+    } catch {
+      /* ignore */
+    }
+  };
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -41,6 +63,8 @@ export function TabNav({
       if (found) {
         setActiveTab(found.id);
         onTabChange(found.id);
+        const g = groups.find((g) => g.tabs.some((t) => t.id === found.id));
+        if (g && g.tabs.length > 1) rememberGroupTab(g.id, found.id);
       }
     };
     window.addEventListener("hashchange", handleHashChange);
@@ -59,12 +83,21 @@ export function TabNav({
     return () => document.removeEventListener("click", handleClick);
   }, [openGroup]);
 
-  const handleTabClick = (tab: Tab) => {
+  const selectTab = (tab: Tab, groupId?: string) => {
     if (tab.disabled) return;
     setActiveTab(tab.id);
     window.location.hash = tab.id;
     onTabChange(tab.id);
+    if (groupId) rememberGroupTab(groupId, tab.id);
     setOpenGroup(null);
+  };
+
+  // グループ本体クリック時に開き直すタブ（記憶 → 無効なら先頭の有効タブ）
+  const resolveGroupTab = (group: TabGroup): Tab => {
+    const remembered = group.tabs.find(
+      (t) => t.id === lastByGroup[group.id] && !t.disabled,
+    );
+    return remembered ?? group.tabs.find((t) => !t.disabled) ?? group.tabs[0];
   };
 
   return (
@@ -83,7 +116,7 @@ export function TabNav({
           return (
             <button
               key={group.id}
-              onClick={() => handleTabClick(single)}
+              onClick={() => selectTab(single)}
               onMouseEnter={() => setOpenGroup(null)}
               disabled={single.disabled}
               className={`flex-1 px-1 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
@@ -102,14 +135,15 @@ export function TabNav({
         }
 
         return (
-          <div key={group.id} className="relative flex-1">
+          <div
+            key={group.id}
+            className="relative flex-1"
+            onMouseEnter={() => setOpenGroup(group.id)}
+          >
+            {/* ラベル部: 最後に開いていたタブへ直行 */}
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setOpenGroup((v) => (v === group.id ? null : group.id));
-              }}
-              onMouseEnter={() => setOpenGroup(group.id)}
-              className={`w-full px-1 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex items-center justify-center ${
+              onClick={() => selectTab(resolveGroupTab(group), group.id)}
+              className={`w-full pl-1 pr-6 sm:pl-4 sm:pr-7 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex items-center justify-center ${
                 isActiveGroup
                   ? "bg-white text-gray-800 shadow-sm"
                   : isOpen
@@ -119,8 +153,23 @@ export function TabNav({
             >
               {group.icon && <span className="mr-1">{group.icon}</span>}
               <span>{group.label}</span>
+            </button>
+            {/* ▾ : ドロップダウン開閉（タッチ端末で切替用） */}
+            <button
+              aria-label={`${group.label} を展開`}
+              onClick={(e) => {
+                e.stopPropagation();
+                // ホバー(onMouseEnter)で開いた直後にトグルで閉じる競合や、
+                // タッチ端末の擬似hoverを避けるため「開く」方向のみに固定。
+                // 閉じるのは外側クリック / タブ選択 / マウス離脱で行う。
+                setOpenGroup(group.id);
+              }}
+              className={`absolute right-0 top-1/2 -translate-y-1/2 h-full px-1.5 sm:px-2 flex items-center rounded-r-lg transition-colors ${
+                isActiveGroup ? "text-gray-500" : "text-gray-400 hover:text-gray-600"
+              }`}
+            >
               <span
-                className={`ml-1 text-[0.65em] opacity-60 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                className={`text-[0.65em] opacity-70 transition-transform ${isOpen ? "rotate-180" : ""}`}
               >
                 ▾
               </span>
@@ -131,7 +180,7 @@ export function TabNav({
                 {group.tabs.map((tab) => (
                   <button
                     key={tab.id}
-                    onClick={() => handleTabClick(tab)}
+                    onClick={() => selectTab(tab, group.id)}
                     disabled={tab.disabled}
                     className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
                       activeTab === tab.id
