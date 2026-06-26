@@ -39,9 +39,9 @@ function App() {
       label: t("tabGroups.content"),
       icon: "🗺",
       tabs: [
+        { id: "ofarm", label: t("tabs.ofarm"), shortLabel: t("tabs.ofarmShort"), icon: "🌾" },
         { id: "skyCorridor", label: t("tabs.skyCorridor"), shortLabel: t("tabs.skyCorridorShort"), icon: "☁" },
         { id: "arena", label: t("tabs.arena"), icon: "🏟" },
-        { id: "ofarm", label: t("tabs.ofarm"), shortLabel: t("tabs.ofarmShort"), icon: "🌾" },
       ],
     },
     {
