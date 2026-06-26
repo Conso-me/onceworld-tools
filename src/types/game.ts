@@ -182,7 +182,7 @@ export interface PetDamageConfig {
   mushroomLight: number;        // 光キノコ (0-1000)
   mushroomDark: number;         // 闇キノコ (0-1000)
   hasMushroomHouse: boolean;    // キノコハウス所持
-  powderVit: number;            // 粉 (各0-1100、ドラゴン印の手ごね機で上限+1/個、最大1000個)
+  powderVit: number;            // 粉 (上限はUIで可変。デフォルト100+ドラゴン印の手ごね機 最大1000個=1100)
   powderSpd: number;
   powderAtk: number;
   powderInt: number;

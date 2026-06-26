@@ -56,6 +56,9 @@ const POWDER_FIELDS: { key: PowderKey; label: string }[] = [
   { key: "powderMdef", label: "M-DEF" },
   { key: "powderLuck", label: "LUCK" },
 ];
+const POWDER_KEYS: PowderKey[] = POWDER_FIELDS.map((f) => f.key);
+// 粉の上限デフォルト = 100 + ドラゴン印の手ごね機 最大1000個（1個につき+1）
+const DEFAULT_POWDER_CAP = 1100;
 
 const STAT_DISPLAY: { key: keyof PetStatResult["final"]; label: string }[] = [
   { key: "vit",  label: "VIT" },
@@ -134,6 +137,11 @@ export function PetConfigPanel({ config, setField, reset, petResult, replaceConf
   const { presets, savePreset, loadPreset, deletePreset } = usePetPresets();
   const [presetName, setPresetName] = useState("");
   const [selectedPresetId, setSelectedPresetId] = useState("");
+  const [powderCap, setPowderCap] = useState(DEFAULT_POWDER_CAP);
+
+  const setAllPowders = (value: number) => {
+    POWDER_KEYS.forEach((key) => setField(key, value));
+  };
 
   const selectedMonster = useMemo(
     () => (config.petMonsterName ? allMonsters.find((m) => m.name === config.petMonsterName) ?? null : null),
@@ -264,13 +272,7 @@ export function PetConfigPanel({ config, setField, reset, petResult, replaceConf
           setField("mushroomWood", 1000);
           setField("mushroomLight", 1000);
           setField("mushroomDark", 1000);
-          setField("powderVit", 1100);
-          setField("powderSpd", 1100);
-          setField("powderAtk", 1100);
-          setField("powderInt", 1100);
-          setField("powderDef", 1100);
-          setField("powderMdef", 1100);
-          setField("powderLuck", 1100);
+          setAllPowders(powderCap);
         }}
         className="w-full py-1.5 lg:py-1 bg-indigo-50 border border-indigo-200 rounded-lg text-xs font-semibold text-indigo-600 hover:bg-indigo-100 transition-colors"
       >
@@ -317,9 +319,37 @@ export function PetConfigPanel({ config, setField, reset, petResult, replaceConf
 
       {/* ── 粉の割り振り ───────────────────────────────────── */}
       <div className="space-y-1">
-        <div className="flex items-center justify-between">
-          <label className="text-xs font-medium text-gray-500">{t("petPowderAlloc")}</label>
-          <span className="text-[10px] text-gray-400">各 0〜1100</span>
+        <div className="flex items-center justify-between gap-2">
+          <label className="text-xs font-medium text-gray-500 whitespace-nowrap">{t("petPowderAlloc")}</label>
+          <div className="flex items-center gap-1">
+            <label className="text-[10px] text-gray-500 whitespace-nowrap">{t("petPowderCap")}</label>
+            <input
+              type="text"
+              inputMode="numeric"
+              value={String(powderCap)}
+              onChange={(e) => {
+                const raw = e.target.value.replace(/[^0-9]/g, "");
+                setPowderCap(raw === "" ? 0 : parseInt(raw, 10));
+              }}
+              className="w-16 px-2 py-1 bg-white border border-gray-200 rounded-lg text-center text-xs font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-1">
+          <button
+            type="button"
+            onClick={() => setAllPowders(powderCap)}
+            className="py-1 bg-indigo-50 border border-indigo-200 rounded-lg text-[11px] font-semibold text-indigo-600 hover:bg-indigo-100 transition-colors"
+          >
+            {t("petPowderMax")}
+          </button>
+          <button
+            type="button"
+            onClick={() => setAllPowders(0)}
+            className="py-1 bg-gray-50 border border-gray-200 rounded-lg text-[11px] font-semibold text-gray-500 hover:bg-gray-100 transition-colors"
+          >
+            {t("petPowderReset")}
+          </button>
         </div>
         <div className="grid grid-cols-4 gap-1">
           {POWDER_FIELDS.map(({ key, label }) => (
@@ -328,7 +358,7 @@ export function PetConfigPanel({ config, setField, reset, petResult, replaceConf
               label={label}
               value={config[key]}
               onChange={(v) => setField(key, v)}
-              max={1100}
+              max={powderCap}
             />
           ))}
         </div>
