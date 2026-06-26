@@ -15,6 +15,14 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-06-26",
     changes: [
+    { type: "improve", text: "feat: グループタブをホバーで展開" },
+    { type: "improve", text: "revert: 戻るボタンを撤去し素のグループタブに戻す" },
+    { type: "feature", text: "feat: 分割表示を廃止し「前のタブに戻る」ボタンを追加" },
+    { type: "improve", text: "feat: グループタブを分割表示にしホバー廃止" },
+    { type: "improve", text: "feat: グループタブは最後に開いたタブへ直行できるように" },
+    { type: "improve", text: "feat: コンテンツの並びを新着順(おふぁ～む/天空回廊/裏路地)に" },
+    { type: "improve", text: "feat: ダメージ計算とステータスを平タブ化し5タブ構成に" },
+    { type: "improve", text: "feat: ナビをカテゴリ別グループメニューに刷新" },
     { type: "feature", text: "feat: 粉の上限を可変入力化しMAX/リセットボタンを追加" },
     { type: "improve", text: "feat: ペット粉の割り振り上限を100→1100に拡張" },
     ],
