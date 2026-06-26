@@ -9,7 +9,7 @@ import { MonsterEditor } from "./components/MonsterEditor";
 import { PetSimulator } from "./components/PetSimulator";
 import { PetBattleSimulator } from "./components/PetBattleSimulator";
 import { OfarmSimulator } from "./components/OfarmSimulator";
-import { TabNav, type Tab } from "./components/ui/TabNav";
+import { TabNav, type TabGroup } from "./components/ui/TabNav";
 import { PatchNotesModal } from "./components/PatchNotesModal";
 import { EquipmentSummaryModal } from "./components/ui/EquipmentSummaryModal";
 import { FeatureGuideModal, useFeatureGuide } from "./components/FeatureGuideModal";
@@ -17,17 +17,53 @@ import { FeatureGuideModal, useFeatureGuide } from "./components/FeatureGuideMod
 function App() {
   const { t, i18n } = useTranslation();
 
-  const tabs: Tab[] = [
-    { id: "damage", label: t("tabs.damage"), shortLabel: t("tabs.damageShort"), icon: "⚔" },
-    { id: "skyCorridor", label: t("tabs.skyCorridor"), shortLabel: t("tabs.skyCorridorShort"), icon: "☁" },
-    { id: "status", label: t("tabs.status"), shortLabel: t("tabs.statusShort"), icon: "✦" },
-    { id: "ofarm", label: t("tabs.ofarm"), shortLabel: t("tabs.ofarmShort"), icon: "🌾" },
-    { id: "arena", label: t("tabs.arena"), icon: "🏟", overflow: true },
-    { id: "pet", label: t("tabs.pet"), shortLabel: t("tabs.petShort"), icon: "🐾", overflow: true },
-    { id: "petbattle", label: t("tabs.petbattle"), shortLabel: t("tabs.petbattleShort"), icon: "⚡", overflow: true },
-    { id: "farm", label: t("tabs.farm"), shortLabel: t("tabs.farmShort"), icon: "♻", overflow: true },
-    { id: "monsters", label: t("tabs.monsters"), shortLabel: t("tabs.monstersShort"), icon: "📋", overflow: true },
+  const groups: TabGroup[] = [
+    {
+      id: "damage",
+      label: t("tabs.damage"),
+      icon: "⚔",
+      tabs: [
+        { id: "damage", label: t("tabs.damage"), shortLabel: t("tabs.damageShort"), icon: "⚔" },
+      ],
+    },
+    {
+      id: "status",
+      label: t("tabs.status"),
+      icon: "✦",
+      tabs: [
+        { id: "status", label: t("tabs.status"), shortLabel: t("tabs.statusShort"), icon: "✦" },
+      ],
+    },
+    {
+      id: "content",
+      label: t("tabGroups.content"),
+      icon: "🗺",
+      tabs: [
+        { id: "ofarm", label: t("tabs.ofarm"), shortLabel: t("tabs.ofarmShort"), icon: "🌾" },
+        { id: "skyCorridor", label: t("tabs.skyCorridor"), shortLabel: t("tabs.skyCorridorShort"), icon: "☁" },
+        { id: "arena", label: t("tabs.arena"), icon: "🏟" },
+      ],
+    },
+    {
+      id: "pet",
+      label: t("tabGroups.pet"),
+      icon: "🐾",
+      tabs: [
+        { id: "pet", label: t("tabs.pet"), shortLabel: t("tabs.petShort"), icon: "🐾" },
+        { id: "petbattle", label: t("tabs.petbattle"), shortLabel: t("tabs.petbattleShort"), icon: "⚡" },
+      ],
+    },
+    {
+      id: "data",
+      label: t("tabGroups.other"),
+      icon: "📦",
+      tabs: [
+        { id: "monsters", label: t("tabs.monsters"), shortLabel: t("tabs.monstersShort"), icon: "📋" },
+        { id: "farm", label: t("tabs.farm"), shortLabel: t("tabs.farmShort"), icon: "♻" },
+      ],
+    },
   ];
+  const allTabs = groups.flatMap((g) => g.tabs);
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
@@ -45,7 +81,7 @@ function App() {
 
   const [activeTab, setActiveTab] = useState(() => {
     const hash = window.location.hash.slice(1);
-    return tabs.find((t) => t.id === hash && !t.disabled)?.id ?? "damage";
+    return allTabs.find((t) => t.id === hash && !t.disabled)?.id ?? "damage";
   });
   const [showPatchNotes, setShowPatchNotes] = useState(false);
   const [showEquipSummary, setShowEquipSummary] = useState(false);
@@ -166,7 +202,7 @@ function App() {
               </a>
             </div>
           </div>
-          <TabNav tabs={tabs} onTabChange={handleTabChange} />
+          <TabNav groups={groups} onTabChange={handleTabChange} />
         </div>
       </header>
 

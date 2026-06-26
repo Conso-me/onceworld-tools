@@ -21,6 +21,11 @@
     "ofarm": "Ofarm",
     "ofarmShort": "Ofarm"
   },
+  "tabGroups": {
+    "content": "Content",
+    "pet": "Pet",
+    "other": "Other"
+  },
   "preparing": "Coming Soon",
   "add": "Add",
   "delete": "Delete",

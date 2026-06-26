@@ -7,29 +7,37 @@ export interface Tab {
   shortLabel?: string;
   icon?: string;
   disabled?: boolean;
-  overflow?: boolean;  // true のタブは「⋯」ドロップダウンに格納
+}
+
+export interface TabGroup {
+  id: string;
+  label: string;
+  icon?: string;
+  tabs: Tab[];
 }
 
 export function TabNav({
-  tabs,
+  groups,
   onTabChange,
 }: {
-  tabs: Tab[];
+  groups: TabGroup[];
   onTabChange: (tabId: string) => void;
 }) {
   const { t } = useTranslation();
+  const allTabs = groups.flatMap((g) => g.tabs);
+
   const [activeTab, setActiveTab] = useState(() => {
     const hash = window.location.hash.slice(1);
-    const found = tabs.find((t) => t.id === hash && !t.disabled);
-    return found ? found.id : tabs[0].id;
+    const found = allTabs.find((t) => t.id === hash && !t.disabled);
+    return found ? found.id : allTabs[0].id;
   });
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [openGroup, setOpenGroup] = useState<string | null>(null);
+  const navRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.slice(1);
-      const found = tabs.find((t) => t.id === hash && !t.disabled);
+      const found = allTabs.find((t) => t.id === hash && !t.disabled);
       if (found) {
         setActiveTab(found.id);
         onTabChange(found.id);
@@ -37,107 +45,119 @@ export function TabNav({
     };
     window.addEventListener("hashchange", handleHashChange);
     return () => window.removeEventListener("hashchange", handleHashChange);
-  }, [tabs, onTabChange]);
+  }, [allTabs, onTabChange]);
 
+  // 外側クリックで閉じる
   useEffect(() => {
-    if (!dropdownOpen) return;
+    if (!openGroup) return;
     function handleClick(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setDropdownOpen(false);
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+        setOpenGroup(null);
       }
     }
     document.addEventListener("click", handleClick);
     return () => document.removeEventListener("click", handleClick);
-  }, [dropdownOpen]);
+  }, [openGroup]);
 
-  const handleClick = (tab: Tab) => {
+  const selectTab = (tab: Tab) => {
     if (tab.disabled) return;
     setActiveTab(tab.id);
     window.location.hash = tab.id;
     onTabChange(tab.id);
-    setDropdownOpen(false);
+    setOpenGroup(null);
   };
 
-  const mainTabs = tabs.filter((t) => !t.overflow);
-  const overflowTabs = tabs.filter((t) => t.overflow);
-  const isOverflowActive = overflowTabs.some((t) => t.id === activeTab);
-
   return (
-    <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
-      {mainTabs.map((tab) => (
-        <button
-          key={tab.id}
-          onClick={() => handleClick(tab)}
-          disabled={tab.disabled}
-          className={`flex-1 px-1 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
-            activeTab === tab.id
-              ? "bg-white text-gray-800 shadow-sm"
-              : tab.disabled
-                ? "text-gray-300 cursor-not-allowed"
-                : "text-gray-500 hover:text-gray-700"
-          }`}
-        >
-          {tab.icon && <span className="mr-1">{tab.icon}</span>}
-          <span className="sm:hidden">{tab.shortLabel ?? tab.label}</span>
-          <span className="hidden sm:inline">{tab.label}</span>
-          {tab.disabled && (
-            <span className="ml-1 text-xs text-gray-300">{t("preparing")}</span>
-          )}
-        </button>
-      ))}
+    <div
+      ref={navRef}
+      className="flex gap-1 bg-gray-100 rounded-xl p-1"
+      onMouseLeave={() => setOpenGroup(null)}
+    >
+      {groups.map((group) => {
+        const isActiveGroup = group.tabs.some((t) => t.id === activeTab);
+        const isOpen = openGroup === group.id;
+        // 単一タブのグループはドロップダウンせず直接タブとして扱う
+        const single = group.tabs.length === 1 ? group.tabs[0] : null;
 
-      {overflowTabs.length > 0 && (
-        <div ref={dropdownRef} className="relative">
-          <button
-            onClick={(e) => { e.stopPropagation(); setDropdownOpen((v) => !v); }}
-            className={`px-2 sm:px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
-              isOverflowActive
-                ? "bg-white text-gray-800 shadow-sm"
-                : dropdownOpen
-                  ? "bg-white/70 text-gray-700"
-                  : "text-gray-500 hover:text-gray-700"
-            }`}
+        if (single) {
+          return (
+            <button
+              key={group.id}
+              onClick={() => selectTab(single)}
+              onMouseEnter={() => setOpenGroup(null)}
+              disabled={single.disabled}
+              className={`flex-1 px-1 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
+                activeTab === single.id
+                  ? "bg-white text-gray-800 shadow-sm"
+                  : single.disabled
+                    ? "text-gray-300 cursor-not-allowed"
+                    : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              {single.icon && <span className="mr-1">{single.icon}</span>}
+              <span className="sm:hidden">{single.shortLabel ?? single.label}</span>
+              <span className="hidden sm:inline">{single.label}</span>
+            </button>
+          );
+        }
+
+        return (
+          <div
+            key={group.id}
+            className="relative flex-1"
+            onMouseEnter={() => setOpenGroup(group.id)}
           >
-            {isOverflowActive
-              ? (() => {
-                  const active = overflowTabs.find((t) => t.id === activeTab)!;
-                  return (
-                    <>
-                      {active.icon && <span className="mr-1">{active.icon}</span>}
-                      <span className="sm:hidden">{active.shortLabel ?? active.label}</span>
-                      <span className="hidden sm:inline">{active.label}</span>
-                    </>
-                  );
-                })()
-              : "⋯"}
-          </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                // ホバーで開いた直後にトグルで閉じる競合や、タッチ端末の
+                // 擬似hoverで閉じてしまうのを避けるため「開く」方向に固定。
+                setOpenGroup(group.id);
+              }}
+              className={`w-full px-1 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex items-center justify-center ${
+                isActiveGroup
+                  ? "bg-white text-gray-800 shadow-sm"
+                  : isOpen
+                    ? "bg-white/70 text-gray-700"
+                    : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              {group.icon && <span className="sm:mr-1">{group.icon}</span>}
+              <span className="hidden sm:inline">{group.label}</span>
+              <span
+                className={`ml-0.5 text-[0.65em] opacity-60 transition-transform ${isOpen ? "rotate-180" : ""}`}
+              >
+                ▾
+              </span>
+            </button>
 
-          {dropdownOpen && (
-            <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-30 py-1 min-w-[140px]">
-              {overflowTabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => handleClick(tab)}
-                  disabled={tab.disabled}
-                  className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                    activeTab === tab.id
-                      ? "text-gray-800 font-semibold bg-gray-50"
-                      : tab.disabled
-                        ? "text-gray-300 cursor-not-allowed"
-                        : "text-gray-600 hover:bg-gray-50"
-                  }`}
-                >
-                  {tab.icon && <span className="mr-1.5">{tab.icon}</span>}
-                  {tab.label}
-                  {tab.disabled && (
-                    <span className="ml-1 text-xs text-gray-300">{t("preparing")}</span>
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+            {isOpen && (
+              <div className="absolute left-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-30 py-1 min-w-[160px]">
+                {group.tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => selectTab(tab)}
+                    disabled={tab.disabled}
+                    className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
+                      activeTab === tab.id
+                        ? "text-gray-800 font-semibold bg-gray-50"
+                        : tab.disabled
+                          ? "text-gray-300 cursor-not-allowed"
+                          : "text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    {tab.icon && <span className="mr-1.5">{tab.icon}</span>}
+                    {tab.label}
+                    {tab.disabled && (
+                      <span className="ml-1 text-xs text-gray-300">{t("preparing")}</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

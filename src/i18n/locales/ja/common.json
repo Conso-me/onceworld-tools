@@ -21,6 +21,11 @@
     "ofarm": "おふぁ～む",
     "ofarmShort": "おふぁ"
   },
+  "tabGroups": {
+    "content": "コンテンツ",
+    "pet": "ペット",
+    "other": "その他"
+  },
   "preparing": "準備中",
   "add": "追加",
   "delete": "削除",
