@@ -264,13 +264,13 @@ export function PetConfigPanel({ config, setField, reset, petResult, replaceConf
           setField("mushroomWood", 1000);
           setField("mushroomLight", 1000);
           setField("mushroomDark", 1000);
-          setField("powderVit", 100);
-          setField("powderSpd", 100);
-          setField("powderAtk", 100);
-          setField("powderInt", 100);
-          setField("powderDef", 100);
-          setField("powderMdef", 100);
-          setField("powderLuck", 100);
+          setField("powderVit", 1100);
+          setField("powderSpd", 1100);
+          setField("powderAtk", 1100);
+          setField("powderInt", 1100);
+          setField("powderDef", 1100);
+          setField("powderMdef", 1100);
+          setField("powderLuck", 1100);
         }}
         className="w-full py-1.5 lg:py-1 bg-indigo-50 border border-indigo-200 rounded-lg text-xs font-semibold text-indigo-600 hover:bg-indigo-100 transition-colors"
       >
@@ -319,7 +319,7 @@ export function PetConfigPanel({ config, setField, reset, petResult, replaceConf
       <div className="space-y-1">
         <div className="flex items-center justify-between">
           <label className="text-xs font-medium text-gray-500">{t("petPowderAlloc")}</label>
-          <span className="text-[10px] text-gray-400">各 0〜100</span>
+          <span className="text-[10px] text-gray-400">各 0〜1100</span>
         </div>
         <div className="grid grid-cols-4 gap-1">
           {POWDER_FIELDS.map(({ key, label }) => (
@@ -328,7 +328,7 @@ export function PetConfigPanel({ config, setField, reset, petResult, replaceConf
               label={label}
               value={config[key]}
               onChange={(v) => setField(key, v)}
-              max={100}
+              max={1100}
             />
           ))}
         </div>
