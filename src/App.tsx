@@ -19,11 +19,18 @@ function App() {
 
   const groups: TabGroup[] = [
     {
-      id: "combat",
-      label: t("tabGroups.combat"),
+      id: "damage",
+      label: t("tabs.damage"),
       icon: "⚔",
       tabs: [
         { id: "damage", label: t("tabs.damage"), shortLabel: t("tabs.damageShort"), icon: "⚔" },
+      ],
+    },
+    {
+      id: "status",
+      label: t("tabs.status"),
+      icon: "✦",
+      tabs: [
         { id: "status", label: t("tabs.status"), shortLabel: t("tabs.statusShort"), icon: "✦" },
       ],
     },
@@ -48,8 +55,8 @@ function App() {
     },
     {
       id: "data",
-      label: t("tabGroups.data"),
-      icon: "📚",
+      label: t("tabGroups.other"),
+      icon: "📦",
       tabs: [
         { id: "monsters", label: t("tabs.monsters"), shortLabel: t("tabs.monstersShort"), icon: "📋" },
         { id: "farm", label: t("tabs.farm"), shortLabel: t("tabs.farmShort"), icon: "♻" },

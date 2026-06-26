@@ -22,10 +22,9 @@
     "ofarmShort": "おふぁ"
   },
   "tabGroups": {
-    "combat": "戦闘",
     "content": "コンテンツ",
     "pet": "ペット",
-    "data": "図鑑・周回"
+    "other": "その他"
   },
   "preparing": "準備中",
   "add": "追加",

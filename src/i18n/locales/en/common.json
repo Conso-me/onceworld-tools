@@ -22,10 +22,9 @@
     "ofarmShort": "Ofarm"
   },
   "tabGroups": {
-    "combat": "Combat",
     "content": "Content",
     "pet": "Pet",
-    "data": "Data"
+    "other": "Other"
   },
   "preparing": "Coming Soon",
   "add": "Add",
