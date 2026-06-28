@@ -48,6 +48,13 @@
     "survivableHits": "Survivable Hits",
     "oneHitKill": "One-shot KO"
   },
+  "evasionRate": "Evasion Rate",
+  "approx": "~{{value}}%",
+  "mostlyEvade": "Mostly Evade",
+  "luckRatio": "LUK Ratio",
+  "luckRatioValue": "×{{value}}",
+  "enemyLuckZero": "Enemy LUK 0 (mostly evade)",
+  "evasionHint": "Mostly evade when your LUK is 3x+ the enemy's",
   "minINTBySpell": "Min INT (By Spell)",
   "minLabel": "Min",
   "nKillLabel": "{{n}}-Kill",
