@@ -567,5 +567,17 @@
       }
     ],
     "nameEn": null
+  },
+  {
+    "name": "照命輪",
+    "maxLevel": 1,
+    "effects": [
+      {
+        "type": "LUCK%",
+        "value": 500,
+        "scalePercent": 0
+      }
+    ],
+    "nameEn": null
   }
 ]
