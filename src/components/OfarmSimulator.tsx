@@ -108,7 +108,7 @@ export function OfarmSimulator({
     const buffs = {
       magicBaseInt: derivedBuffs.magicBaseInt,
       crystalCubePreMult: derivedBuffs.crystalCubePreMult,
-      toughouCubeFinalMult: derivedBuffs.toughouCubeFinalMult,
+      toughouCubePreMult: derivedBuffs.toughouCubePreMult,
       assassinClaw,
       woodMagicDef,
       darkMagicLuck,

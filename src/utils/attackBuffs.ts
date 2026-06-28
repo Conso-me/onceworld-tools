@@ -3,7 +3,7 @@
  *
  * 物理:
  *  - devilEye      ゴッドオブデビルアイ → クリティカル倍率 2.5×(1+n×0.003)
- *  - toughouCube   闘晶立方体           → 最終ダメージ倍率 1+n×0.01
+ *  - toughouCube   闘晶立方体           → 防御計算前倍率 1+n×0.01（魔晶立方体と同じ）
  * 魔法:
  *  - analysisBook         魔法解析書         → 魔法INT加算
  *  - analysisAnalysisBook 解析書の解析書     → 解析書×(1+n×0.1)
@@ -34,8 +34,8 @@ export interface DerivedAttackBuffs {
   crystalCubePreMult: number;
   /** 魔晶立方体: 最終倍率（常に1。防御前モード確定済み） */
   crystalCubeFinalMult: number;
-  /** 闘晶立方体: 最終ダメージに掛ける倍率 */
-  toughouCubeFinalMult: number;
+  /** 闘晶立方体: 防御計算前に掛ける倍率（魔晶立方体と同じ） */
+  toughouCubePreMult: number;
   /** ゴッドオブデビルアイ: クリティカル倍率 */
   devilEyeCritMult: number;
 }
@@ -51,7 +51,7 @@ export function deriveAttackBuffs(b: AttackBuffs): DerivedAttackBuffs {
     magicBaseInt: analysisBookNum * (1 + analysisAnalysisBookNum * 0.1),
     crystalCubePreMult: 1 + crystalCubeNum * 0.01,
     crystalCubeFinalMult: 1,
-    toughouCubeFinalMult: 1 + toughouCubeNum * 0.01,
+    toughouCubePreMult: 1 + toughouCubeNum * 0.01,
     devilEyeCritMult: 2.5 * (1 + devilEyeNum * 0.003),
   };
 }
