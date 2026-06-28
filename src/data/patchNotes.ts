@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-06-28",
     changes: [
+    { type: "feature", text: "feat: 被ダメ側にLUK回避率・倍率表示を追加" },
     { type: "fix", text: "fix: 闘晶立方体の計算式を魔晶立方体と同じ防御計算前適用に修正" },
     ],
   },
