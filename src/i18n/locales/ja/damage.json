@@ -48,6 +48,13 @@
     "survivableHits": "受けられる回数",
     "oneHitKill": "ワンパン即死"
   },
+  "evasionRate": "回避率",
+  "approx": "約{{value}}%",
+  "mostlyEvade": "ほぼ回避",
+  "luckRatio": "相手LUK比",
+  "luckRatioValue": "×{{value}}",
+  "enemyLuckZero": "敵LUK 0（ほぼ回避）",
+  "evasionHint": "自LUKが相手LUKの3倍以上でほぼ回避",
   "minINTBySpell": "最低必要INT（魔法別）",
   "minLabel": "最低",
   "nKillLabel": "{{n}}確殺",

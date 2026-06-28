@@ -704,6 +704,20 @@ export function DamageCalculator({
 
     const additionalNeeded = calcAdditionalDefNeeded(enemyStat, playerDefForCalc, effMdef, enemyIsPhysical);
 
+    // 回避（物理攻撃のみ）: 敵が攻撃側、自分が防御側
+    // 自LUKが敵LUKの3倍以上でほぼ回避（確定回避ではない）
+    // 闇魔法デバフ中は敵LUK半減を反映（与ダメ側と同じ）
+    const enemyLuck = darkMagicEffect ? Math.floor(scaled.scaledLuck / 2) : scaled.scaledLuck;
+    let evasion: { rate: number; ratio: number | null; darkMagic: boolean } | null = null;
+    if (enemyIsPhysical) {
+      const enemyHitRate = calcHitRate(enemyLuck, effLuck);
+      evasion = {
+        rate: 100 - enemyHitRate,
+        ratio: enemyLuck > 0 ? effLuck / enemyLuck : null, // null = 敵LUK0（ほぼ確定回避）
+        darkMagic: darkMagicEffect,
+      };
+    }
+
     return {
       defReq,
       currentDmg,
@@ -714,8 +728,9 @@ export function DamageCalculator({
       hitsToTake,
       additionalNeeded,
       playerDefForCalc,
+      evasion,
     };
-  }, [scaled, effDef, effMdef, enemyToSelfAffinity, effPlayerHp, activeAssassinClaw]);
+  }, [scaled, effDef, effMdef, effLuck, enemyToSelfAffinity, effPlayerHp, activeAssassinClaw, darkMagicEffect]);
 
   // ===== エリア一括比較計算 =====
   const offensiveComparison = useMemo(() => {
@@ -1891,6 +1906,50 @@ export function DamageCalculator({
               })()}
             </div>
           )}
+
+          {/* LUK回避（敵が物理攻撃のときのみ） */}
+          {defensiveResult.evasion && (() => {
+            const { rate, ratio, darkMagic } = defensiveResult.evasion!;
+            const mostlyEvade = ratio === null || ratio >= 3;
+            const rateColor = rate >= 80 ? "text-green-600" : rate < 20 ? "text-red-500" : "text-yellow-600";
+            return (
+              <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 p-3 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-gray-600">{t("evasionRate")}</span>
+                    {darkMagic && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-600">
+                        {t("darkMagicDebuff")}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-lg font-bold ${rateColor}`}>{t("approx", { value: rate })}</span>
+                    {mostlyEvade && (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                        {t("mostlyEvade")}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center justify-between py-1 px-3">
+                  <span className="text-xs text-gray-400">{t("luckRatio")}</span>
+                  <span className="text-xs tabular-nums">
+                    {ratio === null ? (
+                      <span className="text-green-600 font-semibold">{t("enemyLuckZero")}</span>
+                    ) : (
+                      <span className={ratio >= 3 ? "text-green-600 font-semibold" : "text-gray-500"}>
+                        {t("luckRatioValue", { value: ratio.toFixed(1) })}
+                      </span>
+                    )}
+                  </span>
+                </div>
+                {!mostlyEvade && (
+                  <p className="text-xs text-gray-400 px-3">{t("evasionHint")}</p>
+                )}
+              </div>
+            );
+          })()}
         </>) : (
           (activeAttackMode !== "魔攻" || defPanelTab === "被ダメ") && (
             <div className="bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 p-8 text-center">
