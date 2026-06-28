@@ -121,22 +121,40 @@ describe("calcPhysicalDamage", () => {
     expect(result.avg).toBe(Math.floor(7));
   });
 
-  it("finalMult (闘晶立方体) multiplies after defense subtraction", () => {
+  it("finalMult (暗殺者のカギ爪など) multiplies after defense subtraction", () => {
     // ATK=500, DEF=100, MDEF=0 → effectiveDef=100
-    // base_no_cube = (500*1.75 - 100)*4 = (875-100)*4 = 3100
-    // base_with_100_cubes = 3100 * 2.0 = 6200
-    const noCube   = calcPhysicalDamage(500, 100, 0, 1.0, 1.0);
-    const withCube = calcPhysicalDamage(500, 100, 0, 1.0, 2.0);
-    expect(noCube.avg).toBe(3100);
-    expect(withCube.avg).toBe(6200);
-    expect(withCube.avg / noCube.avg).toBeCloseTo(2.0);
+    // base_no_mult = (500*1.75 - 100)*4 = (875-100)*4 = 3100
+    // base_with_x2 = 3100 * 2.0 = 6200
+    const noMult   = calcPhysicalDamage(500, 100, 0, 1.0, 1.0);
+    const withMult = calcPhysicalDamage(500, 100, 0, 1.0, 2.0);
+    expect(noMult.avg).toBe(3100);
+    expect(withMult.avg).toBe(6200);
+    expect(withMult.avg / noMult.avg).toBeCloseTo(2.0);
   });
 
   it("finalMult does NOT help penetrate defense (unlike preMult)", () => {
     // ATK=250000, effectiveDef=600108 → nullified even with finalMult=2.0
-    // This is confirmed by in-game verification (2026-06-14)
     const result = calcPhysicalDamage(250000, 500090, 1000180, 1.0, 2.0);
     expect(result.isNullified).toBe(true);
+  });
+
+  it("preMult (闘晶立方体) multiplies before defense subtraction", () => {
+    // ATK=500, DEF=100, MDEF=0 → effectiveDef=100
+    // base_no_cube  = (500*1.75 - 100)*4 = 3100
+    // base_with_cube= (500*1.75*2.0 - 100)*4 = (1750-100)*4 = 6600
+    const noCube   = calcPhysicalDamage(500, 100, 0, 1.0, 1.0, 2.5, 1.0);
+    const withCube = calcPhysicalDamage(500, 100, 0, 1.0, 1.0, 2.5, 2.0);
+    expect(noCube.avg).toBe(3100);
+    expect(withCube.avg).toBe(6600);
+  });
+
+  it("preMult (闘晶立方体) helps penetrate defense like 魔晶立方体", () => {
+    // ATK=250000, effectiveDef=600108 → nullified at preMult=1.0
+    const noCube = calcPhysicalDamage(250000, 500090, 1000180, 1.0, 1.0, 2.5, 1.0);
+    expect(noCube.isNullified).toBe(true);
+    // preMult=2.0 → 250000*1.75*2.0=875000 > 600108 → 貫通
+    const withCube = calcPhysicalDamage(250000, 500090, 1000180, 1.0, 1.0, 2.5, 2.0);
+    expect(withCube.isNullified).toBe(false);
   });
 
   it("critMult (ゴッドオブデビルアイ) overrides default 2.5x", () => {

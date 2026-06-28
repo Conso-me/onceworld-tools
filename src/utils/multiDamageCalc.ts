@@ -71,7 +71,7 @@ export function calcOffensiveComparison(
     magicBaseInt: number;
     crystalCubePreMult: number;
     crystalCubeFinalMult: number;
-    toughouCubeFinalMult?: number;
+    toughouCubePreMult?: number;
   },
   enemyDebuffs?: { woodMagicEffect?: boolean; darkMagicEffect?: boolean; assassinClaw?: boolean }
 ): OffensiveComparisonRow[] {
@@ -128,9 +128,11 @@ export function calcOffensiveComparison(
     }
 
     // 物理/魔弾
-    const physFinalMult = (magicParams.toughouCubeFinalMult ?? 1) * (assassinClawActive ? 0.1 : 1.0);
+    // 闘晶立方体は防御計算前（preMult）、暗殺者のカギ爪は最終倍率（finalMult）
+    const physPreMult = magicParams.toughouCubePreMult ?? 1;
+    const physFinalMult = assassinClawActive ? 0.1 : 1.0;
     const dmg = attackMode === "物理"
-      ? calcPhysicalDamage(playerStats.atk, effScaledDef, scaled.scaledMdef, affinity, physFinalMult)
+      ? calcPhysicalDamage(playerStats.atk, effScaledDef, scaled.scaledMdef, affinity, physFinalMult, 2.5, physPreMult)
       : calcPetMagicDamage(
           playerStats.int,
           effScaledDef,

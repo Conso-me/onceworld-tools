@@ -1,7 +1,7 @@
 /**
  * OnceWorld ダメージ計算ユーティリティ
  *
- * 物理/魔弾: (ATK or INT) × 1.75 - effectiveDef) × 4 × 属性 × 乱数(0.9-1.1) × クリ(2.5) × 多段
+ * 物理/魔弾: ((ATK or INT) × 1.75 × preMult - effectiveDef) × 4 × 属性 × 乱数(0.9-1.1) × クリ(2.5) × 多段
  * 主人公魔法: ((INT + 解析書) × 1.25 × 魔法倍率 - effectiveDef) × 4 × 属性 × 乱数（クリなし・多段なし）
  * 最小ダメ: baseDamage <= 0 → 1〜9
  * 多段: SPD 3000→2, 10000→3, 30000→4, 100000→5
@@ -37,8 +37,9 @@ export function calcEffectiveDef(
 
 /**
  * 物理/魔弾ダメージ計算（ペット・敵の攻撃）
- * (stat × 1.75 - effectiveDef) × 4 × elementAffinity × finalMult
- * finalMult: 最終ダメージに掛ける倍率（闘晶立方体・検証済み）
+ * (stat × 1.75 × preMult - effectiveDef) × 4 × elementAffinity × finalMult
+ * preMult: 防御計算前に掛ける倍率（闘晶立方体・魔晶立方体と同じ防御前適用に修正）
+ * finalMult: 最終ダメージに掛ける倍率（暗殺者のカギ爪など）
  * critMult: クリティカル倍率（デフォルト2.5。ゴッドオブデビルアイで増加）
  */
 export function calcPhysicalDamage(
@@ -47,10 +48,11 @@ export function calcPhysicalDamage(
   enemyMdef: number,
   elementAffinity: number = 1.0,
   finalMult: number = 1.0,
-  critMult: number = 2.5
+  critMult: number = 2.5,
+  preMult: number = 1.0
 ): DamageRange {
   const effectiveDef = calcEffectiveDef(enemyDef, enemyMdef, true);
-  const base = Math.max(atk * 1.75 - effectiveDef, 0) * 4 * elementAffinity * finalMult;
+  const base = Math.max(atk * 1.75 * preMult - effectiveDef, 0) * 4 * elementAffinity * finalMult;
   return makeDamageRange(base, true, critMult);
 }
 
@@ -158,14 +160,16 @@ export function calcHitsToKill(
 
 /**
  * 物理ダメージを1にする最低ATK（1ダメ以上与えるために必要）
- * ATK * 1.75 > effectiveDef → ATK > effectiveDef / 1.75
+ * ATK * 1.75 * preMult > effectiveDef → ATK > effectiveDef / (1.75 * preMult)
+ * preMult: 闘晶立方体など防御前モードの倍率（魔弾の calcMinIntToHitMadan と同様）
  */
 export function calcMinAtkToHit(
   enemyDef: number,
-  enemyMdef: number
+  enemyMdef: number,
+  preMult: number = 1.0
 ): number {
   const effectiveDef = calcEffectiveDef(enemyDef, enemyMdef, true);
-  return Math.ceil(effectiveDef / 1.75);
+  return Math.ceil(effectiveDef / (1.75 * preMult));
 }
 
 /**
@@ -197,7 +201,8 @@ export function calcMinIntToHit(
 
 /**
  * N回で倒すために必要なATK
- * finalMult: 闘晶立方体・暗殺者のカギ爪などの最終ダメージ倍率
+ * finalMult: 暗殺者のカギ爪などの最終ダメージ倍率
+ * preMult: 闘晶立方体など防御計算前の倍率
  */
 export function calcAtkForKill(
   enemyHP: number,
@@ -206,12 +211,13 @@ export function calcAtkForKill(
   elementAffinity: number,
   multiHit: number,
   targetTurns: number,
-  finalMult: number = 1.0
+  finalMult: number = 1.0,
+  preMult: number = 1.0
 ): number {
   const effectiveDef = calcEffectiveDef(enemyDef, enemyMdef, true);
   const requiredDmgPerTurn = Math.ceil(enemyHP / targetTurns);
   const requiredBase = requiredDmgPerTurn / 4 / elementAffinity / 0.9 / multiHit / finalMult;
-  return Math.max(Math.ceil((requiredBase + effectiveDef) / 1.75), 0);
+  return Math.max(Math.ceil((requiredBase + effectiveDef) / (1.75 * preMult)), 0);
 }
 
 /**

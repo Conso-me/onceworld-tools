@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-06-28",
+    changes: [
+    { type: "fix", text: "fix: 闘晶立方体の計算式を魔晶立方体と同じ防御計算前適用に修正" },
+    ],
+  },
+
+  {
     date: "2026-06-26",
     changes: [
     { type: "improve", text: "feat: グループタブをホバーで展開" },

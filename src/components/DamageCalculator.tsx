@@ -146,8 +146,8 @@ export function DamageCalculator({
   // 魔晶立方体は防御計算前に適用（検証済み）
   const crystalCubePreMult  = crystalCubeMult;
   const crystalCubeFinalMult = 1;
-  // 闘晶立方体は最終ダメージに乗算（検証済み）
-  const toughouCubeFinalMult = 1 + toughouCubeNum * 0.01;
+  // 闘晶立方体は防御計算前に適用（魔晶立方体と同じに修正）
+  const toughouCubePreMult = 1 + toughouCubeNum * 0.01;
   // ゴッドオブデビルアイ：クリティカル倍率増加（2.5 × (1 + n×0.003)）
   const devilEyeCritMult = 2.5 * (1 + devilEyeNum * 0.003);
 
@@ -176,7 +176,7 @@ export function DamageCalculator({
     : myAttackMode;
   const activeCrystalCubePreMult = calcTarget === "pet" ? 1 : crystalCubePreMult;
   const activeCrystalCubeFinalMult = calcTarget === "pet" ? 1 : crystalCubeFinalMult;
-  const activeToughouCubeFinalMult = calcTarget === "pet" ? 1 : toughouCubeFinalMult;
+  const activeToughouCubePreMult = calcTarget === "pet" ? 1 : toughouCubePreMult;
   const activeDevilEyeCritMult = calcTarget === "pet" ? 2.5 : devilEyeCritMult;
   const activeAssassinClaw = calcTarget !== "pet" && myAttackMode === "物理" && assassinClaw;
   const activeMagicBaseInt = calcTarget === "pet" ? 0 : magicBaseInt;
@@ -505,7 +505,9 @@ export function DamageCalculator({
       return { mode: "魔攻" as const, spellResults };
     }
 
-    const physFinalMult = activeToughouCubeFinalMult * (activeAssassinClaw ? 0.1 : 1.0);
+    // 闘晶立方体は防御計算前（preMult）、暗殺者のカギ爪は最終倍率（finalMult）
+    const physPreMult = activeToughouCubePreMult;
+    const physFinalMult = activeAssassinClaw ? 0.1 : 1.0;
 
     let dmg;
     if (activeAttackMode === "物理") {
@@ -515,7 +517,8 @@ export function DamageCalculator({
         scaled.scaledMdef,
         selfToEnemyAffinity,
         physFinalMult,
-        activeDevilEyeCritMult
+        activeDevilEyeCritMult,
+        physPreMult
       );
     } else if (activeAttackMode === "魔法") {
       // ペット魔法攻撃（INT×1.25、クリなし・多段なし）
@@ -548,7 +551,7 @@ export function DamageCalculator({
     // 最低必要ステータス
     let minStat: number;
     if (activeAttackMode === "物理") {
-      minStat = calcMinAtkToHit(effEnemyDef, scaled.scaledMdef);
+      minStat = calcMinAtkToHit(effEnemyDef, scaled.scaledMdef, physPreMult);
     } else if (activeAttackMode === "魔法") {
       minStat = calcMinIntToHit(effEnemyDef, scaled.scaledMdef, 1.0, 0);
     } else {
@@ -564,7 +567,9 @@ export function DamageCalculator({
           scaled.scaledMdef,
           selfToEnemyAffinity,
           multiHit,
-          n
+          n,
+          1.0,
+          physPreMult
         );
       } else if (activeAttackMode === "魔法") {
         // ペット魔法: INT×1.25、多段なし
@@ -610,7 +615,7 @@ export function DamageCalculator({
 
     let overkillStatNeeded: number;
     if (activeAttackMode === "物理") {
-      overkillStatNeeded = calcAtkForKill(scaled.hp * 10, effEnemyDef, scaled.scaledMdef, selfToEnemyAffinity, overkillHitCount, 1, physFinalMult);
+      overkillStatNeeded = calcAtkForKill(scaled.hp * 10, effEnemyDef, scaled.scaledMdef, selfToEnemyAffinity, overkillHitCount, 1, physFinalMult, physPreMult);
     } else if (activeAttackMode === "魔法") {
       // ペット魔法: INT×1.25、多段なし
       overkillStatNeeded = calcIntForKill(scaled.hp * 10, effEnemyDef, scaled.scaledMdef, selfToEnemyAffinity, 1.0, 0, 1, 1.0);
@@ -628,8 +633,8 @@ export function DamageCalculator({
     let clawComparison: { normalAvg: number; clawAvg: number; normalNullified: boolean; clawNullified: boolean } | null = null;
     if (activeAttackMode === "物理") {
       const baseEnemyDef = woodMagicEffect ? Math.floor(scaled.scaledDef / 2) : scaled.scaledDef;
-      const normalDmg = calcPhysicalDamage(effAtk, baseEnemyDef, scaled.scaledMdef, selfToEnemyAffinity, activeToughouCubeFinalMult);
-      const clawDmg   = calcPhysicalDamage(effAtk, 0,             scaled.scaledMdef, selfToEnemyAffinity, activeToughouCubeFinalMult * 0.1);
+      const normalDmg = calcPhysicalDamage(effAtk, baseEnemyDef, scaled.scaledMdef, selfToEnemyAffinity, 1.0, 2.5, activeToughouCubePreMult);
+      const clawDmg   = calcPhysicalDamage(effAtk, 0,             scaled.scaledMdef, selfToEnemyAffinity, 0.1, 2.5, activeToughouCubePreMult);
       clawComparison = { normalAvg: normalDmg.avg, clawAvg: clawDmg.avg, normalNullified: normalDmg.isNullified, clawNullified: clawDmg.isNullified };
     }
 
@@ -649,7 +654,7 @@ export function DamageCalculator({
     woodMagicEffect,
     darkMagicEffect,
     activeAssassinClaw,
-    activeToughouCubeFinalMult,
+    activeToughouCubePreMult,
     activeDevilEyeCritMult,
   ]);
 
@@ -719,10 +724,10 @@ export function DamageCalculator({
       comparisonMonsters,
       { atk: effAtk, int: effInt, spd: effSpd, luck: effLuck, element: effElement },
       activeAttackMode,
-      { magicBaseInt: activeMagicBaseInt, crystalCubePreMult: activeCrystalCubePreMult, crystalCubeFinalMult: activeCrystalCubeFinalMult, toughouCubeFinalMult: activeToughouCubeFinalMult },
+      { magicBaseInt: activeMagicBaseInt, crystalCubePreMult: activeCrystalCubePreMult, crystalCubeFinalMult: activeCrystalCubeFinalMult, toughouCubePreMult: activeToughouCubePreMult },
       { woodMagicEffect, darkMagicEffect, assassinClaw: activeAssassinClaw }
     );
-  }, [comparisonActive, comparisonMonsters, effAtk, effInt, effSpd, effLuck, effElement, activeAttackMode, activeMagicBaseInt, activeCrystalCubePreMult, activeCrystalCubeFinalMult, activeToughouCubeFinalMult, woodMagicEffect, darkMagicEffect, activeAssassinClaw]);
+  }, [comparisonActive, comparisonMonsters, effAtk, effInt, effSpd, effLuck, effElement, activeAttackMode, activeMagicBaseInt, activeCrystalCubePreMult, activeCrystalCubeFinalMult, activeToughouCubePreMult, woodMagicEffect, darkMagicEffect, activeAssassinClaw]);
 
   const defensiveComparison = useMemo(() => {
     if (!comparisonActive || comparisonMonsters.length === 0) return null;
