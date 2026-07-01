@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-07-01",
+    changes: [
+    { type: "improve", text: "feat: 階層スキップシミュを明示検索＋Worker化でフリーズ解消" },
+    ],
+  },
+
+  {
     date: "2026-06-28",
     changes: [
     { type: "feature", text: "feat: アクセ「照命輪」を追加" },
