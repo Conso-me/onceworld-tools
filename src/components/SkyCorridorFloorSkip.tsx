@@ -1,11 +1,14 @@
-import { useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { usePersistedState } from "../hooks/usePersistedState";
 import {
-  enumerateFloorSkip,
   type CycleSolution,
   type InitialStep,
 } from "../utils/skyCorridorFloorSkip";
+import type {
+  FloorSkipRequest,
+  FloorSkipResponse,
+} from "../workers/floorSkip.worker";
 import { InputField } from "./ui/InputField";
 
 const STATUE_MAX = 1000;
@@ -46,18 +49,60 @@ export function SkyCorridorFloorSkip() {
 
   const targetIsValid = targetFloor >= 100 && targetFloor % 100 === 0;
 
-  const solutions = useMemo<CycleSolution[]>(() => {
-    if (!targetIsValid) return [];
-    const all = enumerateFloorSkip({
-      adventurerStatues: adventurer,
-      demonStatues: demon,
-      targetFloor,
-      placeLimit,
-    });
-    return all.slice(0, MAX_SOLUTIONS);
-  }, [adventurer, demon, targetFloor, placeLimit, targetIsValid]);
-
+  // 大きな目標フロアだと列挙が重くフリーズするため、明示的にボタンを
+  // 押したときだけワーカースレッドで計算を実行する（入力ごとの自動計算はしない）。
+  const [solutions, setSolutions] = useState<CycleSolution[]>([]);
+  const [hasSearched, setHasSearched] = useState(false);
+  // 検索後に入力を変更したら結果が古いことを示す
+  const [isStale, setIsStale] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
+
+  const workerRef = useRef<Worker | null>(null);
+  // 最新リクエストのトークン。古いワーカー応答を破棄するために使う。
+  const tokenRef = useRef(0);
+
+  useEffect(() => {
+    const worker = new Worker(
+      new URL("../workers/floorSkip.worker.ts", import.meta.url),
+      { type: "module" }
+    );
+    worker.onmessage = (e: MessageEvent<FloorSkipResponse>) => {
+      // 検索中に再入力・再検索された場合、古い応答は無視する
+      if (e.data.token !== tokenRef.current) return;
+      setSolutions(e.data.solutions);
+      setHasSearched(true);
+      setIsStale(false);
+      setExpanded(new Set());
+      setIsSearching(false);
+    };
+    workerRef.current = worker;
+    return () => {
+      worker.terminate();
+      workerRef.current = null;
+    };
+  }, []);
+
+  const markStale = () => {
+    if (hasSearched) setIsStale(true);
+  };
+
+  const runSearch = () => {
+    if (!targetIsValid || !workerRef.current) return;
+    setIsSearching(true);
+    const token = ++tokenRef.current;
+    const request: FloorSkipRequest = {
+      token,
+      input: {
+        adventurerStatues: adventurer,
+        demonStatues: demon,
+        targetFloor,
+        placeLimit,
+      },
+      limit: MAX_SOLUTIONS,
+    };
+    workerRef.current.postMessage(request);
+  };
   const toggleExpand = (idx: number) => {
     setExpanded((prev) => {
       const next = new Set(prev);
@@ -76,7 +121,10 @@ export function SkyCorridorFloorSkip() {
           <InputField
             label={t("floorSkip.targetFloor")}
             value={targetRaw}
-            onChange={setTargetRaw}
+            onChange={(v) => {
+              setTargetRaw(v);
+              markStale();
+            }}
             placeholder="10000"
             max={TARGET_MAX}
             showReset
@@ -84,7 +132,10 @@ export function SkyCorridorFloorSkip() {
           <InputField
             label={t("floorSkip.adventurerStatues")}
             value={advRaw}
-            onChange={setAdvRaw}
+            onChange={(v) => {
+              setAdvRaw(v);
+              markStale();
+            }}
             placeholder="100"
             max={STATUE_MAX}
             showReset
@@ -93,7 +144,10 @@ export function SkyCorridorFloorSkip() {
           <InputField
             label={t("floorSkip.demonStatues")}
             value={demRaw}
-            onChange={setDemRaw}
+            onChange={(v) => {
+              setDemRaw(v);
+              markStale();
+            }}
             placeholder="0"
             max={STATUE_MAX}
             showReset
@@ -102,11 +156,28 @@ export function SkyCorridorFloorSkip() {
           <InputField
             label={t("floorSkip.placeLimit")}
             value={placeLimitRaw}
-            onChange={setPlaceLimitRaw}
+            onChange={(v) => {
+              setPlaceLimitRaw(v);
+              markStale();
+            }}
             placeholder="10"
             max={PLACE_LIMIT_MAX}
             showReset
           />
+
+          <button
+            type="button"
+            onClick={runSearch}
+            disabled={!targetIsValid || isSearching}
+            className="w-full rounded-xl bg-indigo-600 py-3 text-sm font-bold text-white shadow-sm transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+          >
+            {isSearching ? t("floorSkip.searching") : t("floorSkip.searchButton")}
+          </button>
+          {!targetIsValid && (
+            <p className="text-xs text-amber-600">
+              {t("floorSkip.targetInvalidHint")}
+            </p>
+          )}
         </div>
       </div>
 
@@ -118,9 +189,18 @@ export function SkyCorridorFloorSkip() {
             <span className="ml-2 text-sm font-normal text-gray-400">
               ({solutions.length})
             </span>
+            {isStale && (
+              <span className="ml-2 text-xs font-medium text-amber-600">
+                {t("floorSkip.staleHint")}
+              </span>
+            )}
           </h3>
 
-          {solutions.length === 0 ? (
+          {!hasSearched ? (
+            <p className="text-sm text-gray-500 py-6 text-center">
+              {t("floorSkip.searchPrompt")}
+            </p>
+          ) : solutions.length === 0 ? (
             <p className="text-sm text-gray-500 py-6 text-center">
               {t("floorSkip.noResults")}
             </p>
