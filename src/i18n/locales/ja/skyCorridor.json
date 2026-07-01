@@ -10,6 +10,11 @@
     "placeLimit": "床置き上限",
     "resultsTitle": "到達可能な組み合わせ（操作数の少ない順 上位10件）",
     "noResults": "該当する組み合わせがありません。床置き上限や所持数を見直してください。",
+    "searchButton": "検索開始",
+    "searching": "計算中…",
+    "searchPrompt": "条件を入力して「検索開始」を押してください。",
+    "staleHint": "（入力が変更されました。再検索してください）",
+    "targetInvalidHint": "目標フロアは 100 の倍数で入力してください。",
     "headers": {
       "startFloor": "初動到達",
       "adventurerUsed": "冒険者像",

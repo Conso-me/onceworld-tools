@@ -10,6 +10,11 @@
     "placeLimit": "Place Limit",
     "resultsTitle": "Reachable Combinations (top 10 by fewest operations)",
     "noResults": "No matching combination. Try adjusting the place limit or owned counts.",
+    "searchButton": "Search",
+    "searching": "Calculating…",
+    "searchPrompt": "Enter your conditions and press \"Search\".",
+    "staleHint": "(inputs changed — search again)",
+    "targetInvalidHint": "Target floor must be a multiple of 100.",
     "headers": {
       "startFloor": "Initial",
       "adventurerUsed": "Adventurer",
