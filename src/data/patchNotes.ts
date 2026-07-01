@@ -13,6 +13,13 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-07-02",
+    changes: [
+    { type: "feature", text: "feat: アクセ・ペット最適化シミュを追加" },
+    ],
+  },
+
+  {
     date: "2026-07-01",
     changes: [
     { type: "improve", text: "feat: 階層スキップシミュを明示検索＋Worker化でフリーズ解消" },
