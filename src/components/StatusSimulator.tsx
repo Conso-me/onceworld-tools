@@ -7,6 +7,7 @@ import { calcStatus, calcGoldEnhCost } from "../utils/statusCalc";
 import type { SimConfig } from "../types/game";
 import { SimConfigPanel, STAT_LABELS } from "./SimConfigPanel";
 import { EquipmentOptimizer } from "./EquipmentOptimizer";
+import { AccPetOptimizer } from "./AccPetOptimizer";
 
 // ── Result Tables ─────────────────────────────────────────────────────────────
 
@@ -179,7 +180,7 @@ export function StatusSimulator() {
   const [activeConfig, setActiveConfig] = usePersistedState<"A" | "B">("sim-active", "A");
   const [compareMode, setCompareMode] = usePersistedState<boolean>("sim-compare", false);
 
-  const [simMode, setSimMode] = usePersistedState<"normal" | "optimize">("sim-mode", "normal");
+  const [simMode, setSimMode] = usePersistedState<"normal" | "optimize" | "optimizeAccPet">("sim-mode", "normal");
 
   const { presets, savePreset } = useStatPresets();
   const [presetName, setPresetName] = useState("");
@@ -239,7 +240,7 @@ export function StatusSimulator() {
     <div className="space-y-4">
       {/* モード切り替え */}
       <div className="flex rounded-xl overflow-hidden border border-gray-200 w-fit">
-        {(["normal", "optimize"] as const).map((mode) => (
+        {(["normal", "optimize", "optimizeAccPet"] as const).map((mode) => (
           <button
             key={mode}
             onClick={() => setSimMode(mode)}
@@ -249,13 +250,27 @@ export function StatusSimulator() {
                 : "bg-white text-gray-500 hover:bg-gray-50"
             }`}
           >
-            {mode === "normal" ? "通常モード" : "装備最適化"}
+            {mode === "normal" ? "通常モード" : mode === "optimize" ? "装備最適化" : "アクセ・ペット最適化"}
           </button>
         ))}
       </div>
 
       {simMode === "optimize" ? (
         <EquipmentOptimizer
+          onApply={(overrides, target) => {
+            if (target === "A") {
+              replaceAllA({ ...cfgA, ...overrides });
+            } else {
+              replaceAllB({ ...cfgB, ...overrides });
+              setCompareMode(true);
+              setSimMode("normal");
+            }
+          }}
+        />
+      ) : simMode === "optimizeAccPet" ? (
+        <AccPetOptimizer
+          cfgA={cfgA}
+          cfgB={cfgB}
           onApply={(overrides, target) => {
             if (target === "A") {
               replaceAllA({ ...cfgA, ...overrides });
