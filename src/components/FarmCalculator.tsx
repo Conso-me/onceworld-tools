@@ -17,7 +17,7 @@ import { getMonsterDropInfo } from "../data/monsterDrops";
 import { getMonsterByName, getMonsterDisplayName } from "../data/monsters";
 import { usePersistedState } from "../hooks/usePersistedState";
 import { StatCard } from "./ui/StatCard";
-import { MonsterPickerModal } from "./MonsterPickerModal";
+import { MonsterSelectorModal } from "./ui/MonsterSelectorModal";
 import { AreaPresetModal, type AreaMonsterEntry } from "./AreaPresetModal";
 
 interface MonsterRow {
@@ -322,12 +322,12 @@ export function FarmCalculator() {
             {t("fromAreaPreset")}
           </button>
         </div>
-        {modalOpen && (
-          <MonsterPickerModal
-            onPick={handleMonsterPick}
-            onClose={() => setModalOpen(false)}
-          />
-        )}
+        <MonsterSelectorModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onSelect={handleMonsterPick}
+          showFarmInfo
+        />
         {areaModalOpen && (
           <AreaPresetModal
             onPickGroup={handleAreaPresetPick}

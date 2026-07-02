@@ -75,19 +75,33 @@ const elementLeftColors: Record<string, string> = {
   闇: "text-purple-600",
 };
 
+/** ファーム用ソート (EXP/ゴールドの昇降) */
+type FarmSortKey = "exp_desc" | "exp_asc" | "gold_desc" | "gold_asc";
+
+const FARM_SORT_KEYS: FarmSortKey[] = ["exp_desc", "exp_asc", "gold_desc", "gold_asc"];
+const FARM_SORT_LABEL_KEY: Record<FarmSortKey, string> = {
+  exp_desc: "monsters:sortOptions.expDesc",
+  exp_asc: "monsters:sortOptions.expAsc",
+  gold_desc: "monsters:sortOptions.goldDesc",
+  gold_asc: "monsters:sortOptions.goldAsc",
+};
+
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   onSelect: (monster: MonsterBase) => void;
   showPetStats?: boolean;
+  /** ファーム計算用: 行にEXP/Gを表示しEXP/ゴールドソートに切り替える */
+  showFarmInfo?: boolean;
 }
 
-export function MonsterSelectorModal({ isOpen, onClose, onSelect, showPetStats }: Props) {
+export function MonsterSelectorModal({ isOpen, onClose, onSelect, showPetStats, showFarmInfo }: Props) {
   const { t, i18n } = useTranslation(["game", "monsters", "common"]);
   const lang = i18n.language;
   const [elementFilter, setElementFilter] = useState<ElementFilter>("all");
   const [query, setQuery] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("default");
+  const [farmSort, setFarmSort] = useState<FarmSortKey>("exp_desc");
 
   const allMonsters = useAllMonsters();
   const totalLabel = t("common:total");
@@ -111,11 +125,14 @@ export function MonsterSelectorModal({ isOpen, onClose, onSelect, showPetStats }
         return false;
       });
     }
-    if (showPetStats && sortKey !== "default") {
+    if (showFarmInfo) {
+      const [key, dir] = farmSort.split("_") as ["exp" | "gold", "desc" | "asc"];
+      list = [...list].sort((a, b) => (dir === "desc" ? b[key] - a[key] : a[key] - b[key]));
+    } else if (showPetStats && sortKey !== "default") {
       list = [...list].sort((a, b) => getSortValue(b, sortKey) - getSortValue(a, sortKey));
     }
     return list;
-  }, [allMonsters, elementFilter, query, lang, showPetStats, sortKey]);
+  }, [allMonsters, elementFilter, query, lang, showPetStats, sortKey, showFarmInfo, farmSort]);
 
   const filterItems = [
     { id: "all", label: t("game:elementFilter.all") },
@@ -175,6 +192,24 @@ export function MonsterSelectorModal({ isOpen, onClose, onSelect, showPetStats }
                 ))}
               </div>
             )}
+            {showFarmInfo && (
+              <div className="flex overflow-x-auto gap-1.5 px-4 pb-2 shrink-0">
+                {FARM_SORT_KEYS.map((key) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setFarmSort(key)}
+                    className={`flex-shrink-0 px-2.5 py-1 text-xs rounded-full border font-medium transition-colors ${
+                      farmSort === key
+                        ? "bg-accent text-accent-ink border-accent"
+                        : "bg-card text-muted border-line hover:bg-ink/5"
+                    }`}
+                  >
+                    {t(FARM_SORT_LABEL_KEY[key])}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* PC: カラムヘッダー */}
@@ -182,6 +217,12 @@ export function MonsterSelectorModal({ isOpen, onClose, onSelect, showPetStats }
             <span className="flex-1 text-xs font-bold text-muted uppercase tracking-wide">{t("game:name")}</span>
             <span className="w-14 text-center text-xs font-bold text-muted uppercase tracking-wide">{t("monsters:element")}</span>
             <span className="w-16 text-right text-xs font-bold text-muted uppercase tracking-wide">{t("monsters:attackType")}</span>
+            {showFarmInfo && (
+              <>
+                <span className="w-24 text-right text-xs font-bold text-muted uppercase tracking-wide">EXP</span>
+                <span className="w-20 text-right text-xs font-bold text-muted uppercase tracking-wide">G</span>
+              </>
+            )}
           </div>
 
           {/* モンスター行 */}
@@ -211,6 +252,16 @@ export function MonsterSelectorModal({ isOpen, onClose, onSelect, showPetStats }
                       <span className="w-16 text-right text-sm text-ink">
                         {t(`game:attackType.${monster.attackType}`)}
                       </span>
+                      {showFarmInfo && (
+                        <>
+                          <span className="w-24 text-right text-xs font-medium text-accent whitespace-nowrap">
+                            {monster.exp.toLocaleString()} EXP
+                          </span>
+                          <span className="w-20 text-right text-xs font-medium text-yellow-600 whitespace-nowrap">
+                            {monster.gold.toLocaleString()} G
+                          </span>
+                        </>
+                      )}
                     </div>
                     {showPetStats && <PetStatRow monster={monster} sortKey={sortKey} totalLabel={totalLabel} />}
                   </div>
@@ -227,6 +278,16 @@ export function MonsterSelectorModal({ isOpen, onClose, onSelect, showPetStats }
                       </span>
                     </div>
                     {showPetStats && <PetStatRow monster={monster} sortKey={sortKey} totalLabel={totalLabel} />}
+                    {showFarmInfo && (
+                      <div className="flex items-center gap-3 mt-0.5">
+                        <span className="text-xs font-medium text-accent whitespace-nowrap">
+                          {monster.exp.toLocaleString()} EXP
+                        </span>
+                        <span className="text-xs font-medium text-yellow-600 whitespace-nowrap">
+                          {monster.gold.toLocaleString()} G
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </button>
               ))

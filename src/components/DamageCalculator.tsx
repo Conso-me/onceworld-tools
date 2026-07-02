@@ -6,6 +6,7 @@ import { useSharedSimConfig } from "../hooks/useSharedSimConfig";
 import { useSharedAttackBuffs } from "../hooks/useSharedAttackBuffs";
 import { PetConfigPanel } from "./damage/PetConfigPanel";
 import { PageLayout } from "./ui/layout/PageLayout";
+import { ModalShell } from "./ui/modal/ModalShell";
 import { calcPetStats, DEFAULT_PET_DAMAGE_CONFIG } from "../utils/petStatCalc";
 import type { PetDamageConfig } from "../types/game";
 import { useStatPresets } from "../hooks/useStatPresets";
@@ -1970,27 +1971,13 @@ export function DamageCalculator({
     />
 
       {/* プリセットモーダル */}
-      {presetModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
-          onClick={() => setPresetModalOpen(false)}
-        >
-          <div
-            className="bg-white rounded-2xl shadow-xl p-5 w-80 space-y-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-gray-800">{t("presetModal.title")}</h3>
-              <button
-                onClick={() => setPresetModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
+      <ModalShell
+        isOpen={presetModalOpen}
+        onClose={() => setPresetModalOpen(false)}
+        size="sm"
+        title={t("presetModal.title")}
+      >
+          <div className="p-5 space-y-4 overflow-y-auto">
             {/* 読込・削除 */}
             <div className="space-y-1.5">
               <p className="text-xs font-medium text-gray-500">{t("presetModal.loadDelete")}</p>
@@ -2043,8 +2030,7 @@ export function DamageCalculator({
               </div>
             </div>
           </div>
-        </div>
-      )}
+      </ModalShell>
     </>
   );
 }
