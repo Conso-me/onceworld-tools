@@ -32,9 +32,16 @@
 > `ANTHROPIC_API_KEY` が未設定の場合は `[要翻訳] XXX` プレースホルダーで代替。
 > `--dry-run` フラグで変更せずに確認のみ可能。
 
-## UIレイアウト原則
-- **縦スクロール禁止**：ページ全体が画面高さに収まるレイアウトにする。`overflow-hidden` や `h-screen` を活用し、スクロールバーが出ないことを確認してから完了とする
-- **横並び2カラム**：入力パネル（左）と結果パネル（右）を横並びにする
-  - パターン：`lg:grid lg:grid-cols-[minmax(340px,400px)_1fr] lg:gap-2 lg:items-start`
-  - モバイルは縦積み、PCは横並び（`lg:` prefix）
-- 各タブは DamageCalculator / StatusSimulator のレイアウト構造に倣う
+## レイアウト・UI統一規約
+- **縦スクロール禁止**：PC ではページ全体が画面高さに収まるレイアウトにする。スクロールバーが出ないことを確認してから完了とする
+- **2カラム骨格は `PageLayout`（`src/components/ui/layout/PageLayout.tsx`）経由必須**。`grid-cols-[minmax(` の直書き禁止
+  - 標準：入力左 minmax(340px,400px) / 結果右 1fr / lg:gap-2 / lg:items-start。モバイルは max-w-lg mx-auto space-y-6 の縦積み
+  - 左列を広げたい場合のみ `leftWidth="wide"`（420px）、タブ内サブ画面は `"narrow"`（360px, gap-4）
+- **カードは `Panel`（`src/components/ui/layout/Panel.tsx`、内部は themed/Card）経由**。標準装飾 = `bg-card border border-line rounded-card shadow-sm`。`rounded-3xl` / `shadow-lg` 系の新規使用禁止
+- **モーダルは `ModalShell`（`src/components/ui/modal/`）経由必須**。`fixed inset-0` の直書き禁止
+  - portal / ESC / 背景クリック閉じ / z-50 / bg-black/50 / 中央寄せはシェルが担う
+  - 高さ：2ペイン選択系 = `height="fixed"`（min(640px,85vh)）、表示系 = `"auto"`（max-h-[85vh]）
+- **選択系モーダルは2ペイン**（左：GroupNav グループメニュー / 右：リスト）。PC は縦サイドバー、モバイルは横スクロールピル（GroupNav が自動切替）
+- **ブレークポイント**：ページの2カラム切替 = `lg` / モーダル内の2ペイン切替 = `sm`
+- **ページ内スクロール領域**：`max-h-[calc(100vh-220px)]` に統一（インライン style 禁止）
+- **色はトークン優先**：新規コードでは `bg-card` / `text-ink` / `text-muted` / `border-line` / `accent` 系を使う（`src/index.css` 参照）
