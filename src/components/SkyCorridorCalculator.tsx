@@ -21,6 +21,7 @@ import { SimConfigPanel } from "./SimConfigPanel";
 import { SkyCorridorFloorSkip } from "./SkyCorridorFloorSkip";
 import type { MonsterBase, ScaledMonster } from "../types/game";
 import type { TFunction } from "i18next";
+import { PageLayout } from "./ui/layout/PageLayout";
 
 // ────────────────────────────────────────────
 // フロア↔レベル変換
@@ -891,8 +892,9 @@ export function SkyCorridorCalculator({
   return (
     <div className="space-y-3">
       {mainTabUi}
-      <div className="max-w-lg mx-auto space-y-6 lg:max-w-none lg:space-y-0 lg:grid lg:grid-cols-[minmax(340px,400px)_1fr] lg:gap-2 lg:items-start">
-      {/* ───── 左カラム: 入力パネル ───── */}
+      <PageLayout
+        left={
+      // ───── 左カラム: 入力パネル ─────
       <div className="space-y-6 lg:space-y-2">
         <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-5 lg:space-y-3">
 
@@ -1083,8 +1085,9 @@ export function SkyCorridorCalculator({
           </div>
         )}
       </div>
-
-      {/* ───── 右カラム: 結果テーブル ───── */}
+        }
+        right={
+      // ───── 右カラム: 結果テーブル ─────
       <div className="space-y-3">
         {viewMode === "endurance" && (
           <div className="bg-white rounded-2xl shadow shadow-gray-200/50 px-4 py-3 grid grid-cols-4 gap-x-2 text-center">
@@ -1166,7 +1169,8 @@ export function SkyCorridorCalculator({
           </>
         )}
       </div>
-      </div>
+        }
+      />
     </div>
   );
 }

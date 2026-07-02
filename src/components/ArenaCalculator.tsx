@@ -14,6 +14,7 @@ import { calcMultiHitCount, calcPhysicalDamage, calcHitRate } from "../utils/dam
 import { calcStatus } from "../utils/statusCalc";
 import { getMonsterByName, getMonsterDisplayName } from "../data/monsters";
 import { InputField } from "./ui/InputField";
+import { PageLayout } from "./ui/layout/PageLayout";
 import type { MonsterBase, ScaledMonster } from "../types/game";
 import type { TFunction } from "i18next";
 
@@ -414,8 +415,9 @@ export function ArenaCalculator() {
   const nullifiedCount = arenaResults.filter((r) => r.nullifiedNow).length;
 
   return (
-    <div className="max-w-lg mx-auto space-y-6 lg:max-w-none lg:space-y-0 lg:grid lg:grid-cols-[minmax(340px,400px)_1fr] lg:gap-2 lg:items-start">
-      {/* ───── 左カラム: 入力パネル ───── */}
+    <PageLayout
+      left={
+      // ───── 左カラム: 入力パネル ─────
       <div className="space-y-6 lg:space-y-2">
         <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-5 lg:space-y-3">
           <div className="flex items-center gap-2">
@@ -582,8 +584,9 @@ export function ArenaCalculator() {
           )}
         </div>
       </div>
-
-      {/* ───── 右カラム: 結果テーブル ───── */}
+      }
+      right={
+      // ───── 右カラム: 結果テーブル ─────
       <div className="bg-white rounded-2xl shadow shadow-gray-200/50 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm border-collapse">
@@ -662,6 +665,7 @@ export function ArenaCalculator() {
           </div>
         </div>
       </div>
-    </div>
+      }
+    />
   );
 }

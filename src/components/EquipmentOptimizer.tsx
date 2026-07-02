@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { usePersistedState } from "../hooks/usePersistedState";
 import type { SimConfig, EquipmentItem } from "../types/game";
 import { getEquipmentBySlot } from "../data/equipment";
+import { PageLayout } from "./ui/layout/PageLayout";
 import {
   optimizeEquipment,
   DEFAULT_WEIGHTS,
@@ -264,8 +265,10 @@ export function EquipmentOptimizer({ onApply }: Props) {
   }
 
   return (
-    <div className="lg:grid lg:grid-cols-[minmax(300px,360px)_1fr] gap-4">
-      {/* 左パネル */}
+    <PageLayout
+      leftWidth="narrow"
+      left={
+      // 左パネル
       <div className="space-y-3">
         {/* 最適化スロット */}
         <div className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
@@ -441,9 +444,10 @@ export function EquipmentOptimizer({ onApply }: Props) {
           )}
         </div>
       </div>
-
-      {/* 右パネル：結果 */}
-      <div className="mt-4 lg:mt-0">
+      }
+      right={
+      // 右パネル：結果
+      <div>
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden h-full">
           <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
             <h3 className="text-sm font-semibold text-gray-700">最適装備ランキング</h3>
@@ -495,6 +499,7 @@ export function EquipmentOptimizer({ onApply }: Props) {
           </div>
         </div>
       </div>
-    </div>
+      }
+    />
   );
 }

@@ -5,6 +5,7 @@ import { calcPetStats, findEquivalentLevels, DEFAULT_PET_DAMAGE_CONFIG } from ".
 import type { PetDamageConfig } from "../types/game";
 import { useAllMonsters } from "../hooks/useAllMonsters";
 import { PetConfigPanel } from "./damage/PetConfigPanel";
+import { PageLayout } from "./ui/layout/PageLayout";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -211,8 +212,9 @@ export function PetSimulator() {
   const showEqLevels = resultA !== null && resultB !== null && eqLevels !== null;
 
   return (
-    <div className="lg:grid lg:grid-cols-[minmax(340px,400px)_1fr] lg:gap-6">
-      {/* 左パネル（入力） */}
+    <PageLayout
+      left={
+      // 左パネル（入力）
       <div className="space-y-4">
         {/* A/B 設定タブ */}
         <div className="flex rounded-xl overflow-hidden border border-gray-200">
@@ -242,9 +244,10 @@ export function PetSimulator() {
           showPetStats
         />
       </div>
-
-      {/* 右パネル（結果） */}
-      <div className="mt-6 lg:mt-0 space-y-4">
+      }
+      right={
+      // 右パネル（結果）
+      <div className="space-y-4">
         {showCompare ? (
           <>
             {/* 比較テーブル */}
@@ -289,6 +292,7 @@ export function PetSimulator() {
           </div>
         )}
       </div>
-    </div>
+      }
+    />
   );
 }

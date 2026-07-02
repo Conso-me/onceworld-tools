@@ -6,6 +6,7 @@ import { useSharedAttackBuffs } from "../hooks/useSharedAttackBuffs";
 import { deriveAttackBuffs } from "../utils/attackBuffs";
 import { calcStatus } from "../utils/statusCalc";
 import { InputField } from "./ui/InputField";
+import { PageLayout } from "./ui/layout/PageLayout";
 import { SimConfigPanel } from "./SimConfigPanel";
 import { AttackBuffFields } from "./damage/AttackBuffFields";
 import { formatHitCount } from "../utils/formatNumber";
@@ -153,8 +154,9 @@ export function OfarmSimulator({
   const toggleGroup = (id: string) => setOpenGroups((prev) => ({ ...prev, [id]: !prev[id] }));
 
   return (
-    <div className="max-w-lg mx-auto space-y-6 lg:max-w-none lg:space-y-0 lg:grid lg:grid-cols-[minmax(340px,400px)_1fr] lg:gap-2 lg:items-start">
-      {/* ───── 左カラム: 入力パネル ───── */}
+    <PageLayout
+      left={
+      // ───── 左カラム: 入力パネル ─────
       <div className="space-y-6 lg:space-y-2">
         <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-5 lg:space-y-3">
           {/* 手動 / 装備設定 トグル */}
@@ -217,8 +219,9 @@ export function OfarmSimulator({
           </div>
         </div>
       </div>
-
-      {/* ───── 右カラム: Wave一覧 ───── */}
+      }
+      right={
+      // ───── 右カラム: Wave一覧 ─────
       <div className="space-y-2">
         {/* 敵への効果トグル */}
         <div className="flex flex-wrap items-center gap-1.5">
@@ -323,7 +326,8 @@ export function OfarmSimulator({
           <span className="ml-auto">{t("legendMagic")}</span>
         </div>
       </div>
-    </div>
+      }
+    />
   );
 }
 

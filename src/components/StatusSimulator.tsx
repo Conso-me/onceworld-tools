@@ -8,6 +8,7 @@ import type { SimConfig } from "../types/game";
 import { SimConfigPanel, STAT_LABELS } from "./SimConfigPanel";
 import { EquipmentOptimizer } from "./EquipmentOptimizer";
 import { AccPetOptimizer } from "./AccPetOptimizer";
+import { PageLayout } from "./ui/layout/PageLayout";
 
 // ── Result Tables ─────────────────────────────────────────────────────────────
 
@@ -282,8 +283,9 @@ export function StatusSimulator() {
           }}
         />
       ) : (
-    <div className="lg:grid lg:grid-cols-[minmax(360px,420px)_1fr] gap-6">
-      {/* 左パネル（入力） */}
+    <PageLayout
+      left={
+      // 左パネル（入力）
       <div className="space-y-4">
         {compareMode && (
           <div className="space-y-2">
@@ -327,9 +329,10 @@ export function StatusSimulator() {
           replaceAll={activeReplaceAll}
         />
       </div>
-
-      {/* 右パネル（結果） */}
-      <div className="mt-6 lg:mt-0 space-y-4">
+      }
+      right={
+      // 右パネル（結果）
+      <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-bold text-gray-700">{t("calcResult")}</h2>
           <button
@@ -461,7 +464,8 @@ export function StatusSimulator() {
           )}
         </div>
       </div>
-    </div>
+      }
+    />
       )}
     </div>
   );

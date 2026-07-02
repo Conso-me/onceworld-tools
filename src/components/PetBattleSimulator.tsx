@@ -7,6 +7,7 @@ import type { PetDamageConfig } from "../types/game";
 import { useAllMonsters } from "../hooks/useAllMonsters";
 import { PetConfigPanel } from "./damage/PetConfigPanel";
 import { BattleResultPanel } from "./petbattle/BattleResultPanel";
+import { PageLayout } from "./ui/layout/PageLayout";
 
 export function PetBattleSimulator() {
   const { t } = useTranslation("petbattle");
@@ -55,8 +56,9 @@ export function PetBattleSimulator() {
   const activeResult = activeConfig === "A" ? resultA : resultB;
 
   return (
-    <div className="lg:grid lg:grid-cols-[minmax(340px,400px)_1fr] lg:gap-2 lg:items-start">
-      {/* 左パネル（入力） */}
+    <PageLayout
+      left={
+      // 左パネル（入力）
       <div className="space-y-3">
         {/* A/B 設定タブ */}
         <div className="flex rounded-xl overflow-hidden border border-gray-200">
@@ -86,9 +88,10 @@ export function PetBattleSimulator() {
           showPetStats
         />
       </div>
-
-      {/* 右パネル（結果） */}
-      <div className="mt-4 lg:mt-0">
+      }
+      right={
+      // 右パネル（結果）
+      <div>
         <BattleResultPanel
           resultA={resultA}
           resultB={resultB}
@@ -99,6 +102,7 @@ export function PetBattleSimulator() {
           onPreContactHitsChange={setPreContactHits}
         />
       </div>
-    </div>
+      }
+    />
   );
 }
