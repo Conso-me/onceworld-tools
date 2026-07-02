@@ -420,7 +420,7 @@ function SkySection({
   lang: string;
 }) {
   return (
-    <div className="bg-white rounded-2xl shadow shadow-gray-200/50 overflow-hidden">
+    <div className="bg-card border border-line rounded-card shadow-sm overflow-hidden">
       <div className="px-3 py-2 bg-gray-50 border-b border-gray-200">
         <span className="text-sm font-semibold text-gray-700">{title}</span>
       </div>
@@ -609,7 +609,7 @@ function FireSection({
 }) {
   if (results.length === 0) return null;
   return (
-    <div className="bg-white rounded-2xl shadow shadow-gray-200/50 overflow-hidden">
+    <div className="bg-card border border-line rounded-card shadow-sm overflow-hidden">
       <div className="px-3 py-2 bg-gray-50 border-b border-gray-200">
         <span className="text-sm font-semibold text-gray-700">{title}</span>
       </div>
@@ -896,7 +896,7 @@ export function SkyCorridorCalculator({
         left={
       // ───── 左カラム: 入力パネル ─────
       <div className="space-y-6 lg:space-y-2">
-        <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-5 lg:space-y-3">
+        <div className="bg-card border border-line rounded-card shadow-sm p-6 lg:p-4 space-y-5 lg:space-y-3">
 
           {/* フロア入力 */}
           <div className="space-y-1.5">
@@ -1023,7 +1023,7 @@ export function SkyCorridorCalculator({
 
         {/* サマリー（耐久モード時のみ） */}
         {viewMode === "endurance" && (
-          <div className="bg-white rounded-2xl shadow shadow-gray-200/50 p-4 space-y-1">
+          <div className="bg-card border border-line rounded-card shadow-sm p-4 space-y-1">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">{t("nullifiedMonsters")}</span>
               <span
@@ -1090,7 +1090,7 @@ export function SkyCorridorCalculator({
       // ───── 右カラム: 結果テーブル ─────
       <div className="space-y-3">
         {viewMode === "endurance" && (
-          <div className="bg-white rounded-2xl shadow shadow-gray-200/50 px-4 py-3 grid grid-cols-4 gap-x-2 text-center">
+          <div className="bg-card border border-line rounded-card shadow-sm px-4 py-3 grid grid-cols-4 gap-x-2 text-center">
             {[
               { label: "DEF",   value: effectiveDef  },
               { label: "M-DEF", value: effectiveMdef },

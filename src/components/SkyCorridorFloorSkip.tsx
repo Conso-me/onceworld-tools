@@ -118,7 +118,7 @@ export function SkyCorridorFloorSkip() {
       left={
       // ───── 左カラム: 入力 ─────
       <div className="space-y-6 lg:space-y-2">
-        <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-5 lg:space-y-3">
+        <div className="bg-card border border-line rounded-card shadow-sm p-6 lg:p-4 space-y-5 lg:space-y-3">
 
           <InputField
             label={t("floorSkip.targetFloor")}
@@ -186,7 +186,7 @@ export function SkyCorridorFloorSkip() {
       right={
       // ───── 右カラム: 結果テーブル ─────
       <div className="space-y-3">
-        <div className="bg-white rounded-2xl shadow shadow-gray-200/50 p-4 lg:p-3">
+        <div className="bg-card border border-line rounded-card shadow-sm p-4 lg:p-3">
           <h3 className="text-base font-semibold text-gray-800 mb-3">
             {t("floorSkip.resultsTitle")}
             <span className="ml-2 text-sm font-normal text-gray-400">

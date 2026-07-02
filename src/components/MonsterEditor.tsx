@@ -184,7 +184,7 @@ export function MonsterEditor() {
     <PageLayout
       left={
       // 左：入力フォーム
-      <div className="bg-white rounded-2xl shadow shadow-gray-200/50 p-4 space-y-3">
+      <div className="bg-card border border-line rounded-card shadow-sm p-4 space-y-3">
         <h2 className="text-sm font-bold text-gray-700">
           {editingName !== null ? t("editing", { name: editingName }) : t("newRegistration")}
         </h2>
@@ -319,7 +319,7 @@ export function MonsterEditor() {
       }
       right={
       // 右：登録済みリスト
-      <div className="bg-white rounded-2xl shadow shadow-gray-200/50 p-4 space-y-3">
+      <div className="bg-card border border-line rounded-card shadow-sm p-4 space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-bold text-gray-700">
             {t("registered", { count: customs.length })}

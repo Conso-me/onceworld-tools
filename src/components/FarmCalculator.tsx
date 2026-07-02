@@ -310,7 +310,7 @@ export function FarmCalculator() {
       leftWidth="wide"
       left={
       // Column 1: モンスターリスト
-      <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-4">
+      <div className="bg-card border border-line rounded-card shadow-sm p-6 lg:p-4 space-y-4">
         <div className="flex gap-2">
           <button
             onClick={() => setModalOpen(true)}
@@ -504,7 +504,7 @@ export function FarmCalculator() {
       // Column 2: 周回設定 + 結果
       <div className="space-y-4 lg:space-y-2">
         {/* 周回設定 */}
-        <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 px-4 py-3 space-y-2">
+        <div className="bg-card border border-line rounded-card shadow-sm px-4 py-3 space-y-2">
           <h3 className="text-xs font-semibold text-gray-500">{t("farmSettings")}</h3>
           {/* 3列グリッド: 行をまたいで列位置を揃える */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-2 gap-y-2 text-xs items-center">

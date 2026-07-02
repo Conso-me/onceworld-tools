@@ -419,7 +419,7 @@ export function ArenaCalculator() {
       left={
       // ───── 左カラム: 入力パネル ─────
       <div className="space-y-6 lg:space-y-2">
-        <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-5 lg:space-y-3">
+        <div className="bg-card border border-line rounded-card shadow-sm p-6 lg:p-4 space-y-5 lg:space-y-3">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
               <span className="text-indigo-500 text-sm">{t("common:self")}</span>
@@ -559,7 +559,7 @@ export function ArenaCalculator() {
         </div>
 
         {/* サマリー */}
-        <div className="bg-white rounded-2xl shadow shadow-gray-200/50 p-4 space-y-1">
+        <div className="bg-card border border-line rounded-card shadow-sm p-4 space-y-1">
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600">{t("nullifiedMonsters")}</span>
             <span
@@ -587,7 +587,7 @@ export function ArenaCalculator() {
       }
       right={
       // ───── 右カラム: 結果テーブル ─────
-      <div className="bg-white rounded-2xl shadow shadow-gray-200/50 overflow-hidden">
+      <div className="bg-card border border-line rounded-card shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm border-collapse">
             <thead>

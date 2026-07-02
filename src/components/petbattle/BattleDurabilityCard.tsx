@@ -35,7 +35,7 @@ export function BattleDurabilityCard({ result, spdA, spdB }: BattleDurabilityCar
     initiative === "A" ? "A" : initiative === "B" ? "B" : t("initiative.tied");
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-3 space-y-3">
+    <div className="bg-card border border-line rounded-card shadow-sm p-3 space-y-3">
       <h3 className="text-sm font-bold text-gray-700">{t("durability.title")}</h3>
 
       {/* 勝敗予測バッジ */}

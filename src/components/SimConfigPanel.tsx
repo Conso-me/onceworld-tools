@@ -1018,7 +1018,7 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
       {activeTab === "basic" && (
         <div className="space-y-3">
           {/* キャラクター設定 */}
-          <section className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
+          <section className="bg-card border border-line rounded-card shadow-sm p-3 space-y-2">
             <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">{t("characterSettings")}</h3>
             <div className="grid grid-cols-3 gap-2">
               <NumInput label={t("level")} value={cfg.charLevel} min={1} max={200}
@@ -1071,7 +1071,7 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
           </section>
 
           {/* ステータス割り振り */}
-          <section className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
+          <section className="bg-card border border-line rounded-card shadow-sm p-3 space-y-2">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">{t("allocationPoints")}</h3>
               <div className="flex items-center gap-2">
@@ -1118,7 +1118,7 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
           </section>
 
           {/* 振り分けポイント */}
-          <section className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
+          <section className="bg-card border border-line rounded-card shadow-sm p-3 space-y-2">
             <SectionHeader title={t("allocationSection")} onAllMax={maxAllPoints} />
             <div className="grid grid-cols-2 gap-2">
               <NumInput label={t("johannePen")} value={cfg.johaneCount} max={1000}
@@ -1141,7 +1141,7 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
       {/* ── 装備タブ ── */}
       {activeTab === "equip" && (
         <div className="space-y-4">
-          <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+          <section className="bg-card border border-line rounded-card shadow-sm p-4 space-y-3">
             <SectionHeader title={t("equipment")} onAllMax={maxAllEquip} />
             <div className="space-y-3">
               {EQUIPMENT_SLOTS.map(({ slot, cfgKey, enhKey, goldEnhKey }) => (
@@ -1165,7 +1165,7 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
       {/* ── アクセタブ ── */}
       {activeTab === "acc" && (
         <div className="space-y-4">
-          <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+          <section className="bg-card border border-line rounded-card shadow-sm p-4 space-y-3">
             <SectionHeader title={t("accessory")} onAllMax={maxAllAcc} />
             <div className="space-y-3">
               {ACC_SLOTS.map(({ nameKey, levelKey }, idx) => {
@@ -1199,7 +1199,7 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
       {/* ── ペットタブ ── */}
       {activeTab === "pet" && (
         <div className="space-y-4">
-          <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-4">
+          <section className="bg-card border border-line rounded-card shadow-sm p-4 space-y-4">
             <SectionHeader title={t("pet")} onAllMax={maxAllPet} />
             {PET_SLOTS.map(({ nameKey, levelKey }, idx) => (
               <PetSelector
@@ -1219,7 +1219,7 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
       {activeTab === "other" && (
         <div className="space-y-4">
           {/* プロテイン */}
-          <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+          <section className="bg-card border border-line rounded-card shadow-sm p-4 space-y-3">
             <SectionHeader title={t("protein")} onAllMax={maxAllProtein} />
             <div className="grid grid-cols-2 gap-x-3 gap-y-2">
               {PROTEIN_KEYS.map(({ cfg: cfgKey, label }) => (
@@ -1237,7 +1237,7 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
           </section>
 
           {/* HP補正 */}
-          <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+          <section className="bg-card border border-line rounded-card shadow-sm p-4 space-y-3">
             <SectionHeader title={t("hpCorrection")} onAllMax={maxAllHp} />
             <NumInput label={t("kinikiLiquid")} value={cfg.kinikiLiquidCount} max={1000}
               onChange={(v) => setField("kinikiLiquidCount", v)} />
@@ -1313,7 +1313,7 @@ export function SimConfigPanel({ cfg, setField, reset, replaceAll, extraFields, 
   return (
     <div className="space-y-3">
       {/* ── ビルドプリセット ── */}
-      <div className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
+      <div className="bg-card border border-line rounded-card shadow-sm p-3 space-y-2">
         <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">{t("buildPreset")}</h3>
         <div className="flex gap-1.5 items-center">
           <select

@@ -352,11 +352,11 @@ export function StatusSimulator() {
         </div>
 
         {compareMode ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <div className="bg-card border border-line rounded-card shadow-sm p-4">
             <CompareTable resultA={resultA} resultB={resultB} />
           </div>
         ) : (
-          <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <div className="bg-card border border-line rounded-card shadow-sm p-4">
             <StatTable breakdown={resultA} />
           </div>
         )}
@@ -377,7 +377,7 @@ export function StatusSimulator() {
         )}
 
         {/* ── ダメ計プリセット保存 ── */}
-        <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+        <div className="bg-card border border-line rounded-card shadow-sm p-4 space-y-3">
           <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">{t("damageCalcPresetSave")}</h3>
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-500 shrink-0">{t("attackMode")}</span>

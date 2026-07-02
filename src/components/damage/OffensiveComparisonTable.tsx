@@ -33,7 +33,7 @@ export function OffensiveComparisonTable({ rows, onSelectMonster, selectedSpellN
     : "grid-cols-[minmax(0,1fr)_auto_auto_auto]";
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 overflow-hidden">
+    <div className="bg-card border border-line rounded-card shadow-sm overflow-hidden">
       {/* 魔法選択 */}
       {isMagic && (
         <div className="px-3 py-2 bg-indigo-50 border-b border-indigo-100 flex items-center gap-1.5 flex-wrap">
