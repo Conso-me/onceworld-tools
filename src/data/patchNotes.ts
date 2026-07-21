@@ -15,6 +15,10 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-07-02",
     changes: [
+    { type: "improve", text: "feat: 残モーダルをModalShellへ統一しMonsterPickerを統合廃止" },
+    { type: "improve", text: "feat: 装備/アクセ/ペット選択モーダルを2ペイン化" },
+    { type: "improve", text: "refactor: SimConfigPanelから選択モーダル群をsimconfig/へ抽出" },
+    { type: "improve", text: "feat: ModalShell/GroupNav共通部品を新設し参照2モーダルを載せ替え" },
     { type: "improve", text: "feat: デザイントークン基盤とPageLayout/Panel共通部品を導入" },
     { type: "feature", text: "feat: アクセ・ペット最適化シミュを追加" },
     ],
