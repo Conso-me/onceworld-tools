@@ -15,6 +15,8 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-07-22",
     changes: [
+    { type: "improve", text: "fix: フォントのぼやけ・意図しない改行・1兆入力対応の表示品質改善" },
+    { type: "fix", text: "fix: 全MAXボタンでヨハネの祭壇が設定されない漏れを修正" },
     { type: "fix", text: "fix: 数値インフレとモバイル表示への追従修正" },
     { type: "improve", text: "Merge remote-tracking branch 'origin/main' into feature/layout-unify-pages" },
     ],
