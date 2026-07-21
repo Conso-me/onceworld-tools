@@ -271,7 +271,7 @@ export function EquipmentOptimizer({ onApply }: Props) {
       // 左パネル
       <div className="space-y-3">
         {/* 最適化スロット */}
-        <div className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
+        <div className="bg-card border border-line rounded-card shadow-sm p-3 space-y-2">
           <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">最適化対象スロット</h3>
           <button
             onClick={() => setIncludeWeapon((v) => !v)}
@@ -289,7 +289,7 @@ export function EquipmentOptimizer({ onApply }: Props) {
         </div>
 
         {/* 所持金 */}
-        <div className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
+        <div className="bg-card border border-line rounded-card shadow-sm p-3 space-y-2">
           <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">所持金（予算）</h3>
           <button
             onClick={() => setUnlimited((v) => !v)}
@@ -325,7 +325,7 @@ export function EquipmentOptimizer({ onApply }: Props) {
         </div>
 
         {/* G強化上限 */}
-        <div className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
+        <div className="bg-card border border-line rounded-card shadow-sm p-3 space-y-2">
           <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">G強化上限</h3>
           <div className="flex items-center gap-2">
             <input
@@ -342,7 +342,7 @@ export function EquipmentOptimizer({ onApply }: Props) {
         </div>
 
         {/* 優先度重み */}
-        <div className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
+        <div className="bg-card border border-line rounded-card shadow-sm p-3 space-y-2">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">ステータス優先度</h3>
             <button
@@ -375,7 +375,7 @@ export function EquipmentOptimizer({ onApply }: Props) {
         </div>
 
         {/* 除外装備 */}
-        <div className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
+        <div className="bg-card border border-line rounded-card shadow-sm p-3 space-y-2">
           <button
             onClick={() => setShowExclude((v) => !v)}
             className="flex items-center justify-between w-full"
@@ -448,7 +448,7 @@ export function EquipmentOptimizer({ onApply }: Props) {
       right={
       // 右パネル：結果
       <div>
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden h-full">
+        <div className="bg-card border border-line rounded-card shadow-sm overflow-hidden h-full">
           <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
             <h3 className="text-sm font-semibold text-gray-700">最適装備ランキング</h3>
             {unlimited

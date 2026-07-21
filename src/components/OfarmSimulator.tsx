@@ -158,7 +158,7 @@ export function OfarmSimulator({
       left={
       // ───── 左カラム: 入力パネル ─────
       <div className="space-y-6 lg:space-y-2">
-        <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-5 lg:space-y-3">
+        <div className="bg-card border border-line rounded-card shadow-sm p-6 lg:p-4 space-y-5 lg:space-y-3">
           {/* 手動 / 装備設定 トグル */}
           <div className="flex rounded-lg overflow-hidden border border-gray-200 text-xs">
             {(["manual", "sim"] as const).map((mode) => (
@@ -249,7 +249,7 @@ export function OfarmSimulator({
           const waves = results.filter((r) => r.wave.wave >= group.from && r.wave.wave <= group.to);
           const open = openGroups[group.id] ?? true;
           return (
-            <div key={group.id} className="bg-white rounded-2xl shadow shadow-gray-200/50 overflow-hidden">
+            <div key={group.id} className="bg-card border border-line rounded-card shadow-sm overflow-hidden">
               <button
                 onClick={() => toggleGroup(group.id)}
                 className="w-full flex items-center justify-between px-3 py-2 bg-gray-50 border-b border-gray-200 hover:bg-gray-100 transition-colors"

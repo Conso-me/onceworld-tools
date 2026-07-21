@@ -846,7 +846,7 @@ export function DamageCalculator({
       left={
       // Column 1: 入力パネル
       <div className="space-y-6 lg:space-y-2">
-      <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-6 lg:space-y-3">
+      <div className="bg-card border border-line rounded-card shadow-sm p-6 lg:p-4 space-y-6 lg:space-y-3">
         {/* 敵プリセット */}
         <div className="space-y-1.5">
           <label className="block text-xs font-medium text-gray-500">{t("enemyPreset")}</label>
@@ -1305,7 +1305,7 @@ export function DamageCalculator({
 
       {/* 敵ステータス */}
       {scaled && (
-        <div className="bg-white rounded-2xl shadow shadow-gray-200/50 p-4">
+        <div className="bg-card border border-line rounded-card shadow-sm p-4">
           <div className="flex items-center gap-2 flex-wrap mb-3">
             <span className="font-bold text-base text-gray-800">{scaled.name}</span>
             <span className="text-sm bg-gray-100 text-gray-600 px-2 py-0.5 rounded-lg font-medium">Lv{monsterLevel.toLocaleString()}</span>
@@ -1863,7 +1863,7 @@ export function DamageCalculator({
 
           {/* 現在の被ダメージ */}
           {hasMyDefenseStats && (
-            <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 p-3 space-y-2">
+            <div className="bg-card border border-line rounded-card shadow-sm p-3 space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">{t("defensePanel.currentDamage")}</span>
                 {defensiveResult.nullified ? (
@@ -1918,7 +1918,7 @@ export function DamageCalculator({
             const mostlyEvade = ratio === null || ratio >= 3;
             const rateColor = rate >= 80 ? "text-green-600" : rate < 20 ? "text-red-500" : "text-yellow-600";
             return (
-              <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 p-3 space-y-1.5">
+              <div className="bg-card border border-line rounded-card shadow-sm p-3 space-y-1.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <span className="text-gray-600">{t("evasionRate")}</span>

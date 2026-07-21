@@ -24,7 +24,7 @@ export function BattleRangeCard({ rangePhase, preContactHits, onPreContactHitsCh
     t("range.noAdvantage");
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-3 space-y-3">
+    <div className="bg-card border border-line rounded-card shadow-sm p-3 space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-bold text-gray-700">{t("range.title")}</h3>
         <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${badgeColor}`}>

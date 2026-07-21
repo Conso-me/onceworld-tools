@@ -26,7 +26,7 @@ export function DefensiveComparisonTable({ rows, onSelectMonster }: Props) {
   return (
     <div className="space-y-2">
     <DefenseMaxSummary rows={rows} />
-    <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 overflow-hidden">
+    <div className="bg-card border border-line rounded-card shadow-sm overflow-hidden">
       {/* 横スクロールラッパー */}
       <div className="overflow-x-auto">
       {/* ヘッダー */}

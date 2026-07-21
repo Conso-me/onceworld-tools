@@ -182,7 +182,7 @@ export function AccPetOptimizer({ cfgA, cfgB, onApply }: Props) {
       // 左パネル
       <div className="space-y-3">
         {/* 基準にする設定 */}
-        <div className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
+        <div className="bg-card border border-line rounded-card shadow-sm p-3 space-y-2">
           <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">基準にする設定</h3>
           <div className="flex rounded-lg overflow-hidden border border-gray-200">
             {(["A", "B"] as const).map((id) => (
@@ -205,7 +205,7 @@ export function AccPetOptimizer({ cfgA, cfgB, onApply }: Props) {
         </div>
 
         {/* 優先度重み */}
-        <div className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
+        <div className="bg-card border border-line rounded-card shadow-sm p-3 space-y-2">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">ステータス優先度</h3>
             <button
@@ -238,7 +238,7 @@ export function AccPetOptimizer({ cfgA, cfgB, onApply }: Props) {
         </div>
 
         {/* 除外アクセ */}
-        <div className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
+        <div className="bg-card border border-line rounded-card shadow-sm p-3 space-y-2">
           <button
             onClick={() => setShowExcludeAcc((v) => !v)}
             className="flex items-center justify-between w-full"
@@ -293,7 +293,7 @@ export function AccPetOptimizer({ cfgA, cfgB, onApply }: Props) {
         </div>
 
         {/* 除外ペット */}
-        <div className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
+        <div className="bg-card border border-line rounded-card shadow-sm p-3 space-y-2">
           <button
             onClick={() => setShowExcludePet((v) => !v)}
             className="flex items-center justify-between w-full"
@@ -362,7 +362,7 @@ export function AccPetOptimizer({ cfgA, cfgB, onApply }: Props) {
       right={
       // 右パネル：結果
       <div>
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden h-full">
+        <div className="bg-card border border-line rounded-card shadow-sm overflow-hidden h-full">
           <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
             <h3 className="text-sm font-semibold text-gray-700">最適アクセ・ペットランキング</h3>
             <span className="text-[11px] text-gray-400">アクセ・ペットは最大レベル想定</span>

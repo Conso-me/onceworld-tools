@@ -251,14 +251,14 @@ export function PetSimulator() {
         {showCompare ? (
           <>
             {/* 比較テーブル */}
-            <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+            <div className="bg-card border border-line rounded-card shadow-sm p-4 space-y-3">
               <h2 className="text-base font-bold text-gray-700">{t("statComparison")}</h2>
               <PetCompareTable resultA={resultA} resultB={resultB} />
             </div>
 
             {/* 追いつきレベル */}
             {showEqLevels && (
-              <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+              <div className="bg-card border border-line rounded-card shadow-sm p-4 space-y-3">
                 <h2 className="text-base font-bold text-gray-700">{t("catchupLevel")}</h2>
                 <EquivalentLevelTable
                   resultA={resultA}
@@ -280,7 +280,7 @@ export function PetSimulator() {
           </>
         ) : activeResult ? (
           /* 片方のみ設定済み */
-          <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <div className="bg-card border border-line rounded-card shadow-sm p-4">
             <PetStatPanel
               result={activeResult}
               label={t("configStats", { id: activeConfig })}
