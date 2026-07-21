@@ -51,18 +51,19 @@ export const ACC_CATEGORY_ORDER = ["体力", "攻撃力", "魔力", "防御力",
 export type AccCategory = typeof ACC_CATEGORY_ORDER[number];
 
 export function accEffectCat(type: string): AccCategory {
-  if (type.startsWith("VIT"))    return "体力";
-  if (type.startsWith("ATK"))    return "攻撃力";
-  if (type.startsWith("INT"))    return "魔力";
-  if (type.startsWith("M-DEF"))  return "魔法防御力";
-  if (type.startsWith("DEF"))    return "防御力";
-  if (type.startsWith("LUCK"))   return "幸運";
-  if (type.startsWith("SPD"))    return "攻撃速度";
-  if (type === "経験値")         return "経験値";
-  if (type === "捕獲率")         return "捕獲率";
-  if (type === "ドロップ率")     return "ドロップ率";
-  if (type === "MOV")            return "MOV";
-  if (type === "HP回復")         return "HP回復";
+  const baseType = type.endsWith("%") ? type.slice(0, -1) : type;
+  if (baseType.startsWith("VIT"))    return "体力";
+  if (baseType.startsWith("ATK"))    return "攻撃力";
+  if (baseType.startsWith("INT"))    return "魔力";
+  if (baseType.startsWith("M-DEF"))  return "魔法防御力";
+  if (baseType.startsWith("DEF"))    return "防御力";
+  if (baseType.startsWith("LUCK"))   return "幸運";
+  if (baseType.startsWith("SPD"))    return "攻撃速度";
+  if (baseType === "経験値")         return "経験値";
+  if (baseType === "捕獲率")         return "捕獲率";
+  if (baseType === "ドロップ率")     return "ドロップ率";
+  if (baseType === "MOV")            return "MOV";
+  if (baseType === "HP回復")         return "HP回復";
   return "その他";
 }
 
@@ -98,9 +99,10 @@ export function getAccSummary(acc: AccessoryItem, tFn?: (key: string) => string)
     return `ALL+${effects[0].value}%`;
   }
   return effects.map((e) => {
-    const catKey = ACC_EFFECT_TYPE_CATEGORY_KEY[e.type];
-    const label = tFn && catKey ? tFn(`accCategory.${catKey}`) : e.type;
-    return `${label} +${e.value}`;
+    const baseType = e.type.endsWith("%") ? e.type.slice(0, -1) : e.type;
+    const catKey = ACC_EFFECT_TYPE_CATEGORY_KEY[baseType];
+    const label = tFn && catKey ? tFn(`accCategory.${catKey}`) : baseType;
+    return `${label} +${e.value}${e.type.endsWith("%") ? "%" : ""}`;
   }).join("・");
 }
 

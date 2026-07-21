@@ -106,9 +106,9 @@ function getCategorySkillTypes(cat: PetStatCategory): { flat: string[]; pct: str
     case "魔法防御力": return { flat: ["M-DEF"],      pct: ["M-DEF%"],     finalPct: ["最終M-DEF%"]  };
     case "幸運":       return { flat: ["LUCK"],       pct: ["LUCK%"],      finalPct: ["最終LUCK%"]   };
     case "攻撃速度":   return { flat: ["SPD"],        pct: ["SPD%"],       finalPct: ["最終SPD%"]    };
-    case "経験値":     return { flat: ["経験値"],     pct: [],             finalPct: []              };
-    case "捕獲率":     return { flat: ["捕獲率"],     pct: [],             finalPct: []              };
-    case "ドロップ率": return { flat: ["ドロップ率"], pct: [],             finalPct: []              };
+    case "経験値":     return { flat: [],             pct: ["経験値%"],     finalPct: []              };
+    case "捕獲率":     return { flat: [],             pct: ["捕獲率%"],     finalPct: []              };
+    case "ドロップ率": return { flat: [],             pct: ["ドロップ率%"], finalPct: []              };
     case "MOV":        return { flat: ["MOV"],        pct: [],             finalPct: []              };
     case "HP回復":     return { flat: ["HP回復"],     pct: [],             finalPct: []              };
     case "SP回復":     return { flat: ["SP回復"],     pct: [],             finalPct: []              };
