@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-07-02",
     changes: [
+    { type: "improve", text: "feat: デザイントークン基盤とPageLayout/Panel共通部品を導入" },
     { type: "feature", text: "feat: アクセ・ペット最適化シミュを追加" },
     ],
   },
