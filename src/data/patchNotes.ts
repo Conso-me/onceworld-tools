@@ -13,8 +13,17 @@ export interface PatchEntry {
 
 export const patchNotes: PatchEntry[] = [
   {
+    date: "2026-07-22",
+    changes: [
+    { type: "improve", text: "Merge remote-tracking branch 'origin/main' into feature/layout-unify-pages" },
+    ],
+  },
+
+  {
     date: "2026-07-02",
     changes: [
+    { type: "improve", text: "refactor: カード装飾3系統をトークン標準装飾に一本化" },
+    { type: "improve", text: "refactor: 全タブの2カラム骨格をPageLayoutに統一" },
     { type: "improve", text: "feat: 残モーダルをModalShellへ統一しMonsterPickerを統合廃止" },
     { type: "improve", text: "feat: 装備/アクセ/ペット選択モーダルを2ペイン化" },
     { type: "improve", text: "refactor: SimConfigPanelから選択モーダル群をsimconfig/へ抽出" },
