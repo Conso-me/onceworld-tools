@@ -6,6 +6,7 @@ import {
   getPetNameEn,
 } from "../../data";
 import type { PetStatCategory, PetCategoryGroup } from "../../data";
+import { usePersistedState } from "../../hooks/usePersistedState";
 import { ModalShell, ModalBody } from "../ui/modal/ModalShell";
 import { GroupNav } from "../ui/modal/GroupNav";
 import { SelectorRow } from "../ui/modal/SelectorRow";
@@ -26,15 +27,16 @@ const SUBGROUP_LABEL_KEY: Record<string, string> = {
 };
 
 function PetSubGroup({
-  label, pets, showLabel, cat, subgroupKey, petName, petLevel, onPetChange, onLevelChange,
+  label, pets, cat, subgroupKey, petName, petLevel, isOpen, onToggle, onPetChange, onLevelChange,
 }: {
   label: string;
   pets: PetCategoryGroup["flat"];
-  showLabel: boolean;
   cat: PetStatCategory;
   subgroupKey: keyof PetCategoryGroup;
   petName: string;
   petLevel: number;
+  isOpen: boolean;
+  onToggle: () => void;
   onPetChange: (name: string) => void;
   onLevelChange: (level: number) => void;
 }) {
@@ -45,13 +47,24 @@ function PetSubGroup({
   const translatedLabel = SUBGROUP_LABEL_KEY[label] ? t(SUBGROUP_LABEL_KEY[label]) : label;
   return (
     <>
-      {showLabel && (
-        <div className={`flex items-center gap-2 px-4 py-1 border-y text-xs font-semibold ${labelCls}`}>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={isOpen}
+        className={`flex items-center justify-between w-full px-4 py-1 border-y text-xs font-semibold ${labelCls}`}
+      >
+        <span className="flex items-center gap-2">
           <span>{translatedLabel}</span>
           <span className="font-normal opacity-60">{`${pets.length}`}</span>
-        </div>
-      )}
-      {pets.map((pet) => {
+        </span>
+        <svg
+          className={`w-3.5 h-3.5 transition-transform ${isOpen ? "rotate-180" : ""}`}
+          fill="none" viewBox="0 0 24 24" stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      {isOpen && pets.map((pet) => {
         const selected = petName === pet.name;
         const petLevels = getPatternLevels(pet.pattern);
         const maxLv = petLevels[petLevels.length - 1];
@@ -104,6 +117,9 @@ export function PetSelectorModal({
   onClose: () => void;
 }) {
   const { t } = useTranslation("status");
+  const [flatOpen, setFlatOpen] = usePersistedState("petcfg:open-flat", false);
+  const [pctOpen, setPctOpen] = usePersistedState("petcfg:open-add", true);
+  const [finalPctOpen, setFinalPctOpen] = usePersistedState("petcfg:open-mul", true);
 
   // 選択中ペットが属するカテゴリを初期グループにする
   const [selectedCat, setSelectedCat] = useState<string>(() => {
@@ -141,10 +157,6 @@ export function PetSelectorModal({
   const group = selectedCat === NONE_ID
     ? undefined
     : petStatGroups.get(selectedCat as PetStatCategory);
-  const hasMultipleGroups = group
-    ? [group.flat, group.pct, group.finalPct].filter((g) => g.length > 0).length > 1
-    : false;
-
   return (
     <ModalShell
       isOpen
@@ -170,19 +182,19 @@ export function PetSelectorModal({
           ) : group ? (
             <>
               <PetSubGroup
-                label="実数" pets={group.flat} showLabel={hasMultipleGroups}
+                label="実数" pets={group.flat} isOpen={flatOpen} onToggle={() => setFlatOpen((v) => !v)}
                 cat={selectedCat as PetStatCategory} subgroupKey="flat"
                 petName={petName} petLevel={petLevel}
                 onPetChange={onPetChange} onLevelChange={onLevelChange}
               />
               <PetSubGroup
-                label="加算%" pets={group.pct} showLabel={hasMultipleGroups}
+                label="加算%" pets={group.pct} isOpen={pctOpen} onToggle={() => setPctOpen((v) => !v)}
                 cat={selectedCat as PetStatCategory} subgroupKey="pct"
                 petName={petName} petLevel={petLevel}
                 onPetChange={onPetChange} onLevelChange={onLevelChange}
               />
               <PetSubGroup
-                label="乗算（最終%）" pets={group.finalPct} showLabel={hasMultipleGroups}
+                label="乗算（最終%）" pets={group.finalPct} isOpen={finalPctOpen} onToggle={() => setFinalPctOpen((v) => !v)}
                 cat={selectedCat as PetStatCategory} subgroupKey="finalPct"
                 petName={petName} petLevel={petLevel}
                 onPetChange={onPetChange} onLevelChange={onLevelChange}
