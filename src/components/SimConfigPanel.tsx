@@ -382,6 +382,7 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
 
   function maxAllPoints() {
     setField("johaneCount", 1000);
+    setField("johanneAltarCount", 1000);
     setField("statusTenshouCount", 1000);
     setField("superScrollCount", 1000);
   }
