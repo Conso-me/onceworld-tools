@@ -10,6 +10,7 @@ import type {
   FloorSkipResponse,
 } from "../workers/floorSkip.worker";
 import { InputField } from "./ui/InputField";
+import { PageLayout } from "./ui/layout/PageLayout";
 
 const STATUE_MAX = 1000;
 const PLACE_LIMIT_MAX = 100;
@@ -113,8 +114,9 @@ export function SkyCorridorFloorSkip() {
   };
 
   return (
-    <div className="max-w-lg mx-auto space-y-6 lg:max-w-none lg:space-y-0 lg:grid lg:grid-cols-[minmax(340px,400px)_1fr] lg:gap-2 lg:items-start">
-      {/* ───── 左カラム: 入力 ───── */}
+    <PageLayout
+      left={
+      // ───── 左カラム: 入力 ─────
       <div className="space-y-6 lg:space-y-2">
         <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-5 lg:space-y-3">
 
@@ -180,8 +182,9 @@ export function SkyCorridorFloorSkip() {
           )}
         </div>
       </div>
-
-      {/* ───── 右カラム: 結果テーブル ───── */}
+      }
+      right={
+      // ───── 右カラム: 結果テーブル ─────
       <div className="space-y-3">
         <div className="bg-white rounded-2xl shadow shadow-gray-200/50 p-4 lg:p-3">
           <h3 className="text-base font-semibold text-gray-800 mb-3">
@@ -223,7 +226,8 @@ export function SkyCorridorFloorSkip() {
           )}
         </div>
       </div>
-    </div>
+      }
+    />
   );
 }
 

@@ -17,6 +17,7 @@ import { getMonsterDropInfo } from "../data/monsterDrops";
 import { getMonsterByName, getMonsterDisplayName } from "../data/monsters";
 import { usePersistedState } from "../hooks/usePersistedState";
 import { StatCard } from "./ui/StatCard";
+import { PageLayout } from "./ui/layout/PageLayout";
 import { MonsterSelectorModal } from "./ui/MonsterSelectorModal";
 import { AreaPresetModal, type AreaMonsterEntry } from "./AreaPresetModal";
 
@@ -305,8 +306,10 @@ export function FarmCalculator() {
   const hasMonsters = monsterRows.length > 0;
 
   return (
-    <div className="max-w-lg mx-auto space-y-6 lg:max-w-none lg:space-y-0 lg:grid lg:grid-cols-[minmax(340px,420px)_1fr] lg:gap-2 lg:items-start">
-      {/* Column 1: モンスターリスト */}
+    <PageLayout
+      leftWidth="wide"
+      left={
+      // Column 1: モンスターリスト
       <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-4">
         <div className="flex gap-2">
           <button
@@ -496,8 +499,9 @@ export function FarmCalculator() {
           )}
         </div>
       </div>
-
-      {/* Column 2: 周回設定 + 結果 */}
+      }
+      right={
+      // Column 2: 周回設定 + 結果
       <div className="space-y-4 lg:space-y-2">
         {/* 周回設定 */}
         <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 px-4 py-3 space-y-2">
@@ -625,6 +629,7 @@ export function FarmCalculator() {
           </div>
         )}
       </div>
-    </div>
+      }
+    />
   );
 }

@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import type { MonsterBase, Element, AttackType } from "../types/game";
 import { getCustomMonsters, setCustomMonsters, getAllMonsters } from "../data/monsters";
+import { PageLayout } from "./ui/layout/PageLayout";
 
 const ELEMENTS: Element[] = ["火", "水", "木", "光", "闇"];
 const ATTACK_TYPES: AttackType[] = ["物理", "魔法", "魔弾"];
@@ -180,8 +181,9 @@ export function MonsterEditor() {
   };
 
   return (
-    <div className="max-w-lg mx-auto space-y-4 lg:max-w-none lg:space-y-0 lg:grid lg:grid-cols-[minmax(340px,400px)_1fr] lg:gap-2 lg:items-start">
-      {/* 左：入力フォーム */}
+    <PageLayout
+      left={
+      // 左：入力フォーム
       <div className="bg-white rounded-2xl shadow shadow-gray-200/50 p-4 space-y-3">
         <h2 className="text-sm font-bold text-gray-700">
           {editingName !== null ? t("editing", { name: editingName }) : t("newRegistration")}
@@ -314,8 +316,9 @@ export function MonsterEditor() {
           )}
         </div>
       </div>
-
-      {/* 右：登録済みリスト */}
+      }
+      right={
+      // 右：登録済みリスト
       <div className="bg-white rounded-2xl shadow shadow-gray-200/50 p-4 space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-bold text-gray-700">
@@ -398,6 +401,7 @@ export function MonsterEditor() {
           {t("customMonsterNote")}
         </p>
       </div>
-    </div>
+      }
+    />
   );
 }

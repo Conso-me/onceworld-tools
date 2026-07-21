@@ -10,6 +10,7 @@ import {
   type AccPetOptResult,
 } from "../utils/accPetOptimizer";
 import { DEFAULT_WEIGHTS, type StatWeights } from "../utils/equipOptimizer";
+import { PageLayout } from "./ui/layout/PageLayout";
 
 const WEIGHT_LABELS: { key: keyof StatWeights; label: string }[] = [
   { key: "vit",  label: "VIT"   },
@@ -175,8 +176,10 @@ export function AccPetOptimizer({ cfgA, cfgB, onApply }: Props) {
   }
 
   return (
-    <div className="lg:grid lg:grid-cols-[minmax(300px,360px)_1fr] gap-4">
-      {/* 左パネル */}
+    <PageLayout
+      leftWidth="narrow"
+      left={
+      // 左パネル
       <div className="space-y-3">
         {/* 基準にする設定 */}
         <div className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
@@ -355,9 +358,10 @@ export function AccPetOptimizer({ cfgA, cfgB, onApply }: Props) {
           )}
         </div>
       </div>
-
-      {/* 右パネル：結果 */}
-      <div className="mt-4 lg:mt-0">
+      }
+      right={
+      // 右パネル：結果
+      <div>
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden h-full">
           <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
             <h3 className="text-sm font-semibold text-gray-700">最適アクセ・ペットランキング</h3>
@@ -405,6 +409,7 @@ export function AccPetOptimizer({ cfgA, cfgB, onApply }: Props) {
           </div>
         </div>
       </div>
-    </div>
+      }
+    />
   );
 }
