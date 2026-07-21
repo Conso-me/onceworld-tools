@@ -219,8 +219,8 @@ export function MonsterSelectorModal({ isOpen, onClose, onSelect, showPetStats, 
             <span className="w-16 text-right text-xs font-bold text-muted uppercase tracking-wide">{t("monsters:attackType")}</span>
             {showFarmInfo && (
               <>
-                <span className="w-24 text-right text-xs font-bold text-muted uppercase tracking-wide">EXP</span>
-                <span className="w-20 text-right text-xs font-bold text-muted uppercase tracking-wide">G</span>
+                <span className="w-28 text-right text-xs font-bold text-muted uppercase tracking-wide">EXP</span>
+                <span className="w-24 text-right text-xs font-bold text-muted uppercase tracking-wide">G</span>
               </>
             )}
           </div>
@@ -254,10 +254,10 @@ export function MonsterSelectorModal({ isOpen, onClose, onSelect, showPetStats, 
                       </span>
                       {showFarmInfo && (
                         <>
-                          <span className="w-24 text-right text-xs font-medium text-accent whitespace-nowrap">
+                          <span className="w-28 text-right text-xs font-medium text-accent whitespace-nowrap">
                             {monster.exp.toLocaleString()} EXP
                           </span>
-                          <span className="w-20 text-right text-xs font-medium text-yellow-600 whitespace-nowrap">
+                          <span className="w-24 text-right text-xs font-medium text-yellow-600 whitespace-nowrap">
                             {monster.gold.toLocaleString()} G
                           </span>
                         </>

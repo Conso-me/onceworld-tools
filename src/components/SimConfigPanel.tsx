@@ -498,7 +498,7 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">{t("allocationPoints")}</h3>
               <div className="flex items-center gap-2">
-                <span className={`text-xs font-mono px-2 py-0.5 rounded-full ${overflowed ? "bg-red-100 text-red-600" : "bg-green-100 text-green-700"}`}>
+                <span className={`text-xs font-mono px-2 py-0.5 rounded-full whitespace-nowrap ${overflowed ? "bg-red-100 text-red-600" : "bg-green-100 text-green-700"}`}>
                   {t("remainingPoints", { value: remaining.toLocaleString() })}
                 </span>
                 <button

@@ -373,7 +373,7 @@ export function AccPetOptimizer({ cfgA, cfgB, onApply }: Props) {
               除外が多すぎて候補がありません（アクセ4種・ペット3種以上が必要）
             </div>
           ) : (
-            <div className="overflow-y-auto" style={{ maxHeight: "calc(100vh - 220px)" }}>
+            <div className="overflow-x-auto overflow-y-auto" style={{ maxHeight: "calc(100vh - 220px)" }}>
               <table className="w-full text-xs border-collapse">
                 <thead className="sticky top-0 z-10">
                   <tr className="bg-gray-50 text-[10px] text-gray-500 uppercase">

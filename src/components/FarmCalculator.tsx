@@ -544,20 +544,20 @@ export function FarmCalculator() {
         {/* 結果 */}
         {hasMonsters ? (
           <div className="space-y-2">
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <StatCard title={t("expEfficiency")} accent="indigo">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
-                    <span className="text-sm text-gray-500">{t("expPerRun")}</span>
+                    <span className="text-sm text-gray-500 shrink-0">{t("expPerRun")}</span>
                     <span className="text-lg font-bold text-indigo-600">{expPerRun.toLocaleString()}</span>
                   </div>
                   <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
-                    <span className="text-sm text-gray-500">{t("expPerHour")}</span>
+                    <span className="text-sm text-gray-500 shrink-0">{t("expPerHour")}</span>
                     <span className="text-lg font-bold text-indigo-600">{expPerHour.toLocaleString()}</span>
                   </div>
                   {remainingExpNum > 0 && (
                     <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
-                      <span className="text-sm text-gray-500">{t("timeToGoal")}</span>
+                      <span className="text-sm text-gray-500 shrink-0">{t("timeToGoal")}</span>
                       <span className="text-lg font-bold text-green-600">{timeToGoal}</span>
                     </div>
                   )}
@@ -566,11 +566,11 @@ export function FarmCalculator() {
               <StatCard title={t("goldEfficiency")} accent="green">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
-                    <span className="text-sm text-gray-500">{t("expectedGoldPerRun")}</span>
+                    <span className="text-sm text-gray-500 shrink-0">{t("expectedGoldPerRun")}</span>
                     <span className="text-lg font-bold text-yellow-600">{Math.floor(goldPerRun).toLocaleString()} G</span>
                   </div>
                   <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
-                    <span className="text-sm text-gray-500">{t("goldPerHour")}</span>
+                    <span className="text-sm text-gray-500 shrink-0">{t("goldPerHour")}</span>
                     <span className="text-lg font-bold text-yellow-600">{goldPerHour.toLocaleString()} G</span>
                   </div>
                   <p className="text-xs text-gray-400 px-1">{t("goldDropNote")}</p>

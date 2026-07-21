@@ -462,7 +462,7 @@ export function EquipmentOptimizer({ onApply }: Props) {
               除外装備が多すぎて候補がありません
             </div>
           ) : (
-            <div className="overflow-y-auto" style={{ maxHeight: "calc(100vh - 220px)" }}>
+            <div className="overflow-x-auto overflow-y-auto" style={{ maxHeight: "calc(100vh - 220px)" }}>
               <table className="w-full text-xs border-collapse">
                 <thead className="sticky top-0 z-10">
                   <tr className="bg-gray-50 text-[10px] text-gray-500 uppercase">

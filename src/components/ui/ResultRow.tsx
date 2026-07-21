@@ -24,7 +24,7 @@ export function ResultRow({
 
   return (
     <div className="flex items-center justify-between py-2 px-3 bg-white/60 rounded-lg">
-      <span className="text-sm text-gray-500">{label}</span>
+      <span className="text-sm text-gray-500 shrink-0">{label}</span>
       <div className="flex items-center gap-2">
         <span className={`text-lg font-bold ${colorClasses[color]}`}>
           {value.toLocaleString()}
