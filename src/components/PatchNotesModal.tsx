@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { ModalShell } from "./ui/modal/ModalShell";
 import { useTranslation } from "react-i18next";
 import type { PatchEntry, ChangeType } from "../data/patchNotes";
 import { patchNotes } from "../data/patchNotes";
@@ -186,25 +187,7 @@ export function PatchNotesModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-12 bg-black/40"
-      onClick={onClose}
-    >
-      <div
-        className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* ヘッダー */}
-        <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-200 shrink-0">
-          <h3 className="text-sm font-semibold text-gray-700">{t("patchNotes")}</h3>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-xl leading-none px-1"
-          >
-            ×
-          </button>
-        </div>
-
+    <ModalShell isOpen onClose={onClose} size="md" title={t("patchNotes")}>
         {/* タイプタブ */}
         <div className="border-b border-gray-200 shrink-0">
           <div className="flex -mb-px px-2">
@@ -286,16 +269,6 @@ export function PatchNotesModal({ onClose }: { onClose: () => void }) {
           )}
         </div>
 
-        {/* フッター */}
-        <div className="px-4 py-2.5 border-t border-gray-100 shrink-0">
-          <button
-            onClick={onClose}
-            className="w-full text-xs py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors font-medium"
-          >
-            {t("close")}
-          </button>
-        </div>
-      </div>
-    </div>
+    </ModalShell>
   );
 }

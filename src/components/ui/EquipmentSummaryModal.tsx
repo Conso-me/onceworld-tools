@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
+import { ModalShell } from "./modal/ModalShell";
 import { useTranslation } from "react-i18next";
 import { useSharedSimConfig } from "../../hooks/useSharedSimConfig";
 import { useSharedAttackBuffs } from "../../hooks/useSharedAttackBuffs";
@@ -78,14 +79,6 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
   const [copied, setCopied] = useState(false);
   const crystalCubeNum = Math.min(parseInt(attackBuffs.crystalCube) || 0, 1000);
   const toughouCubeNum = Math.min(parseInt(attackBuffs.toughouCube) || 0, 1000);
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, [onClose]);
 
   const breakdown = calcStatus(cfg);
   const { final, hp, setBonus, setBonusSeries } = breakdown;
@@ -201,36 +194,24 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
   }, [buildCopyText]);
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-12 bg-black/40"
-      onClick={onClose}
+    <ModalShell
+      isOpen
+      onClose={onClose}
+      size="md"
+      title={t("common:equipmentSummary")}
+      headerAction={
+        <button
+          onClick={handleCopy}
+          className={`text-xs px-2.5 py-1 rounded-md font-medium transition-colors ${
+            copied
+              ? "bg-green-100 text-green-700"
+              : "bg-ink/5 text-muted hover:bg-ink/10"
+          }`}
+        >
+          {copied ? t("common:copied") : t("common:copyText")}
+        </button>
+      }
     >
-      <div
-        className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[85vh] flex flex-col"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-200 shrink-0">
-          <h3 className="text-sm font-semibold text-gray-700">{t("common:equipmentSummary")}</h3>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleCopy}
-              className={`text-xs px-2.5 py-1 rounded-md font-medium transition-colors ${
-                copied
-                  ? "bg-green-100 text-green-700"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-            >
-              {copied ? t("common:copied") : t("common:copyText")}
-            </button>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-xl leading-none px-1"
-            >
-              ×
-            </button>
-          </div>
-        </div>
-
         <div className="overflow-y-auto flex-1 px-4 py-3 space-y-3">
           <div>
             <SectionHeader>{t("common:characterInfo")}</SectionHeader>
@@ -341,15 +322,6 @@ export function EquipmentSummaryModal({ onClose }: { onClose: () => void }) {
           </div>
         </div>
 
-        <div className="px-4 py-2.5 border-t border-gray-100 shrink-0">
-          <button
-            onClick={onClose}
-            className="w-full text-xs py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors font-medium"
-          >
-            {t("common:close")}
-          </button>
-        </div>
-      </div>
-    </div>
+    </ModalShell>
   );
 }

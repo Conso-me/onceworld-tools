@@ -5,9 +5,10 @@ import { createPortal } from "react-dom";
  * サイト標準のモーダル外枠。`fixed inset-0` の直書きは禁止 — 必ずこれを経由する。
  * portal / ESC / 背景クリック閉じ / z-50 / bg-black/50 / 中央寄せ / body スクロールロックを担う。
  */
-type ModalSize = "md" | "lg" | "xl";
+type ModalSize = "sm" | "md" | "lg" | "xl";
 
 const SIZE_CLASSES: Record<ModalSize, string> = {
+  sm: "max-w-xs",
   md: "max-w-lg",
   lg: "max-w-2xl",
   xl: "max-w-4xl",
