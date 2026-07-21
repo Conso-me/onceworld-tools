@@ -15,6 +15,7 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-07-22",
     changes: [
+    { type: "fix", text: "fix: 数値インフレとモバイル表示への追従修正" },
     { type: "improve", text: "Merge remote-tracking branch 'origin/main' into feature/layout-unify-pages" },
     ],
   },
