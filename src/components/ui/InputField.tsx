@@ -82,7 +82,7 @@ export function InputField({
           onChange(raw);
         }}
         placeholder={placeholder}
-        className="w-full px-4 py-3 lg:py-2 bg-white border border-gray-200 rounded-xl text-lg lg:text-base font-medium text-gray-800 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+        className="w-full px-3 lg:px-1 py-3 lg:py-2 bg-white border border-gray-200 rounded-xl text-lg lg:text-xs font-medium text-gray-800 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
       />
     </div>
   );

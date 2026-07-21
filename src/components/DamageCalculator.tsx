@@ -950,15 +950,15 @@ export function DamageCalculator({
 
         {/* 自分のステータス */}
         <div className="space-y-4 lg:space-y-2">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
               <span className="text-blue-500 text-sm">{t("common:self")}</span>
             </div>
-            <h3 className="font-semibold text-gray-800">{t("common:myStatus")}</h3>
+            <h3 className="font-semibold text-gray-800 whitespace-nowrap shrink-0">{t("common:myStatus")}</h3>
             <div className="ml-auto flex items-center gap-1.5">
               <button
                 onClick={handleCopyShareUrl}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
                   copied
                     ? "bg-green-100 text-green-600"
                     : "bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700"
@@ -985,7 +985,7 @@ export function DamageCalculator({
                   onClick={() => setPresetModalOpen(true)}
                   className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-100 border border-gray-200 text-xs text-gray-600 hover:bg-gray-200 transition-colors"
                 >
-                  <span>
+                  <span className="whitespace-nowrap">
                     {selectedPresetId
                       ? presets.find((p) => p.id === selectedPresetId)?.name ?? t("common:preset")
                       : t("common:preset")}
@@ -1165,7 +1165,7 @@ export function DamageCalculator({
           {/* ゴッドオブデビルアイ・闘晶立方体（物理攻撃時） */}
           {myAttackMode === "物理" && (
             <div className="pt-2 border-t border-gray-100">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-2">
                 <InputField
                   label={t("devilEye")}
                   value={devilEye}
