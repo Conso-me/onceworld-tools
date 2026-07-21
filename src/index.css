@@ -19,7 +19,7 @@
 
   /* text */
   --ink: #1f1d18;
-  --muted: #8d877b;
+  --muted: #736c60;
 
   /* lines & accents */
   --line: #e9e5dd;
@@ -34,7 +34,7 @@
 
   /* type */
   --font-head: "Zen Kaku Gothic New", sans-serif;
-  --font-body: "Zen Kaku Gothic New", sans-serif;
+  --font-body: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --head-ls: 0;
 
   /* 属性色 (アイコン・チップ専用。面では使わない) */

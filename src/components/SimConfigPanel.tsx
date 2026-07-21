@@ -509,7 +509,7 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
                 </button>
               </div>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-2 gap-y-1.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-1 gap-y-1.5">
               {ALLOC_KEYS.map(({ cfg: cfgKey, label }) => {
                 const val = cfg[cfgKey] as number;
                 const over = val > perStatLimit;
@@ -520,7 +520,7 @@ function InputPanel({ cfg, setField, reset }: { cfg: SimConfig; setField: SimSet
                     <div className="flex gap-1 items-center">
                       <SmallNumInput
                         value={val} onChange={(v) => setField(cfgKey, v)} min={0}
-                        className={`flex-1 min-w-0 border rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 ${over ? "border-red-300 focus:ring-red-300" : "border-gray-200 focus:ring-blue-300"}`}
+                        className={`flex-1 min-w-0 border rounded-lg px-0 py-1 text-[11px] focus:outline-none focus:ring-2 ${over ? "border-red-300 focus:ring-red-300" : "border-gray-200 focus:ring-blue-300"}`}
                       />
                       <button
                         disabled={!canAdd}

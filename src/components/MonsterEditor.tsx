@@ -207,7 +207,7 @@ export function MonsterEditor() {
           <input
             {...numHandlers("level")}
             value={form.level || ""}
-            className="w-24 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 text-right"
+            className="w-28 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 text-right"
           />
         </div>
 

@@ -376,7 +376,7 @@ function SkyTableHeader({ floor, t }: { floor: number; t: TFunction }) {
       <th className="px-2 py-2 text-right font-medium whitespace-nowrap">
         {t("tableHeaders.attackPower", { floor: floor.toLocaleString() })}
       </th>
-      <th className="px-2 py-2 text-center font-medium">{t("tableHeaders.nullify")}</th>
+      <th className="px-2 py-2 text-center font-medium whitespace-nowrap">{t("tableHeaders.nullify")}</th>
       <th className="px-2 py-2 text-center font-medium whitespace-nowrap">
         {t("tableHeaders.endurance")}
       </th>
