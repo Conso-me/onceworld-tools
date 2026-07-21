@@ -1123,13 +1123,13 @@ export function DamageCalculator({
           {/* ステータス入力（手動モードのみ） */}
           {statMode === "manual" && (
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-2">
-              <InputField label="ATK" value={myAtk} onChange={setMyAtk} />
-              <InputField label="INT" value={myInt} onChange={setMyInt} />
-              <InputField label="LUK" value={myLuck} onChange={setMyLuck} />
-              <InputField label="DEF" value={myDef} onChange={setMyDef} />
-              <InputField label="M-DEF" value={myMdef} onChange={setMyMdef} />
               <InputField label="VIT" value={myVit} onChange={setMyVit} />
               <InputField label="SPD" value={mySpd} onChange={setMySpd} />
+              <InputField label="ATK" value={myAtk} onChange={setMyAtk} />
+              <InputField label="INT" value={myInt} onChange={setMyInt} />
+              <InputField label="DEF" value={myDef} onChange={setMyDef} />
+              <InputField label="M-DEF" value={myMdef} onChange={setMyMdef} />
+              <InputField label="LUK" value={myLuck} onChange={setMyLuck} />
             </div>
           )}
 

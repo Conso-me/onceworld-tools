@@ -185,13 +185,13 @@ export function OfarmSimulator({
           {/* 手動ステータス入力 */}
           {statMode === "manual" && (
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-2">
-              <InputField label="ATK" value={manual.atk} onChange={(v) => setManualField("atk", v)} />
-              <InputField label="INT" value={manual.int} onChange={(v) => setManualField("int", v)} />
-              <InputField label="LUK" value={manual.luck} onChange={(v) => setManualField("luck", v)} />
-              <InputField label="DEF" value={manual.def} onChange={(v) => setManualField("def", v)} />
-              <InputField label="M-DEF" value={manual.mdef} onChange={(v) => setManualField("mdef", v)} />
               <InputField label="VIT" value={manual.vit} onChange={(v) => setManualField("vit", v)} />
               <InputField label="SPD" value={manual.spd} onChange={(v) => setManualField("spd", v)} />
+              <InputField label="ATK" value={manual.atk} onChange={(v) => setManualField("atk", v)} />
+              <InputField label="INT" value={manual.int} onChange={(v) => setManualField("int", v)} />
+              <InputField label="DEF" value={manual.def} onChange={(v) => setManualField("def", v)} />
+              <InputField label="M-DEF" value={manual.mdef} onChange={(v) => setManualField("mdef", v)} />
+              <InputField label="LUK" value={manual.luck} onChange={(v) => setManualField("luck", v)} />
             </div>
           )}
 
