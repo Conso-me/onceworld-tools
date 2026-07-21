@@ -52,19 +52,35 @@ export type AccCategory = typeof ACC_CATEGORY_ORDER[number];
 
 export function accEffectCat(type: string): AccCategory {
   const baseType = type.endsWith("%") ? type.slice(0, -1) : type;
-  if (baseType.startsWith("VIT"))    return "体力";
-  if (baseType.startsWith("ATK"))    return "攻撃力";
-  if (baseType.startsWith("INT"))    return "魔力";
-  if (baseType.startsWith("M-DEF"))  return "魔法防御力";
-  if (baseType.startsWith("DEF"))    return "防御力";
-  if (baseType.startsWith("LUCK"))   return "幸運";
-  if (baseType.startsWith("SPD"))    return "攻撃速度";
-  if (baseType === "経験値")         return "経験値";
-  if (baseType === "捕獲率")         return "捕獲率";
-  if (baseType === "ドロップ率")     return "ドロップ率";
-  if (baseType === "MOV")            return "MOV";
-  if (baseType === "HP回復")         return "HP回復";
+  const statType = baseType.startsWith("最終") ? baseType.slice(2) : baseType;
+  if (statType.startsWith("VIT"))    return "体力";
+  if (statType.startsWith("ATK"))    return "攻撃力";
+  if (statType.startsWith("INT"))    return "魔力";
+  if (statType.startsWith("M-DEF"))  return "魔法防御力";
+  if (statType.startsWith("DEF"))    return "防御力";
+  if (statType.startsWith("LUCK"))   return "幸運";
+  if (statType.startsWith("SPD"))    return "攻撃速度";
+  if (statType === "経験値")         return "経験値";
+  if (statType === "捕獲率")         return "捕獲率";
+  if (statType === "ドロップ率")     return "ドロップ率";
+  if (statType === "MOV")            return "MOV";
+  if (statType === "HP回復")         return "HP回復";
   return "その他";
+}
+
+export type AccSubgroupKey = "flat" | "pct" | "finalPct";
+
+export const ACC_SUBGROUP_ORDER: AccSubgroupKey[] = ["flat", "pct", "finalPct"];
+
+/** 選択中カテゴリに対応するeffectの種類でアクセを分類する。 */
+export function getAccSubgroup(acc: AccessoryItem, cat: AccCategory): AccSubgroupKey {
+  const effects = acc.effects.filter((effect) => accEffectCat(effect.type) === cat);
+  if (effects.length === 0) return "flat";
+  if (effects.some((effect) => !effect.type.endsWith("%"))) return "flat";
+  if (effects.some((effect) => effect.type.startsWith("最終") && effect.type.endsWith("%"))) {
+    return "finalPct";
+  }
+  return "pct";
 }
 
 // Computed once — accessory data is static
