@@ -15,6 +15,8 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-07-22",
     changes: [
+    { type: "improve", text: "feat: ペット選択の実数/加算%/乗算%セクションを折り畳み可能に" },
+    { type: "improve", text: "feat: 装備モーダルのフラット化と分類ピルのスマホ折り返し対応" },
     { type: "improve", text: "fix: フォントのぼやけ・意図しない改行・1兆入力対応の表示品質改善" },
     { type: "fix", text: "fix: 全MAXボタンでヨハネの祭壇が設定されない漏れを修正" },
     { type: "fix", text: "fix: 数値インフレとモバイル表示への追従修正" },
