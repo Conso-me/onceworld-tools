@@ -5,6 +5,7 @@ import { usePersistedState, usePersistedGroup } from "../hooks/usePersistedState
 import { useSharedSimConfig } from "../hooks/useSharedSimConfig";
 import { useSharedAttackBuffs } from "../hooks/useSharedAttackBuffs";
 import { PetConfigPanel } from "./damage/PetConfigPanel";
+import { PageLayout } from "./ui/layout/PageLayout";
 import { calcPetStats, DEFAULT_PET_DAMAGE_CONFIG } from "../utils/petStatCalc";
 import type { PetDamageConfig } from "../types/game";
 import { useStatPresets } from "../hooks/useStatPresets";
@@ -839,8 +840,10 @@ export function DamageCalculator({
   };
 
   return (
-    <div className="max-w-lg mx-auto space-y-6 lg:max-w-none lg:space-y-0 lg:grid lg:grid-cols-[minmax(340px,400px)_1fr] lg:gap-2 lg:items-start">
-      {/* Column 1: 入力パネル */}
+    <>
+    <PageLayout
+      left={
+      // Column 1: 入力パネル
       <div className="space-y-6 lg:space-y-2">
       <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 p-6 lg:p-4 space-y-6 lg:space-y-3">
         {/* 敵プリセット */}
@@ -1222,9 +1225,10 @@ export function DamageCalculator({
           <p className="text-gray-400">{t("formulaNote3")}</p>
         </div>
       </details>
-      </div>{/* /Column 1 */}
-
-      {/* ===== 右エリア: 敵ステータス + 与ダメ/被ダメ ===== */}
+      </div>
+      }
+      right={
+      // ===== 右エリア: 敵ステータス + 与ダメ/被ダメ =====
       <div className="space-y-4 lg:space-y-2">
 
       {/* 複数モンスター比較モード */}
@@ -1961,7 +1965,9 @@ export function DamageCalculator({
 
       </div>{/* /与ダメ・被ダメ 2カラム */}
       </>)}
-      </div>{/* /右エリア */}
+      </div>
+      }
+    />
 
       {/* プリセットモーダル */}
       {presetModalOpen && (
@@ -2039,6 +2045,6 @@ export function DamageCalculator({
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
