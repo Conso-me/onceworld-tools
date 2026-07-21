@@ -1,7 +1,8 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { usePersistedState } from "../hooks/usePersistedState";
 import { useSharedSimConfig } from "../hooks/useSharedSimConfig";
+import { useSharedManualStats } from "../hooks/useSharedManualStats";
 import { scaleMonster } from "../utils/monsterScaling";
 import { formatHitCount } from "../utils/formatNumber";
 import {
@@ -646,14 +647,16 @@ export function SkyCorridorCalculator({
   const [viewMode, setViewMode] = usePersistedState<ViewMode>("skyCorridor:viewMode", "endurance");
   const [playerAttackMode, setPlayerAttackMode] = usePersistedState<PlayerAttackMode>("skyCorridor:attackMode", "physical");
 
-  // ステータス入力（手動）
-  const [myDef, setMyDef] = usePersistedState("skyCorridor:def", "");
-  const [myMdef, setMyMdef] = usePersistedState("skyCorridor:mdef", "");
-  const [myVit, setMyVit] = usePersistedState("skyCorridor:vit", "");
-  const [myLuk, setMyLuk] = usePersistedState("skyCorridor:luk", "");
-  const [myAtk, setMyAtk] = usePersistedState("skyCorridor:atk", "");
-  const [myInt, setMyInt] = usePersistedState("skyCorridor:int", "");
-  const [mySpd, setMySpd] = usePersistedState("skyCorridor:spd", "");
+  // ステータス入力（全画面共有）
+  const [manualStats, setManualField] = useSharedManualStats();
+  const { def: myDef, mdef: myMdef, vit: myVit, luck: myLuk, atk: myAtk, int: myInt, spd: mySpd } = manualStats;
+  const setMyDef = useCallback((v: string) => setManualField("def", v), [setManualField]);
+  const setMyMdef = useCallback((v: string) => setManualField("mdef", v), [setManualField]);
+  const setMyVit = useCallback((v: string) => setManualField("vit", v), [setManualField]);
+  const setMyLuk = useCallback((v: string) => setManualField("luck", v), [setManualField]);
+  const setMyAtk = useCallback((v: string) => setManualField("atk", v), [setManualField]);
+  const setMyInt = useCallback((v: string) => setManualField("int", v), [setManualField]);
+  const setMySpd = useCallback((v: string) => setManualField("spd", v), [setManualField]);
   const [syncWithDmg, setSyncWithDmg] = usePersistedState("skyCorridor:sync", false);
 
   // ダメ計の装備入力（解析書・魔晶）を同期

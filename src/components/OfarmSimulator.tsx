@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { usePersistedState } from "../hooks/usePersistedState";
 import { useSharedSimConfig } from "../hooks/useSharedSimConfig";
 import { useSharedAttackBuffs } from "../hooks/useSharedAttackBuffs";
+import { useSharedManualStats } from "../hooks/useSharedManualStats";
 import { deriveAttackBuffs } from "../utils/attackBuffs";
 import { calcStatus } from "../utils/statusCalc";
 import { InputField } from "./ui/InputField";
@@ -61,16 +62,6 @@ function survivalTextClass(hits: number): string {
   return "text-rose-500";
 }
 
-const MANUAL_DEFAULTS = {
-  atk: "",
-  int: "",
-  def: "",
-  mdef: "",
-  spd: "",
-  vit: "",
-  luck: "",
-};
-
 export function OfarmSimulator({
   onNavigateToDamage,
 }: {
@@ -80,8 +71,7 @@ export function OfarmSimulator({
   const lang = i18n.language;
 
   const [statMode, setStatMode] = usePersistedState<"manual" | "sim">("ofarm:statMode", "manual");
-  const [manualElement, setManualElement] = usePersistedState<Element>("ofarm:element", "火");
-  const [manual, setManual] = usePersistedState("ofarm:manual", MANUAL_DEFAULTS);
+  const [manual, setManualField] = useSharedManualStats();
 
   const [simCfg, setSimField, resetSim, replaceAllSim] = useSharedSimConfig();
   const simResult = useMemo(() => calcStatus(simCfg), [simCfg]);
@@ -100,9 +90,6 @@ export function OfarmSimulator({
   useEffect(() => {
     if (equippedWeapon === "暗殺者のカギ爪") setAssassinClaw(true);
   }, [equippedWeapon, setAssassinClaw]);
-
-  const setManualField = (field: keyof typeof MANUAL_DEFAULTS, value: string) =>
-    setManual((prev) => ({ ...prev, [field]: value }));
 
   // 実効プレイヤーステータス
   const player: OfarmPlayerStats = useMemo(() => {
@@ -138,10 +125,10 @@ export function OfarmSimulator({
       vit,
       luck: parseInt(manual.luck) || 0,
       hp: vit > 0 ? vit * 18 + 100 : 0,
-      element: manualElement,
+      element: manual.element,
       ...buffs,
     };
-  }, [statMode, simResult, simCfg.charElement, manual, manualElement, derivedBuffs, assassinClaw, woodMagicDef, darkMagicLuck]);
+  }, [statMode, simResult, simCfg.charElement, manual, derivedBuffs, assassinClaw, woodMagicDef, darkMagicLuck]);
 
   const results = useMemo(() => calcAllOfarmWaves(player), [player]);
 
@@ -179,11 +166,11 @@ export function OfarmSimulator({
             <label className="block text-sm lg:text-xs font-medium text-gray-600">{t("heroElement")}</label>
             <div className="flex gap-1.5">
               {ELEMENTS.map((el) => {
-                const active = statMode === "sim" ? simCfg.charElement === el : manualElement === el;
+                const active = statMode === "sim" ? simCfg.charElement === el : manual.element === el;
                 return (
                   <button
                     key={el}
-                    onClick={() => (statMode === "sim" ? setSimField("charElement", el) : setManualElement(el))}
+                    onClick={() => (statMode === "sim" ? setSimField("charElement", el) : setManualField("element", el))}
                     className={`flex-1 py-2.5 lg:py-1.5 rounded-lg text-xs font-medium border transition-all ${
                       active ? elementBtn[el] : "bg-gray-50 text-gray-400 border-gray-200"
                     }`}

@@ -4,6 +4,7 @@ import type { MonsterBase, Element } from "../types/game";
 import { usePersistedState, usePersistedGroup } from "../hooks/usePersistedState";
 import { useSharedSimConfig } from "../hooks/useSharedSimConfig";
 import { useSharedAttackBuffs } from "../hooks/useSharedAttackBuffs";
+import { useSharedManualStats } from "../hooks/useSharedManualStats";
 import { PetConfigPanel } from "./damage/PetConfigPanel";
 import { PageLayout } from "./ui/layout/PageLayout";
 import { ModalShell } from "./ui/modal/ModalShell";
@@ -99,15 +100,17 @@ export function DamageCalculator({
   // モバイルで「自分のステータス」を折り畳む
   const [myStatusOpen, setMyStatusOpen] = useState(true);
 
-  // 自キャラ ステータス（localStorage永続化）
-  const [myAtk, setMyAtk] = usePersistedState("dmg:atk", "");
-  const [myInt, setMyInt] = usePersistedState("dmg:int", "");
-  const [myDef, setMyDef] = usePersistedState("dmg:def", "");
-  const [myMdef, setMyMdef] = usePersistedState("dmg:mdef", "");
-  const [mySpd, setMySpd] = usePersistedState("dmg:spd", "");
-  const [myVit, setMyVit] = usePersistedState("dmg:vit", "");
-  const [myLuck, setMyLuck] = usePersistedState("dmg:luck", "");
-  const [myElement, setMyElement] = usePersistedState<Element>("dmg:element", "火");
+  // 自キャラ ステータス（全画面共有）
+  const [manualStats, setManualField, , replaceAllManual] = useSharedManualStats();
+  const { atk: myAtk, int: myInt, def: myDef, mdef: myMdef, spd: mySpd, vit: myVit, luck: myLuck, element: myElement } = manualStats;
+  const setMyAtk = useCallback((v: string) => setManualField("atk", v), [setManualField]);
+  const setMyInt = useCallback((v: string) => setManualField("int", v), [setManualField]);
+  const setMyDef = useCallback((v: string) => setManualField("def", v), [setManualField]);
+  const setMyMdef = useCallback((v: string) => setManualField("mdef", v), [setManualField]);
+  const setMySpd = useCallback((v: string) => setManualField("spd", v), [setManualField]);
+  const setMyVit = useCallback((v: string) => setManualField("vit", v), [setManualField]);
+  const setMyLuck = useCallback((v: string) => setManualField("luck", v), [setManualField]);
+  const setMyElement = useCallback((v: Element) => setManualField("element", v), [setManualField]);
   const [myAttackMode, setMyAttackMode] = usePersistedState<PlayerAttackMode>("dmg:attackMode", "物理");
   // 攻撃バフは全画面共有ストア（useSharedAttackBuffs）から取得・更新する
   const [attackBuffs, setAttackBuffField] = useSharedAttackBuffs();
@@ -224,21 +227,24 @@ export function DamageCalculator({
   const handleLoadPreset = useCallback(() => {
     const preset = loadPreset(selectedPresetId);
     if (!preset) return;
-    setMyAtk(preset.atk);
-    setMyInt(preset.int);
-    setMyDef(preset.def);
-    setMyMdef(preset.mdef);
-    setMySpd(preset.spd);
-    setMyVit(preset.vit || "");
-    setMyLuck(preset.luck || "");
-    setMyElement(preset.element);
+    replaceAllManual({
+      ...manualStats,
+      atk: preset.atk,
+      int: preset.int,
+      def: preset.def,
+      mdef: preset.mdef,
+      spd: preset.spd,
+      vit: preset.vit || "",
+      luck: preset.luck || "",
+      element: preset.element,
+    });
     setMyAttackMode(preset.attackMode);
     setAnalysisBook(preset.analysisBook);
     setAnalysisAnalysisBook(preset.analysisAnalysisBook);
     setCrystalCube(preset.crystalCube ?? "");
     setToughouCube(preset.toughouCube ?? "");
     setDevilEye(preset.devilEye ?? "");
-  }, [selectedPresetId, loadPreset, setMyAtk, setMyInt, setMyDef, setMyMdef, setMySpd, setMyVit, setMyLuck, setMyElement, setMyAttackMode, setAnalysisBook, setAnalysisAnalysisBook, setCrystalCube]);
+  }, [selectedPresetId, loadPreset, manualStats, replaceAllManual, setMyAttackMode, setAnalysisBook, setAnalysisAnalysisBook, setCrystalCube, setToughouCube, setDevilEye]);
 
   const handleDeletePreset = useCallback(() => {
     deletePreset(selectedPresetId);
@@ -306,14 +312,17 @@ export function DamageCalculator({
       setStatMode(state.statMode);
 
       if (state.statMode === "manual") {
-        if (state.atk !== undefined) setMyAtk(state.atk);
-        if (state.int !== undefined) setMyInt(state.int);
-        if (state.def !== undefined) setMyDef(state.def);
-        if (state.mdef !== undefined) setMyMdef(state.mdef);
-        if (state.spd !== undefined) setMySpd(state.spd);
-        if (state.vit !== undefined) setMyVit(state.vit);
-        if (state.luck !== undefined) setMyLuck(state.luck);
-        if (state.element) setMyElement(state.element as Element);
+        replaceAllManual({
+          ...manualStats,
+          atk: state.atk ?? manualStats.atk,
+          int: state.int ?? manualStats.int,
+          def: state.def ?? manualStats.def,
+          mdef: state.mdef ?? manualStats.mdef,
+          spd: state.spd ?? manualStats.spd,
+          vit: state.vit ?? manualStats.vit,
+          luck: state.luck ?? manualStats.luck,
+          element: state.element ? state.element as Element : manualStats.element,
+        });
         if (state.attackMode) setMyAttackMode(state.attackMode as PlayerAttackMode);
         if (state.analysisBook !== undefined) setAnalysisBook(state.analysisBook);
         if (state.analysisAnalysisBook !== undefined) setAnalysisAnalysisBook(state.analysisAnalysisBook);
