@@ -15,6 +15,13 @@ export const patchNotes: PatchEntry[] = [
   {
     date: "2026-07-22",
     changes: [
+    { type: "improve", text: "fix: SP回復(ペット)とMOV(アクセ)も加算%として分類" },
+    { type: "improve", text: "fix: ペットのMOV・HP回復も加算%として分類" },
+    { type: "feature", text: "feat: アクセ選択に実数/加算%/乗算の分類見出しを追加" },
+    { type: "improve", text: "Merge remote-tracking branch 'origin/main' into fix/percent-type-classification" },
+    { type: "improve", text: "refactor: 手動ステータス入力の表示順をゲーム準拠(VIT/SPD/ATK/INT/DEF/M-DEF/LUCK)に統一" },
+    { type: "improve", text: "fix: 経験値・捕獲率・ドロップ率・リジェネコアを加算%として正しく分類・表記" },
+    { type: "improve", text: "feat: 手動入力ステータスを4タブ間で共有・同期" },
     { type: "improve", text: "feat: ペット選択の実数/加算%/乗算%セクションを折り畳み可能に" },
     { type: "improve", text: "feat: 装備モーダルのフラット化と分類ピルのスマホ折り返し対応" },
     { type: "improve", text: "fix: フォントのぼやけ・意図しない改行・1兆入力対応の表示品質改善" },
