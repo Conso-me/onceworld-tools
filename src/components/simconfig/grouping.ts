@@ -51,19 +51,36 @@ export const ACC_CATEGORY_ORDER = ["体力", "攻撃力", "魔力", "防御力",
 export type AccCategory = typeof ACC_CATEGORY_ORDER[number];
 
 export function accEffectCat(type: string): AccCategory {
-  if (type.startsWith("VIT"))    return "体力";
-  if (type.startsWith("ATK"))    return "攻撃力";
-  if (type.startsWith("INT"))    return "魔力";
-  if (type.startsWith("M-DEF"))  return "魔法防御力";
-  if (type.startsWith("DEF"))    return "防御力";
-  if (type.startsWith("LUCK"))   return "幸運";
-  if (type.startsWith("SPD"))    return "攻撃速度";
-  if (type === "経験値")         return "経験値";
-  if (type === "捕獲率")         return "捕獲率";
-  if (type === "ドロップ率")     return "ドロップ率";
-  if (type === "MOV")            return "MOV";
-  if (type === "HP回復")         return "HP回復";
+  const baseType = type.endsWith("%") ? type.slice(0, -1) : type;
+  const statType = baseType.startsWith("最終") ? baseType.slice(2) : baseType;
+  if (statType.startsWith("VIT"))    return "体力";
+  if (statType.startsWith("ATK"))    return "攻撃力";
+  if (statType.startsWith("INT"))    return "魔力";
+  if (statType.startsWith("M-DEF"))  return "魔法防御力";
+  if (statType.startsWith("DEF"))    return "防御力";
+  if (statType.startsWith("LUCK"))   return "幸運";
+  if (statType.startsWith("SPD"))    return "攻撃速度";
+  if (statType === "経験値")         return "経験値";
+  if (statType === "捕獲率")         return "捕獲率";
+  if (statType === "ドロップ率")     return "ドロップ率";
+  if (statType === "MOV")            return "MOV";
+  if (statType === "HP回復")         return "HP回復";
   return "その他";
+}
+
+export type AccSubgroupKey = "flat" | "pct" | "finalPct";
+
+export const ACC_SUBGROUP_ORDER: AccSubgroupKey[] = ["flat", "pct", "finalPct"];
+
+/** 選択中カテゴリに対応するeffectの種類でアクセを分類する。 */
+export function getAccSubgroup(acc: AccessoryItem, cat: AccCategory): AccSubgroupKey {
+  const effects = acc.effects.filter((effect) => accEffectCat(effect.type) === cat);
+  if (effects.length === 0) return "flat";
+  if (effects.some((effect) => !effect.type.endsWith("%"))) return "flat";
+  if (effects.some((effect) => effect.type.startsWith("最終") && effect.type.endsWith("%"))) {
+    return "finalPct";
+  }
+  return "pct";
 }
 
 // Computed once — accessory data is static
@@ -98,9 +115,10 @@ export function getAccSummary(acc: AccessoryItem, tFn?: (key: string) => string)
     return `ALL+${effects[0].value}%`;
   }
   return effects.map((e) => {
-    const catKey = ACC_EFFECT_TYPE_CATEGORY_KEY[e.type];
-    const label = tFn && catKey ? tFn(`accCategory.${catKey}`) : e.type;
-    return `${label} +${e.value}`;
+    const baseType = e.type.endsWith("%") ? e.type.slice(0, -1) : e.type;
+    const catKey = ACC_EFFECT_TYPE_CATEGORY_KEY[baseType];
+    const label = tFn && catKey ? tFn(`accCategory.${catKey}`) : baseType;
+    return `${label} +${e.value}${e.type.endsWith("%") ? "%" : ""}`;
   }).join("・");
 }
 
