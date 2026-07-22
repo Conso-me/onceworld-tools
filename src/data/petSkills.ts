@@ -111,7 +111,7 @@ function getCategorySkillTypes(cat: PetStatCategory): { flat: string[]; pct: str
     case "ドロップ率": return { flat: [],             pct: ["ドロップ率%"], finalPct: []              };
     case "MOV":        return { flat: [],             pct: ["MOV%"],       finalPct: []              };
     case "HP回復":     return { flat: [],             pct: ["HP回復%"],    finalPct: []              };
-    case "SP回復":     return { flat: ["SP回復"],     pct: [],             finalPct: []              };
+    case "SP回復":     return { flat: [],             pct: ["SP回復%"],    finalPct: []              };
     default:           return { flat: [],             pct: [],             finalPct: []              };
   }
 }

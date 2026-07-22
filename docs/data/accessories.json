@@ -216,7 +216,7 @@
     "maxLevel": 1,
     "effects": [
       {
-        "type": "MOV",
+        "type": "MOV%",
         "value": 2,
         "scalePercent": 0
       }
@@ -442,7 +442,7 @@
     "maxLevel": 1,
     "effects": [
       {
-        "type": "MOV",
+        "type": "MOV%",
         "value": 3,
         "scalePercent": 0
       }

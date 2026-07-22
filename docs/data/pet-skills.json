@@ -3479,22 +3479,22 @@
     "skills": [
       {
         "level": 200,
-        "type": "SP回復",
+        "type": "SP回復%",
         "value": 3
       },
       {
         "level": 500,
-        "type": "SP回復",
+        "type": "SP回復%",
         "value": 3
       },
       {
         "level": 800,
-        "type": "SP回復",
+        "type": "SP回復%",
         "value": 3
       },
       {
         "level": 1200,
-        "type": "SP回復",
+        "type": "SP回復%",
         "value": 16
       }
     ]
