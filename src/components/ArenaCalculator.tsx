@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { usePersistedState } from "../hooks/usePersistedState";
 import { useSharedSimConfig } from "../hooks/useSharedSimConfig";
+import { useSharedManualStats } from "../hooks/useSharedManualStats";
 import { useSimPresets } from "../hooks/useSimPresets";
 import { scaleMonster } from "../utils/monsterScaling";
 import { formatHitCount } from "../utils/formatNumber";
@@ -259,21 +260,15 @@ function ArenaMonsterRow({ result, onLevelClick, t, lang }: { result: ArenaResul
 // ────────────────────────────────────────────
 export function ArenaCalculator() {
   const { t, i18n } = useTranslation("arena");
-  const [myDef, setMyDef] = usePersistedState("arena:def", "");
-  const [myMdef, setMyMdef] = usePersistedState("arena:mdef", "");
-  const [myVit, setMyVit] = usePersistedState("arena:vit", "");
-  const [myLuk, setMyLuk] = usePersistedState("arena:luk", "");
-  const [myAtk, setMyAtk] = usePersistedState("arena:atk", "");
-  const [mySpd, setMySpd] = usePersistedState("arena:spd", "");
-  const [syncWithDmg, setSyncWithDmg] = usePersistedState("arena:sync", false);
-  const [syncMode, setSyncMode] = usePersistedState<"manual" | "sim">("arena:syncMode", "manual");
-  // ダメ計タブの手動入力値をリアクティブに読み取る（同期ON時に使用）
-  const [dmgDef] = usePersistedState("dmg:def", "");
-  const [dmgMdef] = usePersistedState("dmg:mdef", "");
-  const [dmgVit] = usePersistedState("dmg:vit", "");
-  const [dmgLuck] = usePersistedState("dmg:luck", "");
-  const [dmgAtk] = usePersistedState("dmg:atk", "");
-  const [dmgSpd] = usePersistedState("dmg:spd", "");
+  const [statMode, setStatMode] = usePersistedState<"manual" | "sim">("arena:statMode", "manual");
+  const [manualStats, setManualField] = useSharedManualStats();
+  const { def: myDef, mdef: myMdef, vit: myVit, luck: myLuk, atk: myAtk, spd: mySpd } = manualStats;
+  const setMyDef = useCallback((v: string) => setManualField("def", v), [setManualField]);
+  const setMyMdef = useCallback((v: string) => setManualField("mdef", v), [setManualField]);
+  const setMyVit = useCallback((v: string) => setManualField("vit", v), [setManualField]);
+  const setMyLuk = useCallback((v: string) => setManualField("luck", v), [setManualField]);
+  const setMyAtk = useCallback((v: string) => setManualField("atk", v), [setManualField]);
+  const setMySpd = useCallback((v: string) => setManualField("spd", v), [setManualField]);
   const [simCfg] = useSharedSimConfig();
   const simResult = useMemo(() => calcStatus(simCfg), [simCfg]);
   const [arenaLevel, setArenaLevel] = usePersistedState(
@@ -283,37 +278,13 @@ export function ArenaCalculator() {
   const [selectedSimPresetId, setSelectedSimPresetId] = useState("");
   const { presets: simPresets, loadPreset: loadSimPreset } = useSimPresets();
 
-  // syncON時はdmg:タブの値を読む（syncModeで手動入力/装備設定を選択）
-  const effectiveDef = syncWithDmg
-    ? syncMode === "sim"
-      ? simResult.final.def
-      : parseInt(dmgDef) || 0
-    : parseInt(myDef) || 0;
-  const effectiveMdef = syncWithDmg
-    ? syncMode === "sim"
-      ? simResult.final.mdef
-      : parseInt(dmgMdef) || 0
-    : parseInt(myMdef) || 0;
-  const effectiveVit = syncWithDmg
-    ? syncMode === "sim"
-      ? simResult.final.vit
-      : parseInt(dmgVit) || 0
-    : parseInt(myVit) || 0;
-  const effectiveLuk = syncWithDmg
-    ? syncMode === "sim"
-      ? simResult.final.luck
-      : parseInt(dmgLuck) || 0
-    : parseInt(myLuk) || 0;
-  const effectiveAtk = syncWithDmg
-    ? syncMode === "sim"
-      ? simResult.final.atk
-      : parseInt(dmgAtk) || 0
-    : parseInt(myAtk) || 0;
-  const effectiveSpd = syncWithDmg
-    ? syncMode === "sim"
-      ? simResult.final.spd
-      : parseInt(dmgSpd) || 0
-    : parseInt(mySpd) || 0;
+  // 実効ステータス（装備設定 = シミュ計算結果、手動 = 共有入力値）
+  const effectiveDef = statMode === "sim" ? simResult.final.def : parseInt(myDef) || 0;
+  const effectiveMdef = statMode === "sim" ? simResult.final.mdef : parseInt(myMdef) || 0;
+  const effectiveVit = statMode === "sim" ? simResult.final.vit : parseInt(myVit) || 0;
+  const effectiveLuk = statMode === "sim" ? simResult.final.luck : parseInt(myLuk) || 0;
+  const effectiveAtk = statMode === "sim" ? simResult.final.atk : parseInt(myAtk) || 0;
+  const effectiveSpd = statMode === "sim" ? simResult.final.spd : parseInt(mySpd) || 0;
 
   const playerHp = effectiveVit > 0 ? effectiveVit * 18 + 100 : 0;
 
@@ -325,7 +296,7 @@ export function ArenaCalculator() {
     setMyMdef(String(result.final.mdef));
     setMyVit(String(result.final.vit));
     setMyLuk(String(result.final.luck));
-    setSyncWithDmg(false);
+    setStatMode("manual");
     setSelectedSimPresetId(id);
   };
 
@@ -469,7 +440,7 @@ export function ArenaCalculator() {
                 { label: t("lukEvasionLabel"), val: effectiveLuk, raw: myLuk,  set: setMyLuk  },
               ] as const
             ).map(({ label, val, raw, set }) =>
-              syncWithDmg ? (
+              statMode === "sim" ? (
                 <div key={label} className="space-y-1.5 lg:space-y-1">
                   <label className="block text-sm lg:text-xs font-medium text-gray-400">{label}</label>
                   <div className="w-full px-4 py-3 lg:py-2 bg-gray-50 border border-gray-200 rounded-xl text-lg lg:text-base font-medium text-gray-400">
@@ -482,45 +453,21 @@ export function ArenaCalculator() {
             )}
           </div>
 
-          {/* ダメ計と同期トグル */}
-          <div className="flex items-center gap-3 flex-wrap">
-            <span className="text-sm text-gray-600">{t("syncWithDmg")}</span>
-            <button
-              onClick={() => setSyncWithDmg(!syncWithDmg)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                syncWithDmg ? "bg-indigo-500" : "bg-gray-200"
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
-                  syncWithDmg ? "translate-x-6" : "translate-x-1"
+          {/* 手動入力 / 装備設定 トグル */}
+          <div className="flex rounded-lg overflow-hidden border border-gray-200 text-xs">
+            {(["manual", "sim"] as const).map((mode) => (
+              <button
+                key={mode}
+                onClick={() => setStatMode(mode)}
+                className={`flex-1 py-2 lg:py-1.5 font-medium transition-colors ${
+                  statMode === mode
+                    ? "bg-blue-500 text-white"
+                    : "bg-white text-gray-500 hover:bg-gray-50"
                 }`}
-              />
-            </button>
-            <span
-              className={`text-xs font-medium ${
-                syncWithDmg ? "text-indigo-600" : "text-gray-400"
-              }`}
-            >
-              {syncWithDmg ? t("on") : t("off")}
-            </span>
-            {syncWithDmg && (
-              <div className="flex rounded-lg overflow-hidden border border-indigo-200 text-xs">
-                {(["manual", "sim"] as const).map((mode) => (
-                  <button
-                    key={mode}
-                    onClick={() => setSyncMode(mode)}
-                    className={`px-2 py-1 font-medium transition-colors ${
-                      syncMode === mode
-                        ? "bg-indigo-500 text-white"
-                        : "bg-white text-gray-500 hover:bg-gray-50"
-                    }`}
-                  >
-                    {mode === "manual" ? t("syncModeManual") : t("syncModeSim")}
-                  </button>
-                ))}
-              </div>
-            )}
+              >
+                {mode === "manual" ? t("statModeManual") : t("statModeSim")}
+              </button>
+            ))}
           </div>
 
           <div className="border-t border-gray-100" />
