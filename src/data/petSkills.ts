@@ -88,9 +88,9 @@ function skillTypeToCategories(type: string): PetStatCategory[] {
     if (t.includes("経験値")) cats.add("経験値");
     if (t.includes("捕獲率")) cats.add("捕獲率");
     if (t.includes("ドロップ率")) cats.add("ドロップ率");
-    if (t === "MOV") cats.add("MOV");
-    if (t === "HP回復") cats.add("HP回復");
-    if (t === "SP回復") cats.add("SP回復");
+    if (t.includes("MOV")) cats.add("MOV");
+    if (t.includes("HP回復")) cats.add("HP回復");
+    if (t.includes("SP回復")) cats.add("SP回復");
   }
   if (cats.size === 0) cats.add("その他");
   return [...cats];
@@ -109,8 +109,8 @@ function getCategorySkillTypes(cat: PetStatCategory): { flat: string[]; pct: str
     case "経験値":     return { flat: [],             pct: ["経験値%"],     finalPct: []              };
     case "捕獲率":     return { flat: [],             pct: ["捕獲率%"],     finalPct: []              };
     case "ドロップ率": return { flat: [],             pct: ["ドロップ率%"], finalPct: []              };
-    case "MOV":        return { flat: ["MOV"],        pct: [],             finalPct: []              };
-    case "HP回復":     return { flat: ["HP回復"],     pct: [],             finalPct: []              };
+    case "MOV":        return { flat: [],             pct: ["MOV%"],       finalPct: []              };
+    case "HP回復":     return { flat: [],             pct: ["HP回復%"],    finalPct: []              };
     case "SP回復":     return { flat: ["SP回復"],     pct: [],             finalPct: []              };
     default:           return { flat: [],             pct: [],             finalPct: []              };
   }

@@ -186,7 +186,7 @@
     "skills": [
       {
         "level": 31,
-        "type": "MOV",
+        "type": "MOV%",
         "value": 3
       },
       {
@@ -394,22 +394,22 @@
     "skills": [
       {
         "level": 31,
-        "type": "HP回復",
+        "type": "HP回復%",
         "value": 75
       },
       {
         "level": 71,
-        "type": "HP回復",
+        "type": "HP回復%",
         "value": 225
       },
       {
         "level": 121,
-        "type": "HP回復",
+        "type": "HP回復%",
         "value": 700
       },
       {
         "level": 181,
-        "type": "HP回復",
+        "type": "HP回復%",
         "value": 2000
       }
     ],
@@ -784,22 +784,22 @@
     "skills": [
       {
         "level": 31,
-        "type": "HP回復",
+        "type": "HP回復%",
         "value": 300
       },
       {
         "level": 71,
-        "type": "HP回復",
+        "type": "HP回復%",
         "value": 300
       },
       {
         "level": 121,
-        "type": "HP回復",
+        "type": "HP回復%",
         "value": 1000
       },
       {
         "level": 181,
-        "type": "HP回復",
+        "type": "HP回復%",
         "value": 1000
       }
     ],
@@ -1278,22 +1278,22 @@
     "skills": [
       {
         "level": 31,
-        "type": "HP回復",
+        "type": "HP回復%",
         "value": 1000
       },
       {
         "level": 71,
-        "type": "HP回復",
+        "type": "HP回復%",
         "value": 1000
       },
       {
         "level": 121,
-        "type": "HP回復",
+        "type": "HP回復%",
         "value": 1000
       },
       {
         "level": 181,
-        "type": "HP回復",
+        "type": "HP回復%",
         "value": 1000
       }
     ],
@@ -1902,22 +1902,22 @@
     "skills": [
       {
         "level": 31,
-        "type": "HP回復",
+        "type": "HP回復%",
         "value": 99
       },
       {
         "level": 71,
-        "type": "HP回復",
+        "type": "HP回復%",
         "value": 999
       },
       {
         "level": 121,
-        "type": "HP回復",
+        "type": "HP回復%",
         "value": 9999
       },
       {
         "level": 181,
-        "type": "HP回復",
+        "type": "HP回復%",
         "value": 99999
       }
     ],
@@ -2162,7 +2162,7 @@
     "skills": [
       {
         "level": 31,
-        "type": "MOV",
+        "type": "MOV%",
         "value": 3
       },
       {
@@ -3047,22 +3047,22 @@
     "skills": [
       {
         "level": 200,
-        "type": "MOV",
+        "type": "MOV%",
         "value": 1
       },
       {
         "level": 500,
-        "type": "MOV",
+        "type": "MOV%",
         "value": 1
       },
       {
         "level": 800,
-        "type": "MOV",
+        "type": "MOV%",
         "value": 2
       },
       {
         "level": 1200,
-        "type": "MOV",
+        "type": "MOV%",
         "value": 2
       }
     ]
@@ -3442,7 +3442,7 @@
       },
       {
         "level": 1200,
-        "type": "MOV",
+        "type": "MOV%",
         "value": 10
       }
     ]
